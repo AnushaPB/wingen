@@ -21,7 +21,9 @@
 window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, rarify_n = 4, rarify_nit = 10, min_n = 2, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
 
   # check to make sure coords and ar_df align
-  if(ncol(ar_df) != nrow(coords))
+  if(ncol(ar_df) != nrow(coords)){stop("nrow of the coords data and ncol allelic richness data are not equal,
+                                       make sure rows are individuals for the coords data and cols are individuals
+                                       for the allelic richness data")}
 
   # define which mean function to use
   if(fast){meanf <- meanC} else {meanf <- mean}
@@ -35,11 +37,13 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
   ragg <- agg
 
   # wdim has to be odd
-  if(wdim %% 2 == 0){wdim <- wdim + 1; warning(paste("wdim must be odd, using wdim =", wdim, "instead"))}
+  if(length(wdim) == 1 & wdim %% 2 == 0){wdim <- wdim + 1; warning(paste("wdim must be odd, using wdim =", wdim, "instead"))}
+  if(length(wdim) == 2 & wdim[1] %% 2 == 0){wdim[1] <- wdim[1] + 1; warning(paste("wdim must be odd, using wdim[1] =", wdim, "instead"))}
+  if(length(wdim) == 2 & wdim[2] %% 2 == 0){wdim[2] <- wdim[2] + 1; warning(paste("wdim must be odd, using wdim[2] =", wdim, "instead"))}
 
   # make neighbor matrix for window
-  if(dim(wdim) == 2){n <- matrix(1, wdim[1], wdim[2])}
-  if(dim(wdim) == 1){n <- matrix(1, wdim, wdim)}
+  if(length(wdim) == 2){n <- matrix(1, wdim[1], wdim[2])}
+  if(length(wdim) == 1){n <- matrix(1, wdim, wdim)}
 
   # focal cell (center of matrix) has to be zero
   n[wdim/2 + 0.5, wdim/2 + 0.5] <- 0
