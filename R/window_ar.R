@@ -3,8 +3,8 @@
 #'
 #' @param ar_df dataframe of allelic richness (*note:* rows should be loci, columns should be individuals)
 #' @param coords coordinates (two columns, the first should be x and the second should be y and the order should be the same as ar_df),
-#' @param lyr raster layer to slide window across
-#' @param fact factor of aggregation to apply to the raster layer (reduces computational time)
+#' @param lyr RasterLayer to slide window across
+#' @param fact aggregation factor to apply to the RasterLayer (reduces computational time)
 #' @param wdim dimensions (height x width) of window, if one value is provided a square window is created
 #' @param rarify whether to use rarefaction in calculations
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
@@ -19,7 +19,7 @@
 #' @export
 #'
 #' @examples
-window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, rarify_n = 4, rarify_nit = 10, min_n = 2, FUN = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
+window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, FUN = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
 
   # check to make sure coords and ar_df align
   if(ncol(ar_df) != nrow(coords)){stop("nrow of the coords data and ncol allelic richness data are not equal,
@@ -33,7 +33,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
   ar_df <- data.frame(ar_df)
 
   # make aggregated raster
-  agg <- aggregate(lyr, fact)*0
+  agg <- raster::aggregate(lyr, fact)*0
   # make a copy that will later be used for window calcs
   ragg <- agg
 
@@ -55,7 +55,8 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
   nragg <- ragg
 
   # for every cell in aragg, calculate allelic richness
-  pb <- progress_bar$new(total = ncell(aragg))
+  pb <- progress::progress_bar$new(total = raster::ncell(aragg))
+
   for(i in 1:ncell(aragg)){
     # skip if raster value is NA
     if(is.na(aragg[i])) next
@@ -64,9 +65,9 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
     ragg <- agg
 
     # get adjacent cells to cell i
-    adjc <- adjacent(ragg, i, directions = n, include = TRUE, sorted = TRUE)
+    adjc <- raster::adjacent(ragg, i, directions = n, include = TRUE, sorted = TRUE)
     # get indices of adjacent cells
-    adjci <- map_dbl(adjc, 1, function(x){seq(x[1],x[2])})
+    adjci <- purrr::map_dbl(adjc, 1, function(x){seq(x[1], x[2])})
     # assign adjacent cells a value of 1
     ragg[adjci] <- 1
 
@@ -98,7 +99,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
 
     # every set number of steps plot aragg
     if(plot_its & i %% plot_its_steps == 0){
-      raster::plot(aragg, col = turbo(100), legend = FALSE, axes = FALSE, box = FALSE, main = "Value")
+      raster::plot(aragg, col = viridis::turbo(100), legend = FALSE, axes = FALSE, box = FALSE, main = "Value")
 
     }
 
@@ -114,7 +115,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
   names(aragg) <- "allelic_richness"
   names(nragg) <- "sample_count"
 
-  results <- stack(aragg, nragg)
+  results <- raster::stack(aragg, nragg)
 
   return(results)
 
@@ -144,7 +145,8 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
   # get all possible combos (transpose so rows are unique combos)
   cmb <- t(combn(sub, rarify_n))
 
-  # define subsample to rarify (note: this is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
+  # define subsample to rarify
+  #(note: this is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
   if(nrow(cmb) < rarify_nit){rarify_sub <- nrow(cmb)} else {rarify_sub <- rarify_nit}
 
   # for each of the possible combos get AR
@@ -170,4 +172,5 @@ sample_ar <- function(ar_df, sub, fun = mean){
   ar <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()
   return(ar)
 }
+
 
