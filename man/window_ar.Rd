@@ -14,7 +14,7 @@ window_ar(
   rarify_n = 4,
   rarify_nit = 10,
   min_n = 2,
-  FUN = mean,
+  fun = mean,
   fast = FALSE,
   plot_its = FALSE,
   plot_its_steps = 1
@@ -39,13 +39,13 @@ window_ar(
 
 \item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
 
+\item{fun}{function to use to summarize data in window (defaults to mean)}
+
 \item{fast}{if TRUE uses Rcpp mean to calculate mean, which is slightly faster than base R (\emph{note:} compromises on numerical accuracy)}
 
 \item{plot_its}{whether to produce a plot every plot_its_steps iterations to show progress}
 
 \item{plot_its_steps}{when to plot an iteration if plot_its is true}
-
-\item{fun}{function to use to summarize data in window (defaults to mean)}
 }
 \value{
 RasterStack that includes a raster of allelic richness and a raster of the number of samples used in the calculation of allelic richness for each cell

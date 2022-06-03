@@ -12,3 +12,4 @@
 ^_pkgdown\.yml$
 ^\.github$
 ^usethis_setup\.Rmd$
+^docs$

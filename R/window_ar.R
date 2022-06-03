@@ -19,7 +19,7 @@
 #' @export
 #'
 #' @examples
-window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, FUN = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
+window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
 
   # check to make sure coords and ar_df align
   if(ncol(ar_df) != nrow(coords)){stop("nrow of the coords data and ncol allelic richness data are not equal,
@@ -57,7 +57,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   # for every cell in aragg, calculate allelic richness
   pb <- progress::progress_bar$new(total = raster::ncell(aragg))
 
-  for(i in 1:ncell(aragg)){
+  for(i in 1:raster::ncell(aragg)){
     # skip if raster value is NA
     if(is.na(aragg[i])) next
 
@@ -85,15 +85,15 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
       if(length(sub) < rarify_n){aragg[i] <- NA; nragg[i] <- length(sub); next}
 
       # if number of samples is greater than rarify_n, rarify
-      if(length(sub) > rarify_n){aragg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, fun = fun) %>% na.omit() %>% fun()}
+      if(length(sub) > rarify_n){aragg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, fun = fun) %>% stats::na.omit() %>% fun()}
 
       # if the number of samples is equal to rarify_n, calculate the raw mean
-      if(length(sub) == rarify_n){aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()}
+      if(length(sub) == rarify_n){aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% stats::na.omit() %>% fun()}
 
     } else {
 
       # get allelic richness, first averages by loci and then by individual
-      aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()
+      aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% stats::na.omit() %>% fun()
 
     }
 
@@ -143,7 +143,7 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
   if(!(length(sub) > rarify_n)){stop("rarify_n is less than the number of samples provided")}
 
   # get all possible combos (transpose so rows are unique combos)
-  cmb <- t(combn(sub, rarify_n))
+  cmb <- t(utils::combn(sub, rarify_n))
 
   # define subsample to rarify
   #(note: this is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
@@ -169,7 +169,7 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
 #'
 #' @examples
 sample_ar <- function(ar_df, sub, fun = mean){
-  ar <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()
+  ar <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% stats::na.omit() %>% fun()
   return(ar)
 }
 
