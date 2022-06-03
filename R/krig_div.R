@@ -6,7 +6,7 @@
 #' @param xy whether to co-krige with x and y (~x+y)
 #' @param n_cell number of cells to interpolate across
 #'
-#' @return
+#' @return Raster with kriged values
 #' @export
 #'
 #' @examples

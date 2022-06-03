@@ -7,7 +7,7 @@
 #' @param new.min new min
 #' @param new.max new max
 #'
-#' @return
+#' @return values rescales to new min and max
 #' @export
 #'
 #' @examples
