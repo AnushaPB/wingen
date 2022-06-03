@@ -14,6 +14,11 @@ library("devtools")
 #create_package(here())
 #use_mit_license()
 ```
+```{r}
+check()
+install()
+library("wingen")
+```
 
 ```{r}
 usethis::use_pkgdown()
