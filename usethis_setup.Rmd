@@ -1,0 +1,22 @@
+---
+title: "usethis_setup"
+output: html_document
+---
+
+SHOULDN'T BE RUN AGAIN, BUT KEEPING FOR REFERENCE 
+```{r}
+library("here")
+library("usethis")
+library("devtools")
+```
+
+```{r}
+#create_package(here())
+#use_mit_license()
+```
+
+```{r}
+usethis::use_pkgdown()
+pkgdown::build_site()
+```
+
