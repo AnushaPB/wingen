@@ -23,3 +23,4 @@ rarified mean allelic richness for a subsample
 \description{
 Rarefaction function
 }
+\keyword{Internal}

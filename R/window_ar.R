@@ -134,7 +134,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 #' @return rarified mean allelic richness for a subsample
 #' @export
 #'
-#' @keyword Internal
+#' @keywords Internal
 #'
 #' @examples
 rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
@@ -165,7 +165,7 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
 #' @return mean allelic richness of a subsample
 #' @export
 #'
-#' @keyword Internal
+#' @keywords Internal
 #'
 #' @examples
 sample_ar <- function(ar_df, sub, fun = mean){
