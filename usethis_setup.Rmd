@@ -25,3 +25,7 @@ usethis::use_pkgdown()
 pkgdown::build_site()
 ```
 
+```{r}
+use_pipe(export = TRUE)
+```
+
