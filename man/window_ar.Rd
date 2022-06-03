@@ -10,23 +10,24 @@ window_ar(
   lyr,
   fact = 0,
   wdim = 10,
-  rarify = TRUE,
+  rarify = FALSE,
   rarify_n = 4,
   rarify_nit = 10,
   min_n = 2,
+  FUN = mean,
   fast = FALSE,
   plot_its = FALSE,
   plot_its_steps = 1
 )
 }
 \arguments{
-\item{ar_df}{dataframe of allelic richness (\emph{note:} rows should be individuals, columns should be loci)}
+\item{ar_df}{dataframe of allelic richness (\emph{note:} rows should be loci, columns should be individuals)}
 
 \item{coords}{coordinates (two columns, the first should be x and the second should be y and the order should be the same as ar_df),}
 
-\item{lyr}{raster layer to slide window across}
+\item{lyr}{RasterLayer to slide window across}
 
-\item{fact}{factor of aggregation to apply to the raster layer (reduces computational time)}
+\item{fact}{aggregation factor to apply to the RasterLayer (reduces computational time)}
 
 \item{wdim}{dimensions (height x width) of window, if one value is provided a square window is created}
 
@@ -43,6 +44,8 @@ window_ar(
 \item{plot_its}{whether to produce a plot every plot_its_steps iterations to show progress}
 
 \item{plot_its_steps}{when to plot an iteration if plot_its is true}
+
+\item{fun}{function to use to summarize data in window (defaults to mean)}
 }
 \value{
 RasterStack that includes a raster of allelic richness and a raster of the number of samples used in the calculation of allelic richness for each cell
