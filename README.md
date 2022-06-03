@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# wingen <img src="man/figures/logo.png" align="right" height="122" />
+# wingen <img src="man/figures/logo.png" style="float:right; height=100px;" />
 
 <!-- badges: start -->
 <!-- badges: end -->
