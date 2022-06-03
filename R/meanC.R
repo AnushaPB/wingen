@@ -1,6 +1,6 @@
 
 # C Function to calculate mean - note: faster, but compromises on numerical accuracy
-Rcpp::cppFunction('double meanC(NumericVector x) {
+Rcpp::cppFunction("double meanC(NumericVector x) {
   int n = x.size();
   double total = 0;
 
@@ -8,4 +8,4 @@ Rcpp::cppFunction('double meanC(NumericVector x) {
     total += x[i];
   }
   return total / n;
-}')
+}")
