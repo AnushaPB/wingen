@@ -27,5 +27,6 @@ pkgdown::build_site()
 
 ```{r}
 use_pipe(export = TRUE)
+use_logo("logo.png", geometry = "250x250", retina = TRUE)
 ```
 
