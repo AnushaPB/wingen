@@ -10,6 +10,7 @@
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
 #' @param min_n min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)
+#' @param fun function to use to summarize data in window (defaults to mean)
 #' @param fast if TRUE uses Rcpp mean to calculate mean, which is slightly faster than base R (*note:* compromises on numerical accuracy)
 #' @param plot_its whether to produce a plot every plot_its_steps iterations to show progress
 #' @param plot_its_steps when to plot an iteration if plot_its is true
@@ -18,7 +19,7 @@
 #' @export
 #'
 #' @examples
-window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, rarify_n = 4, rarify_nit = 10, min_n = 2, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
+window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, rarify_n = 4, rarify_nit = 10, min_n = 2, FUN = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1){
 
   # check to make sure coords and ar_df align
   if(ncol(ar_df) != nrow(coords)){stop("nrow of the coords data and ncol allelic richness data are not equal,
@@ -26,7 +27,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
                                        for the allelic richness data")}
 
   # define which mean function to use
-  if(fast){meanf <- meanC} else {meanf <- mean}
+  if(fast){fun <- meanC} else {fun <- mean}
 
   # make ar_df into dataframe
   ar_df <- data.frame(ar_df)
@@ -83,15 +84,15 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
       if(length(sub) < rarify_n){aragg[i] <- NA; nragg[i] <- length(sub); next}
 
       # if number of samples is greater than rarify_n, rarify
-      if(length(sub) > rarify_n){aragg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, meanf = meanf) %>% na.omit() %>% meanf()}
+      if(length(sub) > rarify_n){aragg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, fun = fun) %>% na.omit() %>% fun()}
 
       # if the number of samples is equal to rarify_n, calculate the raw mean
-      if(length(sub) == rarify_n){aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% meanf()}
+      if(length(sub) == rarify_n){aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()}
 
     } else {
 
       # get allelic richness, first averages by loci and then by individual
-      aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% meanf()
+      aragg[i] <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()
 
     }
 
@@ -127,13 +128,15 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = TRUE, ra
 #' @param sub subset of row indices
 #' @param rarify_nit number of iterations (i.e. random samples of size rarify_n to draw)
 #' @param rarify_n number of points to use for each rarefaction iteration
-#' @param meanf function to use to calculate the mean (defaults to base R mean)
+#' @param fun function to use to calculate the mean (defaults to base R mean)
 #'
 #' @return rarified mean allelic richness for a subsample
 #' @export
 #'
+#' @keyword Internal
+#'
 #' @examples
-rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, meanf = mean){
+rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean){
 
   # check to make sure sub is greater than 4
   if(!(length(sub) > rarify_n)){stop("rarify_n is less than the number of samples provided")}
@@ -145,7 +148,7 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, meanf = mean){
   if(nrow(cmb) < rarify_nit){rarify_sub <- nrow(cmb)} else {rarify_sub <- rarify_nit}
 
   # for each of the possible combos get AR
-  ar <- apply(cmb[1:rarify_sub,], 1, sample_ar, ar_df = ar_df, meanf = meanf)
+  ar <- apply(cmb[1:rarify_sub,], 1, sample_ar, ar_df = ar_df, fun = fun)
 
   return(ar)
 }
@@ -155,14 +158,16 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, meanf = mean){
 #'
 #' @param ar_df dataframe of allelic richness (*note:* cols should be individuals, rows should be loci)
 #' @param sub row indices of subsample
-#' @param meanf function to use to calculate the mean (defaults to base R mean)
+#' @param fun function to use to calculate the mean (defaults to base R mean)
 #'
 #' @return mean allelic richness of a subsample
 #' @export
 #'
+#' @keyword Internal
+#'
 #' @examples
-sample_ar <- function(ar_df, sub, meanf = mean){
-  ar <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% meanf()
+sample_ar <- function(ar_df, sub, fun = mean){
+  ar <- ar_df[,sub] %>% rowMeans(na.rm = TRUE) %>% na.omit() %>% fun()
   return(ar)
 }
 
