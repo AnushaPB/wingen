@@ -34,9 +34,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   ar_df <- data.frame(ar_df)
 
   # make aggregated raster
-  agg <- raster::aggregate(lyr, fact) * 0
-  # make a copy that will later be used for window calcs
-  ragg <- agg
+  ragg <- raster::aggregate(lyr, fact) * 0
 
   # check to make sure wdim is formatted correctly and is odd
   wdim <- wdim_check(wdim)
@@ -48,6 +46,9 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   aragg <- ragg
   # make copy of raster to count number of individuals used in the calculation
   nragg <- ragg
+
+  # get cell index for each coordinate
+  coord_cells <- raster::extract(ragg, coords, cell = TRUE)[,"cells"]
 
   # for every cell in aragg, calculate allelic richness
   pb <- progress::progress_bar$new(total = raster::ncell(aragg))
@@ -62,22 +63,14 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
       next
     }
 
-    # reset raster every iteration
-    ragg <- agg
-
     # get adjacent cells to cell i
     adjc <- raster::adjacent(ragg, i, directions = n, include = TRUE, sorted = TRUE)
     # get indices of adjacent cells
     adjci <- purrr::map_dbl(adjc, 1, function(x) {
       seq(x[1], x[2])
     })
-    # assign adjacent cells a value of 1
-    ragg[adjci] <- 1
-
-    # extract coordinates to determine which cells are in that cluster of cells
-    coords$group <- raster::extract(ragg, coords[, c("x", "y")])
-    # get list of indices (COORDS AND AR_DF must be in same order)
-    sub <- which(coords$group == 1)
+    # get list of indices of coords that fall in cells
+    sub <- which(coord_cells %in% adjci)
 
     # if there are too few samples in that window assign the cell value NA and skip to the next iteration
     if (length(sub) < min_n) {
@@ -146,8 +139,6 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 
   return(results)
 }
-
-
 
 #' Rarefaction function
 #'
