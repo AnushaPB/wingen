@@ -11,7 +11,6 @@
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
 #' @param min_n min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to mean)
-#' @param fast if TRUE uses Rcpp mean to calculate mean, which is slightly faster than base R (*note:* compromises on numerical accuracy)
 #' @param plot_its whether to produce a plot every plot_its_steps iterations to show progress
 #' @param plot_its_steps when to plot an iteration if plot_its is true
 #'
@@ -19,20 +18,16 @@
 #' @export
 #'
 #' @examples
-window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, fast = FALSE, plot_its = FALSE, plot_its_steps = 1) {
+#' \dontrun{
+#' window_ar(ar_df, coords, lyr)
+#' }
+#'
+window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, plot_its = FALSE, plot_its_steps = 1) {
 
+  # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
   # check to make sure coords and ar_df align
   if (ncol(ar_df) != nrow(coords)) {
-    stop("nrow of the coords data and ncol allelic richness data are not equal,
-                                       make sure rows are individuals for the coords data and cols are individuals
-                                       for the allelic richness data")
-  }
-
-  # define which mean function to use
-  if (fast) {
-    fun <- meanC
-  } else {
-    fun <- mean
+    stop("nrow of the coords data and ncol allelic richness data are not equal, make sure rows are individuals for the coords data and cols are individuals for the allelic richness data")
   }
 
   # make ar_df into dataframe
@@ -43,30 +38,11 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   # make a copy that will later be used for window calcs
   ragg <- agg
 
-  # wdim has to be odd
-  if (length(wdim) == 1 & wdim %% 2 == 0) {
-    wdim <- wdim + 1
-    warning(paste("wdim must be odd, using wdim =", wdim, "instead"))
-  }
-  if (length(wdim) == 2 & wdim[1] %% 2 == 0) {
-    wdim[1] <- wdim[1] + 1
-    warning(paste("wdim must be odd, using wdim[1] =", wdim, "instead"))
-  }
-  if (length(wdim) == 2 & wdim[2] %% 2 == 0) {
-    wdim[2] <- wdim[2] + 1
-    warning(paste("wdim must be odd, using wdim[2] =", wdim, "instead"))
-  }
+  # check to make sure wdim is formatted correctly and is odd
+  wdim <- wdim_check(wdim)
 
   # make neighbor matrix for window
-  if (length(wdim) == 2) {
-    n <- matrix(1, wdim[1], wdim[2])
-  }
-  if (length(wdim) == 1) {
-    n <- matrix(1, wdim, wdim)
-  }
-
-  # focal cell (center of matrix) has to be zero
-  n[wdim / 2 + 0.5, wdim / 2 + 0.5] <- 0
+  n <- wdim_to_mat(wdim)
 
   # make copy of raster for ar surface
   aragg <- ragg
@@ -78,7 +54,13 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 
   for (i in 1:raster::ncell(aragg)) {
     # skip if raster value is NA
-    if (is.na(aragg[i])) next
+    if (is.na(aragg[i])) {
+      # progress bar
+      pb$tick()
+
+      # skip to next
+      next
+    }
 
     # reset raster every iteration
     ragg <- agg
@@ -101,6 +83,10 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
     if (length(sub) < min_n) {
       aragg[i] <- NA
       nragg[i] <- length(sub)
+
+      # progress bar
+      pb$tick()
+
       next
     }
 
@@ -110,6 +96,10 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
       if (length(sub) < rarify_n) {
         aragg[i] <- NA
         nragg[i] <- length(sub)
+
+        # progress bar
+        pb$tick()
+
         next
       }
 
@@ -170,7 +160,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 #' @return rarified mean allelic richness for a subsample
 #' @export
 #'
-#' @keywords Internal
+#' @keywords internal
 #'
 #' @examples
 rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
@@ -207,7 +197,7 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
 #' @return mean allelic richness of a subsample
 #' @export
 #'
-#' @keywords Internal
+#' @keywords internal
 #'
 #' @examples
 sample_ar <- function(ar_df, sub, fun = mean) {
@@ -216,4 +206,53 @@ sample_ar <- function(ar_df, sub, fun = mean) {
     stats::na.omit() %>%
     fun()
   return(ar)
+}
+
+wdim_to_mat <- function(wdim){
+  if (any(wdim < 3)) {
+    stop("wdim cannot be less than 3")
+  }
+
+  if (length(wdim) == 2) {
+    n <- matrix(1, wdim[1], wdim[2])
+  } else if (length(wdim) == 1) {
+    n <- matrix(1, wdim, wdim)
+  } else {
+    stop("wdim must be a number or a vector of length 2")
+  }
+
+  # focal cell (center of matrix) has to be zero
+  n[wdim / 2 + 0.5, wdim / 2 + 0.5] <- 0
+
+  return(n)
+}
+
+wdim_check <- function(wdim){
+  if (any(wdim < 3)) {
+    stop("wdim cannot be less than 3")
+  }
+
+  if (length(wdim) == 1) {
+
+    if(wdim %% 2 == 0){
+      wdim <- wdim + 1
+      warning(paste("wdim must be odd, using wdim =", wdim, "instead"))
+    }
+
+  }
+  if (length(wdim) == 2) {
+
+    if(wdim[1] %% 2 == 0){
+      wdim[1] <- wdim[1] + 1
+      warning(paste("wdim must be odd, using wdim[1] =", wdim[1], "instead"))
+    }
+
+    if (wdim[2] %% 2 == 0) {
+      wdim[2] <- wdim[2] + 1
+      warning(paste("wdim must be odd, using wdim[2] =", wdim[2], "instead"))
+    }
+
+  }
+
+  return(wdim)
 }
