@@ -1,31 +1,75 @@
 
-#' Krige map
+#' Raster interpolation using 'autoKrige'
 #'
-#' @param r raster for kriging
-#' @param spdf SpatialPointsDataFrame object to create grid for kriging
-#' @param xy whether to co-krige with x and y (~x+y)
-#' @param n_cell number of cells to interpolate across
-#'
-#' @return Raster with kriged values
+#' @param r RasterLayer or RasterStack
+#' @inheritParams krig_rast_lyr
+#' @return RasterLayer or RasterStack
 #' @export
 #'
 #' @examples
-krig_div <- function(r, spdf, xy = TRUE, n_cell = 10000) {
+krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
 
-  # convert raster to points
-  pa_df <- raster::rasterToPoints(r)
+  rls <- raster::as.list(r)
+
+  if(is.null(grd)){
+    grd <- r[[1]]
+    warning("no grd provided, defaults to using first raster layer to create grd")
+  }
+
+  rstk <- purrr::map(rls, krig_rast_lyr, grd, xy, agg, disagg, n_cell)
+  rstk <- raster::stack(rstk)
+
+  names(rstk) <- names(r)
+
+  return(rstk)
+}
+
+#' Krige RasterLayer
+#'
+#' Helper function for \code{\link{krig_rast}}
+#'
+#' @param r raster for kriging
+#' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param xy whether to co-krige with x and y (~x+y)
+#' @param agg factor used for aggregation if provided
+#' @param disagg factor used for disaggregation if provided
+#' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
+#'
+#' @return RasterLayer
+#' @export
+#'
+#' @keywords internal
+#'
+#' @examples
+krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000) {
+
+  # convert raster to df
+  krig_df <- data.frame(raster::rasterToPoints(r))
 
   # create grid
-  krig_grid <- spdf_to_grid(spdf, n_cell = n_cell)
-
-  # TODO: FIX PROJECTION STUFF
-  krig_df <- coord_proj(pa_df[, c("x", "y")], spdf)
+  if(is.null(grd)){
+    krig_grid <- raster_to_grid(r, agg = agg, disagg = disagg)
+  } else if(class(grd) == "SpatialPointsDataFrame") {
+    krig_grid <- spdf_to_grid(grd, n_cell = n_cell)
+  } else if(class(grd) == "RasterLayer"){
+    krig_grid <- raster_to_grid(grd, agg = agg, disagg = disagg)
+  } else if(sp::gridded(grd)){
+    krig_grid <- grid
+  } else { stop(" unable to find an inherited method for type of grd provided")}
 
   # Assign values to df
-  krig_df$layer <- pa_df[, 3]
+  krig_df$layer <- krig_df[, 3]
+
+  # convert to spdf
+  sp::coordinates(krig_df) <- ~ x + y
 
   # remove na values
   krig_df <- krig_df[!is.na(krig_df$layer), ]
+
+  # remove crs values (automap doesn't like latlon CRS)
+  if(!raster::compareCRS(krig_df, krig_grid)){warning("the provided raster and grid have different crs")}
+  raster::crs(krig_df) <- NA
+  raster::crs(krig_grid) <- NA
 
   # Krige
   if (xy) {
@@ -40,29 +84,24 @@ krig_div <- function(r, spdf, xy = TRUE, n_cell = 10000) {
 
   # turn SPDF into raster and stack
   krig_raster <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
-
-  # plot
-  raster::plot(krig_raster, col = viridis::turbo(100), legend = FALSE, box = FALSE, axes = FALSE)
-  graphics::lines(spdf)
-
   return(krig_raster)
 }
 
-#' Make grid for kriging
+
+#' Conver a raster to a grid
 #'
-#' @param xrange range of xvalues
-#' @param yrange range of yvalues
-#' @param len length provided to expand.grid
+#' @param x RasterLayer
+#' @param fact factor for aggregation (defaults to no aggregation)
 #'
-#' @return
+#' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
 #' @examples
-range_to_grid <- function(xrange, yrange, len) {
-  grd <- expand.grid(
-    x = seq(from = xrange[1], to = xrange[2], len = len),
-    y = seq(from = yrange[1], to = yrange[2], len = len)
-  )
+raster_to_grid <- function(x, agg = NULL, disagg = NULL){
+  if(!is.null(agg)){x <- raster::aggregate(x, agg)}
+  if(!is.null(disagg)){x <- raster::disaggregate(x, disagg)}
+
+  grd <- data.frame(raster::rasterToPoints(x))
   sp::coordinates(grd) <- ~ x + y
   sp::gridded(grd) <- TRUE
   return(grd)
@@ -74,7 +113,7 @@ range_to_grid <- function(xrange, yrange, len) {
 #' @param n_cell number of grid cells to use when kriging
 #'
 #' @note code from: https://stackoverflow.com/questions/43436466/create-grid-in-r-for-kriging-in-gstat
-#' @return
+#' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
 #' @examples
@@ -97,33 +136,28 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
 }
 
 
-#' TEMP COORDS FUNCTION
+#' Mask diversity map based on sample number
 #'
-#' @param coords coordinates
-#' @param spdf SpatialPointsDataFrame
-#' @param crop_to_spdf whether to crop the coordinates to the spdf
+#' @param x RasterStack where the first layer is genetic diversity and the second layer is sample count
+#' @param min_n minimum number of samples (everything less than this number is masked)
+#' @param plot whether to plot results
+#' @param bkg.col background color for plotting map
 #'
-#' @return
+#' @return RasterLayer
 #' @export
 #'
 #' @examples
-coord_proj <- function(coords, spdf, crop_to_spdf = FALSE) {
-  # make df
-  coords_spdf <- data.frame(x = coords[, 1], y = coords[, 2])
+div_mask <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
+  ar <- x[[1]]
+  counts <- x[[2]]
 
-  # make into SPFD
-  sp::coordinates(coords_spdf) <- ~ x + y
+  counts[counts < min_n] <- NA
+  ar <- mask(ar, counts)
 
-  # Assign CRS
-  raster::crs(coords_spdf) <- raster::crs("+proj=longlat +datum=WGS84 +no_defs")
-
-  # Transform to CRS of spdf
-  coords_spdf <- sp::spTransform(coords_spdf, raster::crs(spdf))
-
-  # Crop points to SPDF
-  if (crop_to_spdf) {
-    coords_spdf <- raster::crop(coords_spdf, spdf)
+  if(plot){
+    raster::plot(x[[1]], col = bkg.col,  box = FALSE, axes = FALSE)
+    raster::plot(ar, col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
   }
 
-  return(coords_spdf)
+  return(ar)
 }

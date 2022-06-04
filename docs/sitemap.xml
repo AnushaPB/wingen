@@ -4,6 +4,12 @@
     <loc>/404.html</loc>
   </url>
   <url>
+    <loc>/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>/articles/wingen-vignette.html</loc>
+  </url>
+  <url>
     <loc>/authors.html</loc>
   </url>
   <url>
@@ -19,10 +25,28 @@
     <loc>/reference/coord_proj.html</loc>
   </url>
   <url>
+    <loc>/reference/div_mask.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ex_coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ex_lyr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/ex_vcf.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
     <loc>/reference/krig_div.html</loc>
+  </url>
+  <url>
+    <loc>/reference/krig_rast.html</loc>
+  </url>
+  <url>
+    <loc>/reference/krig_rast_lyr.html</loc>
   </url>
   <url>
     <loc>/reference/pipe.html</loc>
@@ -34,6 +58,9 @@
     <loc>/reference/rarify_ar.html</loc>
   </url>
   <url>
+    <loc>/reference/raster_to_grid.html</loc>
+  </url>
+  <url>
     <loc>/reference/rescale.html</loc>
   </url>
   <url>
@@ -41,6 +68,12 @@
   </url>
   <url>
     <loc>/reference/spdf_to_grid.html</loc>
+  </url>
+  <url>
+    <loc>/reference/vcf_to_dosage.html</loc>
+  </url>
+  <url>
+    <loc>/reference/vcf_to_genind.html</loc>
   </url>
   <url>
     <loc>/reference/window_ar.html</loc>

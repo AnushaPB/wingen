@@ -11,6 +11,9 @@ spdf_to_grid(spdf, n_cell = 1000)
 
 \item{n_cell}{number of grid cells to use when kriging}
 }
+\value{
+gridded SpatialPixelsDataFrame
+}
 \description{
 Make grid from Spatial Points Data Frame
 }

@@ -21,6 +21,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/wingen-vignette.html">Wingen Vignette</a>
+  </div>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -53,7 +59,6 @@
   rarify_nit <span class="op">=</span> <span class="fl">10</span>,
   min_n <span class="op">=</span> <span class="fl">2</span>,
   fun <span class="op">=</span> <span class="va">mean</span>,
-  fast <span class="op">=</span> <span class="cn">FALSE</span>,
   plot_its <span class="op">=</span> <span class="cn">FALSE</span>,
   plot_its_steps <span class="op">=</span> <span class="fl">1</span>
 <span class="op">)</span></code></pre></div>
@@ -81,8 +86,6 @@
 <dd><p>min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)</p></dd>
 <dt>fun</dt>
 <dd><p>function to use to summarize data in window (defaults to mean)</p></dd>
-<dt>fast</dt>
-<dd><p>if TRUE uses Rcpp mean to calculate mean, which is slightly faster than base R (<em>note:</em> compromises on numerical accuracy)</p></dd>
 <dt>plot_its</dt>
 <dd><p>whether to produce a plot every plot_its_steps iterations to show progress</p></dd>
 <dt>plot_its_steps</dt>
@@ -93,6 +96,14 @@
     <p>RasterStack that includes a raster of allelic richness and a raster of the number of samples used in the calculation of allelic richness for each cell</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
+<span class="r-in"><span class="fu">window_ar</span><span class="op">(</span><span class="va">ar_df</span>, <span class="va">coords</span>, <span class="va">lyr</span><span class="op">)</span></span>
+<span class="r-in"><span class="op">}</span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 

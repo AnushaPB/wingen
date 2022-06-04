@@ -21,6 +21,12 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/wingen-vignette.html">Wingen Vignette</a>
+  </div>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -47,24 +53,34 @@
 
       <dl><dt>
           
-          <code><a href="coord_proj.html">coord_proj()</a></code> 
+          <code><a href="div_mask.html">div_mask()</a></code> 
         </dt>
-        <dd>TEMP COORDS FUNCTION</dd>
+        <dd>Mask diversity map based on sample number</dd>
       </dl><dl><dt>
           
-          <code><a href="krig_div.html">krig_div()</a></code> 
+          <code><a href="ex_coords.html">ex_coords</a></code> 
         </dt>
-        <dd>Krige map</dd>
+        <dd>Example coordinates</dd>
       </dl><dl><dt>
           
-          <code><a href="range_to_grid.html">range_to_grid()</a></code> 
+          <code><a href="ex_lyr.html">ex_lyr</a></code> 
         </dt>
-        <dd>Make grid for kriging</dd>
+        <dd>Example raster</dd>
       </dl><dl><dt>
           
-          <code><a href="rarify_ar.html">rarify_ar()</a></code> 
+          <code><a href="ex_vcf.html">ex_vcf</a></code> 
         </dt>
-        <dd>Rarefaction function</dd>
+        <dd>Example vcf</dd>
+      </dl><dl><dt>
+          
+          <code><a href="krig_rast.html">krig_rast()</a></code> 
+        </dt>
+        <dd>Raster interpolation using 'autoKrige'</dd>
+      </dl><dl><dt>
+          
+          <code><a href="raster_to_grid.html">raster_to_grid()</a></code> 
+        </dt>
+        <dd>Conver a raster to a grid</dd>
       </dl><dl><dt>
           
           <code><a href="rescale.html">rescale()</a></code> 
@@ -72,14 +88,19 @@
         <dd>Rescale values from zero to one</dd>
       </dl><dl><dt>
           
-          <code><a href="sample_ar.html">sample_ar()</a></code> 
-        </dt>
-        <dd>Calculate mean allelic richness of a sample</dd>
-      </dl><dl><dt>
-          
           <code><a href="spdf_to_grid.html">spdf_to_grid()</a></code> 
         </dt>
         <dd>Make grid from Spatial Points Data Frame</dd>
+      </dl><dl><dt>
+          
+          <code><a href="vcf_to_dosage.html">vcf_to_dosage()</a></code> 
+        </dt>
+        <dd>Convert vcf to dosage matrix</dd>
+      </dl><dl><dt>
+          
+          <code><a href="vcf_to_genind.html">vcf_to_genind()</a></code> 
+        </dt>
+        <dd>Wrapper for vcfR2genind function that assigns pops</dd>
       </dl><dl><dt>
           
           <code><a href="window_ar.html">window_ar()</a></code> 

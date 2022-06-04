@@ -21,8 +21,9 @@ library("wingen")
 ```
 
 ```{r}
-usethis::use_pkgdown()
+#usethis::use_pkgdown()
 pkgdown::build_site()
+pkgdown::build_home_index()
 ```
 
 ```{r}
@@ -31,7 +32,7 @@ use_logo("logo.png", geometry = "250x250", retina = TRUE)
 ```
 
 ```{r}
-#styler::style_pkg() 
+styler::style_pkg() 
 ```
 
 ```{r}
