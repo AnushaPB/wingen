@@ -19,4 +19,4 @@ mean allelic richness of a subsample
 \description{
 Calculate mean allelic richness of a sample
 }
-\keyword{Internal}
+\keyword{internal}

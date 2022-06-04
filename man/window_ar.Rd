@@ -15,7 +15,6 @@ window_ar(
   rarify_nit = 10,
   min_n = 2,
   fun = mean,
-  fast = FALSE,
   plot_its = FALSE,
   plot_its_steps = 1
 )
@@ -41,8 +40,6 @@ window_ar(
 
 \item{fun}{function to use to summarize data in window (defaults to mean)}
 
-\item{fast}{if TRUE uses Rcpp mean to calculate mean, which is slightly faster than base R (\emph{note:} compromises on numerical accuracy)}
-
 \item{plot_its}{whether to produce a plot every plot_its_steps iterations to show progress}
 
 \item{plot_its_steps}{when to plot an iteration if plot_its is true}
@@ -52,4 +49,10 @@ RasterStack that includes a raster of allelic richness and a raster of the numbe
 }
 \description{
 Sliding window allelic richness
+}
+\examples{
+\dontrun{
+window_ar(ar_df, coords, lyr)
+}
+
 }
