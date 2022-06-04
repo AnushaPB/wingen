@@ -1,0 +1,68 @@
+---
+title: "Wingen Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wingen-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, warning = FALSE, message = FALSE}
+library(wingen)
+library(raster)
+library(vcfR)
+library(viridis)
+
+devtools::load_all()
+```
+
+```{r, fig.width = 5, fig.height = 5}
+coords_file <- system.file("extdata", "ex_coords.csv", package = "wingen")
+lyr_file <- system.file("extdata", "ex_layer.tif", package = "wingen")
+vcf_file <- system.file("extdata", "ex_vcf.vcf", package = "wingen")
+
+ex_lyr <- raster(lyr_file)
+ex_coords <- read.csv(coords_file)
+ex_vcf <- read.vcfR(vcf_file)
+
+plot(ex_lyr, legend = FALSE, col = "gray", axes = FALSE, box = FALSE)
+points(ex_coords)
+```
+
+```{r}
+# convert from vcf to genind in order to calculate allelic richness
+genind <- vcfR::vcfR2genind(ex_vcf)
+
+# allelic richness requires populations
+# since we are working with individual data we will treat each individual as it's own population
+genind$pop <- as.factor(1:nrow(genind@tab))
+  
+# calculate allelic richness using hierfstat
+ar <- hierfstat::allelic.richness(genind)
+
+# ge AR data frame
+ar_df <- ar$Ar
+
+```
+
+```{r, fig.width = 8, fig.height=4}
+# run window AR (for the sake of speed I am aggregating the raster by a factor of 50)
+rar <- window_ar(ar_df, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = FALSE, min_n = 4)
+plot(rar, col = magma(100), axes = FALSE)
+  
+```
+```{r, fig.width = 8, fig.height=4}
+# run window AR with rarefaction
+wind_rar <- window_ar(ar_df, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+plot(wind_rar, col = magma(100), axes = FALSE)
+  
+```
+
+
