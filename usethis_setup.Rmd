@@ -30,3 +30,20 @@ use_pipe(export = TRUE)
 use_logo("logo.png", geometry = "250x250", retina = TRUE)
 ```
 
+```{r}
+#styler::style_pkg() 
+```
+
+```{r}
+usethis::use_vignette("wingen-vignette")
+```
+```{r}
+# creates testing structure
+usethis::use_testthat()
+```
+
+```{r}
+# Creates and modifies external data for use in package
+usethis::use_data_raw()
+```
+
