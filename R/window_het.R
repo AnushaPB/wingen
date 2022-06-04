@@ -22,7 +22,7 @@
 #' window_ar(ar_df, coords, lyr)
 #' }
 #'
-window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, plot_its = FALSE, plot_its_steps = 1) {
+window_het <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, plot_its = FALSE, plot_its_steps = 1) {
 
   # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
   # check to make sure coords and ar_df align
@@ -43,7 +43,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   n <- wdim_to_mat(wdim)
 
   # make copy of raster for ar surface
-  aragg <- ragg
+  gdagg <- ragg
   # make copy of raster to count number of individuals used in the calculation
   nragg <- ragg
 
@@ -53,12 +53,9 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
   # for every cell in aragg, calculate allelic richness
   pb <- progress::progress_bar$new(total = raster::ncell(aragg))
 
-  for (i in 1:raster::ncell(aragg)) {
+  for (i in 1:raster::ncell(ragg)) {
     # skip if raster value is NA
-    if (is.na(aragg[i])) {
-      # progress bar
-      pb$tick()
-
+    if (is.na(ragg[i])) {
       # skip to next
       next
     }
@@ -74,11 +71,8 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 
     # if there are too few samples in that window assign the cell value NA and skip to the next iteration
     if (length(sub) < min_n) {
-      aragg[i] <- NA
+      gdagg[i] <- NA
       nragg[i] <- length(sub)
-
-      # progress bar
-      pb$tick()
 
       next
     }
@@ -87,25 +81,22 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 
       # if number of samples is less than rarify_n, assign the value NA
       if (length(sub) < rarify_n) {
-        aragg[i] <- NA
+        gdagg[i] <- NA
         nragg[i] <- length(sub)
-
-        # progress bar
-        pb$tick()
 
         next
       }
 
       # if number of samples is greater than rarify_n, rarify
       if (length(sub) > rarify_n) {
-        aragg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, fun = fun) %>%
+        gdagg[i] <- rarify_ar(ar_df, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, fun = fun) %>%
           stats::na.omit() %>%
           fun()
       }
 
       # if the number of samples is equal to rarify_n, calculate the raw mean
       if (length(sub) == rarify_n) {
-        aragg[i] <- ar_df[, sub] %>%
+        gdagg[i] <- ar_df[, sub] %>%
           rowMeans(na.rm = TRUE) %>%
           stats::na.omit() %>%
           fun()
@@ -113,7 +104,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
     } else {
 
       # get allelic richness, first averages by loci and then by individual
-      aragg[i] <- ar_df[, sub] %>%
+      gdagg[i] <- ar_df[, sub] %>%
         rowMeans(na.rm = TRUE) %>%
         stats::na.omit() %>%
         fun()
@@ -121,21 +112,19 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 
     # every set number of steps plot aragg
     if (plot_its & i %% plot_its_steps == 0) {
-      raster::plot(aragg, col = viridis::turbo(100), legend = FALSE, axes = FALSE, box = FALSE, main = "Value")
+      raster::plot(gdagg, col = viridis::turbo(100), legend = FALSE, axes = FALSE, box = FALSE, main = "Value")
     }
 
     # count the number of points used in the calculation
     nragg[i] <- length(sub)
 
-    # progress bar
-    pb$tick()
   }
 
   # name rasters
-  names(aragg) <- "allelic_richness"
+  names(gdagg) <- "heterozygosity"
   names(nragg) <- "sample_count"
 
-  results <- raster::stack(aragg, nragg)
+  results <- raster::stack(gdagg, nragg)
 
   return(results)
 }
@@ -154,7 +143,7 @@ window_ar <- function(ar_df, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, r
 #' @keywords internal
 #'
 #' @examples
-rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
+rarify_het <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
 
   # check to make sure sub is greater than 4
   if (!(length(sub) > rarify_n)) {
@@ -172,14 +161,14 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
     rarify_sub <- rarify_nit
   }
 
-  # for each of the possible combos get AR
-  ar <- apply(cmb[1:rarify_sub, ], 1, sample_ar, ar_df = ar_df, fun = fun)
+  # for each of the possible combos get heterozygosity
+  gd <- apply(cmb[1:rarify_sub, ], 1, sample_ar, ar_df = ar_df, fun = fun)
 
-  return(ar)
+  return(gd)
 }
 
 
-#' Calculate mean allelic richness of a sample
+#' Calculate mean heterozygosity of a sample
 #'
 #' @param ar_df dataframe of allelic richness (*note:* cols should be individuals, rows should be loci)
 #' @param sub row indices of subsample
@@ -192,11 +181,11 @@ rarify_ar <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
 #'
 #' @examples
 sample_ar <- function(ar_df, sub, fun = mean) {
-  ar <- ar_df[, sub] %>%
+  het <- ar_df[, sub] %>%
     rowMeans(na.rm = TRUE) %>%
     stats::na.omit() %>%
     fun()
-  return(ar)
+  return(het)
 }
 
 wdim_to_mat <- function(wdim) {
