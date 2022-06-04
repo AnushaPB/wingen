@@ -208,7 +208,7 @@ sample_ar <- function(ar_df, sub, fun = mean) {
   return(ar)
 }
 
-wdim_to_mat <- function(wdim){
+wdim_to_mat <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")
   }
@@ -227,22 +227,19 @@ wdim_to_mat <- function(wdim){
   return(n)
 }
 
-wdim_check <- function(wdim){
+wdim_check <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")
   }
 
   if (length(wdim) == 1) {
-
-    if(wdim %% 2 == 0){
+    if (wdim %% 2 == 0) {
       wdim <- wdim + 1
       warning(paste("wdim must be odd, using wdim =", wdim, "instead"))
     }
-
   }
   if (length(wdim) == 2) {
-
-    if(wdim[1] %% 2 == 0){
+    if (wdim[1] %% 2 == 0) {
       wdim[1] <- wdim[1] + 1
       warning(paste("wdim must be odd, using wdim[1] =", wdim[1], "instead"))
     }
@@ -251,7 +248,6 @@ wdim_check <- function(wdim){
       wdim[2] <- wdim[2] + 1
       warning(paste("wdim must be odd, using wdim[2] =", wdim[2], "instead"))
     }
-
   }
 
   return(wdim)

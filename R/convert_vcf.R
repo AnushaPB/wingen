@@ -10,11 +10,10 @@
 #' data("ex_vcf")
 #' vcf_to_dosage(ex_vcf)
 #'
-vcf_to_dosage <- function(x){
-
-  if(class(x)[1] == "vcfR"){
+vcf_to_dosage <- function(x) {
+  if (class(x)[1] == "vcfR") {
     vcf <- x
-  } else if(file.exists(x)){
+  } else if (file.exists(x)) {
     vcf <- vcfR::read.vcfR(x)
   }
 
@@ -40,45 +39,35 @@ vcf_to_dosage <- function(x){
 #' data("ex_vcf")
 #' vcf_to_genind(ex_vcf)
 #'
-vcf_to_genind <- function(x, pops = NULL){
-
-  if(class(x)[1] == "vcfR"){
+vcf_to_genind <- function(x, pops = NULL) {
+  if (class(x)[1] == "vcfR") {
     vcf <- x
-  } else if(file.exists(x)){
+  } else if (file.exists(x)) {
     vcf <- vcfR::read.vcfR(x)
   }
 
   # convert to genind
   genind <- vcfR::vcfR2genind(vcf)
 
-  #assign pops if null or pop vector provided
-  if(is.null(genind$pop) | is.vector(pops)){
-
-    if(is.null(pops)){
+  # assign pops if null or pop vector provided
+  if (is.null(genind$pop) | is.vector(pops)) {
+    if (is.null(pops)) {
       genind$pop <- as.factor(1:nrow(genind@tab))
 
       warning("no pops were provided, assigning a pop to each individual (to stop this, set pop = FALSE)")
     }
 
-    if(is.vector(pops)){
-
-      if(!is.null(genind$pop) & is.vector(pops)){
-
+    if (is.vector(pops)) {
+      if (!is.null(genind$pop) & is.vector(pops)) {
         warning("overwriting genind pops with vector of pops provided")
-
       }
 
-      if(length(pops) != nrow(genind@tab)){
-
+      if (length(pops) != nrow(genind@tab)) {
         stop("length of pops does not match number of individuals in genind")
-
       } else {
-
         genind$pop <- as.factor(pops)
-
       }
     }
-
   }
 
   return(genind)
