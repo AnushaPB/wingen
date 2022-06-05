@@ -22,7 +22,7 @@
 #' window_ar(ar_df, coords, lyr)
 #' }
 #'
-window_ar2 <- function(genind, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, plot_its = FALSE, plot_its_steps = 1) {
+window_ar <- function(genind, coords, lyr, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, plot_its = FALSE, plot_its_steps = 1) {
 
   #genind pop
   genind$pop <- rep(factor(1), nrow(genind$tab))
@@ -34,48 +34,25 @@ window_ar2 <- function(genind, coords, lyr, fact = 0, wdim = 10, rarify = FALSE,
   }
 
   # make neighbor matrix for window
-  n <- wdim_to_mat(wdim)
+  nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
   ragg <- raster::aggregate(lyr, fact) * 0
-  # make copy of raster for ar surface
-  aragg <- ragg
-  # make copy of raster to count number of individuals used in the calculation
-  nragg <- ragg
 
   # get cell index for each coordinate
   coord_cells <- raster::extract(ragg, coords, cell = TRUE)[,"cells"]
 
-  rast_vals <- foreach(i = 1:raster::ncell(ragg), .combine = rbind, .packages=c("sp", "raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
-    # skip if raster value is NA
-    if (is.na(aragg[i])) {
-      return(data.frame(gd = NA, nr = NA))
-    }
+  rast_vals <- foreach(i = 1:raster::ncell(ragg), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
 
-    # get adjacent cells to cell i
-    adjc <- raster::adjacent(ragg, i, directions = n, include = TRUE, sorted = TRUE)
-    # get indices of adjacent cells
-    adjci <- purrr::map_dbl(adjc, 1, function(x) {seq(x[1], x[2])})
-    # get list of indices of coords in that set of cells
-    sub <- which(coord_cells %in% adjci)
+    result <- window_helper(i, ragg, genind, coord_cells, nmat, min_n, fun)
 
-    # if there are too few samples in that window assign the cell value NA
-    if (length(sub) < min_n) {
-      gd <- NA
-      nr <- length(sub)
-    } else {
-      # get allelic richness
-      gd <- hierfstat::allelic.richness(genind[sub,])$Ar[,1]
-      gd <- fun(stats::na.omit(gd))
-
-      # count the number of points used in the calculation
-      nr <- length(sub)
-    }
-
-    return(data.frame(gd = gd, nr = nr))
+    return(result)
 
   }
 
+  # make copies of rasters
+  aragg <- ragg
+  nragg <- ragg
   # assign values to rasters
   aragg[] <- rast_vals[,"gd"]
   nragg[] <- rast_vals[,"nr"]
@@ -89,7 +66,43 @@ window_ar2 <- function(genind, coords, lyr, fact = 0, wdim = 10, rarify = FALSE,
   return(results)
 }
 
+#' Helper function for window calculations
+#'
+#' @param i
+#' @param ragg
+#' @param genind
+#' @param coord_cells
+#' @param nmat
+#' @param min_n
+#' @param fun
+#'
+#' @return
+#' @export
+#'
+#' @examples
+window_helper <- function(i, ragg, genind, coord_cells, nmat, min_n, fun){
+  # skip if raster value is NA
+  if (is.na(ragg[i])) {
+    return(data.frame(gd = NA, nr = NA))
+  }
 
+  sub <- get_adj(i, ragg, nmat, coord_cells)
+
+  # if there are too few samples in that window assign the cell value NA
+  if (length(sub) < min_n) {
+    gd <- NA
+    nr <- length(sub)
+  } else {
+    # get allelic richness
+    gd <- hierfstat::allelic.richness(genind[sub,])$Ar[,1]
+    gd <- fun(stats::na.omit(gd))
+
+    # count the number of points used in the calculation
+    nr <- length(sub)
+  }
+
+  return(data.frame(gd = gd, nr = nr))
+}
 
 #' Rarefaction function
 #'
