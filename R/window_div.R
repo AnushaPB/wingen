@@ -159,7 +159,7 @@ rarify_het <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
   }
 
   # for each of the possible combos get heterozygosity
-  gd <- apply(cmb[1:rarify_sub, ], 1, sample_ar, ar_df = ar_df, fun = fun)
+  gd <- apply(cmb[1:rarify_sub, ], 1, sample_het, ar_df = ar_df, fun = fun)
 
   return(gd)
 }
@@ -177,7 +177,7 @@ rarify_het <- function(ar_df, sub, rarify_nit = 10, rarify_n = 4, fun = mean) {
 #' @keywords internal
 #'
 #' @examples
-sample_ar <- function(ar_df, sub, fun = mean) {
+sample_het <- function(ar_df, sub, fun = mean) {
   het <- ar_df[, sub] %>%
     rowMeans(na.rm = TRUE) %>%
     stats::na.omit() %>%
