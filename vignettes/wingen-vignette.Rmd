@@ -21,6 +21,8 @@ library(wingen)
 library(raster)
 library(vcfR)
 library(viridis)
+library(foreach)
+library(doParallel)
 
 devtools::load_all()
 ```
@@ -55,14 +57,14 @@ ar_df <- ar$Ar
 ```
 
 ```{r, fig.width = 8, fig.height=4}
-# run window AR (for the sake of speed I am aggregating the raster by a factor of 50)
-rar <- window_ar(ar_df, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = FALSE, min_n = 4)
+# (for the sake of speed I am aggregating the raster by a factor of 50)
+rar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = FALSE)
 plot(rar, col = magma(100), axes = FALSE)
-  
 ```
+
 ```{r, fig.width = 8, fig.height=4}
 # run window AR with rarefaction
-wind_rar <- window_ar(ar_df, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+wind_rar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
 plot(wind_rar, col = magma(100), axes = FALSE)
   
 ```
@@ -85,4 +87,40 @@ plot(krig_msk, col =  viridis::magma(100),  box = FALSE, axes = FALSE)
 ```{r, fig.width = 5, fig.height = 5}
 krig_msk <- div_mask(krig_ar, 4, plot = TRUE, bkg.col = "black")
 ```
+# Different measures
+```{r, fig.width = 8, fig.height=4}
+# run window AR with rarefaction
+wind_ar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "allelic.richness", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+wind_het <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "het", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+wind_pi <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
 
+plot(wind_ar[[1]], col = magma(100), axes = FALSE)
+plot(wind_het[[1]], col = magma(100), axes = FALSE)
+plot(wind_pi[[1]], col = magma(100), axes = FALSE)
+```
+
+
+# PARALLEL
+```{r}
+#register cores
+cores <- 6
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
+system.time(res <- window_gd(genind, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = TRUE, rarify_nit = 10))
+
+plot(res, col = viridis::magma(100),  box = FALSE, axes = FALSE)
+
+#stop cluster
+stopCluster(cl)
+```
+
+```{r}
+res2
+```
+
+# NOTES:
+try is.het(extract.gt(vcf))
+df2genind
+write another wrapper for gd that converts stuff into the correct file format before putting into the gd funciton
+add documentation for functions
