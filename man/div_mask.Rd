@@ -4,7 +4,13 @@
 \alias{div_mask}
 \title{Mask diversity map based on sample number}
 \usage{
-div_mask(x, min_n, plot = FALSE, bkg.col = "white")
+div_mask(
+  x,
+  min_n,
+  plot = FALSE,
+  bkg.col = "white",
+  col.pal = viridis::magma(100)
+)
 }
 \arguments{
 \item{x}{RasterStack where the first layer is genetic diversity and the second layer is sample count}

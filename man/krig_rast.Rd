@@ -4,7 +4,15 @@
 \alias{krig_rast}
 \title{Raster interpolation using 'autoKrige'}
 \usage{
-krig_rast(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000)
+krig_rast(
+  r,
+  grd = NULL,
+  xy = FALSE,
+  agg = NULL,
+  disagg = NULL,
+  n_cell = 10000,
+  na.rm = NULL
+)
 }
 \arguments{
 \item{r}{RasterLayer or RasterStack}

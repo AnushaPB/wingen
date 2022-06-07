@@ -10,7 +10,8 @@ krig_rast_lyr(
   xy = FALSE,
   agg = NULL,
   disagg = NULL,
-  n_cell = 10000
+  n_cell = 10000,
+  na.rm = NULL
 )
 }
 \arguments{

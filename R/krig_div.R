@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
+krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000, na.rm = NULL){
 
   rls <- raster::as.list(r)
 
@@ -41,7 +41,7 @@ krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_ce
 #' @keywords internal
 #'
 #' @examples
-krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000) {
+krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000, na.rm = NULL) {
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
@@ -148,15 +148,22 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
 #'
 #' @examples
 div_mask <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
-  ar <- x[[1]]
-  counts <- x[[2]]
 
-  counts[counts < min_n] <- NA
-  ar <- mask(ar, counts)
+  sc_index <- grepl("^sample_count", names(x))
+  ar <- x[[which(!sc_index)]]
+  counts <- x[[which(sc_index)]]
+
+  for(i in 1:raster::nlayers(ar)){
+    counts[[i]][counts[[i]] < min_n] <- NA
+    ar[[i]] <- raster::mask(ar[[i]], counts[[i]])
+  }
+
 
   if(plot){
-    raster::plot(x[[1]], col = bkg.col,  box = FALSE, axes = FALSE)
-    raster::plot(ar, col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
+    for(i in 1:raster::nlayers(ar)){
+      raster::plot(x[[which(!sc_index)]][[i]], col = bkg.col,  box = FALSE, axes = FALSE,  main = names(ar[[i]]))
+      raster::plot(ar[[i]], col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
+    }
   }
 
   return(ar)
