@@ -7,7 +7,7 @@ Authors@R: c(
             person("Ian", "Wang", , email = "ianwang@berkeley.edu", role = c("aut"),
                    comment = c(ORCID = "0000-0003-2554-9414"))
             )
-Description: Visualize genetic diversity across space using a sliding window approach with options for rarefaction and interpolation
+Description: Visualize genetic diversity across space using a sliding window approach with options for rarefaction and interpolation.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -32,6 +32,7 @@ Imports:
     vcfR,
     viridis
 Suggests: 
+    devtools, 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
