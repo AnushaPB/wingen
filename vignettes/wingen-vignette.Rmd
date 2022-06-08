@@ -11,9 +11,10 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "##",
-  background = "#FFFFFF",
-  rmarkdown.html_vignette.check_title = FALSE
+  background = "#FFFFFF"
 )
+
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup, warning = FALSE, message = FALSE}
@@ -40,87 +41,59 @@ plot(ex_lyr, legend = FALSE, col = "gray", axes = FALSE, box = FALSE)
 points(ex_coords)
 ```
 
-```{r}
-# convert from vcf to genind in order to calculate allelic richness
-genind <- vcfR::vcfR2genind(ex_vcf)
-
-# allelic richness requires populations
-# since we are working with individual data we will treat each individual as it's own population
-genind$pop <- as.factor(1:nrow(genind@tab))
-  
-# calculate allelic richness using hierfstat
-ar <- hierfstat::allelic.richness(genind)
-
-# ge AR data frame
-ar_df <- ar$Ar
-
-```
-
 ```{r, fig.width = 8, fig.height=4}
 # (for the sake of speed I am aggregating the raster by a factor of 50)
-rar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = FALSE)
-plot(rar, col = magma(100), axes = FALSE)
+gdmap <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = FALSE)
+plot(gdmap, col = magma(100), axes = FALSE)
 ```
 
 ```{r, fig.width = 8, fig.height=4}
-# run window AR with rarefaction
-wind_rar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-plot(wind_rar, col = magma(100), axes = FALSE)
+# run window with rarefaction
+gdmapr <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+plot(gdmapr, col = magma(100), axes = FALSE)
   
 ```
 
 ```{r, fig.width = 10, fig.height = 5}
-krig_ar <- krig_rast(wind_rar, disagg = 10)
-plot(krig_ar, col = viridis::magma(100), box = FALSE, axes = FALSE)
+krig_gdmapr <- krig_rast(gdmapr, disagg = 10)
+plot(krig_gdmapr, col = viridis::magma(100), box = FALSE, axes = FALSE)
 
-krig_ar <- krig_rast(wind_rar, ex_lyr, agg = 5)
-plot(krig_ar, col = viridis::magma(100), box = FALSE, axes = FALSE)
+krig_gdmapr <- krig_rast(gdmapr, ex_lyr, agg = 5)
+plot(krig_gdmapr, col = viridis::magma(100), box = FALSE, axes = FALSE)
 ```
 ```{r, fig.width = 5, fig.height=5}
-krig_msk <- div_mask(wind_rar, 4)
+krig_msk <- div_mask(gdmapr, 4)
 plot(krig_msk, col = viridis::magma(100), box = FALSE, axes = FALSE)
 
-krig_msk <- div_mask(krig_ar, 4)
+krig_msk <- div_mask(krig_gdmapr, 4)
 plot(krig_msk, col =  viridis::magma(100),  box = FALSE, axes = FALSE)
 ```
 
 ```{r, fig.width = 5, fig.height = 5}
-krig_msk <- div_mask(krig_ar, 4, plot = TRUE, bkg.col = "black")
+krig_msk <- div_mask(krig_gdmapr, 4, plot = TRUE, bkg.col = "black")
 ```
-# Different measures
-```{r, fig.width = 8, fig.height=4}
-# run window AR with rarefaction
-wind_ar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "allelic.richness", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-wind_het <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "het", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-wind_pi <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-
-plot(wind_ar[[1]], col = magma(100), axes = FALSE)
-plot(wind_het[[1]], col = magma(100), axes = FALSE)
-plot(wind_pi[[1]], col = magma(100), axes = FALSE)
-```
-
-
-# PARALLEL
-```{r}
-#register cores
+# Different measures (with parallelization!)
+```{r, fig.width = 9, fig.height=3, cache = TRUE}
 cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-system.time(res <- window_gd(genind, ex_coords, ex_lyr, fact = 50, wdim = 5, rarify = TRUE, rarify_nit = 10))
+wind_het <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "het", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+wind_pi <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+#wind_ar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "allelic.richness", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
 
-plot(res, col = viridis::magma(100),  box = FALSE, axes = FALSE)
-
-#stop cluster
 stopCluster(cl)
-```
 
-```{r}
-res2
+par(mfrow = c(1,3))
+#plot(wind_ar[[1]], col = magma(100), axes = FALSE)
+plot(wind_het[[1]], col = magma(100), axes = FALSE)
+plot(wind_pi[[1]], col = magma(100), axes = FALSE)
 ```
+```{r fig.width = 9, fig.height=3}
+#gd_stack <- stack(wind_ar, wind_het, wind_pi)
+gd_stack <- stack(wind_het, wind_pi)
+gd_krig <- krig_rast(gd_stack, ex_lyr, agg = 5)
 
-# NOTES:
-try is.het(extract.gt(vcf))
-df2genind
-write another wrapper for gd that converts stuff into the correct file format before putting into the gd funciton
-add documentation for functions
+par(mfrow = c(1,3))
+gd_mask <- div_mask(gd_krig, 4, plot = TRUE, bkg.col = "black")
+```
