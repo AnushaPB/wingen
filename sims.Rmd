@@ -1,0 +1,96 @@
+---
+title: "sims"
+output: html_document
+---
+
+```{r}
+## simple example
+df <- data.frame(locusA=c("11","11","12","32"),
+locusB=c(NA,"34","55","15"),locusC=c("22","22","21","22"))
+row.names(df) <- .genlab("genotype",4)
+df
+
+obj <- df2genind(df, ploidy=2, ncode=1)
+obj
+tab(obj)
+
+
+## converting a genind as data.frame
+genind2df(obj)
+genind2df(obj, sep="/")
+```
+
+```{r}
+#function to make equidistant sampling sites
+equi_samp <- function(nsite, ldim){
+  #nsite - number of points (or sites) to sample (should be a perfect square)
+  #ldim - landscape dimension of one side (landscape should be a square)
+  inc <- ldim/(nsite)
+  s <- seq(inc, ldim-inc, inc) 
+  s <- s[s != 50]
+  xgrid <- ygrid <- s
+  cgrid <- expand.grid(xgrid, ygrid)
+  colnames(cgrid) <- c("x","y")
+  coordinates(cgrid) <- ~x+y
+  
+  return(cgrid)
+}
+```
+
+```{r}
+m <- matrix(nrow = 10, ncol = 10)
+r <- raster(m)
+r[] <- 1
+extent(r) <- extent(0,10,0,10)
+s <- equi_samp(4, ldim = 10)
+
+plot(r)
+points(s)
+
+```
+
+```{r}
+
+sim <- function(s, r, L, L2 =L, rarify = FALSE){
+  df <- data.frame(s, L1 = L)
+
+  df$L2 <- L2
+  
+  gen <- df[, c("L1", "L2")]
+  coords <- df[, c("x", "y")]
+  
+  gen <- df2genind(gen, ploidy=2, ncode=1)
+  
+  cores <- 6
+  cl <- makeCluster(cores)
+  registerDoParallel(cl)
+  
+  res <- window_gd_general(gen, coords, lyr = r, stat = calc_mean_ar, fact = 0, wdim = 11, min_n = 0, rarify = rarify, rarify_n = 2, rarify_nit = 4) 
+  plot(res,  col = magma(100))
+  
+  stopCluster(cl)
+
+  return(res)
+}
+
+r1 <- sim(s, r, L = 1, rarify = FALSE)
+r2 <- sim(s, r, L = 1, rarify = FALSE)
+r3 <- sim(s, r, L = 1, rarify = TRUE)
+r4 <- sim(s, r, L = 0, rarify = TRUE)
+
+```
+```{r, fig.width = 4, fig.height = 4}
+
+plot(r1[[2]], main = "sample count", col = magma(100), axes = FALSE, box = FALSE)
+
+par(mfcol=c(2,2), mar = rep(2,4))
+lapply(list(r1,r2,r3,r4), function(x){plot(x[[1]], col = magma(100), zlim = c(1,2), axes = FALSE, box = FALSE)})
+```
+
+```{r, fig.width = 4, fig.height = 4}
+
+plot(r1[[2]], main = "sample count", col = magma(100), axes = FALSE, box = FALSE)
+
+par(mfcol=c(2,2), mar = rep(2,4))
+lapply(list(r1,r2,r3,r4), function(x){plot(x[[1]], col = magma(100), zlim = c(0,1), axes = FALSE, box = FALSE)})
+```
