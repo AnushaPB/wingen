@@ -13,3 +13,5 @@
 ^\.github$
 ^usethis_setup\.Rmd$
 ^docs$
+^sim-vignette\.Rmd$
+^logo\.png$
