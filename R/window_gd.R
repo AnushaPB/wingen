@@ -248,7 +248,7 @@ sample_gd <- function(gen, sub, stat) {
 #'
 #' @examples
 calc_mean_ar <- function(genind){
-  genind$pop <- rep(factor(1), nrow(gen$tab))
+  genind$pop <- rep(factor(1), nrow(genind$tab))
   ar <- hierfstat::allelic.richness(genind)$Ar[,1]
   gd <- mean(stats::na.omit(ar))
   return(gd)
