@@ -27,7 +27,7 @@ window_helper(
 
 \item{coord_cells}{cell indices for each coordinate}
 
-\item{nmat}{neighbor matrix}
+\item{nmat}{neighborhood matrix}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed}
 
