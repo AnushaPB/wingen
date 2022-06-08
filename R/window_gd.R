@@ -4,6 +4,7 @@
 #'
 #' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
 #' @param stat genetic diversity stat to calculate (can either be "pi", "allelic.richness", or "het")
+#' @param parallel whether to use parallelization
 #'
 #' @inheritParams window_gd_general
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
@@ -33,7 +34,7 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
   }
 
   if(stat == "het"){
-    gen <- is.het(extract.gt(vcf))
+    gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
@@ -71,6 +72,8 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
 #'
+#' @importFrom foreach %dopar%
+#'
 #' @keywords internal
 #'
 #' @examples
@@ -79,7 +82,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
 
   # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
 
-  # make neighbor matrix for window
+  # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
@@ -90,7 +93,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
 
   if(parallel){
-    rast_vals <- foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
+    rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
 
       result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun)
 
@@ -120,7 +123,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
 #'
 #' @param i cell index
 #' @param coord_cells cell indices for each coordinate
-#' @param nmat neighbor matrix
+#' @param nmat neighborhood matrix
 #'
 #' @inheritParams window_gd_general
 #'
@@ -279,8 +282,8 @@ calc_mean_het <- function(hetmat){
 #' @export
 #'
 #' @examples
-calc_pi <- function(dos, L = ncol(gen)){
-  gd <- pi.dosage(dos)
+calc_pi <- function(dos, L = ncol(dos)){
+  gd <- hierfstat::pi.dosage(dos)
   return(gd)
 }
 
@@ -301,12 +304,42 @@ check_data <- function(gen, coords){
   # check number of samples
   if(class(gen) == "genind"){
     nind <- nrow(gen$tab)
-    if (nrow(gen$tab) != nrow(coords)) {
-      stop("number of samples in coords data and number of samples in gen data are not equal")
-    }
   }
 
-  if(class(gen) == "vcfR"){nind <- ncol(ex_vcf)}
+  if(class(gen) == "vcfR"){
+    nind <- (ncol(gen@gt) - 1)
+  }
+
   # check to make sure coords and gen align
+  if (nind != nrow(coords)) {
+    stop("number of samples in coords data and number of samples in gen data are not equal")
+  }
 
 }
+
+#' Helper function to get adjacent cells to a given cell index
+#'
+#' @param i cell index
+#' @param r RasterLayer
+#' @param n neighborhood matrix
+#' @param coord_cells cell numbers of coordinates
+#'
+#' @return indices of coordinates that are adjacent to the given cell
+#' @export
+#'
+#' @keywords internal
+#'
+#' @examples
+get_adj <- function(i, r, n, coord_cells){
+  # get adjacent cells to cell i
+  adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
+  # get indices of adjacent cells
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {seq(x[1], x[2])})
+  # get list of indices of coords in that set of cells
+  sub <- which(coord_cells %in% adjci)
+
+  return(sub)
+}
+
+
+
