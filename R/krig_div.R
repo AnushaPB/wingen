@@ -50,6 +50,7 @@ krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, 
   if(is.null(grd)){
     krig_grid <- raster_to_grid(r, agg = agg, disagg = disagg)
   } else if(class(grd) == "SpatialPointsDataFrame") {
+    #TODO: FIX THIS NOT WORKING
     krig_grid <- spdf_to_grid(grd, n_cell = n_cell)
   } else if(class(grd) == "RasterLayer"){
     krig_grid <- raster_to_grid(grd, agg = agg, disagg = disagg)
@@ -161,7 +162,7 @@ div_mask <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridi
 
   if(plot){
     for(i in 1:raster::nlayers(ar)){
-      raster::plot(x[[which(!sc_index)]][[i]], col = bkg.col,  box = FALSE, axes = FALSE,  main = names(ar[[i]]))
+      raster::plot(x[[which(!sc_index)]][[i]], col = bkg.col,  box = FALSE, axes = FALSE, legend = FALSE,  main = names(ar[[i]]))
       raster::plot(ar[[i]], col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
     }
   }
