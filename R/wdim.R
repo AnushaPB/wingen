@@ -1,4 +1,18 @@
 
+#' Helper function to convert wdim object to neighbor matrix
+#'
+#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#'
+#' @return neighborhood matrix
+#'
+#' @keywords internal
+#'
+#' @export
+#'
+#' @examples
+#' wdim_to_mat(3)
+#' wdim_to_mat(c(3,5))
+#'
 wdim_to_mat <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")
@@ -18,6 +32,17 @@ wdim_to_mat <- function(wdim) {
   return(n)
 }
 
+#' Helper function to check that wdim object is correctly assigned
+#'
+#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#'
+#' @return corrected wdim
+#' @export
+#'
+#' @examples
+#' wdim_check(c(4,4))
+#' wdim_check(4)
+#'
 wdim_check <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")
@@ -43,3 +68,4 @@ wdim_check <- function(wdim) {
 
   return(wdim)
 }
+
