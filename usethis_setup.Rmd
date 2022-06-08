@@ -47,4 +47,10 @@ usethis::use_testthat()
 # Creates and modifies external data for use in package
 usethis::use_data_raw()
 ```
+```{r}
+usethis::use_build_ignore("sim-vignette.Rmd")
+```
+```{r}
+usethis::use_import_from('foreach', "%dopar%")
+```
 
