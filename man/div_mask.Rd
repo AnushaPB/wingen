@@ -20,6 +20,8 @@ div_mask(
 \item{plot}{whether to plot results}
 
 \item{bkg.col}{background color for plotting map}
+
+\item{col.pal}{color palette to use for plotting}
 }
 \value{
 RasterLayer

@@ -41,6 +41,8 @@ window_gd(
 \item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
+
+\item{parallel}{whether to use parallelization}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell

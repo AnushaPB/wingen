@@ -9,7 +9,9 @@ raster_to_grid(x, agg = NULL, disagg = NULL)
 \arguments{
 \item{x}{RasterLayer}
 
-\item{fact}{factor for aggregation (defaults to no aggregation)}
+\item{agg}{factor used for aggregation if provided}
+
+\item{disagg}{factor used for disaggregation if provided}
 }
 \value{
 gridded SpatialPixelsDataFrame
