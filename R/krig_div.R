@@ -7,7 +7,7 @@
 #' @export
 #'
 #' @examples
-krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000, na.rm = NULL){
+krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
 
   rls <- raster::as.list(r)
 
@@ -55,7 +55,7 @@ krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, 
   } else if(class(grd) == "RasterLayer"){
     krig_grid <- raster_to_grid(grd, agg = agg, disagg = disagg)
   } else if(sp::gridded(grd)){
-    krig_grid <- grid
+    krig_grid <- grd
   } else { stop(" unable to find an inherited method for type of grd provided")}
 
   # Assign values to df
@@ -92,7 +92,7 @@ krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, 
 #' Conver a raster to a grid
 #'
 #' @param x RasterLayer
-#' @param fact factor for aggregation (defaults to no aggregation)
+#' @inheritParams krig_rast
 #'
 #' @return gridded SpatialPixelsDataFrame
 #' @export
@@ -143,6 +143,7 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
 #' @param min_n minimum number of samples (everything less than this number is masked)
 #' @param plot whether to plot results
 #' @param bkg.col background color for plotting map
+#' @param col.pal color palette to use for plotting
 #'
 #' @return RasterLayer
 #' @export
