@@ -17,11 +17,15 @@
 #' window_gd(vcf, coords, lyr, stat = "allelic.richness")
 #' }
 window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE){
+  # check that the input file is a vcf or a path to a vcf object
+  if(class(vcf) != "vcfR" & is.character(vcf)){
+    vcf <- read.vcfR(vcf)
+  } else if (class(vcf) != "vcfR" & !is.character(vcf)){
+    stop("gen object must be of type vcfR or a path to a .vcf files")
+  }
+
   # check to make sure coords and gen align
   check_data(vcf, coords)
-
-  # check that the input file is a vcf
-  if(class(vcf) != "vcfR"){stop("gen object must be of type vcfR")}
 
   # calc stats
   if(stat == "allelic.richness"){
@@ -201,24 +205,24 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean){
 #' @examples
 rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat = stat, fun = fun) {
 
-  # check to make sure sub is greater than 4
+  # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
     stop("rarify_n is less than the number of samples provided")
   }
 
-  # get all possible combos (transpose so rows are unique combos)
-  cmb <- t(utils::combn(sub, rarify_n))
-
   # define subsample to rarify
-  # (note: this is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
-  if (nrow(cmb) < rarify_nit) {
-    rarify_sub <- nrow(cmb)
+  # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
+  if (choose(length(sub), rarify_n) < rarify_nit) {
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- t(utils::combn(sub, rarify_n))
+
   } else {
-    rarify_sub <- rarify_nit
+    # random sample subsets of size rarify_nit (transpose so rows are unique combos)
+    cmb <- t(replicate(rarify_nit, sample(sub, rarify_n), simplify = TRUE))
   }
 
   # for each of the possible combos get gendiv stat
-  gdrar <- apply(cmb[1:rarify_sub, ], 1, sample_gd, gen = gen, stat = stat)
+  gdrar <- apply(cmb, 1, sample_gd, gen = gen, stat = stat)
 
   # summarize rarefaction results
   gd <- stats::na.omit(fun(gdrar))
