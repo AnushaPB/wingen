@@ -61,34 +61,6 @@ params = {
         'layers': {
 
             # layer name (LAYER NAMES MUST BE UNIQUE!)
-            'lyr_0': {
-
-                # -------------------------------------#
-                # --- layer num. 0: init parameters ---#
-                # -------------------------------------#
-
-                # initiating parameters for this layer
-                'init': {
-
-                    # parameters for a 'defined'-type Layer
-                    'defined': {
-                        # raster to use for the Layer
-                        'rast': unifenv,
-                        # point coordinates
-                        'pts': None,
-                        # point values
-                        'vals': None,
-                        # interpolation method {None, 'linear', 'cubic',
-                        # 'nearest'}
-                        'interp_method': None,
-
-                    },  # <END> 'defined'
-
-                },  # <END> 'init'
-
-            },  # <END> layer num. 0
-
-            # layer name (LAYER NAMES MUST BE UNIQUE!)
             'lyr_1': {
 
                 # -------------------------------------#
