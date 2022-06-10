@@ -36,7 +36,7 @@ params = {
     #------------#
         'main': {
             #x,y (a.k.a. j,i) dimensions of the Landscape
-            'dim':                      (20,20),
+            'dim':                      (100,100),
             #x,y resolution of the Landscape
             'res':                      (1,1),
             #x,y coords of upper-left corner of the Landscape
@@ -45,41 +45,70 @@ params = {
             'prj':                      None,
             }, # <END> 'main'
 
-    #--------------#
-    #--- layers ---#
-    #--------------#
+        # --------------#
+        # --- layers ---#
+        # --------------#
         'layers': {
 
-            #layer name (LAYER NAMES MUST BE UNIQUE!)
+            # layer name (LAYER NAMES MUST BE UNIQUE!)
             'lyr_0': {
 
-        #-------------------------------------#
-        #--- layer num. 0: init parameters ---#
-        #-------------------------------------#
+                # -------------------------------------#
+                # --- layer num. 0: init parameters ---#
+                # -------------------------------------#
 
-                #initiating parameters for this layer
+                # initiating parameters for this layer
                 'init': {
 
-                    #parameters for a 'random'-type Layer
-                    'random': {
-                        #number of random points
-                        'n_pts':                        500,
-                        #interpolation method {'linear', 'cubic', 'nearest'}
-                        'interp_method':                'linear',
+                    # parameters for a 'defined'-type Layer
+                    'defined': {
+                        # raster to use for the Layer
+                        'rast': make_unif_array(100),
+                        # point coordinates
+                        'pts': None,
+                        # point values
+                        'vals': None,
+                        # interpolation method {None, 'linear', 'cubic',
+                        # 'nearest'}
+                        'interp_method': None,
 
-                        }, # <END> 'random'
+                    },  # <END> 'defined'
 
-                    }, # <END> 'init'
+                },  # <END> 'init'
 
-                }, # <END> layer num. 0
+            },  # <END> layer num. 0
 
+            # layer name (LAYER NAMES MUST BE UNIQUE!)
+            'lyr_1': {
 
+                # -------------------------------------#
+                # --- layer num. 1: init parameters ---#
+                # -------------------------------------#
 
-    #### NOTE: Individual Layers' sections can be copy-and-pasted (and
-    #### assigned distinct keys and names), to create additional Layers.
+                # initiating parameters for this layer
+                'init': {
 
+                    # parameters for a 'nlmpy'-type Layer
+                    'nlmpy': {
+                        # nlmpy function to use the create this Layer
+                        'function': 'mpd',
+                        # number of rows (MUST EQUAL LANDSCAPE DIMENSION y!)
+                        'nRow': 100,
+                        # number of cols (MUST EQUAL LANDSCAPE DIMENSION x!)
+                        'nCol': 100,
+                        # level of spatial autocorrelation in element values
+                        'h': 0.5,
 
-            } # <END> 'layers'
+                    },  # <END> 'nlmpy'
+
+                },  # <END> 'init'
+
+            },  # <END> layer num. 1
+
+            #### NOTE: Individual Layers' sections can be copy-and-pasted (and
+            #### assigned distinct keys and names), to create additional Layers.
+
+        }  # <END> 'layers'
 
         }, # <END> 'landscape'
 
@@ -104,9 +133,9 @@ params = {
                     #starting number of individs
                     'N':                250,
                     #carrying-capacity Layer name
-                    'K_layer':          'lyr_0',
+                    'K_layer':          'lyr_1',
                     #multiplicative factor for carrying-capacity layer
-                    'K_factor':         1,
+                    'K_factor':         10,
                     }, # <END> 'init'
 
             #-------------------------------------#
@@ -185,7 +214,7 @@ params = {
                     #file defining custom genomic arch
                     'gen_arch_file':            None,
                     #num of loci
-                    'L':                        100,
+                    'L':                        100000,
                     #fixed starting allele freq; None/False -> rand; True -> 0.5
                     'start_p_fixed':            0.5,
                     #whether to start neutral locus freqs at 0
@@ -249,7 +278,7 @@ params = {
 #-------------#
     'model': {
         #total Model runtime (in timesteps)
-        'T':            100,
+        'T':            501,
         #min burn-in runtime (in timesteps)
         'burn_T':       30,
         #seed number
@@ -272,7 +301,39 @@ params = {
             'repeat_burn':      False,
             }, # <END> 'iterations'
 
-
+        ####################################
+        #### data-collection parameters ####
+        ####################################
+        'data': {
+            'sampling': {
+                #sampling scheme {'all', 'random', 'point', 'transect'}
+                'scheme':               'all',
+                #sample size at each point, for point & transect sampling
+                'n':                    None,
+                #coords of collection points, for point sampling
+                'points':               None,
+                #coords of transect endpoints, for transect sampling
+                'transect_endpoints':   None,
+                #num points along transect, for transect sampling
+                'n_transect_points':    None,
+                #collection radius around points, for point & transect sampling
+                'radius':               None,
+                #when to collect data
+                'when':                 500,
+                #whether to save current Layers when data is collected
+                'include_landscape':    True,
+                #whether to include fixed loci in VCF files
+                'include_fixed_sites':  False,
+                },
+            'format': {
+                #format for genetic data {'vcf', 'fasta'}
+                'gen_format':           'vcf',
+                #format for vector geodata {'csv', 'shapefile', 'geojson'}
+                'geo_vect_format':      'csv',
+                #format for raster geodata {'geotiff', 'txt'}
+                'geo_rast_format':      'geotiff',
+                },
+            }, #<END> 'data'
 
         } # <END> 'model'
 
