@@ -2,7 +2,7 @@ import geonomics as gnx
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import nlmpy
+from nlmpy import nlmpy
 
 def make_unif_array(n):
     """Makes a square array of ones, size n x n cells."""
