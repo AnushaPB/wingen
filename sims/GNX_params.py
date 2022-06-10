@@ -1,4 +1,5 @@
 # GNX_params_09-06-2022_18:58:59.py
+import numpy as np
 def make_unif_array(n):
     """Makes a square array of ones, size n x n cells."""
     array = np.ones((n,n))
