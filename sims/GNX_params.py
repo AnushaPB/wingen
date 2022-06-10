@@ -24,7 +24,7 @@
 
 
 params = {
-#-----------------------------------------------------------------------------#
+#--------------------------------------------------------------------------#
 
 #-----------------#
 #--- LANDSCAPE ---#
@@ -45,75 +45,79 @@ params = {
             'prj':                      None,
             }, # <END> 'main'
 
-        # --------------#
-        # --- layers ---#
-        # --------------#
+    #--------------#
+    #--- layers ---#
+    #--------------#
         'layers': {
 
-            # layer name (LAYER NAMES MUST BE UNIQUE!)
+            #layer name (LAYER NAMES MUST BE UNIQUE!)
             'lyr_0': {
 
-                # -------------------------------------#
-                # --- layer num. 0: init parameters ---#
-                # -------------------------------------#
+        #-------------------------------------#
+        #--- layer num. 0: init parameters ---#
+        #-------------------------------------#
 
-                # initiating parameters for this layer
+                #initiating parameters for this layer
                 'init': {
 
-                    # parameters for a 'defined'-type Layer
+                    #parameters for a 'defined'-type Layer
                     'defined': {
-                        # raster to use for the Layer
-                        'rast': make_unif_array(100),
-                        # point coordinates
-                        'pts': None,
-                        # point values
-                        'vals': None,
-                        # interpolation method {None, 'linear', 'cubic',
-                        # 'nearest'}
-                        'interp_method': None,
+                        #raster to use for the Layer
+                        'rast':                   make_unif_array(100),
+                        #point coordinates
+                        'pts':                    None,
+                        #point values
+                        'vals':                   None,
+                        #interpolation method {None, 'linear', 'cubic',
+                        #'nearest'}
+                        'interp_method':          None,
 
-                    },  # <END> 'defined'
+                        }, # <END> 'defined'
 
-                },  # <END> 'init'
+                    }, # <END> 'init'
 
-            },  # <END> layer num. 0
+                }, # <END> layer num. 0
 
-            # layer name (LAYER NAMES MUST BE UNIQUE!)
+
+            #layer name (LAYER NAMES MUST BE UNIQUE!)
             'lyr_1': {
 
-                # -------------------------------------#
-                # --- layer num. 1: init parameters ---#
-                # -------------------------------------#
+        #-------------------------------------#
+        #--- layer num. 1: init parameters ---#
+        #-------------------------------------#
 
-                # initiating parameters for this layer
+                #initiating parameters for this layer
                 'init': {
 
-                    # parameters for a 'nlmpy'-type Layer
+                    #parameters for a 'nlmpy'-type Layer
                     'nlmpy': {
-                        # nlmpy function to use the create this Layer
-                        'function': 'mpd',
-                        # number of rows (MUST EQUAL LANDSCAPE DIMENSION y!)
-                        'nRow': 100,
-                        # number of cols (MUST EQUAL LANDSCAPE DIMENSION x!)
-                        'nCol': 100,
-                        # level of spatial autocorrelation in element values
-                        'h': 0.5,
+                        #nlmpy function to use the create this Layer
+                        'function':                 'mpd',
+                        #number of rows (MUST EQUAL LANDSCAPE DIMENSION y!)
+                        'nRow':                     100,
+                        #number of cols (MUST EQUAL LANDSCAPE DIMENSION x!)
+                        'nCol':                     100,
+                        #level of spatial autocorrelation in element values
+                        'h':                        0.5,
 
-                    },  # <END> 'nlmpy'
+                        }, # <END> 'nlmpy'
 
-                },  # <END> 'init'
+                    }, # <END> 'init'
 
-            },  # <END> layer num. 1
-
-            #### NOTE: Individual Layers' sections can be copy-and-pasted (and
-            #### assigned distinct keys and names), to create additional Layers.
-
-        }  # <END> 'layers'
-
-     }, # <END> 'landscape'
+                }, # <END> layer num. 1
 
 
-#-----------------------------------------------------------------------------#
+
+    #### NOTE: Individual Layers' sections can be copy-and-pasted (and
+    #### assigned distinct keys and names), to create additional Layers.
+
+
+            } # <END> 'layers'
+
+        }, # <END> 'landscape'
+
+
+#-------------------------------------------------------------------------#
 
 #-----------------#
 #--- COMMUNITY ---#
