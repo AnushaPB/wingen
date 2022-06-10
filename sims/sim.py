@@ -313,6 +313,8 @@ params = {
                 'geo_vect_format':      'csv',
                 #format for raster geodata {'geotiff', 'txt'}
                 'geo_rast_format':      'geotiff',
+                #format for files containing non-neutral loci
+                'nonneut_loc_format':      'csv',
                 },
             }, #<END> 'data'
 
