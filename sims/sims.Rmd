@@ -1,0 +1,387 @@
+---
+title: "sims"
+output: html_document
+---
+
+```{r}
+library(wingen)
+library(raster)
+library(vcfR)
+library(viridis)
+library(foreach)
+library(doParallel)
+
+library(adegenet)
+library(hierfstat)
+```
+
+
+# system time sims
+```{r}
+vcf <- read.vcfR("data/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
+geo <- read.csv("data/mod-sim_params_it-0_t-500_spp-spp_0.csv")
+coords <- geo[,c("idx","x","y")]
+
+set.seed(42)
+l <- sample(nrow(vcf@gt), 10000)
+#s <- grid_samp(coords, npts = 350, ldim = 100)
+#s <- s[1:200]
+#si <- which(coords$idx %in% s)
+si <- sample(nrow(coords), 200)
+
+subvcf <- vcf[l,c(1, si+1)]
+
+subcoords <- coords[si,]
+subcoords <- subcoords[,c("x","y")]
+subcoords$y <- -subcoords$y
+coords$y <- -coords$y
+
+# check match
+all(colnames(subvcf@gt)[-1] == geo$idx[si])
+
+
+```
+
+```{r,  fig.width = 6, fig.height = 6}
+lyr <- read.csv("data/middle_earth.csv", header = FALSE)
+lyr <- raster(as.matrix(lyr))
+extent(lyr) <- extent(0,100,-100,0)
+
+par(mar = rep(2,4))
+plot(lyr, col = viridis::magma(100), main = "Carrying Capacity", axes = FALSE, box = FALSE)
+plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), main = "Distribution of Individuals", axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.6), xlab = "", ylab = "")
+points(subcoords$x, subcoords$y, pch = 16, cex = 1, col = mako(1, begin = 0.2, alpha = 0.9), xlab = "", ylab = "")
+legend(0,-80, 
+       c("All Individuals", "Sampled Individuals"), 
+       pch = c(16,16), 
+       col = c(mako(1, begin = 0.7), mako(1, begin = 0.2)),
+       bty = "n",
+       text.col = "black",
+       cex = 1.5)
+
+```
+
+```{r}
+cores <- 6
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+res1 <- window_gd(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+res2 <- window_gd(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = FALSE, min_n = 4, parallel = TRUE)
+stopCluster(cl)
+plot(res1[[1]], col = magma(100))
+points(subcoords[,c("x","y")])
+plot(res2[[1]], col = magma(100))
+points(subcoords[,c("x","y")])
+```
+
+
+```{r, fig.width = 6, fig.height = 6}
+
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 6, rarify = FALSE, parallel = TRUE)
+
+
+tr_k <- krig_gd(tr[["res"]], lyr)
+tr_k_mask <- mask_gd(tr_k, 4)
+
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
+plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
+
+```
+
+```{r, fig.width = 12, fig.height = 3}
+th <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+
+th_k <- krig_gd(r = th[["res"]], grd = lyr)
+th_k_mask <- mask_gd(th_k, 4)
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(th[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(th_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(th_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(th[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE, legend.shrink = 0.5)
+plot(th_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
+
+
+```
+```{r}
+cores <- 6
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
+stk <- stack()
+
+for(f in c(3, 5, 7)){
+  for(w in c(3, 5, 7)){
+    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+    stk <- stack(stk, res[[1]])
+    plot(res[[1]], col = magma(100))
+  }
+}
+
+
+```
+
+## ADD FOR LOOP TEST OF FACT VS WINDOW SIZE
+
+
+```{r, fig.width = 4, fig.height = 4}
+set.seed(42)
+
+resf <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+
+plot_time_test(resf, stat = "fact")
+plot_time_test(resf, stat = "ncell")
+plot_time_test(resf, stat = "total_count")
+```
+
+```{r, fig.width = 10, fig.height = 5}
+plot_rast_test(resf)
+```
+
+```{r, fig.width = 16, fig.height = 4}
+set.seed(42)
+
+resw <- purrr::map(c(3, 5, 7, 9, 11, 13), time_test, "wdim", subvcf, subcoords, lyr, fact = 2, stat = "pi", rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+
+plot_time_test(resw)
+
+```
+
+```{r, fig.width = 10, fig.height = 4}
+plot_rast_test(resw)
+```
+
+```{r, fig.width = 16, fig.height = 4}
+set.seed(42)
+
+resfr <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 5, rarify = FALSE, min_n = 10)
+
+plot_time_test(resfr)
+
+```
+
+```{r, fig.width = 10, fig.height = 4}
+plot_rast_test(resfr)
+```
+
+```{r, fig.width = 16, fig.height = 4}
+set.seed(42)
+
+reswr <- purrr::map(c(5, 7, 9, 11, 13), time_test, "wdim", subvcf, subcoords, lyr, fact = 4, stat = "pi", rarify = FALSE, min_n = 10)
+
+plot_time_test(reswr)
+
+```
+# REALIZATION: TIME CHANGING MIGHT HAVE TO DO WITH EDGE OF LANDSCAPE, NOT WINDOW SIZE EXACLTY - MAY NEED TO TRY FAKE LANDSCAPE WITH PERFECT EVEN SAMPLING TO GET CALCS RIGHT
+(replicate the vcf from one individual multiple times evenly across a landscape, also check if there is a diff based on the value but there shouldn't be)
+```{r, fig.width = 16, fig.height = 4}
+plot_rast_test(reswr)
+```
+
+
+
+
+```{r}
+set.seed(42)
+
+#ress <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 2, wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+ress <- purrr::map(c("het", "pi"), time_test, "stat", subvcf, subcoords, lyr, fact = 2, wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+
+```
+
+
+```{r}
+calc_mean_ar
+
+genind <- vcfR::vcfR2genind(subvcf)
+system.time(calc_mean_ar(subvcf[1:10000,1:10]))
+system.time(calc_mean_het(subvcf[1:10000,1:10]))
+system.time(calc_pi(subvcf[1:10000,1:10]))
+```
+
+```{r}
+ta <- c()
+th <- c()
+tp <- c()
+
+ # calc stats
+for(s in c(5, 10, 20)){
+  for(stat in c("pi", "het", "allelic.richness")){
+    
+    vcfsub <- vcf[,c(1, sample(ncol(vcf@gt)-1, s) + 1)]
+  
+    if(stat == "allelic.richness"){
+      gen <- vcfR::vcfR2genind(vcfsub)
+      Sys.time()
+      calc_mean_ar(gen)
+      time <- (Sys.time() - ptm)
+      ta <- c(ta,time)
+    }
+  
+    if(stat == "het"){
+      gen <- vcfR::is.het(vcfR::extract.gt(vcfsub), na_is_false = FALSE)
+      Sys.time()
+      calc_mean_het(gen)
+      time <- (Sys.time() - ptm)
+      th <- c(th,time)
+    }
+  
+    if(stat == "pi"){
+      gen <- vcf_to_dosage(vcfsub[,1:2])
+      Sys.time()
+      calc_pi(gen)
+      time <- (Sys.time() - ptm)
+      tp <- c(tp, time)
+     }
+    }
+}
+
+
+```
+
+```{r}
+df <- data.frame(sample = rep(c(5,10,20),3), time = c(ta, th, tp), stat = c(rep("AR", 3), rep("He", 3), rep("pi", 3)))
+#write.csv(df, "sims/ggtime_results.csv", row.names = FALSE)
+ggplot()+
+  geom_line(data=df, aes(x = sample, y = time, col = stat))+
+  theme_bw()
+```
+
+```{r}
+ta <- c()
+th <- c()
+tp <- c()
+
+ # calc stats
+for(s in c(1000, 10000, nrow(vcf@gt))){
+  for(stat in c("pi", "het", "allelic.richness")){
+    
+    vcfsub <- vcf[sample(nrow(vcf@gt), s),c(1, sample(ncol(vcf@gt)-1, 10) + 1)]
+  
+    if(stat == "allelic.richness"){
+      gen <- vcfR::vcfR2genind(vcfsub)
+      ptm <- Sys.time()
+      calc_mean_ar(gen)
+      time <- (Sys.time() - ptm)
+      ta <- c(ta,time)
+    }
+  
+    if(stat == "het"){
+      gen <- vcfR::is.het(vcfR::extract.gt(vcfsub), na_is_false = FALSE)
+      ptm <- Sys.time()
+      calc_mean_het(gen)
+      time <- (Sys.time() - ptm)
+      th <- c(th,time)
+    }
+  
+    if(stat == "pi"){
+      gen <- vcf_to_dosage(vcfsub)
+      ptm <- Sys.time()
+      calc_pi(gen)
+      time <- (Sys.time() - ptm)
+      tp <- c(tp, time)
+     }
+    }
+}
+
+```
+
+```{r}
+df <- data.frame(sample = rep( c(1000, 10000, nrow(vcf@gt)),3), time = c(ta, th, tp), stat = c(rep("AR", 3), rep("He", 3), rep("pi", 3)))
+write.csv(df, "sims/ggtime_results_loci.csv", row.names = FALSE)
+ggplot()+
+  geom_line(data=df, aes(x = sample, y = time, col = stat))+
+  theme_bw()
+```
+
+
+# UNIFORM GRID
+```{r, fig.width = 5, fig.height=5}
+m <- matrix(1, ncol = 14, nrow = 14)
+r <- raster(m)
+pts <- rasterToPoints(r)
+dcoords <- data.frame(pts[,c("x","y")])
+dvcf <- vcf[1:10000,c(1, sample(nrow(dcoords)) + 1)]
+
+dr <- raster(matrix(1,ncol = 100, nrow = 100))
+
+par(pty ="s")
+plot(dr)
+points(dcoords)
+
+resfr <- purrr::map(c(2, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr, stat = "pi", wdim = 5, rarify = FALSE, min_n = 2)
+
+plot_time_test(resfr, stat = "fact")
+```
+
+```{r, fig.width = 10, fig.height = 4}
+plot_rast_test(resfr)
+```
+```{r}
+resf <- purrr::map(c(2, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 2, rarify_nit = 10, min_n = 2)
+
+plot_time_test(resf, stat = "total_count")
+```
+
+
+note to self: I don't think I am counting total time right still...need to think on it
+
+
+# Rarefaction test
+
+```{r}
+m <- matrix(1, ncol = 10, nrow = 20)
+r1 <- raster(m)
+extent(r1) <- c(0, 10, 0, 20)
+m <- matrix(2, ncol = 10, nrow = 20)
+r2 <- raster(m)
+r2 <- aggregate(r2, 2)
+extent(r2) <- c(10, 20, 0, 20)
+pts <- rbind(rasterToPoints(r1), rasterToPoints(r2))
+
+
+dcoords <- data.frame(pts[,c("x","y")])
+plot(dcoords)
+dvcf <- vcf[1:10000,c(1, sample(nrow(dcoords)) + 1)]
+
+dr <- raster(matrix(1, ncol = 20, nrow = 20))
+extent(dr) <- c(0,20,0,20)
+par(pty ="s")
+plot(dr)
+points(dcoords)
+
+wr <- sim(dvcf, dcoords, dr, stat = "het", fact = 0, wdim = 7, min_n = 6, rarify = FALSE, parallel = TRUE)
+
+wor <- sim(dvcf, dcoords, dr, stat = "het", fact = 0, wdim = 7, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+
+plot(wr$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
+plot(wor$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
+
+par(mfrow = c(1,2))
+plot(wr$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "No Rarefaction")
+plot(wor$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "Rarefaction")
+```
+
+
