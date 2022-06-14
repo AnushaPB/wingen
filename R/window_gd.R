@@ -248,7 +248,7 @@ sample_gd <- function(gen, sub, stat) {
 
 #' Calculate mean allelic richness
 #'
-#' @param genind genind object
+#' @param genind genind
 #'
 #' @return allelic richness averaged across all loci
 #' @export
@@ -287,7 +287,7 @@ calc_mean_het <- function(hetmat){
 #'
 #' @examples
 calc_pi <- function(dos, L = ncol(dos)){
-  gd <- hierfstat::pi.dosage(dos)
+  gd <- hierfstat::pi.dosage(dos, L)
   return(gd)
 }
 
