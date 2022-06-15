@@ -15,6 +15,7 @@ Visualize genetic diversity across space using a sliding window approach with op
 
 Authors:
 \itemize{
+  \item Anne Chambers (\href{https://orcid.org/0000-0002-7369-0108}{ORCID})
   \item Ian Wang \email{ianwang@berkeley.edu} (\href{https://orcid.org/0000-0003-2554-9414}{ORCID})
 }
 
