@@ -248,7 +248,7 @@ sample_gd <- function(gen, sub, stat, nloci = NULL) {
 
 #' Calculate mean allelic richness
 #'
-#' @param genind genind object
+#' @param genind genind
 #'
 #' @return allelic richness averaged across all loci
 #' @export

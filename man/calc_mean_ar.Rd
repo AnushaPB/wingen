@@ -7,7 +7,7 @@
 calc_mean_ar(genind)
 }
 \arguments{
-\item{genind}{genind object}
+\item{genind}{genind}
 }
 \value{
 allelic richness averaged across all loci

@@ -2,12 +2,12 @@
 #' Raster interpolation using 'autoKrige'
 #'
 #' @param r RasterLayer or RasterStack
-#' @inheritParams krig_rast_lyr
+#' @inheritParams krig_gd_lyr
 #' @return RasterLayer or RasterStack
 #' @export
 #'
 #' @examples
-krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
+krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
 
   rls <- raster::as.list(r)
 
@@ -16,7 +16,7 @@ krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_ce
     warning("no grd provided, defaults to using first raster layer to create grd")
   }
 
-  rstk <- purrr::map(rls, krig_rast_lyr, grd, xy, agg, disagg, n_cell)
+  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, agg, disagg, n_cell)
   rstk <- raster::stack(rstk)
 
   names(rstk) <- names(r)
@@ -26,10 +26,11 @@ krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_ce
 
 #' Krige RasterLayer
 #'
-#' Helper function for \code{\link{krig_rast}}
+#' Helper function for \code{\link{krig_gd}}
 #'
 #' @param r raster for kriging
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param coords if provided, kriging will occur based only on values at these coordinates
 #' @param xy whether to co-krige with x and y (~x+y)
 #' @param agg factor used for aggregation if provided
 #' @param disagg factor used for disaggregation if provided
@@ -41,10 +42,15 @@ krig_rast <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_ce
 #' @keywords internal
 #'
 #' @examples
-krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000, na.rm = NULL) {
+krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 1000, samplen = NULL) {
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
+
+  if(!is.null(coords)){
+    rex <- extract(r, coords)
+    krig_df <- data.frame(coords, layer = rex)
+  }
 
   # create grid
   if(is.null(grd)){
@@ -84,15 +90,15 @@ krig_rast_lyr <- function(r, grd = NULL, xy = FALSE, agg = NULL, disagg = NULL, 
   krig_spdf <- krig_res$krige_output
 
   # turn SPDF into raster and stack
-  krig_raster <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
-  return(krig_raster)
+  krig_gder <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
+  return(krig_gder)
 }
 
 
 #' Conver a raster to a grid
 #'
 #' @param x RasterLayer
-#' @inheritParams krig_rast
+#' @inheritParams krig_gd
 #'
 #' @return gridded SpatialPixelsDataFrame
 #' @export
@@ -136,37 +142,3 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
   return(krig_grd)
 }
 
-
-#' Mask diversity map based on sample number
-#'
-#' @param x RasterStack where the first layer is genetic diversity and the second layer is sample count
-#' @param min_n minimum number of samples (everything less than this number is masked)
-#' @param plot whether to plot results
-#' @param bkg.col background color for plotting map
-#' @param col.pal color palette to use for plotting
-#'
-#' @return RasterLayer
-#' @export
-#'
-#' @examples
-div_mask <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
-
-  sc_index <- grepl("^sample_count", names(x))
-  ar <- x[[which(!sc_index)]]
-  counts <- x[[which(sc_index)]]
-
-  for(i in 1:raster::nlayers(ar)){
-    counts[[i]][counts[[i]] < min_n] <- NA
-    ar[[i]] <- raster::mask(ar[[i]], counts[[i]])
-  }
-
-
-  if(plot){
-    for(i in 1:raster::nlayers(ar)){
-      raster::plot(x[[which(!sc_index)]][[i]], col = bkg.col,  box = FALSE, axes = FALSE, legend = FALSE,  main = names(ar[[i]]))
-      raster::plot(ar[[i]], col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
-    }
-  }
-
-  return(ar)
-}
