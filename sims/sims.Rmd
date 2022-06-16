@@ -13,6 +13,8 @@ library(doParallel)
 
 library(adegenet)
 library(hierfstat)
+
+source("sim_functions.R")
 ```
 
 
@@ -67,7 +69,6 @@ cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 res1 <- window_gd(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
-res2 <- window_gd(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = FALSE, min_n = 4, parallel = TRUE)
 stopCluster(cl)
 plot(res1[[1]], col = magma(100))
 points(subcoords[,c("x","y")])
@@ -78,8 +79,7 @@ points(subcoords[,c("x","y")])
 
 ```{r, fig.width = 6, fig.height = 6}
 
-tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 6, rarify = FALSE, parallel = TRUE)
-
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
 tr_k <- krig_gd(tr[["res"]], lyr)
 tr_k_mask <- mask_gd(tr_k, 4)
@@ -95,7 +95,6 @@ plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box =
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
 
-
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
 plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
@@ -103,7 +102,7 @@ plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, lege
 ```
 
 ```{r, fig.width = 12, fig.height = 3}
-th <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+th <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
 
 th_k <- krig_gd(r = th[["res"]], grd = lyr)
 th_k_mask <- mask_gd(th_k, 4)
@@ -123,24 +122,35 @@ par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(th[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE, legend.shrink = 0.5)
 plot(th_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
 
-
 ```
-```{r}
+```{r, fig.width = 5, fig.height = 5}
 cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-stk <- stack()
+stk <- list()
 
+i = 1
 for(f in c(3, 5, 7)){
   for(w in c(3, 5, 7)){
-    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
-    stk <- stack(stk, res[[1]])
+    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
+    stk[[i]] <-  res[[1]]
     plot(res[[1]], col = magma(100))
+    i <- i + 1
   }
 }
 
-
+i = 1
+par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
+for(f in c(3, 5, 7)){
+  for(w in c(3, 5, 7)){
+    plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.23, 0.48), add = TRUE)
+    rect(0, -105, 100, 0, border = "black")
+    i <- i + 1
+  }
+}
+plot(stk[[1]], zlim = c(0.23, 0.48), col = magma(100) )
 ```
 
 ## ADD FOR LOOP TEST OF FACT VS WINDOW SIZE
@@ -163,7 +173,11 @@ plot_rast_test(resf)
 ```{r, fig.width = 16, fig.height = 4}
 set.seed(42)
 
-resw <- purrr::map(c(3, 5, 7, 9, 11, 13), time_test, "wdim", subvcf, subcoords, lyr, fact = 2, stat = "pi", rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+resw <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 3, stat = "pi", rarify = TRUE, rarify_n = 4, rarify_nit = 5)
+
+plot_time_test(resw)
+
+resw <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 5, stat = "pi", rarify = TRUE, rarify_n = 4, rarify_nit = 5)
 
 plot_time_test(resw)
 
@@ -201,15 +215,6 @@ plot_rast_test(reswr)
 ```
 
 
-
-
-```{r}
-set.seed(42)
-
-#ress <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 2, wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
-ress <- purrr::map(c("het", "pi"), time_test, "stat", subvcf, subcoords, lyr, fact = 2, wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
-
-```
 
 
 ```{r}
@@ -319,32 +324,32 @@ ggplot()+
 
 # UNIFORM GRID
 ```{r, fig.width = 5, fig.height=5}
-m <- matrix(1, ncol = 14, nrow = 14)
+m <- matrix(1, ncol = 10, nrow = 10)
 r <- raster(m)
 pts <- rasterToPoints(r)
 dcoords <- data.frame(pts[,c("x","y")])
 dvcf <- vcf[1:10000,c(1, sample(nrow(dcoords)) + 1)]
 
-dr <- raster(matrix(1,ncol = 100, nrow = 100))
+dr <- raster(matrix(1,ncol = 10, nrow = 10))
 
 par(pty ="s")
+ncell(dr) == nrow(dcoords)
 plot(dr)
 points(dcoords)
-
-resfr <- purrr::map(c(2, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr, stat = "pi", wdim = 5, rarify = FALSE, min_n = 2)
-
-plot_time_test(resfr, stat = "fact")
 ```
-
-```{r, fig.width = 10, fig.height = 4}
-plot_rast_test(resfr)
-```
+note: rarify_n needs to be 2 so that landscape/sampling doesn't affect the results (e.g. you don't want any NA values)
 ```{r}
-resf <- purrr::map(c(2, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 2, rarify_nit = 10, min_n = 2)
+dr100 <- raster(matrix(1, ncol = 100, nrow = 100))
+resf <- purrr::map(c(2, 3, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 2, rarify_nit = 2, min_n = 2)
 
 plot_time_test(resf, stat = "total_count")
 ```
-
+# FIGURE OUT THIS WEIRDNESS:
+```{r}
+resf <- purrr::map(c(3, 5, 7, 9), time_test, "wdim", dvcf, dcoords, dr, stat = "pi", fact = 1, rarify = TRUE, rarify_n = 2, rarify_nit = 2)
+plot_time_test(resf, stat = "wsize")
+plot_time_test(resf)
+```
 
 note to self: I don't think I am counting total time right still...need to think on it
 
@@ -385,3 +390,51 @@ plot(wor$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "Rarefaction")
 ```
 
 
+# Comparison of measures
+
+```{r, fig.width = 6, fig.height = 6}
+
+tr <- sim(subvcf, subcoords, lyr, stat = "allelic.richness", fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
+
+tr_k <- krig_gd(tr[["res"]], lyr)
+tr_k_mask <- mask_gd(tr_k, 4)
+
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
+plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
+
+```
+# FULL
+```{r}
+load("results_FULL_noRarify.RData")
+fulldiv <- mask_gd(results[[2]], 10)
+
+fulldiv <- results[[2]][[1]]
+fulldiv[results[[2]][[2]] < 4] <- NA
+plot(fulldiv, col = magma(100))
+```
+# COMPARE STATS
+```{r}
+set.seed(42)
+
+res_div <- purrr::map(c("pi", "het"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, min_n = 4, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(res_div[[1]][[2]][[1]],, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(res_div[[2]][[2]][[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+
+```
