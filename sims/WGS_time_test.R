@@ -18,7 +18,7 @@ l <- sample(nrow(vcf@gt), 100000)
 #s <- grid_samp(coords, npts = 350, ldim = 100)
 #s <- s[1:200]
 #si <- which(coords$idx %in% s)
-si <- sample(nrow(coords), 100)
+si <- sample(nrow(coords), 200)
 
 subvcf <- vcf[l,c(1, si+1)]
 

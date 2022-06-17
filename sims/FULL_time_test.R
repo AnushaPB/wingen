@@ -21,17 +21,17 @@ lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
 
 
-cores <- 8
+cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5,  rarify = FALSE, min_n = 4, parallel = TRUE, nloci = nrow(vcf@gt))
+#results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5,  rarify = FALSE, min_n = 4, parallel = TRUE, nloci = nrow(vcf@gt))
 
-save(results, file = "results_FULL2.RData")
+#save(results, file = "results_FULL2.RData")
 
-#results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(vcf@gt))
+results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(vcf@gt))
 
-#save(results, file = "results_FULL_rarify.RData")
+save(results, file = "results_FULL_rarify.RData")
 
 
 stopCluster(cl)
