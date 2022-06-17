@@ -15,7 +15,8 @@ window_helper(
   rarify_n,
   rarify_nit,
   min_n,
-  fun
+  fun,
+  nloci = NULL
 )
 }
 \arguments{

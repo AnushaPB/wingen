@@ -4,7 +4,7 @@
 \alias{rarify_helper}
 \title{Rarefaction helper function}
 \usage{
-rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun = mean)
+rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloci = NULL)
 }
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
