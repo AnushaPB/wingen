@@ -48,7 +48,7 @@ usethis::use_testthat()
 usethis::use_data_raw()
 ```
 ```{r}
-usethis::use_build_ignore("sim-vignette.Rmd")
+usethis::use_build_ignore("sims/")
 ```
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
