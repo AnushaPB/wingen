@@ -29,7 +29,7 @@ coords$y <- -coords$y
 # check match
 all(colnames(subvcf@gt)[-1] == geo$idx[si])
 
-lyr <- read.csv("data/middle_earth.csv", header = FALSE)
+lyr <- read.csv(here("sims/data/middle_earth.csv"), header = FALSE)
 lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
 
@@ -37,13 +37,30 @@ cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
+results <- list()
 
-save(results, file = "results_WGS_10p_200ind.RData")
+stats <- c("pi", "het", "allelic.richness")
+for(i in 1:length(stats)){
+  ptm <- Sys.time()
+  gdmapr <- window_gd(subvcf, subcoords, lyr, stat = stats[[i]], fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel = TRUE, nloci = nrow(subvcf@gt))
+
+  df <- data.frame(time = (Sys.time() - ptm),
+                   fact = 3,
+                   wdim = 5,
+                   rarify_n = 4,
+                   rarify_nit = 5)
+
+  results[[i]] <- list(df, gdmapr)
+
+  # temp: see results as they get output
+  write_rast_test(results, here("sims/outputs/WGS_200ind"))
+}
+
+save(results, file = here("sims/outputs/WGS_200ind.RData"))
 
 resls <- unlist_test(results)
-write.csv(resls$df, "time_results_WGS_10p_200ind.csv")
-write_rast_test(results, "WGS_200ind")
+write.csv(resls$df, here("sims/outputs/time_results_WGS_10p_200ind.csv"))
+write_rast_test(results, here("sims/outputs/WGS_200ind"))
 
 
 stopCluster(cl)
