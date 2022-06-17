@@ -13,5 +13,5 @@
 ^\.github$
 ^usethis_setup\.Rmd$
 ^docs$
-^sims\.Rmd$
 ^logo\.png$
+^sims$

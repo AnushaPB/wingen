@@ -4,7 +4,7 @@
 \alias{sample_gd}
 \title{Helper function to calculate genetic diversity of a sample}
 \usage{
-sample_gd(gen, sub, stat)
+sample_gd(gen, sub, stat, nloci = NULL)
 }
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}

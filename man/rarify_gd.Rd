@@ -4,7 +4,7 @@
 \alias{rarify_gd}
 \title{Helper function to rarify subsample and calculate genetic diversity}
 \usage{
-rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat = stat, fun = fun)
+rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci = NULL)
 }
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
