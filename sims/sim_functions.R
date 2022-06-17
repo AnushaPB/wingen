@@ -112,3 +112,14 @@ plot_rast_test <- function(res, zlim1 = NULL, zlim2 = NULL){
   lapply(res, function(x){plot(x[[1]], axes = FALSE, box = FALSE, col = viridis::magma(100), zlim = zlim1)})
   lapply(res, function(x){plot(x[[2]], axes = FALSE, box = FALSE, col = viridis::mako(100), zlim = zlim2)})
 }
+
+
+write_rast_test <- function(res, file.name = NULL){
+  resl <- unlist_test(res)$raster
+  lapply(resl, write_rast_helper, file.name)
+}
+
+write_rast_helper <- function(resl, file.name = NULL){
+  lyrname <- names(resl)[1]
+  terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
+}
