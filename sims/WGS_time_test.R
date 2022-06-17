@@ -43,3 +43,7 @@ results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", sub
 stopCluster(cl)
 
 save(results, file = "results_WGS_10p.RData")
+
+resls <- unlist_test(results)
+write.csv(resls$df, "time_results_WGS_10p.csv")
+terra::writeRaster(terra::rast(resls$raster), "results_WGS.tif")

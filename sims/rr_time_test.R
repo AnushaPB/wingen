@@ -37,3 +37,7 @@ extent(lyr) <- extent(0,100,-100,0)
 results <- purrr::map(c("pi", "het", "allelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = FALSE, nloci = nrow(subvcf@gt))
 
 save(results, file = "results_rr.RData")
+
+resls <- unlist_test(results)
+write.csv(resls$df, "time_results_rr.csv")
+terra::writeRaster(terra::rast(resls$raster), "results_rr.tif")

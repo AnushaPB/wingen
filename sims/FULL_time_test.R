@@ -30,7 +30,11 @@ registerDoParallel(cl)
 #save(results, file = "results_FULL2.RData")
 
 results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(vcf@gt))
+resls <- unlist_test(results)
+write.csv(resls$df, "time_results_FULL.csv")
+terra::writeRaster(terra::rast(resls$raster), "results_FULL.tif")
 
+#results <- purrr::map(c("het", "pi", "allelic.richness"), time_test, "stat", vcf, coords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(vcf@gt))
 save(results, file = "results_FULL_rarify.RData")
 
 
