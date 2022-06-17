@@ -16,7 +16,8 @@ window_gd_general(
   rarify_nit = 10,
   min_n = 2,
   fun = mean,
-  parallel = FALSE
+  parallel = FALSE,
+  nloci = NULL
 )
 }
 \arguments{
