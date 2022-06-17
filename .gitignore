@@ -1,4 +1,11 @@
 
+# SIMS
+sims/RData/
+sims/data/
+sims/bdrive/
+sims/GNX_mod-sims_params
+sims/outputs
+
 # History files
 .Rhistory
 .Rapp.history
