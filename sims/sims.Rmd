@@ -68,22 +68,16 @@ legend(0,-80,
 cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
-res1 <- window_gd(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+res1 <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
 stopCluster(cl)
 plot(res1[[1]], col = magma(100))
-points(subcoords[,c("x","y")])
-plot(res2[[1]], col = magma(100))
 points(subcoords[,c("x","y")])
 ```
 
 
 ```{r, fig.width = 6, fig.height = 6}
 
-<<<<<<< HEAD
 tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
-=======
-tr <- sim(subvcf, subcoords, lyr, stat = "pi",fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, rarify = FALSE, parallel = TRUE)
->>>>>>> 85a8ec4f95212fa728de953d32b95b7538024fdc
 
 tr_k <- krig_gd(tr[["res"]], lyr)
 tr_k_mask <- mask_gd(tr_k, 4)
@@ -357,7 +351,7 @@ note to self: I don't think I am counting total time right still...need to think
 ```{r, fig.width = 10, fig.height = 4, cache = TRUE}
 
 set.seed(42)
-ress <- purrr::map(c("het", "pi"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, nloci = 100000)
+ress <- purrr::map(c("het", "pi", "biallelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, nloci = 100000)
 
 
 par(pty = "s", mar = rep(3,4), mfrow = c(1,3), oma = rep(2,4))
@@ -368,11 +362,8 @@ plot(ress[[2]][[2]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Pi", axe
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 plot(ress[[1]][[2]]$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Heterozygosity", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
 
-# object has tr with first slot as time and second as AR rasters
-# created using this script: allelic_richness_time_test.R
-load("ar_results.RData")
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr[["res"]]$allelic_richness, col = viridis::magma(100, alpha = 1.0), main = "Allelic Richness", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
+plot(ress[[1]][[2]]$allelic_richness, col = viridis::magma(100, alpha = 1.0), main = "Allelic Richness", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
 ```
 
 # Rarefaction test
@@ -412,39 +403,73 @@ plot(wor$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "Rarefaction")
 
 
 # Comparison of measures
+```{r, fig.width=9, fig.height=3}
+load("RData/results_rr.RData")
+#RERUN
+rr_pi <- results[[2]][[2]]$pi*150000/10000
+rr_het <- results[[1]][[2]]$heterozygosity
+rr_ar <- results[[3]][[2]]$allelic_richness
+
+results <- stack(list.files("outputs/", full.names = TRUE))
+wgs_het <- results[[1]]
+wgs_pi <- results[[3]]
+
+
+full_het <- stack("RData/FULL_heterozygosity.tif")[[1]]
+full_het <- mask(full_het, wgs_pi)
+load("RData/results_pi_FULL.RData")
+full_pi <- full_norarify[[2]]$pi
+full_pi <- mask(full_pi, wgs_pi)
+
+pi_stack <- stack(full_pi, wgs_pi, rr_pi)
+het_stack <- stack(full_het, wgs_het, rr_het)
+names(pi_stack) <- paste0("pi_", c("FULL", "WGS", "rr"))
+names(het_stack) <- paste0("het_", c("FULL", "WGS", "rr"))
+
+par(mfrow = c(1,3))
+lapply(as.list(pi_stack), raster::plot, col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.1952093, 0.4601057))
+lapply(as.list(het_stack), raster::plot, col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.3257500, 0.4587500))
+```
 
 ```{r, fig.width = 6, fig.height = 6}
-
-tr <- sim(subvcf, subcoords, lyr, stat = "allelic.richness", fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
-
-tr_k <- krig_gd(tr[["res"]], lyr)
-tr_k_mask <- mask_gd(tr_k, 4)
-
+load("RData/results_WGS_10p.RData")
+results
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+plot(results[[2]][[2]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+plot(results[[1]][[2]]$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.32575, 0.45725))
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+plot(results[[3]][[2]]$allelic_richness, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
-plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(results[[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(results[[3]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 ```
-# FULL
-```{r}
-load("results_FULL_noRarify.RData")
-fulldiv <- mask_gd(results[[2]], 10)
 
-fulldiv <- results[[2]][[1]]
-fulldiv[results[[2]][[2]] < 4] <- NA
-plot(fulldiv, col = magma(100))
+```{r, fig.width = 6, fig.height = 6}
+load("RData/results_FULL_noRarify.RData")
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+# FIX CONVERSION LATER
+plot(full_norarify[[2]]$pi*150000/10000, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+full_het <- stack("RData/FULL_heterozygosity.tif")
+plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+plot(full_het$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+
+
 ```
+
+
 # COMPARE STATS
 ```{r}
 set.seed(42)
