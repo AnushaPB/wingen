@@ -12,11 +12,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' window_gd(vcf, coords, lyr, stat = "het")
 #' window_gd(vcf, coords, lyr, stat = "pi")
-#' window_gd(vcf, coords, lyr, stat = "allelic.richness")
 #' }
-window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
     vcf <- read.vcfR(vcf)
@@ -59,7 +57,7 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
-    names(results[[1]]) <- "allelic_richness"
+    names(results[[1]]) <- "biallelic_richness"
 
   }
 
@@ -106,6 +104,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
 
   if(parallel){
+
     rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
 
       result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci)
@@ -113,6 +112,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
       return(result)
 
     }
+
   } else {
 
     rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci)
@@ -262,6 +262,8 @@ sample_gd <- function(gen, sub, stat, nloci = NULL) {
 #' @return allelic richness averaged across all loci
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
 calc_mean_ar <- function(genind){
   genind$pop <- rep(factor(1), nrow(genind$tab))
@@ -277,6 +279,8 @@ calc_mean_ar <- function(genind){
 #'
 #' @return heterozygosity averaged across all individuals and then all loci
 #' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 calc_mean_het <- function(hetmat){
@@ -300,6 +304,8 @@ calc_mean_het <- function(hetmat){
 #' @return
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
 calc_pi <- function(dos, nloci = NULL){
   gd <- hierfstat::pi.dosage(dos, L = nloci)
@@ -312,6 +318,8 @@ calc_pi <- function(dos, nloci = NULL){
 #'
 #' @return allelic richness averaged across all loci
 #' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 calc_mean_biar <- function(dos){
@@ -327,6 +335,8 @@ calc_mean_biar <- function(dos){
 #'
 #' @return
 #' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 helper_calc_biar <- function(loc){
