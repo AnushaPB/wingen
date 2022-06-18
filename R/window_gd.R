@@ -3,7 +3,7 @@
 #' Sliding window map of genetic diversity
 #'
 #' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
-#' @param stat genetic diversity stat to calculate (can either be "pi", "allelic.richness", or "het")
+#' @param stat genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
 #' @param parallel whether to use parallelization
 #'
 #' @inheritParams window_gd_general
@@ -53,7 +53,15 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
     names(results[[1]]) <- "pi"
    }
 
+  if(stat == "biallelic.richness"){
+    #convert vcf to genlight to dosage matrix
+    gen <- vcf_to_dosage(vcf)
 
+    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+
+    names(results[[1]]) <- "allelic_richness"
+
+  }
 
   names(results[[2]]) <- "sample_count"
 
@@ -72,6 +80,8 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
 #' @param min_n min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
+#' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
+#' @param nloci for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
@@ -91,7 +101,6 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
 
   # make aggregated raster
   if(fact == 0){lyr <- lyr * 0} else {lyr <- raster::aggregate(lyr, fact) * 0}
-
 
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
@@ -256,6 +265,7 @@ sample_gd <- function(gen, sub, stat, nloci = NULL) {
 #' @examples
 calc_mean_ar <- function(genind){
   genind$pop <- rep(factor(1), nrow(genind$tab))
+  #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == nloci)
   ar <- hierfstat::allelic.richness(genind)$Ar[,1]
   gd <- mean(stats::na.omit(ar))
   return(gd)
@@ -270,6 +280,11 @@ calc_mean_ar <- function(genind){
 #'
 #' @examples
 calc_mean_het <- function(hetmat){
+  # if hetmat is not a matrix (e.g. has NULL dimensions/is a vector or has one value, calculate and return the mean)
+  if(is.null(dim(hetmat)) & length(hetmat) > 0){
+    return(stats::na.omit(mean(hetmat)))
+  }
+
   gd_byloci <- colMeans(hetmat, na.rm = TRUE)
   gd <- stats::na.omit(mean(gd_byloci))
   return(gd)
@@ -289,6 +304,40 @@ calc_mean_het <- function(hetmat){
 calc_pi <- function(dos, nloci = NULL){
   gd <- hierfstat::pi.dosage(dos, L = nloci)
   return(gd)
+}
+
+#' Calculate mean allelic richness for biallelic data
+#'
+#' @param dos dosage matrix
+#'
+#' @return allelic richness averaged across all loci
+#' @export
+#'
+#' @examples
+calc_mean_biar <- function(dos){
+  if(!all(dos %in% c(0,1,2))){stop("to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")}
+  ar_by_locus <- apply(dos, 2, helper_calc_biar)
+  mean_ar <- mean(na.omit(ar_by_locus))
+  return(mean_ar)
+}
+
+#' Helper function to calculate allelic richness for a biallelic locus
+#'
+#' @param loc genotypes at a biallelic locus (must have values of 0, 1, or 2)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+helper_calc_biar <- function(loc){
+  uq <- na.omit(unique(loc))
+  if (1 %in% uq){
+    return(2)
+  } else if (0 %in% uq & 2 %in% uq){
+    return(2)
+  } else {
+    return(1)
+  }
 }
 
 #' Check coordinate and genetic data
@@ -344,6 +393,4 @@ get_adj <- function(i, r, n, coord_cells){
 
   return(sub)
 }
-
-
 
