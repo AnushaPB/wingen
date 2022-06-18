@@ -1,3 +1,4 @@
+# Code to create example data
 
 ex_vcf <- vcfR::read.vcfR("inst/extdata/ex_vcf.vcf")
 usethis::use_data(ex_vcf, overwrite = TRUE)
