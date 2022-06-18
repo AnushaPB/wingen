@@ -14,6 +14,8 @@ rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloci = NULL)
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
+
+\item{nloci}{if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \description{
 Rarefaction helper function

@@ -27,7 +27,7 @@ window_gd(
 
 \item{lyr}{RasterLayer to slide window across}
 
-\item{stat}{genetic diversity stat to calculate (can either be "pi", "allelic.richness", or "het")}
+\item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotid diversity, "het" for average heterozygosity, "allelic.richness" for average allelic richness, or "biallelic.richness" to get average allelic richness for a biallelic dataset (this is faster than "allelic.richness"))}
 
 \item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
 
@@ -44,6 +44,8 @@ window_gd(
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
 \item{parallel}{whether to use parallelization}
+
+\item{nloci}{if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell

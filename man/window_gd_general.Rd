@@ -40,6 +40,10 @@ window_gd_general(
 \item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
+
+\item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
+
+\item{nloci}{if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell

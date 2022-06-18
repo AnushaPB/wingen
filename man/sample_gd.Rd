@@ -8,6 +8,8 @@ sample_gd(gen, sub, stat, nloci = NULL)
 }
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
+
+\item{nloci}{if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{
 mean allelic richness of a subsample
