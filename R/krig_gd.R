@@ -48,7 +48,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, di
   krig_df <- data.frame(raster::rasterToPoints(r))
 
   if(!is.null(coords)){
-    rex <- extract(r, coords)
+    rex <- raster::extract(r, coords)
     krig_df <- data.frame(coords, layer = rex)
   }
 
