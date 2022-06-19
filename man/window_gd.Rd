@@ -8,12 +8,12 @@ window_gd(
   vcf,
   coords,
   lyr,
-  stat = "het",
+  stat = "pi",
   fact = 0,
   wdim = 10,
   rarify = FALSE,
   rarify_n = 4,
-  rarify_nit = 10,
+  rarify_nit = 5,
   min_n = 2,
   fun = mean,
   parallel = FALSE,
@@ -27,7 +27,7 @@ window_gd(
 
 \item{lyr}{RasterLayer to slide window across}
 
-\item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotid diversity, "het" for average heterozygosity, "allelic.richness" for average allelic richness, or "biallelic.richness" to get average allelic richness for a biallelic dataset (this is faster than "allelic.richness"))}
+\item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
 
 \item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
 
@@ -43,9 +43,9 @@ window_gd(
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
-\item{parallel}{whether to use parallelization}
+\item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
 
-\item{nloci}{if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
+\item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
@@ -55,8 +55,6 @@ Sliding window map of genetic diversity
 }
 \examples{
 \dontrun{
-window_gd(vcf, coords, lyr, stat = "het")
 window_gd(vcf, coords, lyr, stat = "pi")
-window_gd(vcf, coords, lyr, stat = "allelic.richness")
 }
 }

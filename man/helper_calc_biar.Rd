@@ -12,3 +12,4 @@ helper_calc_biar(loc)
 \description{
 Helper function to calculate allelic richness for a biallelic locus
 }
+\keyword{internal}
