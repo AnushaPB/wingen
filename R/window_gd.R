@@ -4,7 +4,6 @@
 #'
 #' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
 #' @param stat genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
-#' @param parallel whether to use parallelization
 #'
 #' @inheritParams window_gd_general
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
@@ -14,10 +13,10 @@
 #' \dontrun{
 #' window_gd(vcf, coords, lyr, stat = "pi")
 #' }
-window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
-    vcf <- read.vcfR(vcf)
+    vcf <- vcfR::read.vcfR(vcf)
   } else if (class(vcf) != "vcfR" & !is.character(vcf)){
     stop("gen object must be of type vcfR or a path to a .vcf files")
   }
@@ -35,7 +34,7 @@ window_gd <- function(vcf, coords, lyr, stat = "het", fact = 0, wdim = 10, rarif
 
   }
 
-  if(stat == "het"){
+  if(stat == "het" | stat == "heterozygosity"){
     gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
@@ -325,7 +324,7 @@ calc_pi <- function(dos, nloci = NULL){
 calc_mean_biar <- function(dos){
   if(!all(dos %in% c(0,1,2))){stop("to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")}
   ar_by_locus <- apply(dos, 2, helper_calc_biar)
-  mean_ar <- mean(na.omit(ar_by_locus))
+  mean_ar <- mean(stats::na.omit(ar_by_locus))
   return(mean_ar)
 }
 
@@ -340,7 +339,7 @@ calc_mean_biar <- function(dos){
 #'
 #' @examples
 helper_calc_biar <- function(loc){
-  uq <- na.omit(unique(loc))
+  uq <- stats::na.omit(unique(loc))
   if (1 %in% uq){
     return(2)
   } else if (0 %in% uq & 2 %in% uq){
