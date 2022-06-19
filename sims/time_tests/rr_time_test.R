@@ -1,40 +1,29 @@
 library(wingen)
-library(raster)
-library(vcfR)
-library(viridis)
 library(foreach)
 library(doParallel)
-library(adegenet)
-library(hierfstat)
 library(here)
 source(here("sims/sim_functions.R"))
 
-vcf <- read.vcfR("data/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
-geo <- read.csv("data/mod-sim_params_it-0_t-500_spp-spp_0.csv")
-coords <- geo[,c("idx","x","y")]
-
 set.seed(42)
+
+load_middle_earth()
+
+IDS <- read.csv(here("sims/data/samples_seed42.csv"))
+# get indexes of individuals
+si <- IDS$inds
+# sample loci
 l <- sample(nrow(vcf@gt), 10000)
-si <- sample(nrow(coords), 200)
-
-subvcf <- vcf[l,c(1, si+1)]
-
-subcoords <- coords[si,]
-subcoords <- subcoords[,c("x","y")]
-subcoords$y <- -subcoords$y
-coords$y <- -coords$y
+# subset coodinates
+coords <- coords[si,]
+# subset vcf
+vcf <- vcf[l,c(1, si + 1)]
 
 # check match
-all(colnames(subvcf@gt)[-1] == geo$idx[si])
+all(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
-lyr <- read.csv("data/middle_earth.csv", header = FALSE)
-lyr <- raster(as.matrix(lyr))
-extent(lyr) <- extent(0,100,-100,0)
+# run test
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
 
-results <- purrr::map(c("pi", "het", "allelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, parallel = FALSE, nloci = nrow(subvcf@gt))
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
 
-save(results, file = "results_rr.RData")
 
-resls <- unlist_test(results)
-write.csv(resls$df, "time_results_rr.csv")
-terra::writeRaster(terra::rast(resls$raster), "results_rr.tif")
