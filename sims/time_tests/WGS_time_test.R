@@ -19,7 +19,7 @@ si <- IDS$inds
 # sample loci
 l <- sample(nrow(vcf@gt), 100000)
 
-subvcf <- vcf[l,c(1, si+1)]
+subvcf <- vcf[l,c(1, si + 1)]
 
 subcoords <- coords[si,]
 subcoords <- subcoords[,c("x","y")]
@@ -42,7 +42,7 @@ results <- list()
 stats <- c("pi", "het", "allelic.richness")
 for(i in 1:length(stats)){
   ptm <- Sys.time()
-  gdmapr <- window_gd(subvcf, subcoords, lyr, stat = stats[[i]], fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel = TRUE, nloci = nrow(subvcf@gt))
+  gdmapr <- window_gd(subvcf, subcoords, lyr, stat = stats[i], fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel = TRUE, nloci = nrow(subvcf@gt))
 
   df <- data.frame(time = (Sys.time() - ptm),
                    fact = 3,

@@ -28,7 +28,7 @@ registerDoParallel(cl)
 stats <- c("pi", "het", "allelic.richness")
 for(i in 1:length(stats)){
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat = stats[[i]], fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel = TRUE, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat = stats[i], fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel = TRUE, nloci = nrow(vcf@gt))
 
   df <- data.frame(time = (Sys.time() - ptm),
                    fact = 3,
