@@ -15,3 +15,4 @@ allelic richness averaged across all loci
 \description{
 Calculate mean allelic richness for biallelic data
 }
+\keyword{internal}

@@ -15,3 +15,4 @@ heterozygosity averaged across all individuals and then all loci
 \description{
 Calculate mean heterozygosity
 }
+\keyword{internal}

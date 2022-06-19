@@ -14,3 +14,4 @@ calc_pi(dos, nloci = NULL)
 \description{
 Wrapper for \link[hierfstat]{pi.dosage} function
 }
+\keyword{internal}
