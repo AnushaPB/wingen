@@ -1,3 +1,23 @@
+load_middle_earth <- function(){
+  # load genetic data
+  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-500_spp-spp_0.vcf"))
+  assign("vcf", vcf, envir = .GlobalEnv)
+
+  # load coords
+  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-500_spp-spp_0.csv"))
+  coords <- geo[,c("idx", "x", "y")]
+  coords$y <- -coords$y
+  assign("coords", coords, envir = .GlobalEnv)
+
+  # load rasters
+  lyr <- read.csv(here::here("sims/data/middle_earth.csv"), header = FALSE)
+  lyr <- raster::raster(as.matrix(lyr))
+  raster::extent(lyr) <- raster::extent(0,100,-100,0)
+  assign("lyr", lyr, envir = .GlobalEnv)
+
+  return()
+}
+
 grid_samp <- function(pts, npts, ldim, full = FALSE){
   inc <- ldim/sqrt(npts)
   xgrid <- ygrid <- seq(0, ldim, inc)
@@ -82,8 +102,40 @@ time_test <- function(val, var, vcf, coords, lyr, stat = "pi", fact = 2, wdim = 
   return(list(df, gdmapr))
 }
 
+default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
+  ptm <- Sys.time()
+  gdmapr <- window_gd(vcf, coords, lyr, stat, fact = 3, wdim = 5, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
+
+  df <- data.frame(time = (Sys.time() - ptm),
+                   fact = 3,
+                   wdim = 5)
+
+  if(rarify){
+    df$rarify_n <- 4
+    df$rarify_nit <- 5
+  } else {
+    df$min_n <- 4
+  }
+
+  # make ls of results
+  results <- list(df, gdmapr)
+
+  # temp: see results as they get output
+  write_rast_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify)))
+
+  return(results)
+}
+
+run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name, stats =  c("pi", "het", "biallelic.richness")){
+  results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
+  write_time_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_time_results.csv")))
+  purrr::map(results, write_rast_test, here(paste0("sims/outputs/", file.name,"_rarify", rarify)))
+}
+
+
 unlist_test <- function(res){
   df <- purrr::map_dfr(res, function(x){x[[1]]})
+
   r <- purrr::map(res, function(x){x[[2]]})
   return(list(df = df, raster = r))
 }
@@ -109,17 +161,28 @@ plot_time_test <- function(res, stat = "all"){
 plot_rast_test <- function(res, zlim1 = NULL, zlim2 = NULL){
   res <- unlist_test(res)$raster
   par(pty = "s", mfrow = c(2, length(res)), mar = rep(2,4), oma = rep(2,4))
-  lapply(res, function(x){plot(x[[1]], axes = FALSE, box = FALSE, col = viridis::magma(100), zlim = zlim1)})
-  lapply(res, function(x){plot(x[[2]], axes = FALSE, box = FALSE, col = viridis::mako(100), zlim = zlim2)})
+  purrr::map(res, function(x){plot(x[[1]], axes = FALSE, box = FALSE, col = viridis::magma(100), zlim = zlim1)})
+  purrr::map(res, function(x){plot(x[[2]], axes = FALSE, box = FALSE, col = viridis::mako(100), zlim = zlim2)})
 }
 
 
-write_rast_test <- function(res, file.name = NULL){
-  resl <- unlist_test(res)$raster
-  lapply(resl, write_rast_helper, file.name)
+write_time_test <- function(res, file.name){
+  df <- purrr::map_dfr(res, function(x){x[[1]]})
+  write.csv(df, file.name)
 }
 
-write_rast_helper <- function(resl, file.name = NULL){
+write_rast_test <- function(res, file.name){
+  if(class(res[[2]]) == "RasterStack"){
+    resl <- res[[2]]
+    write_rast_helper(resl, file.name)
+  } else {
+    resl <- purrr::map(res, function(x){x[[2]]})
+    purrr::map(resl, write_rast_helper, file.name)
+  }
+}
+
+write_rast_helper <- function(resl, file.name){
   lyrname <- names(resl)[1]
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
+
