@@ -21,7 +21,7 @@ message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 all(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "WGS")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "WGS_allSamples")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "WGS")
 
