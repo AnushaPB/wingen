@@ -10,6 +10,10 @@ set.seed(42)
 load_middle_earth()
 coords <- coords[,c("x","y")]
 
+
+# confirm that correct set is being used
+message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+
 cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)

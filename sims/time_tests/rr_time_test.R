@@ -23,6 +23,10 @@ vcf <- vcf[l, c(1, si + 1)]
 # check match
 all(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
+
+# confirm that correct set is being used
+message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+
 # run test
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
 

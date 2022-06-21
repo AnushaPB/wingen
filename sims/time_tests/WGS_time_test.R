@@ -17,7 +17,10 @@ l <- sample(nrow(vcf@gt), 100000)
 # subset coodinates
 coords <- coords[si,]
 # subset vcf
-vcf <- vcf[l,c(1, si + 1)]
+vcf <- vcf[l, c(1, si + 1)]
+
+# confirm that correct set is being used
+message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
 all(colnames(vcf@gt)[-1] == as.character(coords$idx))
