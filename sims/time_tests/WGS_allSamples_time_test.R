@@ -20,10 +20,14 @@ message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 # check match
 all(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
+cores <- 10
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "WGS_allSamples")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "WGS_allSamples")
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "WGS_allSamples")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "WGS_allSamples")
 
-
+stopCluster(cl)
 
