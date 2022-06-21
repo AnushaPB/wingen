@@ -6,6 +6,7 @@ source(here("sims/sim_functions.R"))
 
 set.seed(42)
 
+# load vcf, coords, and lyr
 load_middle_earth()
 
 cores <- 10
