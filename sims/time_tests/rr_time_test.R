@@ -27,9 +27,13 @@ all(colnames(vcf@gt)[-1] == as.character(coords$idx))
 # confirm that correct set is being used
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-# run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
+cores <- 10
+cl <- makeCluster(cores)
+registerDoParallel(cl)
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
+# run test
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr", stats = "het")
+
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
 
 
