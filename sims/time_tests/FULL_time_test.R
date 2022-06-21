@@ -8,6 +8,7 @@ set.seed(42)
 
 # load vcf, coords, and lyr
 load_middle_earth()
+coords <- coords[,c("x","y")]
 
 cores <- 10
 cl <- makeCluster(cores)
