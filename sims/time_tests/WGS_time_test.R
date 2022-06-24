@@ -23,16 +23,16 @@ vcf <- vcf[l, c(1, si + 1)]
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
-all(colnames(vcf@gt)[-1] == as.character(coords$idx))
+stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "WGS")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "WGS")
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "WGS")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "WGS")
 
 
 stopCluster(cl)
