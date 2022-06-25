@@ -46,7 +46,7 @@ wgd <- window_gd(vcf,
           coords,
           lyr,
           stat = "pi",
-          fact = 5,
+          fact = 3,
           wdim = 5,
           rarify = TRUE,
           nloci = 1000)

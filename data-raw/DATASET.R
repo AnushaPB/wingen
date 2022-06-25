@@ -17,16 +17,15 @@ middle_earth_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-500_spp-spp_
   dplyr::mutate(y = -y)
 
 # get subsample
-set.seed(42)
-samples <- sample(1:nrow(middle_earth_coords), 200)
-middle_earth_coords <- middle_earth_coords[samples, ]
+samples <- read.csv("inst/extdata/samples_seed42.csv")
+middle_earth_coords <- middle_earth_coords[samples$inds, ]
 
 # load genetic data
 vcf <- vcfR::read.vcfR("inst/extdata/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
 
 # subsample loci and individuals
 # note: first column is FORMAT, hence c(1, samples + 1)
-middle_earth_vcf <- vcf[sample(1:nrow(vcf@gt), 1000), c(1, samples + 1)]
+middle_earth_vcf <- vcf[sample(1:nrow(vcf@gt), 1000), c(1, samples$inds + 1)]
 # check to make sure order and IDs are the same
 stopifnot(colnames(middle_earth_vcf@gt)[-1] == middle_earth_coords$idx)
 
