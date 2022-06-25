@@ -49,6 +49,8 @@ usethis::use_data_raw()
 ```
 ```{r}
 usethis::use_build_ignore("sims/")
+# THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
+usethis::use_build_ignore("inst/extdata/")
 ```
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
