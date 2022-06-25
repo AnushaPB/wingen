@@ -21,5 +21,34 @@ devtools::install_github("AnushaPB/wingen")
 
 ``` r
 library(wingen)
-## TODO: add basic example code
+
+# load example middle earth data 
+## vcf - biallelic SNP data (1000 loci x 100 individuals
+## coords - coordinates of samples
+## lyr - raster layer
+load_middle_earth_ex()
+
+# Run sliding window calculations of pi with rarefaction
+wgd <- window_gd(vcf,
+          coords,
+          lyr,
+          stat = "pi",
+          fact = 5,
+          wdim = 5,
+          rarify = TRUE,
+          nloci = 1000)
+
+# Krige results
+kgd <- krig_gd(wgd, lyr)
+
+# Mask results
+mgd <- mask_gd(kgd, min_n = 4)
+
+# Plot results
+par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))
+plot_gd(wgd, main = "Window pi")
+plot_gd(kgd, main = "Kriged pi")
+plot_gd(mgd, main = "Kriged & masked pi")
 ```
+
+<img src="man/figures/README-example-1.png" width="100%" />
