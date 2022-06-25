@@ -274,7 +274,7 @@ calc_mean_ar <- function(genind){
 
 #' Calculate mean heterozygosity
 #'
-#' @param hetmat matrix of heterozygosity (0 = homozygote, 1 = heterozygote)
+#' @param hetmat matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)
 #'
 #' @return heterozygosity averaged across all individuals and then all loci
 #' @export
@@ -288,8 +288,7 @@ calc_mean_het <- function(hetmat){
     return(stats::na.omit(mean(hetmat)))
   }
 
-  gd_byloci <- colMeans(hetmat, na.rm = TRUE)
-  gd <- stats::na.omit(mean(gd_byloci))
+  gd <- mean(hetmat, na.rm = TRUE)
   return(gd)
 }
 
