@@ -35,6 +35,7 @@ Imports:
 Suggests: 
     devtools, 
     knitr,
+    rgeos,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
