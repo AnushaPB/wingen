@@ -186,3 +186,38 @@ write_rast_helper <- function(resl, file.name){
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
 
+get_divout <- function(file.name, rarify = NULL, measure = NULL, file.type = ".tif", rootPath = here("sims/outputs")){
+  # Code to search for file in directory
+  listFiles <- list.files(rootPath, recursive = FALSE)
+  presentFile <- grepl(file.name, listFiles) & grepl(file.type, listFiles)
+  if(!is.null(rarify)){ presentFile <- presentFile & grepl(paste0("rarify", rarify), listFiles)}
+  if(!is.null(measure)){ presentFile <- presentFile & grepl(measure, listFiles)}
+  locFile <- listFiles[presentFile]
+
+  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, measure, "- skipping")); return()}
+  file <- here(rootPath, locFile)
+  r <- raster::stack(file)
+  r <- r[[seq(1, nlayers(r),2)]]
+
+  return(r)
+}
+
+get_timeout <- function(file.name, rarify = NULL, parallel = NULL, file.type = ".csv", rootPath = here("sims/outputs")){
+  # Code to search for file in directory
+  listFiles <- list.files(rootPath, recursive = FALSE)
+  presentFile <- grepl(paste0(file.name, "_rarify"), listFiles) & grepl(file.type, listFiles)
+  if(!is.null(rarify)){ presentFile <- presentFile & grepl(paste0("rarify", rarify), listFiles)}
+  if(!is.null(parallel)){ presentFile <- presentFile & grepl(paste0("parallel", parallel), listFiles)}
+  locFile <- listFiles[presentFile]
+
+  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, parallel, "- skipping")); return()}
+  file <- here(rootPath, locFile)
+  r <- purrr::map_dfr(file, read.csv)
+
+  r$stat <- c("pi", "heterozygosity", "allelic richness")
+  r$parallel <- parallel
+  r$rarify <- rarify
+  r$dataset <- file.name
+
+  return(r)
+}
