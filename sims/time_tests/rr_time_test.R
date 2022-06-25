@@ -21,19 +21,14 @@ coords <- coords[si,]
 vcf <- vcf[l, c(1, si + 1)]
 
 # check match
-all(colnames(vcf@gt)[-1] == as.character(coords$idx))
-
+stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 # confirm that correct set is being used
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-cores <- 10
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr", stats = "het")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
 
 stopCluster(cl)

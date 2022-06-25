@@ -121,15 +121,17 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   results <- list(df, gdmapr)
 
   # temp: see results as they get output
-  write_rast_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify)))
+  write_rast_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+
+  message("calculation of ", stat, " complete...")
 
   return(results)
 }
 
 run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name, stats =  c("pi", "het", "biallelic.richness")){
   results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
-  write_time_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_time_results.csv")))
-  purrr::map(results, write_rast_test, here(paste0("sims/outputs/", file.name,"_rarify", rarify)))
+  write_time_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
+  purrr::map(results, write_rast_test, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
 }
 
 
