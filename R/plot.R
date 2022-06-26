@@ -20,6 +20,6 @@ plot_gd <- function(x, col = viridis::magma(100), zlim = NULL, main = NULL){
 #' @export
 #'
 #' @examples
-plot_count <- function(x, col = viridis::mako(100), zlim = NULL){
+plot_count <- function(x, col = viridis::mako(100), zlim = NULL, main = NULL){
   raster::plot(x[[2]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
 }

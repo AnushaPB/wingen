@@ -7,7 +7,14 @@
 #' @export
 #'
 #' @examples
-krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
+#' load_mini_ex()
+#' wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+#' kpi <- krig_gd(wpi, lyr)
+#' plot_gd(kpi)
+#' plot_count(kpi)
+#'
+
+krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
 
   rls <- raster::as.list(r)
 
@@ -16,7 +23,7 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
     warning("no grd provided, defaults to using first raster layer to create grd")
   }
 
-  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, agg, disagg, n_cell)
+  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, resample, agg, disagg, n_cell)
   rstk <- raster::stack(rstk)
 
   names(rstk) <- names(r)
@@ -32,8 +39,9 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates
 #' @param xy whether to co-krige with x and y (~x+y)
-#' @param agg factor used for aggregation if provided
-#' @param disagg factor used for disaggregation if provided
+#' @param resample if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)
+#' @param agg factor used for aggregation of grd if provided
+#' @param disagg factor used for disaggregation of grd if provided
 #' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
 #'
 #' @return RasterLayer
@@ -42,7 +50,12 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
 #' @keywords internal
 #'
 #' @examples
-krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 1000, samplen = NULL) {
+krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg = NULL, disagg = NULL, n_cell = 1000) {
+
+  # resample raster layer to grd resolution if grd is a raster and resample = TRUE
+  if(class(grd) == "RasterLayer" & resample){
+    r <- raster::resample(r, grd)
+  }
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))

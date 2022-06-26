@@ -20,3 +20,26 @@ load_middle_earth_ex <- function(){
 
   return(message("middle earth loaded..."))
 }
+
+#' Load mini middle earth example
+#'
+#' Loads mini middle earth example data and assigns to simple names
+#'
+#' @return three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
+#' @export
+#'
+#' @examples
+load_mini_ex <- function(){
+
+  # load all data
+  data("mini_vcf")
+  data("mini_coords")
+  data("mini_lyr")
+
+  # assign data to simpler object names
+  assign("vcf", mini_vcf, envir = .GlobalEnv)
+  assign("coords", mini_coords, envir = .GlobalEnv)
+  assign("lyr", mini_lyr, envir = .GlobalEnv)
+
+  return(message("mini middle earth loaded..."))
+}

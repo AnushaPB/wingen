@@ -9,10 +9,10 @@ krig_gd_lyr(
   grd = NULL,
   coords = NULL,
   xy = FALSE,
+  resample = FALSE,
   agg = NULL,
   disagg = NULL,
-  n_cell = 1000,
-  samplen = NULL
+  n_cell = 1000
 )
 }
 \arguments{
@@ -24,9 +24,11 @@ krig_gd_lyr(
 
 \item{xy}{whether to co-krige with x and y (~x+y)}
 
-\item{agg}{factor used for aggregation if provided}
+\item{resample}{if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)}
 
-\item{disagg}{factor used for disaggregation if provided}
+\item{agg}{factor used for aggregation of grd if provided}
+
+\item{disagg}{factor used for disaggregation of grd if provided}
 
 \item{n_cell}{number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}}
 }

@@ -29,3 +29,12 @@ RasterLayer
 \description{
 Mask diversity map based on sample number
 }
+\examples{
+
+load_mini_ex()
+wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+kpi <- krig_gd(wpi, lyr)
+mpi <- mask_gd(kpi, min_n = 3)
+plot_gd(mpi)
+
+}

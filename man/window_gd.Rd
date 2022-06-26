@@ -10,7 +10,7 @@ window_gd(
   lyr,
   stat = "pi",
   fact = 0,
-  wdim = 10,
+  wdim = 5,
   rarify = FALSE,
   rarify_n = 4,
   rarify_nit = 5,
@@ -54,7 +54,13 @@ RasterStack that includes a raster of genetic diversity and a raster of the numb
 Sliding window map of genetic diversity
 }
 \examples{
-\dontrun{
-window_gd(vcf, coords, lyr, stat = "pi")
-}
+load_mini_ex()
+wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+whet <- window_gd(vcf, coords, lyr, stat = "het", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+war <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+plot_gd(wpi)
+plot_gd(whet)
+plot_gd(war)
+plot_count(wpi)
+
 }

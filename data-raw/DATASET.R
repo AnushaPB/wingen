@@ -1,15 +1,4 @@
-# Code to create example data
-
-ex_vcf <- vcfR::read.vcfR("inst/extdata/ex_vcf.vcf")
-usethis::use_data(ex_vcf, overwrite = TRUE)
-
-ex_coords <- read.csv("inst/extdata/ex_coords.csv")
-usethis::use_data(ex_coords, overwrite = TRUE)
-
-ex_lyr <- raster::raster("inst/extdata/ex_layer.tif")
-usethis::use_data(ex_lyr, overwrite = TRUE)
-
-# MIDDLE EARTH EXAMPLE DATA
+# Code to create middle earth example data -------------------------------------------------------------
 
 # load coords
 middle_earth_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-500_spp-spp_0.csv") %>%
@@ -39,3 +28,13 @@ lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
 middle_earth_lyr <- raster::raster(as.matrix(lyr))
 raster::extent(middle_earth_lyr) <- raster::extent(0,100,-100,0)
 usethis::use_data(middle_earth_lyr, overwrite = TRUE)
+
+# Code to create tiny example dataset ------------------------------------------------------------------
+mini_lyr <- raster::aggregate(middle_earth_lyr, 10)
+mini_vcf <- middle_earth_vcf[1:10,1:11]
+mini_coords <- middle_earth_coords[1:10,]
+
+usethis::use_data(mini_lyr, overwrite = TRUE)
+usethis::use_data(mini_vcf, overwrite = TRUE)
+usethis::use_data(mini_coords, overwrite = TRUE)
+

@@ -9,6 +9,7 @@ krig_gd(
   grd = NULL,
   coords = NULL,
   xy = FALSE,
+  resample = FALSE,
   agg = NULL,
   disagg = NULL,
   n_cell = 10000
@@ -23,9 +24,11 @@ krig_gd(
 
 \item{xy}{whether to co-krige with x and y (~x+y)}
 
-\item{agg}{factor used for aggregation if provided}
+\item{resample}{if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)}
 
-\item{disagg}{factor used for disaggregation if provided}
+\item{agg}{factor used for aggregation of grd if provided}
+
+\item{disagg}{factor used for disaggregation of grd if provided}
 
 \item{n_cell}{number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}}
 }
@@ -34,4 +37,12 @@ RasterLayer or RasterStack
 }
 \description{
 Raster interpolation using 'autoKrige'
+}
+\examples{
+load_mini_ex()
+wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+kpi <- krig_gd(wpi, lyr)
+plot_gd(kpi)
+plot_count(kpi)
+
 }

@@ -11,6 +11,13 @@
 #' @export
 #'
 #' @examples
+#'
+#' load_mini_ex()
+#' wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
+#' kpi <- krig_gd(wpi, lyr)
+#' mpi <- mask_gd(kpi, min_n = 3)
+#' plot_gd(mpi)
+#'
 mask_gd <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
 
   sc_index <- grepl("^sample_count", names(x))
