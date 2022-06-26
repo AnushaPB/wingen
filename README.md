@@ -39,10 +39,10 @@ wgd <- window_gd(vcf,
           nloci = 1000)
 
 # Krige results
-kgd <- krig_gd(wgd, lyr)
+kgd <- krig_gd(wgd, lyr, disagg = 2)
 
 # Mask results
-mgd <- mask_gd(kgd, min_n = 4)
+mgd <- mask_gd(kgd, min_n = 3)
 
 # Plot results
 par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))
