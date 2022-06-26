@@ -102,21 +102,18 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="load_mini_ex.html">load_mini_ex</a></span><span class="op">(</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in load_mini_ex():</span> could not find function "load_mini_ex"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> mini middle earth loaded...</span>
 <span class="r-in"><span class="va">wpi</span> <span class="op">&lt;-</span> <span class="fu">window_gd</span><span class="op">(</span><span class="va">vcf</span>, <span class="va">coords</span>, <span class="va">lyr</span>, stat <span class="op">=</span> <span class="st">"pi"</span>, nloci <span class="op">=</span> <span class="fl">10</span>, rarify_n <span class="op">=</span> <span class="fl">4</span>, rarify_nit <span class="op">=</span> <span class="fl">5</span>, rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4,     rarify_nit = 5, rarify = TRUE):</span> object 'vcf' not found</span>
 <span class="r-in"><span class="va">whet</span> <span class="op">&lt;-</span> <span class="fu">window_gd</span><span class="op">(</span><span class="va">vcf</span>, <span class="va">coords</span>, <span class="va">lyr</span>, stat <span class="op">=</span> <span class="st">"het"</span>, nloci <span class="op">=</span> <span class="fl">10</span>, rarify_n <span class="op">=</span> <span class="fl">4</span>, rarify_nit <span class="op">=</span> <span class="fl">5</span>, rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in window_gd(vcf, coords, lyr, stat = "het", nloci = 10, rarify_n = 4,     rarify_nit = 5, rarify = TRUE):</span> object 'vcf' not found</span>
 <span class="r-in"><span class="va">war</span> <span class="op">&lt;-</span> <span class="fu">window_gd</span><span class="op">(</span><span class="va">vcf</span>, <span class="va">coords</span>, <span class="va">lyr</span>, stat <span class="op">=</span> <span class="st">"biallelic.richness"</span>, nloci <span class="op">=</span> <span class="fl">10</span>, rarify_n <span class="op">=</span> <span class="fl">4</span>, rarify_nit <span class="op">=</span> <span class="fl">5</span>, rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in window_gd(vcf, coords, lyr, stat = "biallelic.richness", nloci = 10,     rarify_n = 4, rarify_nit = 5, rarify = TRUE):</span> object 'vcf' not found</span>
 <span class="r-in"><span class="fu"><a href="plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wpi</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'wpi' not found</span>
+<span class="r-plt img"><img src="window_gd-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="fu"><a href="plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">whet</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'whet' not found</span>
+<span class="r-plt img"><img src="window_gd-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="fu"><a href="plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">war</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'war' not found</span>
+<span class="r-plt img"><img src="window_gd-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span class="fu"><a href="plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">wpi</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in h(simpleError(msg, call)):</span> error in evaluating the argument 'x' in selecting a method for function 'plot': object 'wpi' not found</span>
+<span class="r-plt img"><img src="window_gd-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

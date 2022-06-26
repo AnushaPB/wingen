@@ -190,9 +190,10 @@
           wdim <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
           nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<pre><code><span class="co">## Loading required namespace: adegenet</span></code></pre>
 <pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##    9.87    0.27   10.36</span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<span class="co">##   10.49    0.47   11.21</span></code></pre>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cores</span> <span class="op">&lt;-</span> <span class="fl">5</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="va">cores</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
@@ -209,14 +210,14 @@
           parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##    0.52    0.08   11.23</span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<span class="co">##    0.82    0.09   11.95</span></code></pre>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="other-genetic-diversity-metrics">Other genetic diversity metrics<a class="anchor" aria-label="anchor" href="#other-genetic-diversity-metrics"></a>
 </h2>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pi_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
           <span class="va">coords</span>,
           <span class="va">lyr</span>,
@@ -241,13 +242,13 @@
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">pi_wgd</span>, main <span class="op">=</span> <span class="st">"Pi"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-1.png" width="480"></p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">het_wgd</span>, main <span class="op">=</span> <span class="st">"Heterozygosity"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">AR_wgd</span>, main <span class="op">=</span> <span class="st">"Allelic Richness"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-3.png" width="480"></p>
 </div>
