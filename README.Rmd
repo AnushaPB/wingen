@@ -31,16 +31,16 @@ devtools::install_github("AnushaPB/wingen")
 
 ## Example
 
-```{r example, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 3, fig.width = 9}
+```{r}
 
 library(wingen)
 
 # load example middle earth data 
-## vcf - biallelic SNP data (1000 loci x 100 individuals
-## coords - coordinates of samples
-## lyr - raster layer
 load_middle_earth_ex()
 
+```
+
+```{r example, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 3, fig.width = 9}
 # Run sliding window calculations of pi with rarefaction
 wgd <- window_gd(vcf,
           coords,

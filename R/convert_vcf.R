@@ -6,6 +6,8 @@
 #' @return returns dosage matrix
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
 #' data("ex_vcf")
 #' vcf_to_dosage(ex_vcf)
@@ -35,6 +37,8 @@ vcf_to_dosage <- function(x) {
 #' @export
 #'
 #' @examples
+#'
+#' @keywords internal
 #'
 #' data("ex_vcf")
 #' vcf_to_genind(ex_vcf)

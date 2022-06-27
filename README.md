@@ -23,11 +23,21 @@ devtools::install_github("AnushaPB/wingen")
 library(wingen)
 
 # load example middle earth data 
-## vcf - biallelic SNP data (1000 loci x 100 individuals
-## coords - coordinates of samples
-## lyr - raster layer
 load_middle_earth_ex()
+```
 
+    ## ------------ middle earth loaded -------------
+    ##  
+    ## Added to GlobalEnv: 
+    ## vcf vcfR object with (1000 loci x 200 samples) 
+    ## coords dataframe with x and y coordinates 
+    ## lyr middle earth RasterLayer (100 x 100) 
+    ## 
+    ## ----------------------------------------------
+
+    ## 
+
+``` r
 # Run sliding window calculations of pi with rarefaction
 wgd <- window_gd(vcf,
           coords,

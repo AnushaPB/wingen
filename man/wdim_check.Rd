@@ -20,3 +20,4 @@ wdim_check(c(4,4))
 wdim_check(4)
 
 }
+\keyword{internal}

@@ -87,12 +87,19 @@
 <div class="section level2">
 <h2 id="load-middle-earth-example">Load middle earth example<a class="anchor" aria-label="anchor" href="#load-middle-earth-example"></a>
 </h2>
-<p>The middle earth example dataset contains three objects which are loaded by. [Add more detail about this simulation here] </p>
-<p><em>vcf</em> - biallelic SNP data (1000 loci x 100 individuals <em>coords</em> - coordinates of samples <em>lyr</em> - raster layer</p>
+<p>The middle earth example dataset contains three objects which are loaded by ‘load_middle_earth_ex()’ [Add more detail about this simulation here]</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## middle earth loaded...</span></code></pre>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<pre><code><span class="co">## <span style="color: #00BBBB; font-weight: bold;">------------ middle earth loaded -------------</span></span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">## </span> </span>
+<span class="co"><span style="color: #0000BB;">## Added to GlobalEnv:</span> </span>
+<span class="co"><span style="color: #BBBB00; font-weight: bold;">## vcf</span> <span style="color: #BBBB00;">vcfR object with (1000 loci x 200 samples)</span> </span>
+<span class="co"><span style="color: #00BB00; font-weight: bold;">## coords</span> <span style="color: #00BB00;">dataframe with x and y coordinates</span> </span>
+<span class="co"><span style="color: #BB00BB; font-weight: bold;">## lyr</span> <span style="color: #BB00BB;">middle earth RasterLayer (100 x 100)</span> </span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">## </span></span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">## ----------------------------------------------</span></span></code></pre>
+<pre><code><span class="co">## </span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Genetic data</span>
 <span class="va">vcf</span></code></pre></div>
 <pre><code><span class="co">## ***** Object of Class vcfR *****</span>
@@ -102,7 +109,7 @@
 <span class="co">## Object size: 1.7 Mb</span>
 <span class="co">## 0 percent missing data</span>
 <span class="co">## *****        *****         *****</span></code></pre>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Coordinates</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">coords</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##             x          y</span>
@@ -112,7 +119,7 @@
 <span class="co">## 135 88.893018 -65.835666</span>
 <span class="co">## 363 86.545357 -21.280152</span>
 <span class="co">## 106 74.171030 -28.331393</span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Raster data</span>
 <span class="va">lyr</span></code></pre></div>
 <pre><code><span class="co">## class      : RasterLayer </span>
@@ -123,7 +130,7 @@
 <span class="co">## source     : memory</span>
 <span class="co">## names      : layer </span>
 <span class="co">## values     : 0, 1  (min, max)</span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Map of data</span>
 <span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lyr</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">coords</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">mako</a></span><span class="op">(</span><span class="fl">1</span>, begin <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">3</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></code></pre></div>
@@ -135,7 +142,7 @@
 <div class="section level3">
 <h3 id="run-sliding-window-calculations">Run sliding window calculations<a class="anchor" aria-label="anchor" href="#run-sliding-window-calculations"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
           <span class="va">coords</span>,
           <span class="va">lyr</span>,
@@ -145,33 +152,33 @@
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
           nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## Loading required namespace: adegenet</span></code></pre>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window pi"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/sliding%20window-1.png" width="480"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window sample counts"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/sliding%20window-2.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="krige-results">Krige results<a class="anchor" aria-label="anchor" href="#krige-results"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">kgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/krig_gd.html">krig_gd</a></span><span class="op">(</span><span class="va">wgd</span>, <span class="va">lyr</span>, resample <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## [using ordinary kriging]</span></code></pre>
 <pre><code><span class="co">## Warning in sqrt(krige_result$var1.var): NaNs produced</span></code></pre>
 <pre><code><span class="co">## [using ordinary kriging]</span></code></pre>
 <pre><code><span class="co">## Warning in sqrt(krige_result$var1.var): NaNs produced</span></code></pre>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged pi"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/krige%20results-1.png" width="480"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged sample counts"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/krige%20results-2.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="mask-results">Mask results<a class="anchor" aria-label="anchor" href="#mask-results"></a>
 </h3>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span>, min_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span></code></pre></div>
@@ -181,7 +188,7 @@
 <div class="section level2">
 <h2 id="parallelization">Parallelization<a class="anchor" aria-label="anchor" href="#parallelization"></a>
 </h2>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
           <span class="va">coords</span>,
           <span class="va">lyr</span>,
@@ -192,8 +199,8 @@
           nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <pre><code><span class="co">## Loading required namespace: adegenet</span></code></pre>
 <pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##   10.49    0.47   11.21</span></code></pre>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<span class="co">##   10.25    0.33   10.78</span></code></pre>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cores</span> <span class="op">&lt;-</span> <span class="fl">5</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="va">cores</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
@@ -210,14 +217,14 @@
           parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="op">)</span></code></pre></div>
 <pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##    0.82    0.09   11.95</span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<span class="co">##    0.93    0.05   11.94</span></code></pre>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="other-genetic-diversity-metrics">Other genetic diversity metrics<a class="anchor" aria-label="anchor" href="#other-genetic-diversity-metrics"></a>
 </h2>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pi_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
           <span class="va">coords</span>,
           <span class="va">lyr</span>,
@@ -242,13 +249,13 @@
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">pi_wgd</span>, main <span class="op">=</span> <span class="st">"Pi"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-1.png" width="480"></p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">het_wgd</span>, main <span class="op">=</span> <span class="st">"Heterozygosity"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">AR_wgd</span>, main <span class="op">=</span> <span class="st">"Allelic Richness"</span><span class="op">)</span></code></pre></div>
 <p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-3.png" width="480"></p>
 </div>

@@ -3,3 +3,13 @@ template:
   bootstrap: 5
 
 
+reference:
+- title: Main functions
+- contents:
+  - ends_with("_gd")
+  - plot_count
+- title: Middle earth example
+- contents:
+  - starts_with("load_")
+  - starts_with("middle_earth_")
+  - starts_with("mini_")

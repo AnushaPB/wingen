@@ -20,3 +20,4 @@ Make grid from Spatial Points Data Frame
 \note{
 code from: https://stackoverflow.com/questions/43436466/create-grid-in-r-for-kriging-in-gstat
 }
+\keyword{internal}

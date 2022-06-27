@@ -13,8 +13,6 @@ knitr::opts_chunk$set(
   comment = "##",
   background = "#FFFFFF"
 )
-
-options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup, warning = FALSE, message = FALSE}
@@ -28,11 +26,7 @@ library(doParallel)
 
 # Load middle earth example
 
-The middle earth example dataset contains three objects which are loaded by. [Add more detail about this simulation here] \code{load_middle_earth_ex()}
-
-*vcf* - biallelic SNP data (1000 loci x 100 individuals
-*coords* - coordinates of samples
-*lyr* - raster layer
+The middle earth example dataset contains three objects which are loaded by 'load_middle_earth_ex()' [Add more detail about this simulation here] 
 
 ```{r load example data, fig.width = 5, fig.height = 5}
 load_middle_earth_ex()

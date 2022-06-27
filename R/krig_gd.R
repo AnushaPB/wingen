@@ -116,6 +116,8 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 #' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
 raster_to_grid <- function(x, agg = NULL, disagg = NULL){
   if(!is.null(agg)){x <- raster::aggregate(x, agg)}
@@ -135,6 +137,8 @@ raster_to_grid <- function(x, agg = NULL, disagg = NULL){
 #' @note code from: https://stackoverflow.com/questions/43436466/create-grid-in-r-for-kriging-in-gstat
 #' @return gridded SpatialPixelsDataFrame
 #' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 spdf_to_grid <- function(spdf, n_cell = 1000) {

@@ -39,6 +39,8 @@ wdim_to_mat <- function(wdim) {
 #' @return corrected wdim
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
 #' wdim_check(c(4,4))
 #' wdim_check(4)

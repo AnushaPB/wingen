@@ -19,3 +19,4 @@ gridded SpatialPixelsDataFrame
 \description{
 Conver a raster to a grid
 }
+\keyword{internal}

@@ -20,3 +20,4 @@ data("ex_vcf")
 vcf_to_dosage(ex_vcf)
 
 }
+\keyword{internal}
