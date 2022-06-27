@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-Create maps of genetic diversity using a sliding window approach
+Create maps of genetic diversity using a sliding window approach.
 
 ## Installation
 
@@ -26,12 +26,13 @@ library(wingen)
 load_middle_earth_ex()
 ```
 
+    ## 
     ## ------------ middle earth loaded -------------
     ##  
     ## Added to GlobalEnv: 
-    ## vcf vcfR object with (1000 loci x 200 samples) 
-    ## coords dataframe with x and y coordinates 
-    ## lyr middle earth RasterLayer (100 x 100) 
+    ## *vcf* vcfR object (1000 loci x 200 samples) 
+    ## *coords* dataframe with x and y coordinates 
+    ## *lyr* middle earth RasterLayer (100 x 100) 
     ## 
     ## ----------------------------------------------
 

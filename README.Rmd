@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-Create maps of genetic diversity using a sliding window approach
+Create maps of genetic diversity using a sliding window approach.
 
 ## Installation
 
