@@ -63,3 +63,9 @@ plot_gd(mgd, main = "Kriged & masked pi")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />
+
+For an extended example check out the package vignette:
+
+``` r
+vignette("wingen-vignette")
+```

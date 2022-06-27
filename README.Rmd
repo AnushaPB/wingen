@@ -64,4 +64,9 @@ plot_gd(kgd, main = "Kriged pi")
 plot_gd(mgd, main = "Kriged & masked pi")
 ```
 
+For an extended example check out the package vignette:
+
+``` r
+vignette("wingen-vignette")
+```
 
