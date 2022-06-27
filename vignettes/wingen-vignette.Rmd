@@ -1,11 +1,12 @@
 ---
-title: "wingen-vignette"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{wingen-vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+# Wingen
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -24,7 +25,7 @@ library(foreach)
 library(doParallel)
 ```
 
-# Load middle earth example
+## Load middle earth example
 
 The middle earth example dataset contains three objects which are loaded by 'load_middle_earth_ex()' [Add more detail about this simulation here] 
 
@@ -32,27 +33,27 @@ The middle earth example dataset contains three objects which are loaded by 'loa
 load_middle_earth_ex()
 
 # Genetic data
-vcf
+lotr_vcf
 
 # Coordinates
-head(coords)
+head(lotr_coords)
 
 # Raster data
-lyr
+lotr_lyr
 
 # Map of data
-plot(lyr, col = magma(100), axes = FALSE, box = FALSE)
-points(coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
+plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
+points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```
 
-# Main functions
+## Main functions
 
-## Run sliding window calculations
+### Run sliding window calculations
 
 ```{r sliding window, fig.width = 5, fig.height = 5, cache = TRUE}
-wgd <- window_gd(vcf,
-          coords,
-          lyr,
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
@@ -64,16 +65,16 @@ plot_gd(wgd, main = "Window pi")
 plot_count(wgd, main = "Window sample counts")
 ```
 
-## Krige results
+### Krige results
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
-kgd <- krig_gd(wgd, lyr, resample = FALSE)
+kgd <- krig_gd(wgd, lotr_lyr, resample = FALSE)
 
 plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
-## Mask results
+### Mask results
 
 ```{r mask results, fig.width = 5, fig.height = 5}
 mgd <- mask_gd(kgd, min_n = 3)
@@ -82,12 +83,12 @@ plot_gd(mgd, main = "Kriged & masked pi")
 ```
 
 
-# Parallelization
+## Parallelization
 
 ```{r no parallelization}
-system.time(wgd <- window_gd(vcf,
-          coords,
-          lyr,
+system.time(wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
@@ -95,15 +96,15 @@ system.time(wgd <- window_gd(vcf,
           nloci = 1000))
 ```
 
-```{r parallelization, fig.width = 5, fig.height = 5}
+```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
 cores <- 5
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 system.time(
-wgd <- window_gd(vcf,
-          coords,
-          lyr,
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
@@ -115,29 +116,29 @@ wgd <- window_gd(vcf,
 stopCluster(cl)
 ```
 
-# Other genetic diversity metrics
+## Other genetic diversity metrics
 
 ```{r}
-pi_wgd <- window_gd(vcf,
-          coords,
-          lyr,
+pi_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
           rarify = TRUE,
           nloci = 1000)
 
-het_wgd <- window_gd(vcf,
-          coords,
-          lyr,
+het_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "het",
           fact = 3,
           wdim = 5,
           rarify = TRUE)
 
-AR_wgd <- window_gd(vcf,
-          coords,
-          lyr,
+AR_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "biallelic.richness",
           fact = 3,
           wdim = 5,

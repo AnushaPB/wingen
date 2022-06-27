@@ -16,3 +16,4 @@
 ^logo\.png$
 ^sims$
 ^inst/extdata$
+^README_cache$

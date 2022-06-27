@@ -13,10 +13,10 @@
 #' @examples
 #'
 #' load_mini_ex()
-#' wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
-#' kpi <- krig_gd(wpi, lyr)
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+#' kpi <- krig_gd(wpi, mini_lyr)
 #' mpi <- mask_gd(kpi, min_n = 3)
-#' plot_gd(mpi)
+#' plot_gd(mpi, "Kriged and Masked Pi")
 #'
 mask_gd <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
 

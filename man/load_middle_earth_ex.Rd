@@ -7,7 +7,7 @@
 load_middle_earth_ex()
 }
 \value{
-three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
+three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
 }
 \description{
 Loads middle earth example data and assigns to simple names

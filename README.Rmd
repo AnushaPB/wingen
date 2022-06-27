@@ -36,16 +36,16 @@ devtools::install_github("AnushaPB/wingen")
 
 library(wingen)
 
-# load example middle earth data 
+# load example data
 load_middle_earth_ex()
 
 ```
 
 ```{r example, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 3, fig.width = 9}
 # Run sliding window calculations of pi with rarefaction
-wgd <- window_gd(vcf,
-          coords,
-          lyr,
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
@@ -53,7 +53,7 @@ wgd <- window_gd(vcf,
           nloci = 1000)
 
 # Krige results
-kgd <- krig_gd(wgd, lyr, disagg = 2)
+kgd <- krig_gd(wgd, lotr_lyr)
 
 # Mask results
 mgd <- mask_gd(kgd, min_n = 3)

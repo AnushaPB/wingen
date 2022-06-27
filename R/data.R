@@ -8,7 +8,7 @@
 #'   \item{y}{y coordinate}
 #' }
 #' @source
-"middle_earth_coords"
+"lotr_coords"
 
 #' Middle earth example vcf
 #'
@@ -16,7 +16,7 @@
 #'
 #' @format Object of class vcfR with 100 individuals and 1000 loci
 #' @source
-"middle_earth_vcf"
+"lotr_vcf"
 
 #' Middle earth example raster
 #'
@@ -25,7 +25,7 @@
 #'
 #' @format A RasterLayer of middle earth
 #' @source
-"middle_earth_lyr"
+"lotr_lyr"
 
 #' Mini middle earth example coordinates
 #'

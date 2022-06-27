@@ -55,12 +55,8 @@ Sliding window map of genetic diversity
 }
 \examples{
 load_mini_ex()
-wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
-whet <- window_gd(vcf, coords, lyr, stat = "het", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
-war <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
-plot_gd(wpi)
-plot_gd(whet)
-plot_gd(war)
+wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+plot_gd(wpi, main = "Window pi")
 plot_count(wpi)
 
 }

@@ -40,9 +40,9 @@ Raster interpolation using 'autoKrige'
 }
 \examples{
 load_mini_ex()
-wpi <- window_gd(vcf, coords, lyr, stat = "pi", nloci = 10, rarify_n = 4, rarify_nit = 5, rarify = TRUE)
-kpi <- krig_gd(wpi, lyr)
-plot_gd(kpi)
+wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+kpi <- krig_gd(wpi, mini_lyr)
+plot_gd(kpi, main = "Kriged Pi")
 plot_count(kpi)
 
 }

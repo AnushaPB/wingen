@@ -51,11 +51,14 @@ usethis::use_data_raw()
 usethis::use_build_ignore("sims/")
 # THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
 usethis::use_build_ignore("inst/extdata/")
+
+usethis::use_build_ignore("README_cache/")
 ```
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
 ```
 #CI/GitHub actions
+https://github.com/r-lib/actions/tree/master/examples
 ## Quickstart CI workflow
 
 ```{r}
@@ -74,3 +77,10 @@ This workflow runs R CMD check via the rcmdcheck package on the three major OSs 
 When should you use it?
 You plan to submit your package to CRAN or Bioconductor
 Your package has OS-specific code
+
+# manual check
+```{r}
+devtools::check()
+```
+
+

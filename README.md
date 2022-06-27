@@ -24,17 +24,17 @@ devtools::install_github("AnushaPB/wingen")
 ``` r
 library(wingen)
 
-# load example middle earth data 
+# load example data
 load_middle_earth_ex()
 ```
 
     ## 
-    ## ------------ middle earth loaded -------------
+    ## ------------ middle earth example ------------
     ##  
-    ## Added to GlobalEnv: 
-    ## *vcf* vcfR object (1000 loci x 200 samples) 
-    ## *coords* dataframe with x and y coordinates 
-    ## *lyr* middle earth RasterLayer (100 x 100) 
+    ## Objects loaded: 
+    ## *lotr_vcf* vcfR object (1000 loci x 200 samples) 
+    ## *lotr_coords* dataframe with x and y coordinates 
+    ## *lotr_lyr* middle earth RasterLayer (100 x 100) 
     ## 
     ## ----------------------------------------------
 
@@ -42,9 +42,9 @@ load_middle_earth_ex()
 
 ``` r
 # Run sliding window calculations of pi with rarefaction
-wgd <- window_gd(vcf,
-          coords,
-          lyr,
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
           stat = "pi",
           fact = 3,
           wdim = 5,
@@ -52,7 +52,7 @@ wgd <- window_gd(vcf,
           nloci = 1000)
 
 # Krige results
-kgd <- krig_gd(wgd, lyr, disagg = 2)
+kgd <- krig_gd(wgd, lotr_lyr)
 
 # Mask results
 mgd <- mask_gd(kgd, min_n = 3)
