@@ -84,12 +84,19 @@
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">wingen</span><span class="op">)</span>
 
 <span class="co"># load example middle earth data </span>
-<span class="co">## vcf - biallelic SNP data (1000 loci x 100 individuals</span>
-<span class="co">## coords - coordinates of samples</span>
-<span class="co">## lyr - raster layer</span>
-<span class="fu"><a href="reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="co"># Run sliding window calculations of pi with rarefaction</span>
+<span class="fu"><a href="reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ------------ middle earth loaded -------------</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  </span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Added to GlobalEnv: </span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## vcf vcfR object with (1000 loci x 200 samples) </span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## coords dataframe with x and y coordinates </span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="do">## lyr middle earth RasterLayer (100 x 100) </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">## ----------------------------------------------</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Run sliding window calculations of pi with rarefaction</span>
 <span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
           <span class="va">coords</span>,
           <span class="va">lyr</span>,
