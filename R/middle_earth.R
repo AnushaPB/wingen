@@ -9,9 +9,9 @@
 load_middle_earth_ex <- function(){
 
   # load all data
-  data("lotr_vcf")
-  data("lotr_lyr")
-  data("lotr_coords")
+  utils::data("lotr_vcf")
+  utils::data("lotr_lyr")
+  utils::data("lotr_coords")
 
   # give message with information about objects
   return(message(cat(crayon::cyan(crayon::bold("\n------------- middle earth example -------------\n")),

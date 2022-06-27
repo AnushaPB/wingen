@@ -11,12 +11,12 @@
 #' @export
 #'
 #' @examples
-#'
+#' library("raster")
 #' load_mini_ex()
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' mpi <- mask_gd(kpi, min_n = 3)
-#' plot_gd(mpi, "Kriged and Masked Pi")
+#' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
 mask_gd <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
 

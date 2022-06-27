@@ -12,7 +12,7 @@ library("devtools")
 
 ```{r}
 #create_package(here())
-#use_mit_license()
+#usethis::use_mit_license()
 ```
 ```{r}
 check()
@@ -53,6 +53,11 @@ usethis::use_build_ignore("sims/")
 usethis::use_build_ignore("inst/extdata/")
 
 usethis::use_build_ignore("README_cache/")
+
+usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
+
+usethis::use_build_ignore("vignettes/wingen-vignette_files/")
+
 ```
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
