@@ -21,9 +21,9 @@ load_middle_earth_ex <- function(){
   # give message with information about objects
   message(cat(crayon::cyan(crayon::bold("\n------------ middle earth loaded -------------\n")),
               crayon::blue("\nAdded to GlobalEnv:"),
-              crayon::yellow(crayon::bold("\nvcf")), crayon::yellow("vcfR object with (1000 loci x 200 samples)"),
-              crayon::green(crayon::bold("\ncoords")), crayon::green("dataframe with x and y coordinates"),
-              crayon::magenta(crayon::bold("\nlyr")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
+              crayon::yellow(crayon::bold("\n*vcf*")), crayon::yellow("vcfR object (1000 loci x 200 samples)"),
+              crayon::green(crayon::bold("\n*coords*")), crayon::green("dataframe with x and y coordinates"),
+              crayon::magenta(crayon::bold("\n*lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
               crayon::cyan(crayon::bold("\n\n----------------------------------------------"))
               )
           )
@@ -52,9 +52,9 @@ load_mini_ex <- function(){
   # give message with information about objects
   message(cat(crayon::cyan(crayon::bold("\n-------- mini middle earth loaded ---------\n")),
               crayon::blue("\nAdded to GlobalEnv:"),
-              crayon::yellow(crayon::bold("\nvcf")), crayon::yellow("vcfR object with (10 loci x 10 samples)"),
-              crayon::green(crayon::bold("\ncoords")), crayon::green("dataframe with x and y coordinates"),
-              crayon::magenta(crayon::bold("\nlyr")), crayon::magenta("middle earth RasterLayer (10 x 10)"),
+              crayon::yellow(crayon::bold("\n*vcf*")), crayon::yellow("vcfR object (10 loci x 10 samples)"),
+              crayon::green(crayon::bold("\n*coords*")), crayon::green("dataframe with x and y coordinates"),
+              crayon::magenta(crayon::bold("\n*lyr*")), crayon::magenta("middle earth RasterLayer (10 x 10)"),
               crayon::cyan(crayon::bold("\n\n-------------------------------------------"))
               ))
 }
