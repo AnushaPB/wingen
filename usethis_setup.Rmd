@@ -55,4 +55,22 @@ usethis::use_build_ignore("inst/extdata/")
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
 ```
+#CI/GitHub actions
+## Quickstart CI workflow
 
+```{r}
+usethis::use_github_action("check-release")
+```
+
+This workflow installs latest release R version on macOS and runs R CMD check via the rcmdcheck package. If this is the first time you have used CI for a project this is probably what you want to use.
+
+## Standard CI workflow
+```{r}
+usethis::use_github_action("check-standard")
+```
+
+This workflow runs R CMD check via the rcmdcheck package on the three major OSs (linux, macOS and Windows) with the current, development, and previous versions of R. If you plan to someday submit your package to CRAN or Bioconductor this is likely the workflow you want to use.
+
+When should you use it?
+You plan to submit your package to CRAN or Bioconductor
+Your package has OS-specific code
