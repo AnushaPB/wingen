@@ -9,8 +9,8 @@
 #' @keywords internal
 #'
 #' @examples
-#' data("ex_vcf")
-#' vcf_to_dosage(ex_vcf)
+#' data("mini_vcf")
+#' vcf_to_dosage(mini_vcf)
 #'
 vcf_to_dosage <- function(x) {
   if (class(x)[1] == "vcfR") {
@@ -36,12 +36,11 @@ vcf_to_dosage <- function(x) {
 #' @return returns genind object
 #' @export
 #'
-#' @examples
-#'
 #' @keywords internal
 #'
-#' data("ex_vcf")
-#' vcf_to_genind(ex_vcf)
+#' @examples
+#' data("mini_vcf")
+#' vcf_to_genind(mini_vcf)
 #'
 vcf_to_genind <- function(x, pops = NULL) {
   if (class(x)[1] == "vcfR") {

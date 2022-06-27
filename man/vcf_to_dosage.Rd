@@ -16,8 +16,8 @@ returns dosage matrix
 Convert vcf to dosage matrix
 }
 \examples{
-data("ex_vcf")
-vcf_to_dosage(ex_vcf)
+data("mini_vcf")
+vcf_to_dosage(mini_vcf)
 
 }
 \keyword{internal}

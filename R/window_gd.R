@@ -104,6 +104,9 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
 
+  # ignore this: (need to assign i something so that R CMD Check recognizes it as a defined global variable - also this is useful for testing)
+  i <- 1
+
   if(parallel){
 
     rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
