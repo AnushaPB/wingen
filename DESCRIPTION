@@ -20,6 +20,7 @@ Imports:
     automap,
     crayon,
     doParallel,
+    fansi,
     foreach,
     graphics,
     hierfstat,
