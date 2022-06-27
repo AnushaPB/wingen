@@ -4,6 +4,8 @@
 # wingen <img src="man/figures/logo.png" align="right" height=150 />
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml)
 <!-- badges: end -->
 
 Create maps of genetic diversity using a sliding window approach.
