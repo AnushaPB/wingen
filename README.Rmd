@@ -11,7 +11,15 @@ knitr::opts_chunk$set(
 )
 ```
  
+```{r color, echo = FALSE, results='asis'}
+# crayon needs to be explicitly activated in Rmd
+options(crayon.enabled = TRUE)
+# Hooks needs to be set to deal with outputs
+# thanks to fansi logic
+old_hooks <- fansi::set_knit_hooks(knitr::knit_hooks, 
+                                   which = c("output", "message", "error"))
 
+```
 
 # wingen <img src="man/figures/logo.png" align="right" height=150 />
 
@@ -32,13 +40,11 @@ devtools::install_github("AnushaPB/wingen")
 
 ## Example
 
-```{r}
-
+```{r, comment=NA}
 library(wingen)
 
 # load example data
 load_middle_earth_ex()
-
 ```
 
 ```{r example, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 3, fig.width = 9}

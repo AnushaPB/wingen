@@ -14,14 +14,14 @@ load_middle_earth_ex <- function(){
   data("lotr_coords")
 
   # give message with information about objects
-  message(cat(crayon::cyan(crayon::bold("\n------------ middle earth example ------------\n")),
+  return(message(cat(crayon::cyan(crayon::bold("\n------------ middle earth example ------------\n")),
               crayon::blue("\nObjects loaded:"),
               crayon::yellow(crayon::bold("\n*lotr_vcf*")), crayon::yellow("vcfR object (1000 loci x 200 samples)"),
               crayon::green(crayon::bold("\n*lotr_coords*")), crayon::green("dataframe with x and y coordinates"),
               crayon::magenta(crayon::bold("\n*lotr_lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
-              crayon::cyan(crayon::bold("\n\n----------------------------------------------"))
+              crayon::cyan(crayon::bold("\n\n----------------------------------------------\n"))
               )
-          )
+          ))
 }
 
 #' Load mini middle earth example

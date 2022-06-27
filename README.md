@@ -1,5 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<STYLE type='text/css' scoped>
+PRE.fansi SPAN {padding-top: .25em; padding-bottom: .25em};
+</STYLE>
 
 # wingen <img src="man/figures/logo.png" align="right" height=150 />
 
@@ -28,17 +31,17 @@ library(wingen)
 load_middle_earth_ex()
 ```
 
-    ## 
-    ## ------------ middle earth example ------------
-    ##  
-    ## Objects loaded: 
-    ## *lotr_vcf* vcfR object (1000 loci x 200 samples) 
-    ## *lotr_coords* dataframe with x and y coordinates 
-    ## *lotr_lyr* middle earth RasterLayer (100 x 100) 
-    ## 
-    ## ----------------------------------------------
+<PRE class="fansi fansi-output"><CODE><span style='color: #00BBBB; font-weight: bold;'>
+------------ middle earth example ------------
+</span> <span style='color: #0000BB;'>
+Objects loaded:</span> <span style='color: #BBBB00; font-weight: bold;'>
+*lotr_vcf*</span> <span style='color: #BBBB00;'>vcfR object (1000 loci x 200 samples)</span> <span style='color: #00BB00; font-weight: bold;'>
+*lotr_coords*</span> <span style='color: #00BB00;'>dataframe with x and y coordinates</span> <span style='color: #BB00BB; font-weight: bold;'>
+*lotr_lyr*</span> <span style='color: #BB00BB;'>middle earth RasterLayer (100 x 100)</span> <span style='color: #00BBBB; font-weight: bold;'>
 
-    ## 
+----------------------------------------------
+</span>
+</CODE></PRE>
 
 ``` r
 # Run sliding window calculations of pi with rarefaction
