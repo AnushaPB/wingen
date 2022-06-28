@@ -30,14 +30,14 @@ load_middle_earth_ex()
 ```
 
 
-    ------------ middle earth example ------------
+    ------------- middle earth example -------------
      
     Objects loaded: 
     *lotr_vcf* vcfR object (1000 loci x 200 samples) 
     *lotr_coords* dataframe with x and y coordinates 
     *lotr_lyr* middle earth RasterLayer (100 x 100) 
 
-    ----------------------------------------------
+    ------------------------------------------------
 
 ``` r
 # Run sliding window calculations of pi with rarefaction
@@ -45,8 +45,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 3,
-          wdim = 5,
+          fact = 5,
+          wdim = 3,
           rarify = TRUE,
           nloci = 1000)
 
@@ -54,7 +54,7 @@ wgd <- window_gd(lotr_vcf,
 kgd <- krig_gd(wgd, lotr_lyr)
 
 # Mask results
-mgd <- mask_gd(kgd, min_n = 3)
+mgd <- mask_gd(kgd, min_n = 2)
 
 # Plot results
 par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))

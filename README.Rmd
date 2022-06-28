@@ -44,8 +44,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 3,
-          wdim = 5,
+          fact = 5,
+          wdim = 3,
           rarify = TRUE,
           nloci = 1000)
 
@@ -53,7 +53,7 @@ wgd <- window_gd(lotr_vcf,
 kgd <- krig_gd(wgd, lotr_lyr)
 
 # Mask results
-mgd <- mask_gd(kgd, min_n = 3)
+mgd <- mask_gd(kgd, min_n = 2)
 
 # Plot results
 par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))
@@ -67,4 +67,5 @@ For an extended example check out the package vignette:
 ``` r
 vignette("wingen-vignette")
 ```
+
 
