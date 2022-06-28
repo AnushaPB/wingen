@@ -18,6 +18,7 @@ RoxygenNote: 7.2.0
 Imports: 
     adegenet,
     automap,
+    crayon,
     doParallel,
     foreach,
     graphics,
@@ -26,6 +27,7 @@ Imports:
     progress,
     purrr,
     raster,
+    Rcpp,
     rgdal,
     sp,
     stats,
@@ -33,11 +35,13 @@ Imports:
     vcfR,
     viridis
 Suggests: 
-    devtools, 
+    covr,
+    devtools,
     knitr,
+    rgeos,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0)

@@ -4,14 +4,10 @@
 \alias{raster_to_grid}
 \title{Conver a raster to a grid}
 \usage{
-raster_to_grid(x, agg = NULL, disagg = NULL)
+raster_to_grid(x)
 }
 \arguments{
 \item{x}{RasterLayer}
-
-\item{agg}{factor used for aggregation if provided}
-
-\item{disagg}{factor used for disaggregation if provided}
 }
 \value{
 gridded SpatialPixelsDataFrame
@@ -19,3 +15,4 @@ gridded SpatialPixelsDataFrame
 \description{
 Conver a raster to a grid
 }
+\keyword{internal}

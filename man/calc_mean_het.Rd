@@ -7,7 +7,7 @@
 calc_mean_het(hetmat)
 }
 \arguments{
-\item{hetmat}{matrix of heterozygosity (0 = homozygote, 1 = heterozygote)}
+\item{hetmat}{matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)}
 }
 \value{
 heterozygosity averaged across all individuals and then all loci

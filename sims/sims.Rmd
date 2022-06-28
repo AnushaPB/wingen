@@ -2,7 +2,7 @@
 title: "sims"
 output: html_document
 ---
-
+ 
 ```{r}
 library(wingen)
 library(raster)
@@ -10,6 +10,10 @@ library(vcfR)
 library(viridis)
 library(foreach)
 library(doParallel)
+library(here)
+library(ggplot2)
+library(dplyr)
+library(purrr)
 
 library(adegenet)
 library(hierfstat)
@@ -38,7 +42,6 @@ coords$y <- -coords$y
 # check match
 all(colnames(subvcf@gt)[-1] == geo$idx[si])
 
-
 ```
 
 ```{r,  fig.width = 6, fig.height = 6}
@@ -52,7 +55,7 @@ par(mar = rep(2,4))
 plot(lyr, col = viridis::magma(100), main = "Carrying Capacity", axes = FALSE, box = FALSE)
 plot(kde, col = viridis::magma(100), main = "Population Density", axes = FALSE, box = FALSE)
 plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), main = "Distribution of Individuals", axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.6), xlab = "", ylab = "")
+points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.4), xlab = "", ylab = "")
 points(subcoords$x, subcoords$y, pch = 16, cex = 1, col = mako(1, begin = 0.2, alpha = 0.9), xlab = "", ylab = "")
 legend(0,-80, 
        c("All Individuals", "Sampled Individuals"), 
@@ -64,22 +67,12 @@ legend(0,-80,
 
 ```
 
-```{r}
-cores <- 6
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-res1 <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
-stopCluster(cl)
-plot(res1[[1]], col = magma(100))
-points(subcoords[,c("x","y")])
-```
 
+```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 
-```{r, fig.width = 6, fig.height = 6}
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
-tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
-
-tr_k <- krig_gd(tr[["res"]], lyr)
+tr_k <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
 tr_k_mask <- mask_gd(tr_k, 4)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
@@ -90,36 +83,150 @@ plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, z
 plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
 plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
 
 ```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
-```{r, fig.width = 12, fig.height = 3}
-th <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE)
-
-th_k <- krig_gd(r = th[["res"]], grd = lyr)
-th_k_mask <- mask_gd(th_k, 4)
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(th[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(th_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(th_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(th[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE, legend.shrink = 0.5)
-plot(th_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
+tr_k_2 <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
 
 ```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = FALSE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = FALSE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = TRUE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+# Comparison of measures
+
+# Nsamp = 100
+```{r, fig.width = 6, fig.height = 8}
+msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = 100)
+measures <- c("pi", "biallelic_richness", "heterozygosity")
+datasets <- c("rr", "WGS", "FULL")
+
+for(m in measures){
+  par(mfrow = c(3, 2), mar = rep(2,4))
+  for(d in datasets){ 
+    for(rarify in c("TRUE", "FALSE")){
+      r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = 100)
+      r <- mask(r, msk_lyr)
+      plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(d, m, rarify))          
+    }
+  }
+}
+
+
+```
+
+```{r, fig.width = 7.5, fig.height = 5}
+# {PLOT CODE}
+for(m in measures){
+  par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
+  for(rarify in c("TRUE", "FALSE")){
+    for(d in datasets){
+      r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = 100)
+      r <- mask(r, msk_lyr)
+      if(m == "pi"){zlim = c(0.1,0.5)}
+      if(m == "biallelic_richness"){zlim = c(1.1,2)}
+      if(m == "heterozygosity"){zlim = c(0.3,0.5)}
+       plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
+      plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)          
+    }
+  }
+}
+```
+
+
+```{r}
+# demonstrate that allelic richness and biallelic richness are the same 
+wgs_ar <- stack("outputs/WGS_200ind_allelic_richness.tif")[[1]]
+
+wgs_bar <- stack("outputs/WGS_200ind_biallelic_richness.tif")[[1]]
+
+par(mfrow = c(1,2))
+lapply(list(wgs_bar, wgs_ar), raster::plot, col = magma(100), box = FALSE, axes = FALSE)
+
+```
+
+## Timing
+```{r}
+
+
+tdf <- dplyr::bind_rows(
+  map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "FALSE", nsamp = 100),
+  map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "TRUE", nsamp = 100),
+  
+  map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "FALSE", nsamp = 200),
+  map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "TRUE", nsamp = 200)
+)
+
+tdf[tdf$dataset == "rr", "dataset"] <- "RADseq-type dataset (10,000 loci)"
+tdf[tdf$dataset == "WGS", "dataset"] <- "WGS-type dataset (100,000 loci)"
+
+ggplot(data = tdf) +
+  geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
+  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "darkgray") +
+  geom_hline(yintercept = 60*5, linetype = "dashed", col = "gray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "gray") +
+  geom_bar(aes(x = factor(nsamp), y = time, fill = stat), 
+           stat = "identity", 
+           position=position_dodge()) +
+  facet_grid(~dataset,  scales = "free_y") +
+  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8, name = "statistic") +
+  xlab("number of samples") +
+  ylab("time (seconds)") +
+  theme_bw() +
+  theme(panel.grid.minor.y = element_blank(), 
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.x = element_blank(), 
+        panel.grid.major.x = element_blank())
+
+```
+
+```{r}
+load("RData/ar_results.RData")
+
+```
+## Window vs aggregation factor
+
 ```{r, fig.width = 5, fig.height = 5}
 cores <- 6
 cl <- makeCluster(cores)
@@ -128,7 +235,7 @@ registerDoParallel(cl)
 stk <- list()
 
 i = 1
-for(f in c(3, 5, 7)){
+for(f in c(2, 4, 8)){
   for(w in c(3, 5, 7)){
     res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
     stk[[i]] <-  res[[1]]
@@ -139,10 +246,10 @@ for(f in c(3, 5, 7)){
 
 i = 1
 par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
-for(f in c(3, 5, 7)){
+for(f in c(2, 4, 8)){
   for(w in c(3, 5, 7)){
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.23, 0.48), add = TRUE)
+    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.2, 0.5), add = TRUE)
     rect(0, -105, 100, 0, border = "black")
     i <- i + 1
   }
@@ -150,8 +257,8 @@ for(f in c(3, 5, 7)){
 plot(stk[[1]], zlim = c(0.23, 0.48), col = magma(100) )
 ```
 
-## ADD FOR LOOP TEST OF FACT VS WINDOW SIZE
-
+#
+# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
 
 ```{r, fig.width = 4, fig.height = 4}
 set.seed(42)
@@ -207,114 +314,6 @@ plot_time_test(reswr)
 ```
 # REALIZATION: TIME CHANGING MIGHT HAVE TO DO WITH EDGE OF LANDSCAPE, NOT WINDOW SIZE EXACLTY - MAY NEED TO TRY FAKE LANDSCAPE WITH PERFECT EVEN SAMPLING TO GET CALCS RIGHT
 (replicate the vcf from one individual multiple times evenly across a landscape, also check if there is a diff based on the value but there shouldn't be)
-```{r, fig.width = 16, fig.height = 4}
-plot_rast_test(reswr)
-```
-
-```{r}
-calc_mean_ar
-
-genind <- vcfR::vcfR2genind(subvcf)
-system.time(calc_mean_ar(subvcf[1:10000,1:10]))
-system.time(calc_mean_het(subvcf[1:10000,1:10]))
-system.time(calc_pi(subvcf[1:10000,1:10]))
-```
-
-```{r}
-ta <- c()
-th <- c()
-tp <- c()
-
- # calc stats
-for(s in c(5, 10, 20)){
-  for(stat in c("pi", "het", "allelic.richness")){
-    
-    vcfsub <- vcf[,c(1, sample(ncol(vcf@gt)-1, s) + 1)]
-  
-    if(stat == "allelic.richness"){
-      gen <- vcfR::vcfR2genind(vcfsub)
-      Sys.time()
-      calc_mean_ar(gen)
-      time <- (Sys.time() - ptm)
-      ta <- c(ta,time)
-    }
-  
-    if(stat == "het"){
-      gen <- vcfR::is.het(vcfR::extract.gt(vcfsub), na_is_false = FALSE)
-      Sys.time()
-      calc_mean_het(gen)
-      time <- (Sys.time() - ptm)
-      th <- c(th,time)
-    }
-  
-    if(stat == "pi"){
-      gen <- vcf_to_dosage(vcfsub[,1:2])
-      Sys.time()
-      calc_pi(gen)
-      time <- (Sys.time() - ptm)
-      tp <- c(tp, time)
-     }
-    }
-}
-
-
-```
-
-```{r}
-df <- data.frame(sample = rep(c(5,10,20),3), time = c(ta, th, tp), stat = c(rep("AR", 3), rep("He", 3), rep("pi", 3)))
-#write.csv(df, "sims/ggtime_results.csv", row.names = FALSE)
-ggplot()+
-  geom_line(data=df, aes(x = sample, y = time, col = stat))+
-  theme_bw()
-```
-
-```{r}
-ta <- c()
-th <- c()
-tp <- c()
-
- # calc stats
-for(s in c(1000, 10000, nrow(vcf@gt))){
-  for(stat in c("pi", "het", "allelic.richness")){
-    
-    vcfsub <- vcf[sample(nrow(vcf@gt), s),c(1, sample(ncol(vcf@gt)-1, 10) + 1)]
-  
-    if(stat == "allelic.richness"){
-      gen <- vcfR::vcfR2genind(vcfsub)
-      ptm <- Sys.time()
-      calc_mean_ar(gen)
-      time <- (Sys.time() - ptm)
-      ta <- c(ta,time)
-    }
-  
-    if(stat == "het"){
-      gen <- vcfR::is.het(vcfR::extract.gt(vcfsub), na_is_false = FALSE)
-      ptm <- Sys.time()
-      calc_mean_het(gen)
-      time <- (Sys.time() - ptm)
-      th <- c(th,time)
-    }
-  
-    if(stat == "pi"){
-      gen <- vcf_to_dosage(vcfsub)
-      ptm <- Sys.time()
-      calc_pi(gen)
-      time <- (Sys.time() - ptm)
-      tp <- c(tp, time)
-     }
-    }
-}
-
-```
-
-```{r}
-df <- data.frame(sample = rep( c(1000, 10000, nrow(vcf@gt)),3), time = c(ta, th, tp), stat = c(rep("AR", 3), rep("He", 3), rep("pi", 3)))
-write.csv(df, "sims/ggtime_results_loci.csv", row.names = FALSE)
-ggplot()+
-  geom_line(data=df, aes(x = sample, y = time, col = stat))+
-  theme_bw()
-```
-
 
 # UNIFORM GRID
 ```{r, fig.width = 5, fig.height=5}
@@ -347,24 +346,6 @@ plot_time_test(resf)
 
 note to self: I don't think I am counting total time right still...need to think on it (check the minutes versus seconds calculations)
 
-# Comparison of pi, het and AR
-```{r, fig.width = 10, fig.height = 4, cache = TRUE}
-
-set.seed(42)
-ress <- purrr::map(c("het", "pi", "biallelic.richness"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, min_n = 4, rarify_n = 4, rarify_nit = 5, nloci = 100000)
-
-
-par(pty = "s", mar = rep(3,4), mfrow = c(1,3), oma = rep(2,4))
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(ress[[2]][[2]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(ress[[1]][[2]]$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Heterozygosity", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(ress[[1]][[2]]$allelic_richness, col = viridis::magma(100, alpha = 1.0), main = "Allelic Richness", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE, legend.width=1.5, legend.shrink=0.8)
-```
 
 # Rarefaction test
 
@@ -402,85 +383,130 @@ plot(wor$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "Rarefaction")
 ```
 
 
-# Comparison of measures
-```{r, fig.width=9, fig.height=3}
-load("RData/results_rr.RData")
-#RERUN
-rr_pi <- results[[2]][[2]]$pi*150000/10000
-rr_het <- results[[1]][[2]]$heterozygosity
-rr_ar <- results[[3]][[2]]$allelic_richness
 
-results <- stack(list.files("outputs/", full.names = TRUE))
-wgs_het <- results[[1]]
-wgs_pi <- results[[3]]
+#Rarefaction take 2
+```{r}
+SiteSampleBuffer <- function(sample_sites, coords, npts, buffer_size = 5){
+  #sample_sites - coordinates of sampling sites
+  #coords - coordinates of all individuals in data set
+  #npts - number of points to sample from each site
+  #buffer - buffer around site from which to draw samples randomly
+  #edge_buffer - buffer from landscape edges to prevent sampling of sites
+  
+  site_samples <- data.frame()
+  
+  #sample sites can be provided as either sp or coords in vector format (nloop just counts how many sites)
+  if(class(sample_sites)[1] == "SpatialPoints"){nloop <- length(sample_sites)} else {nloop <- nrow(sample_sites)}
+  
+  for(s in 1:nloop){
+    #create buffer around sites from which to sample points
+    site_buffers <- rgeos::gBuffer(sample_sites[s,], width = buffer_size)
+    #subset out only coordinates falling within site buffers
+    buffer_samples <- coords[site_buffers,]
+    if(length(buffer_samples) < npts){stop(paste0("Less than npts found in buffer around site"))}
+    #convert from SPDF to df
+    buffer_samples_df <- data.frame(buffer_samples)
+    #randomly sample samples from coordinates
+    randsamp <- sample(nrow(buffer_samples_df), npts)
+    #subset df
+    buffer_samples_df <- buffer_samples_df[randsamp,]
+    
+    #save site IDs
+    buffer_samples_df$site <- s
+    
+    #bind samples
+    site_samples <- rbind(site_samples, buffer_samples_df)
+  }
+  return(site_samples[,c("idx", "x", "y")])
+}
+```
+
+```{r}
+
+plot(lyr)
+points(coords)
+
+pts <- coords
+coordinates(pts) <- ~x+y
+
+sample_sites <- rbind.data.frame(c(75, -20), c(25, -20), c(50, -20))
+colnames(sample_sites) <- c("x", "y")
+coordinates(sample_sites) <- ~x+y
 
 
-full_het <- stack("RData/FULL_heterozygosity.tif")[[1]]
-full_het <- mask(full_het, wgs_pi)
-load("RData/results_pi_FULL.RData")
-full_pi <- full_norarify[[2]]$pi
-full_pi <- mask(full_pi, wgs_pi)
+subcoords <- rbind.data.frame(SiteSampleBuffer(sample_sites[3], pts, npts = 5, buffer_size = 10),
+                              SiteSampleBuffer(sample_sites[2], pts, npts = 20, buffer_size = 10))
 
-pi_stack <- stack(full_pi, wgs_pi, rr_pi)
-het_stack <- stack(full_het, wgs_het, rr_het)
-names(pi_stack) <- paste0("pi_", c("FULL", "WGS", "rr"))
-names(het_stack) <- paste0("het_", c("FULL", "WGS", "rr"))
+
+plot(lyr)
+points(subcoords[,c("x","y")])
+
+
+si <- colnames(vcf@gt) %in% subcoords$idx
+si[1] <- TRUE
+subvcf <- vcf[l, si]
+
+# reorder coords to match
+subcoords <- subcoords[match(colnames(subvcf@gt[,-1]), subcoords$idx),]
+ 
+# check match
+all(colnames(subvcf@gt)[-1] == as.character(subcoords$idx))
+
+nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", fact = 3, wdim = 5, rarify = FALSE, min_n = 4, nloci = nrow(subvcf@gt))
+yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, nloci = nrow(subvcf@gt))
+par(mfrow = c(1,3))
+plot(nr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
+plot(yr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
+plot(mask(full_ar, nr)[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
 
 par(mfrow = c(1,3))
-lapply(as.list(pi_stack), raster::plot, col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.1952093, 0.4601057))
-lapply(as.list(het_stack), raster::plot, col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.3257500, 0.4587500))
-```
-
-```{r, fig.width = 6, fig.height = 6}
-load("RData/results_WGS_10p.RData")
-results
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(results[[2]][[2]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(results[[1]][[2]]$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.32575, 0.45725))
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(results[[3]][[2]]$allelic_richness, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(results[[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(results[[3]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-```
-
-```{r, fig.width = 6, fig.height = 6}
-load("RData/results_FULL_noRarify.RData")
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-# FIX CONVERSION LATER
-plot(full_norarify[[2]]$pi*150000/10000, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-full_het <- stack("RData/FULL_heterozygosity.tif")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(full_het$heterozygosity, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-
+plot(nr[[1]], col = magma(100))
+plot(yr[[1]], col = magma(100))
+plot(mask(full_ar, nr)[[1]], col = magma(100))
 ```
 
 
-# COMPARE STATS
+# check grid alignment
+```{r, fig.width = 10, fig.height = 20}
+library(wingen)
+library(raster)
+library("viridis")
+data("lotr_lyr")
+
+lyr <- init(lotr_lyr, 'chess')
+lyr3 <- init(aggregate(lyr, 3),  'chess')
+lyrd3 <- init(disaggregate(lyr, 3),  'chess')
+pts <- raster::rasterToPoints(lyr)
+pts3 <- raster::rasterToPoints(lyr3)
+
+par(pty = "s", mfrow = c(4,2))
+plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
+plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyr3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
+plot(lyr3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
+plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyrd3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
+plot(lyrd3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+
+
+```
+# Heterozygosity is weird
 ```{r}
-set.seed(42)
+hetmat <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
-res_div <- purrr::map(c("pi", "het"), time_test, "stat", subvcf, subcoords, lyr, fact = 3, wdim = 5, min_n = 4, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(res_div[[1]][[2]][[1]],, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(res_div[[2]][[2]][[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
-
+write.csv(hetmat, "hetmat_full.csv")
 ```
+

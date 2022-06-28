@@ -15,3 +15,8 @@
 ^docs$
 ^logo\.png$
 ^sims$
+^inst/extdata$
+^README_cache$
+^vignettes/wingen-vignette_cache$
+^vignettes/wingen-vignette_files$
+^codecov\.yml$

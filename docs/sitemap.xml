@@ -22,49 +22,82 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/reference/coord_proj.html</loc>
+    <loc>/reference/calc_mean_ar.html</loc>
   </url>
   <url>
-    <loc>/reference/div_mask.html</loc>
+    <loc>/reference/calc_mean_biar.html</loc>
   </url>
   <url>
-    <loc>/reference/ex_coords.html</loc>
+    <loc>/reference/calc_mean_het.html</loc>
   </url>
   <url>
-    <loc>/reference/ex_lyr.html</loc>
+    <loc>/reference/calc_pi.html</loc>
   </url>
   <url>
-    <loc>/reference/ex_vcf.html</loc>
+    <loc>/reference/check_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_adj.html</loc>
+  </url>
+  <url>
+    <loc>/reference/helper_calc_biar.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/krig_div.html</loc>
+    <loc>/reference/krig_gd.html</loc>
   </url>
   <url>
-    <loc>/reference/krig_rast.html</loc>
+    <loc>/reference/krig_gd_lyr.html</loc>
   </url>
   <url>
-    <loc>/reference/krig_rast_lyr.html</loc>
+    <loc>/reference/load_middle_earth_ex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/load_mini_ex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mask_gd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/middle_earth_coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/middle_earth_lyr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/middle_earth_vcf.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mini_coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mini_lyr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/mini_vcf.html</loc>
   </url>
   <url>
     <loc>/reference/pipe.html</loc>
   </url>
   <url>
-    <loc>/reference/range_to_grid.html</loc>
+    <loc>/reference/plot_count.html</loc>
   </url>
   <url>
-    <loc>/reference/rarify_ar.html</loc>
+    <loc>/reference/plot_gd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rarify_gd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rarify_helper.html</loc>
   </url>
   <url>
     <loc>/reference/raster_to_grid.html</loc>
   </url>
   <url>
-    <loc>/reference/rescale.html</loc>
-  </url>
-  <url>
-    <loc>/reference/sample_ar.html</loc>
+    <loc>/reference/sample_gd.html</loc>
   </url>
   <url>
     <loc>/reference/spdf_to_grid.html</loc>
@@ -76,6 +109,21 @@
     <loc>/reference/vcf_to_genind.html</loc>
   </url>
   <url>
-    <loc>/reference/window_ar.html</loc>
+    <loc>/reference/wdim_check.html</loc>
+  </url>
+  <url>
+    <loc>/reference/wdim_to_mat.html</loc>
+  </url>
+  <url>
+    <loc>/reference/window_gd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/window_gd_general.html</loc>
+  </url>
+  <url>
+    <loc>/reference/window_helper.html</loc>
+  </url>
+  <url>
+    <loc>/reference/wingen-package.html</loc>
   </url>
 </urlset>

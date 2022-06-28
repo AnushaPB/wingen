@@ -1,5 +1,4 @@
 ---
-title: "Wingen Vignette"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{wingen-vignette}
@@ -7,14 +6,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+# Wingen
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = FALSE,
   comment = "##",
   background = "#FFFFFF"
 )
-
-options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup, warning = FALSE, message = FALSE}
@@ -24,79 +23,134 @@ library(vcfR)
 library(viridis)
 library(foreach)
 library(doParallel)
-
-devtools::load_all()
 ```
 
-```{r, fig.width = 5, fig.height = 5}
-coords_file <- system.file("extdata", "ex_coords.csv", package = "wingen")
-lyr_file <- system.file("extdata", "ex_layer.tif", package = "wingen")
-vcf_file <- system.file("extdata", "ex_vcf.vcf", package = "wingen")
+## Load middle earth example
 
-ex_lyr <- raster(lyr_file)
-ex_coords <- read.csv(coords_file)
-ex_vcf <- read.vcfR(vcf_file)
+The middle earth example dataset contains three objects which are loaded by 'load_middle_earth_ex()' [Add more detail about this simulation here] 
 
-plot(ex_lyr, legend = FALSE, col = "gray", axes = FALSE, box = FALSE)
-points(ex_coords)
+```{r load example data, fig.width = 5, fig.height = 5}
+load_middle_earth_ex()
+
+# Genetic data
+lotr_vcf
+
+# Coordinates
+head(lotr_coords)
+
+# Raster data
+lotr_lyr
+
+# Map of data
+plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
+points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```
 
-```{r, fig.width = 8, fig.height=4}
-# (for the sake of speed I am aggregating the raster by a factor of 50)
-system.time(gdmap <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 20, wdim = 5, rarify = FALSE))
-plot(gdmap, col = magma(100), axes = FALSE)
+## Main functions
+
+### Run sliding window calculations
+
+```{r sliding window, fig.width = 5, fig.height = 5, cache = TRUE}
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "pi",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE,
+          nloci = 1000)
+
+
+plot_gd(wgd, main = "Window pi")
+plot_count(wgd, main = "Window sample counts")
 ```
 
-```{r, fig.width = 8, fig.height=4}
-# run window with rarefaction
-gdmapr <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-plot(gdmapr, col = magma(100), axes = FALSE)
-  
+### Krige results
+
+```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
+kgd <- krig_gd(wgd, lotr_lyr, resample = FALSE)
+
+plot_gd(kgd, main = "Kriged pi")
+plot_count(kgd, main = "Kriged sample counts")
 ```
 
-```{r, fig.width = 10, fig.height = 5}
-krig_gdmapr <- krig_gd(gdmapr, disagg = 10)
-plot(krig_gdmapr, col = viridis::magma(100), box = FALSE, axes = FALSE)
+### Mask results
 
-krig_gdmapr <- krig_gd(gdmapr, ex_lyr, agg = 5)
-plot(krig_gdmapr, col = viridis::magma(100), box = FALSE, axes = FALSE)
-```
-```{r, fig.width = 5, fig.height=5}
-krig_msk <- mask_gd(gdmapr, 4)
-plot(krig_msk, col = viridis::magma(100), box = FALSE, axes = FALSE)
+```{r mask results, fig.width = 5, fig.height = 5}
+mgd <- mask_gd(kgd, min_n = 3)
 
-krig_msk <- mask_gd(krig_gdmapr, 4)
-plot(krig_msk, col =  viridis::magma(100),  box = FALSE, axes = FALSE)
+plot_gd(mgd, main = "Kriged & masked pi")
 ```
 
-```{r, fig.width = 5, fig.height = 5}
-krig_msk <- mask_gd(krig_gdmapr, 4, plot = TRUE, bkg.col = "black")
+
+## Parallelization
+
+```{r no parallelization}
+system.time(wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "pi",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE,
+          nloci = 1000))
 ```
-# Different measures (with parallelization!)
-```{r, fig.width = 9, fig.height=3, cache = TRUE}
-cores <- 6
+
+```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
+cores <- 5
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-wind_het <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "het", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-wind_pi <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
-#wind_ar <- window_gd(ex_vcf, ex_coords, ex_lyr, stat = "allelic.richness", fact = 50, wdim = 5, rarify = TRUE,  rarify_n = 4, rarify_nit = 10)
+system.time(
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "pi",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE,
+          nloci = 1000, 
+          parallel = TRUE)
+)
 
 stopCluster(cl)
-
-par(mfrow = c(1,3))
-#plot(wind_ar[[1]], col = magma(100), axes = FALSE)
-plot(wind_het[[1]], col = magma(100), axes = FALSE)
-plot(wind_pi[[1]], col = magma(100), axes = FALSE)
-```
-```{r fig.width = 9, fig.height=3}
-#gd_stack <- stack(wind_ar, wind_het, wind_pi)
-gd_stack <- stack(wind_het, wind_pi)
-gd_krig <- krig_gd(gd_stack, ex_lyr, agg = 5)
-
-par(mfrow = c(1,3))
-gd_mask <- mask_gd(gd_krig, 4, plot = TRUE, bkg.col = "black")
 ```
 
+## Other genetic diversity metrics
 
+```{r}
+pi_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "pi",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE,
+          nloci = 1000)
+
+het_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "het",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE)
+
+AR_wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "biallelic.richness",
+          fact = 3,
+          wdim = 5,
+          rarify = TRUE)
+```
+
+
+```{r, fig.width = 5, fig.height = 5}
+plot_gd(pi_wgd, main = "Pi")
+
+plot_gd(het_wgd, main = "Heterozygosity")
+
+plot_gd(AR_wgd, main = "Allelic Richness")
+```
 

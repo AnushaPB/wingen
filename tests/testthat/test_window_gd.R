@@ -1,4 +1,11 @@
 
+test_that("window_gd returns expected output", {
+  library("raster")
+  load_mini_ex()
+  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
+  expect_s4_class(wpi, "RasterStack")
+  expect_equal(raster::nlayers(wpi), 2)
+})
 
 test_that("wdim_check fixes wdim", {
   expect_error(wdim_check(1))

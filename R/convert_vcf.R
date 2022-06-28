@@ -6,16 +6,15 @@
 #' @return returns dosage matrix
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
-#' data("ex_vcf")
-#' vcf_to_dosage(ex_vcf)
+#' data("mini_vcf")
+#' vcf_to_dosage(mini_vcf)
 #'
 vcf_to_dosage <- function(x) {
-  if (class(x)[1] == "vcfR") {
-    vcf <- x
-  } else if (file.exists(x)) {
-    vcf <- vcfR::read.vcfR(x)
-  }
+  # check vcf
+  vcf <- vcf_check(x)
 
   # convert to genlight
   genlight <- vcfR::vcfR2genlight(vcf)
@@ -34,34 +33,34 @@ vcf_to_dosage <- function(x) {
 #' @return returns genind object
 #' @export
 #'
-#' @examples
+#' @keywords internal
 #'
-#' data("ex_vcf")
-#' vcf_to_genind(ex_vcf)
+#' @examples
+#' data("mini_vcf")
+#' vcf_to_genind(mini_vcf)
 #'
 vcf_to_genind <- function(x, pops = NULL) {
-  if (class(x)[1] == "vcfR") {
-    vcf <- x
-  } else if (file.exists(x)) {
-    vcf <- vcfR::read.vcfR(x)
-  }
+
+  # check vcf
+  vcf <- vcf_check(x)
 
   # convert to genind
   genind <- vcfR::vcfR2genind(vcf)
+
+  # TODO: Clean this up - Check if pops is false
+  if (is.logical(pops)) if (!pops) return(genind)
 
   # assign pops if null or pop vector provided
   if (is.null(genind$pop) | is.vector(pops)) {
     if (is.null(pops)) {
       genind$pop <- as.factor(1:nrow(genind@tab))
-
-      warning("no pops were provided, assigning a pop to each individual (to stop this, set pop = FALSE)")
+      warning("no pops were provided, assigning a pop to each individual (to stop this, set pops = FALSE)")
     }
 
     if (is.vector(pops)) {
       if (!is.null(genind$pop) & is.vector(pops)) {
-        warning("overwriting genind pops with vector of pops provided")
+        warning("overwriting existing genind pops with vector of pops provided")
       }
-
       if (length(pops) != nrow(genind@tab)) {
         stop("length of pops does not match number of individuals in genind")
       } else {
@@ -71,4 +70,27 @@ vcf_to_genind <- function(x, pops = NULL) {
   }
 
   return(genind)
+}
+
+#' Check if an object is a vcf or a path to a vcf
+#'
+#' @param x vcfR object or path to vcf
+#'
+#' @return vcf object
+#' @export
+#'
+#' @keywords internal
+#'
+#' @examples
+vcf_check <- function(x){
+  if (class(x)[1] == "vcfR") {
+    vcf <- x
+  } else if (file.exists(x)) {
+    vcf <- vcfR::read.vcfR(x)
+  } else if (is.character(x)){
+    stop("Cannot open file: No such file or directory")
+  } else {
+    stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
+  }
+  return(vcf)
 }

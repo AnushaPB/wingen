@@ -10,10 +10,13 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' window_gd(vcf, coords, lyr, stat = "pi")
-#' }
-window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+#' library("raster")
+#' load_mini_ex()
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+#' plot_gd(wpi, main = "Window pi")
+#' plot_count(wpi)
+#'
+window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
     vcf <- vcfR::read.vcfR(vcf)
@@ -101,6 +104,9 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, w
 
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
+
+  # ignore this: (need to assign i something so that R CMD Check recognizes it as a defined global variable - also this is useful for testing)
+  i <- 1
 
   if(parallel){
 
@@ -274,7 +280,7 @@ calc_mean_ar <- function(genind){
 
 #' Calculate mean heterozygosity
 #'
-#' @param hetmat matrix of heterozygosity (0 = homozygote, 1 = heterozygote)
+#' @param hetmat matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)
 #'
 #' @return heterozygosity averaged across all individuals and then all loci
 #' @export
@@ -288,8 +294,8 @@ calc_mean_het <- function(hetmat){
     return(stats::na.omit(mean(hetmat)))
   }
 
-  gd_byloci <- colMeans(hetmat, na.rm = TRUE)
-  gd <- stats::na.omit(mean(gd_byloci))
+  gd <- mean(hetmat, na.rm = TRUE)
+
   return(gd)
 }
 

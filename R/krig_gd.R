@@ -7,7 +7,15 @@
 #' @export
 #'
 #' @examples
-krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 10000){
+#' library("raster")
+#' load_mini_ex()
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+#' kpi <- krig_gd(wpi, mini_lyr)
+#' plot_gd(kpi, main = "Kriged Pi")
+#' plot_count(kpi)
+#'
+
+krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
 
   rls <- raster::as.list(r)
 
@@ -16,7 +24,7 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
     warning("no grd provided, defaults to using first raster layer to create grd")
   }
 
-  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, agg, disagg, n_cell)
+  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, resample, agg_grd, disagg_grd, agg_r, disagg_r, n_cell)
   rstk <- raster::stack(rstk)
 
   names(rstk) <- names(r)
@@ -32,8 +40,12 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates
 #' @param xy whether to co-krige with x and y (~x+y)
-#' @param agg factor used for aggregation if provided
-#' @param disagg factor used for disaggregation if provided
+#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r. Defaults to FALSE but we *highly recommend setting this to either "grd" or "r"*
+#' @param agg_grd factor to use for aggregation of grd, if provided
+#' @param disagg_grd factor to use for disaggregation of grd, if provided
+#' @param agg_r factor to use for aggregation of r, if provided
+#' @param disagg_r factor to use for disaggregation, of r if provided
+#' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
 #'
 #' @return RasterLayer
@@ -42,7 +54,14 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg
 #' @keywords internal
 #'
 #' @examples
-krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, disagg = NULL, n_cell = 1000, samplen = NULL) {
+krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
+
+  # Transform raster layer
+  if(class(grd) == "RasterLayer"){
+    stk <- raster_transform(r, grd)
+    r <- stk[[names(r)]]
+    grd <- stk[["grd"]]
+  }
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
@@ -54,12 +73,12 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, di
 
   # create grid
   if(is.null(grd)){
-    krig_grid <- raster_to_grid(r, agg = agg, disagg = disagg)
+    krig_grid <- raster_to_grid(r)
   } else if(class(grd) == "SpatialPointsDataFrame") {
     #TODO: FIX THIS NOT WORKING
     krig_grid <- spdf_to_grid(grd, n_cell = n_cell)
   } else if(class(grd) == "RasterLayer"){
-    krig_grid <- raster_to_grid(grd, agg = agg, disagg = disagg)
+    krig_grid <- raster_to_grid(grd)
   } else if(sp::gridded(grd)){
     krig_grid <- grd
   } else { stop(" unable to find an inherited method for type of grd provided")}
@@ -103,11 +122,10 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, agg = NULL, di
 #' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
+#' @keywords internal
+#'
 #' @examples
-raster_to_grid <- function(x, agg = NULL, disagg = NULL){
-  if(!is.null(agg)){x <- raster::aggregate(x, agg)}
-  if(!is.null(disagg)){x <- raster::disaggregate(x, disagg)}
-
+raster_to_grid <- function(x){
   grd <- data.frame(raster::rasterToPoints(x))
   sp::coordinates(grd) <- ~ x + y
   sp::gridded(grd) <- TRUE
@@ -122,6 +140,8 @@ raster_to_grid <- function(x, agg = NULL, disagg = NULL){
 #' @note code from: https://stackoverflow.com/questions/43436466/create-grid-in-r-for-kriging-in-gstat
 #' @return gridded SpatialPixelsDataFrame
 #' @export
+#'
+#' @keywords internal
 #'
 #' @examples
 spdf_to_grid <- function(spdf, n_cell = 1000) {
@@ -142,3 +162,39 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
   return(krig_grd)
 }
 
+
+#' Transform raster
+#'
+#' @inheritParams krig_gd
+#'
+#' @return stack of transformed rasters
+#' @export
+#'
+#' @examples
+raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE){
+  if(raster::nlayers(r) > 1) stop(">1 layer provided for r")
+  if(raster::nlayers(grd) > 1) stop(">1 layer provided for grd")
+
+  if(resample_first){
+    if(resample == "r") r <- raster::resample(r, grd)
+    if(resample == "grd") grd <- raster::resample(grd, r)
+  }
+
+  if(!is.null(agg_grd) & !is.null(disagg_grd)) stop("Both agg_grd and disagg_grd provided, when only one should be provided")
+  if(!is.null(agg_grd)) grd <- raster::aggregate(grd, agg_grd)
+  if(!is.null(disagg_grd)) grd <- raster::disaggregate(grd, disagg_grd)
+
+  if(!is.null(agg_r) & !is.null(disagg_r)) stop("Both agg_r and disagg_r provided, when only one should be provided")
+  if(!is.null(agg_r)) r <- raster::aggregate(r, agg_r)
+  if(!is.null(disagg_r)) r <- raster::disaggregate(r, disagg_r)
+
+  if(!resample_first){
+    if(resample == "r") r <- raster::resample(r, grd)
+    if(resample == "grd") grd <- raster::resample(grd, r)
+  }
+
+  s <- list(r, grd)
+  names(s) <- c(names(r), "grd")
+
+  return(s)
+}

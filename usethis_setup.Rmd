@@ -12,7 +12,7 @@ library("devtools")
 
 ```{r}
 #create_package(here())
-#use_mit_license()
+#usethis::use_mit_license()
 ```
 ```{r}
 check()
@@ -49,8 +49,56 @@ usethis::use_data_raw()
 ```
 ```{r}
 usethis::use_build_ignore("sims/")
+# THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
+usethis::use_build_ignore("inst/extdata/")
+
+usethis::use_build_ignore("README_cache/")
+
+usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
+
+usethis::use_build_ignore("vignettes/wingen-vignette_files/")
+
 ```
 ```{r}
 usethis::use_import_from('foreach', "%dopar%")
 ```
+#CI/GitHub actions
+https://github.com/r-lib/actions/tree/master/examples
+## Quickstart CI workflow
 
+```{r}
+usethis::use_github_action("check-release")
+```
+
+This workflow installs latest release R version on macOS and runs R CMD check via the rcmdcheck package. If this is the first time you have used CI for a project this is probably what you want to use.
+
+## Standard CI workflow
+```{r}
+usethis::use_github_action("check-standard")
+```
+
+This workflow runs R CMD check via the rcmdcheck package on the three major OSs (linux, macOS and Windows) with the current, development, and previous versions of R. If you plan to someday submit your package to CRAN or Bioconductor this is likely the workflow you want to use.
+
+When should you use it?
+You plan to submit your package to CRAN or Bioconductor
+Your package has OS-specific code
+
+# manual check
+qpdf: https://stackoverflow.com/questions/41570633/how-to-build-qpdf-on-windows
+```{r}
+devtools::check()
+```
+
+
+# Code coverage
+```{r}
+usethis::use_coverage(type = "codecov")
+use_github_action("test-coverage")
+
+library(covr)
+
+codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
+```
+
+Link for badge from: https://app.codecov.io/gh/AnushaPB/wingen/settings/badge 
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)

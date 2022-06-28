@@ -46,8 +46,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .Rproj.user
+
 # docs
-inst/doc
+# inst/doc
 
 # tif files
 *.tif

@@ -4,9 +4,12 @@
 # wingen <img src="man/figures/logo.png" align="right" height=150 />
 
 <!-- badges: start -->
+<!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
+
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
 <!-- badges: end -->
 
-Create maps of genetic diversity using a sliding window approach
+Create maps of genetic diversity using a sliding window approach.
 
 ## Installation
 
@@ -21,5 +24,49 @@ devtools::install_github("AnushaPB/wingen")
 
 ``` r
 library(wingen)
-## TODO: add basic example code
+
+# load example data
+load_middle_earth_ex()
+```
+
+
+    ------------- middle earth example -------------
+     
+    Objects loaded: 
+    *lotr_vcf* vcfR object (1000 loci x 200 samples) 
+    *lotr_coords* dataframe with x and y coordinates 
+    *lotr_lyr* middle earth RasterLayer (100 x 100) 
+
+    ------------------------------------------------
+
+``` r
+# Run sliding window calculations of pi with rarefaction
+wgd <- window_gd(lotr_vcf,
+          lotr_coords,
+          lotr_lyr,
+          stat = "pi",
+          fact = 5,
+          wdim = 3,
+          rarify = TRUE,
+          nloci = 1000)
+
+# Krige results
+kgd <- krig_gd(wgd, lotr_lyr)
+
+# Mask results
+mgd <- mask_gd(kgd, min_n = 2)
+
+# Plot results
+par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))
+plot_gd(wgd, main = "Window pi")
+plot_gd(kgd, main = "Kriged pi")
+plot_gd(mgd, main = "Kriged & masked pi")
+```
+
+<img src="man/figures/README-example-1.png" width="100%" />
+
+For an extended example check out the package vignette:
+
+``` r
+vignette("wingen-vignette")
 ```

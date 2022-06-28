@@ -31,4 +31,4 @@ run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = T
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
 
-
+stopCluster(cl)

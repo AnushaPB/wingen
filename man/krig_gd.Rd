@@ -9,8 +9,12 @@ krig_gd(
   grd = NULL,
   coords = NULL,
   xy = FALSE,
-  agg = NULL,
-  disagg = NULL,
+  resample = FALSE,
+  agg_grd = NULL,
+  disagg_grd = NULL,
+  agg_r = NULL,
+  disagg_r = NULL,
+  resample_first = TRUE,
   n_cell = 10000
 )
 }
@@ -23,9 +27,17 @@ krig_gd(
 
 \item{xy}{whether to co-krige with x and y (~x+y)}
 
-\item{agg}{factor used for aggregation if provided}
+\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r. Defaults to FALSE but we \emph{highly recommend setting this to either "grd" or "r"}}
 
-\item{disagg}{factor used for disaggregation if provided}
+\item{agg_grd}{factor to use for aggregation of grd, if provided}
+
+\item{disagg_grd}{factor to use for disaggregation of grd, if provided}
+
+\item{agg_r}{factor to use for aggregation of r, if provided}
+
+\item{disagg_r}{factor to use for disaggregation, of r if provided}
+
+\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 
 \item{n_cell}{number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}}
 }
@@ -34,4 +46,13 @@ RasterLayer or RasterStack
 }
 \description{
 Raster interpolation using 'autoKrige'
+}
+\examples{
+library("raster")
+load_mini_ex()
+wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+kpi <- krig_gd(wpi, mini_lyr)
+plot_gd(kpi, main = "Kriged Pi")
+plot_count(kpi)
+
 }

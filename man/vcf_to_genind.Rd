@@ -18,8 +18,8 @@ returns genind object
 Wrapper for vcfR2genind function that assigns pops
 }
 \examples{
-
-data("ex_vcf")
-vcf_to_genind(ex_vcf)
+data("mini_vcf")
+vcf_to_genind(mini_vcf)
 
 }
+\keyword{internal}
