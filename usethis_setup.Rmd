@@ -100,3 +100,5 @@ library(covr)
 codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
 ```
 
+Link for badge from: https://app.codecov.io/gh/AnushaPB/wingen/settings/badge 
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
