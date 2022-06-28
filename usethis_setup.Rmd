@@ -90,3 +90,13 @@ devtools::check()
 ```
 
 
+# Code coverage
+```{r}
+usethis::use_coverage(type = "codecov")
+use_github_action("test-coverage")
+
+library(covr)
+
+codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
+```
+
