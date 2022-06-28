@@ -172,8 +172,8 @@ spdf_to_grid <- function(spdf, n_cell = 1000) {
 #'
 #' @examples
 raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE){
-  if(nlayers(r) > 1) stop(">1 layer provided for r")
-  if(nlayers(grd) > 1) stop(">1 layer provided for grd")
+  if(raster::nlayers(r) > 1) stop(">1 layer provided for r")
+  if(raster::nlayers(grd) > 1) stop(">1 layer provided for grd")
 
   if(resample_first){
     if(resample == "r") r <- raster::resample(r, grd)

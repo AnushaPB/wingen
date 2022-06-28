@@ -9,7 +9,7 @@
 #'
 #' @examples
 plot_gd <- function(x, col = viridis::magma(100), zlim = NULL, main = NULL){
-  if(nlayers(x) > 2) warning("More than two raster layers in stack provided, using first layer")
+  if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, using first layer")
   raster::plot(x[[1]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
 }
 
