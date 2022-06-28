@@ -68,11 +68,11 @@ legend(0,-80,
 ```
 
 
-```{r, fig.width = 6, fig.height = 6}
+```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 
 tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
-tr_k <- krig_gd(tr[["res"]], lyr, disagg = 3, resample = FALSE)
+tr_k <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
 tr_k_mask <- mask_gd(tr_k, 3)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
@@ -101,7 +101,7 @@ datasets <- c("rr", "WGS", "FULL")
 
 for(m in measures){
   par(mfrow = c(3, 2), mar = rep(2,4))
-  for(d in datasets){
+  for(d in datasets){ 
     for(rarify in c("TRUE", "FALSE")){
       r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = 100)
       r <- mask(r, msk_lyr)

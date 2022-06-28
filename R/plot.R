@@ -9,6 +9,7 @@
 #'
 #' @examples
 plot_gd <- function(x, col = viridis::magma(100), zlim = NULL, main = NULL){
+  if(nlayers(x) > 1) error("More than two raster layers in stack provided")
   raster::plot(x[[1]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
 }
 
@@ -23,5 +24,7 @@ plot_gd <- function(x, col = viridis::magma(100), zlim = NULL, main = NULL){
 #'
 #' @examples
 plot_count <- function(x, col = viridis::mako(100), zlim = NULL, main = NULL){
-  raster::plot(x[[2]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
+  if(nlayers(x) > 2) error("More than two raster layers in stack provided")
+  if(nlayers(x) == 2) raster::plot(x[[2]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
+  if(nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE)
 }
