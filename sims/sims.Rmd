@@ -73,7 +73,7 @@ legend(0,-80,
 tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
 tr_k <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
-tr_k_mask <- mask_gd(tr_k, 3)
+tr_k_mask <- mask_gd(tr_k, 4)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
@@ -90,7 +90,50 @@ plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FAL
 plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
 
 ```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
+tr_k_2 <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = FALSE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = FALSE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
+```{r, fig.width = 16, fig.height = 4}
+par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
+
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = TRUE)
+for(i in c(1, 2, 4, 8)){
+  tr_k_mask <- mask_gd(tr_k_2F, i)
+  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
+}
+
+```
 # Comparison of measures
 
 # Nsamp = 100
@@ -182,8 +225,7 @@ ggplot(data = tdf) +
 load("RData/ar_results.RData")
 
 ```
-
-# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
+## Window vs aggregation factor
 
 ```{r, fig.width = 5, fig.height = 5}
 cores <- 6
@@ -193,7 +235,7 @@ registerDoParallel(cl)
 stk <- list()
 
 i = 1
-for(f in c(3, 5, 7)){
+for(f in c(2, 4, 8)){
   for(w in c(3, 5, 7)){
     res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
     stk[[i]] <-  res[[1]]
@@ -204,10 +246,10 @@ for(f in c(3, 5, 7)){
 
 i = 1
 par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
-for(f in c(3, 5, 7)){
+for(f in c(2, 4, 8)){
   for(w in c(3, 5, 7)){
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.23, 0.48), add = TRUE)
+    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.2, 0.5), add = TRUE)
     rect(0, -105, 100, 0, border = "black")
     i <- i + 1
   }
@@ -215,7 +257,8 @@ for(f in c(3, 5, 7)){
 plot(stk[[1]], zlim = c(0.23, 0.48), col = magma(100) )
 ```
 
-## ADD FOR LOOP TEST OF FACT VS WINDOW SIZE
+#
+# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
 
 ```{r, fig.width = 4, fig.height = 4}
 set.seed(42)
@@ -422,4 +465,48 @@ plot(yr[[1]], col = magma(100))
 plot(mask(full_ar, nr)[[1]], col = magma(100))
 ```
 
+
+# check grid alignment
+```{r, fig.width = 10, fig.height = 20}
+library(wingen)
+library(raster)
+library("viridis")
+data("lotr_lyr")
+
+lyr <- init(lotr_lyr, 'chess')
+lyr3 <- init(aggregate(lyr, 3),  'chess')
+lyrd3 <- init(disaggregate(lyr, 3),  'chess')
+pts <- raster::rasterToPoints(lyr)
+pts3 <- raster::rasterToPoints(lyr3)
+
+par(pty = "s", mfrow = c(4,2))
+plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
+plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyr3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
+plot(lyr3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
+plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+plot(lyrd3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
+plot(lyrd3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
+points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
+
+
+
+```
+# Heterozygosity is weird
+```{r}
+hetmat <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
+
+write.csv(hetmat, "hetmat_full.csv")
+```
 

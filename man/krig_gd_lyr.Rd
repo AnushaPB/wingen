@@ -10,8 +10,11 @@ krig_gd_lyr(
   coords = NULL,
   xy = FALSE,
   resample = FALSE,
-  agg = NULL,
-  disagg = NULL,
+  agg_grd = NULL,
+  disagg_grd = NULL,
+  agg_r = NULL,
+  disagg_r = NULL,
+  resample_first = TRUE,
   n_cell = 1000
 )
 }
@@ -24,11 +27,17 @@ krig_gd_lyr(
 
 \item{xy}{whether to co-krige with x and y (~x+y)}
 
-\item{resample}{if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)}
+\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r. Defaults to FALSE but we \emph{highly recommend setting this to either "grd" or "r"}}
 
-\item{agg}{factor used for aggregation of grd if provided}
+\item{agg_grd}{factor to use for aggregation of grd, if provided}
 
-\item{disagg}{factor used for disaggregation of grd if provided}
+\item{disagg_grd}{factor to use for disaggregation of grd, if provided}
+
+\item{agg_r}{factor to use for aggregation of r, if provided}
+
+\item{disagg_r}{factor to use for disaggregation, of r if provided}
+
+\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 
 \item{n_cell}{number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}}
 }
