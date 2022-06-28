@@ -84,6 +84,7 @@ You plan to submit your package to CRAN or Bioconductor
 Your package has OS-specific code
 
 # manual check
+qpdf: https://stackoverflow.com/questions/41570633/how-to-build-qpdf-on-windows
 ```{r}
 devtools::check()
 ```

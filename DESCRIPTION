@@ -35,7 +35,8 @@ Imports:
     vcfR,
     viridis
 Suggests: 
-    devtools, 
+    covr,
+    devtools,
     knitr,
     rgeos,
     rmarkdown,
