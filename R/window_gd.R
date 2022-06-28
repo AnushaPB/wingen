@@ -295,6 +295,7 @@ calc_mean_het <- function(hetmat){
   }
 
   gd <- mean(hetmat, na.rm = TRUE)
+
   return(gd)
 }
 
