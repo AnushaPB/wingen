@@ -6,25 +6,34 @@ source(here("sims/sim_functions.R"))
 
 set.seed(42)
 
+set.seed(42)
+
 # load vcf, coords, and lyr
 load_middle_earth()
-coords <- coords[,c("x","y")]
 
-# check match
-s <- sample(1:nrow(coords), 500)
-vcf <- vcf[, c(1, s + 1)]
-coords <- coords[, s]
-stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
+IDS <- read.csv(here("sims/data/samples_seed42.csv"))
+# get indexes of individuals
+si <- IDS$inds
+# sample loci
+l <- sample(nrow(vcf@gt), 100000)
+# subset coodinates
+coords <- coords[si,]
+# subset vcf
+vcf <- vcf[l, c(1, si + 1)]
 
 # confirm that correct set is being used
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+
+# check match
+stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
+
 
 cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, file.name = "vn")
 
-run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, file.name = "vn")
 
 stopCluster(cl)
