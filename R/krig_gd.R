@@ -58,7 +58,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 
   # Transform raster layer
   if(class(grd) == "RasterLayer"){
-    stk <- raster_transform(r, grd)
+    stk <- raster_transform(r, grd, resample, agg_grd, disagg_grd, agg_r, disagg_r, resample_first)
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
   }
