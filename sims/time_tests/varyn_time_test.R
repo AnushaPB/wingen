@@ -11,9 +11,9 @@ load_middle_earth()
 coords <- coords[,c("x","y")]
 
 # check match
-s <- sample(1:nrow(coords), 500)
+s <- sample(1:nrow(coords), 100)
 vcf <- vcf[, c(1, s + 1)]
-coords <- coords[, s]
+coords <- coords[s, ]
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 # confirm that correct set is being used
@@ -23,8 +23,8 @@ cores <- 10
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, file.name = "vn", stat = "het")
 
-run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, file.name = "vn", stat = "het")
 
 stopCluster(cl)
