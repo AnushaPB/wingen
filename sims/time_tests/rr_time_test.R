@@ -27,8 +27,8 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr")
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
 
 stopCluster(cl)

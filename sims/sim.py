@@ -169,15 +169,15 @@ params = {
                     #concentration of distr of movement direction
                     'direction_distr_kappa':                0,
                     #1st param of distr of movement distance
-                    'movement_distance_distr_param1':       0.01,
+                    'movement_distance_distr_param1':       0,
                     #2nd param of distr of movement distance
-                    'movement_distance_distr_param2':       0.5,
+                    'movement_distance_distr_param2':       0.1,
                     #movement distance distr to use ('lognormal','levy','wald')
                     'movement_distance_distr':              'lognormal',
                     #1st param of distr of dispersal distance
-                    'dispersal_distance_distr_param1':      -1,
+                    'dispersal_distance_distr_param1':      0,
                     #2nd param of distr of dispersal distance
-                    'dispersal_distance_distr_param2':      0.05,
+                    'dispersal_distance_distr_param2':      0.1,
                     #dispersal distance distr to use ('lognormal','levy','wald')
                     'dispersal_distance_distr':             'lognormal',
                     },    # <END> 'movement'

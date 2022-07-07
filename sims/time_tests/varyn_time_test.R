@@ -28,12 +28,12 @@ message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 
-cores <- 10
+cores <- 5
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, file.name = "vn")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "vn", stat = "het")
 
-run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, file.name = "vn")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "vn", stat = "het")
 
 stopCluster(cl)
