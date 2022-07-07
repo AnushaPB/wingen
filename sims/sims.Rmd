@@ -70,9 +70,9 @@ legend(0,-80,
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 
-tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, min_n = 4, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
-tr_k <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
+tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3, disagg_r = 3)
 tr_k_mask <- mask_gd(tr_k, 4)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
@@ -93,7 +93,7 @@ plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, lege
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
-tr_k_2 <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = TRUE)
+tr_k_2 <- krig_gd(tr[["res"]], lyr, disagg_grd = 2, resample = TRUE)
 for(i in c(1, 2, 4, 8)){
   tr_k_mask <- mask_gd(tr_k_2, i)
   plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
@@ -104,7 +104,7 @@ for(i in c(1, 2, 4, 8)){
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 2, resample = FALSE)
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 2, resample = FALSE)
 for(i in c(1, 2, 4, 8)){
   tr_k_mask <- mask_gd(tr_k_2F, i)
   plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
@@ -115,7 +115,7 @@ for(i in c(1, 2, 4, 8)){
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = FALSE)
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 1, resample = FALSE)
 for(i in c(1, 2, 4, 8)){
   tr_k_mask <- mask_gd(tr_k_2F, i)
   plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
@@ -126,7 +126,7 @@ for(i in c(1, 2, 4, 8)){
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg = 1, resample = TRUE)
+tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 3, resample = FALSE)
 for(i in c(1, 2, 4, 8)){
   tr_k_mask <- mask_gd(tr_k_2F, i)
   plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
@@ -138,40 +138,47 @@ for(i in c(1, 2, 4, 8)){
 
 # Nsamp = 100
 ```{r, fig.width = 6, fig.height = 8}
-msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = 100)
+
 measures <- c("pi", "biallelic_richness", "heterozygosity")
 datasets <- c("rr", "WGS", "FULL")
-
-for(m in measures){
-  par(mfrow = c(3, 2), mar = rep(2,4))
-  for(d in datasets){ 
-    for(rarify in c("TRUE", "FALSE")){
-      r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = 100)
-      r <- mask(r, msk_lyr)
-      plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(d, m, rarify))          
+for(nsamp in c(100, 200)){
+  msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = nsamp)
+  for(m in measures){
+    par(mfrow = c(3, 2), mar = rep(2,4))
+    for(d in datasets){ 
+      for(rarify in c("TRUE", "FALSE")){
+        r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = nsamp)
+        r <- mask(r, msk_lyr)
+        plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(d, m, rarify))          
+      }
     }
   }
 }
+
 
 
 ```
 
 ```{r, fig.width = 7.5, fig.height = 5}
 # {PLOT CODE}
-for(m in measures){
-  par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
-  for(rarify in c("TRUE", "FALSE")){
-    for(d in datasets){
-      r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = 100)
-      r <- mask(r, msk_lyr)
-      if(m == "pi"){zlim = c(0.1,0.5)}
-      if(m == "biallelic_richness"){zlim = c(1.1,2)}
-      if(m == "heterozygosity"){zlim = c(0.3,0.5)}
-       plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
-      plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)          
+for(nsamp in c(100,200)){
+  msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = nsamp)
+  for(m in measures){
+    par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
+    for(rarify in c("TRUE", "FALSE")){
+      for(d in datasets){
+        r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = nsamp)
+        r <- mask(r, msk_lyr)
+        if(m == "pi"){zlim = c(0.1,0.5)}
+        if(m == "biallelic_richness"){zlim = c(1.1,2)}
+        if(m == "heterozygosity"){zlim = c(0,1)}
+         plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
+         plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)          
+      }
     }
   }
 }
+
 ```
 
 
@@ -333,15 +340,21 @@ points(dcoords)
 note: rarify_n needs to be 2 so that landscape/sampling doesn't affect the results (e.g. you don't want any NA values)
 ```{r}
 dr100 <- raster(matrix(1, ncol = 100, nrow = 100))
-resf <- purrr::map(c(2, 3, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 2, rarify_nit = 2, min_n = 2)
+resf3 <- purrr::map(c(2, 3, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 3, rarify = FALSE, min_n = 1)
 
-plot_time_test(resf, stat = "total_count")
+plot_time_test(resf5, stat = "fact")
 ```
 # FIGURE OUT THIS WEIRDNESS:
 ```{r}
-resf <- purrr::map(c(3, 5, 7, 9), time_test, "wdim", dvcf, dcoords, dr, stat = "pi", fact = 1, rarify = TRUE, rarify_n = 2, rarify_nit = 2)
+plot(dr)
+plot(crop(dr, extent(0,21/100,0,21/100)), add = TRUE, col = "red")
+points(dcoords)
+
+resf <- purrr::map(c(3, 5, 7, 9), time_test, "wdim", dvcf, dcoords, dr, stat = "pi", rarify = FALSE, min_n = 1)
 plot_time_test(resf, stat = "wsize")
 plot_time_test(resf)
+
+plot_rast_test(resf)
 ```
 
 note to self: I don't think I am counting total time right still...need to think on it (check the minutes versus seconds calculations)
@@ -504,9 +517,174 @@ points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3
 
 ```
 # Heterozygosity is weird
-```{r}
-hetmat <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
+```{r, fig.width = 10, fig.height = 5}
+#hetmat <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
-write.csv(hetmat, "hetmat_full.csv")
+#write.csv(hetmat, "hetmat_full.csv")
+hetmat <- read.csv("hetmat_full.csv")
+hetmat <- hetmat[,-1]
+hetmat <- as.matrix(hetmat)
+
+rM <- rowMeans(hetmat)
+hist(rM)
+cM <- colMeans(hetmat)
+hist(cM)
+M <- mean(hetmat)
+
+rM100 <- rowMeans(hetmat[, 1:100], na.rm = TRUE)
+cM100 <- colMeans(hetmat[, 1:100], na.rm = TRUE)
+M100 <- mean(hetmat[, 1:100], na.rm = TRUE)
+
+rM200 <- rowMeans(hetmat[, 1:200], na.rm = TRUE)
+cM200 <- colMeans(hetmat[, 1:200], na.rm = TRUE)
+M200 <- mean(hetmat[, 1:200], na.rm = TRUE)
+
+par(mfrow = c(1,2), pty = "s")
+plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Loci Averages (n = 150k)")
+polygon(density(rM), col = rgb(1,1,0,0.5))
+polygon(density(rM100), col = rgb(0,1,1,0.5))
+polygon(density(rM200), col = rgb(1,0,1,0.5))
+
+legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
+
+
+plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Individual Averages (n = 1k)")
+polygon(density(cM), col = rgb(1,1,0,0.5))
+polygon(density(cM100), col = rgb(0,1,1,0.5))
+polygon(density(cM200), col = rgb(1,0,1,0.5))
+
+legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
+
+mean(cM)
+mean(rM)
+M
+mean(cM100)
+mean(rM100)
+M100
+mean(cM200)
+mean(rM200)
+M200
+
+
+```
+
+```{r, fig.width = 15, fig.height=3}
+msk_lyr <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = 100)
+
+
+par(mfrow = c(1,5))
+for(i in c(100, 200, 300, 500)){
+  r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = i)
+  r <- mask(r, msk_lyr)
+  plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(i), zlim = c(0.3,0.5))    
+}
+
+
+msk_lyr <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = 200)
+
+par(mfrow = c(1,5))
+for(i in c(200, 300, 500)){
+  r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = i)
+  r <- mask(r, msk_lyr)
+  plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(i), zlim = c(0.3,0.5))    
+}
+```
+
+```{r, fig.width = 5, fig.height = 5}
+plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Individual Averages (n = 1k)")
+polygon(density(cM), col = rgb(1,1,0,0.5))
+polygon(density(cM100), col = rgb(0,1,1,0.5))
+polygon(density(cM200), col = rgb(1,0,1,0.5))
+
+r <- get_divout(file.name = "WGS", rarify = TRUE, measure = "heterozygosity", nsamp = "100")
+r100 <- na.omit(getValues(r[[1]]))
+
+r <- get_divout(file.name = "WGS", rarify = TRUE, measure = "heterozygosity", nsamp = "200")
+r200 <- na.omit(getValues(r[[1]]))
+
+r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "300")
+r300 <- na.omit(getValues(r[[1]]))
+
+r <- get_divout(file.name = "FULL", rarify = TRUE, measure = "heterozygosity")
+rFULL <- na.omit(getValues(r[[1]]))
+
+
+par(pty = "s")
+plot(1, type = "n", xlim = c(0.3, 0.5), ylim = c(0,45), ylab = "density", xlab = "H", main = "Raster Values")
+polygon(density(rFULL), col = rgb(1,1,0,0.5))
+polygon(density(r100), col = rgb(0,1,1,0.5))
+polygon(density(r200), col = rgb(1,0,1,0.5))
+legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
+
+```
+
+```{r, fig.height = 5, fig.width = 5}
+par(mfrow = c(2,2), mar = rep(2,4))
+
+for(nsamp in c(100, 200)){
+    rs <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = nsamp)
+    plot(rs,  col = magma(100), box = FALSE, axes = FALSE)          
+  
+    r <- get_divout(file.name = "FULL", rarify = "TRUE", measure = "heterozygosity")
+    r <- mask(r, rs)
+    plot(r,  col = magma(100), box = FALSE, axes = FALSE) 
+}
+
+mr <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = 100)
+for(nsamp in c(100, 200)){
+    rs <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = nsamp)
+    rs <- mask(rs, mr)
+    plot(rs,  col = magma(100), box = FALSE, axes = FALSE, zlim =  c(0.3,0.5))          
+  
+    r <- get_divout(file.name = "FULL", rarify = "TRUE", measure = "heterozygosity")
+    r <- mask(r, mr)
+    plot(r,  col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.3,0.5)) 
+}
+```
+
+
+```{r, fig.width = 5, fig.height = 5}
+
+r1 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "100")
+r100 <- na.omit(getValues(r1[[1]]))
+
+r3 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "300")
+r300 <- na.omit(getValues(r3[[1]]))
+
+r5 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "500")
+r500 <- na.omit(getValues(r5[[1]]))
+
+rF <- get_divout(file.name = "FULL", rarify = TRUE, measure = "heterozygosity")
+rFULL <- na.omit(getValues(rF[[1]]))
+
+
+
+cp <- viridis::plasma(4, 0.5)
+par(pty = "s")
+plot(1, type = "n", xlim = c(0.3, 0.5), ylim = c(0,45), ylab = "density", xlab = "H", main = "Raster Values")
+
+polygon(density(rFULL), col = cp[4])
+polygon(density(r500), col = cp[3])
+polygon(density(r300), col = cp[2])
+polygon(density(r100), col = cp[1])
+legend("topright",c("100", "300", "500", "FULL"), col = cp, pch = 15)
+
+```
+```{r, fig.height = 8, fig.width = 10}
+par(pty = "s", mfrow = c(3,4), mar = rep(1,4))
+plot_gd(r1)
+plot_gd(r3)
+plot_gd(r5)
+plot_gd(rF)
+
+plot_gd(r1)
+plot_gd(mask(r3, r1))
+plot_gd(mask(r5, r1))
+plot_gd(mask(rF, r1))
+
+plot_gd(r1, zlim = c(0.25, 0.45))
+plot_gd(mask(r3, r1), zlim = c(0.25, 0.45))
+plot_gd(mask(r5, r1), zlim = c(0.25, 0.45))
+plot_gd(mask(rF, r1), zlim = c(0.25, 0.45))
 ```
 
