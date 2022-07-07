@@ -104,7 +104,7 @@ time_test <- function(val, var, vcf, coords, lyr, stat = "pi", fact = 2, wdim = 
 
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, fact = 3, wdim = 5, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, fact = 3, wdim = 5, rarify, rarify_n = 10, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
 
   df <- data.frame(time = (Sys.time() - ptm),
                    fact = 3,
