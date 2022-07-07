@@ -29,6 +29,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
 
   # calc stats
   if(stat == "allelic.richness"){
+    # convert from vcf to genind
     gen <- vcfR::vcfR2genind(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_ar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
@@ -38,6 +39,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
   }
 
   if(stat == "het" | stat == "heterozygosity"){
+    # convert from vcf to heterozygosity matrix
     gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
@@ -46,6 +48,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
   }
 
   if(stat == "pi"){
+    # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_pi, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel, nloci)
@@ -54,7 +57,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
    }
 
   if(stat == "biallelic.richness"){
-    #convert vcf to genlight to dosage matrix
+    #convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
@@ -73,6 +76,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
 #' @param gen genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @param coords coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),
 #' @param lyr RasterLayer to slide window across
+#' @param stat function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)
 #' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
 #' @param rarify if rarify = TRUE, rarefaction is performed
@@ -259,6 +263,7 @@ sample_gd <- function(gen, sub, stat, nloci = NULL) {
   if(is.null(nloci)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], nloci)}
   return(gd)
 }
+
 
 #' Calculate mean allelic richness
 #'
