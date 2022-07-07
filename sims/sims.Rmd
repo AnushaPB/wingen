@@ -23,8 +23,8 @@ source("sim_functions.R")
 
 # system time sims
 ```{r}
-vcf <- read.vcfR("data/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
-geo <- read.csv("data/mod-sim_params_it-0_t-500_spp-spp_0.csv")
+vcf <- read.vcfR("data/new_sims/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
+geo <- read.csv("data/new_sims/mod-sim_params_it-0_t-500_spp-spp_0.csv")
 coords <- geo[,c("idx","x","y")]
 
 set.seed(42)
@@ -70,14 +70,14 @@ legend(0,-80,
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 
-tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
-tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3, disagg_r = 3)
+tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3)
 tr_k_mask <- mask_gd(tr_k, 4)
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr[["res"]]$pi, col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
+plot(tr[["res"]][[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
@@ -90,6 +90,8 @@ plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FAL
 plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
 
 ```
+
+
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
