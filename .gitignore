@@ -5,6 +5,7 @@ sims/data/
 sims/bdrive/
 sims/GNX_mod-sims_params
 sims/outputs
+sims/*.csv
 
 # History files
 .Rhistory
@@ -55,3 +56,7 @@ vignettes/*.pdf
 
 #vcfs
 *.vcf
+
+#random spatial files
+*.grd
+*.gri
