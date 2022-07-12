@@ -69,8 +69,13 @@ legend(0,-80,
 
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
+cores <- 6
+cl <- makeCluster(cores)
+registerDoParallel(cl)
 
-tr <- sim(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))s
+
+stopCluster(cl)
 
 tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3)
 tr_k_mask <- mask_gd(tr_k, 4)
@@ -688,5 +693,10 @@ plot_gd(r1, zlim = c(0.25, 0.45))
 plot_gd(mask(r3, r1), zlim = c(0.25, 0.45))
 plot_gd(mask(r5, r1), zlim = c(0.25, 0.45))
 plot_gd(mask(rF, r1), zlim = c(0.25, 0.45))
+```
+# NEW SIMS
+```{r}
+hf <- raster("outputs/FULL_rarifyTRUE_nsamp1450_nloci150000_heterozygosity.tif")
+plot(hf, col = magma(100))
 ```
 
