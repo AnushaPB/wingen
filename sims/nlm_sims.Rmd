@@ -1,0 +1,27 @@
+---
+title: "nlm_sims"
+output: html_document
+---
+```{r}
+library(NLMR)
+library(raster)
+
+H = 0.5
+# Generate NLM
+set.seed(22)
+nlm22 <- nlm_mpd(102, 102, resolution = 1, roughness = 1-H, rescale = TRUE, verbose = TRUE)
+nlm22 <- crop(nlm22, c(0,100,0,100))
+nlm22 <- nlm22/4
+plot(nlm22)
+
+cellStats(nlm22, sum)
+
+nlm22 <- as.matrix(nlm22)
+write.table(nlm22, here("sims_nlm", "data", "nlm.csv"), row.names = FALSE, col.names = FALSE, sep = ",")
+```
+```{r}
+nlm <- read.csv(here("sims_nlm", "data", "nlm.csv"), header = FALSE)
+nlm <- raster(as.matrix(nlm))
+plot(nlm)
+```
+
