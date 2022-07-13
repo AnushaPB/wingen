@@ -9,10 +9,8 @@ set.seed(42)
 # load vcf, coords, and lyr
 load_middle_earth()
 
-# get ids of inds to sample
-IDS <- read.csv(here("sims/data/samples_seed42.csv"))
-# get indexes of individuals
-si <- IDS$inds
+# sample inds
+si <- sample(nrow(coords), 200)
 # sample loci
 l <- sample(nrow(vcf@gt), 10000)
 # subset coodinates
@@ -27,6 +25,11 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test
+
+cores <- 10
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
