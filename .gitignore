@@ -7,6 +7,9 @@ sims/GNX_mod-sims_params
 sims/outputs
 sims/*.csv
 
+# private token
+token.R
+
 # History files
 .Rhistory
 .Rapp.history
