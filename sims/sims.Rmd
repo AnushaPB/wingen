@@ -23,11 +23,11 @@ source("sim_functions.R")
 
 # system time sims
 ```{r}
-vcf <- read.vcfR("data/new_sims/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
-geo <- read.csv("data/new_sims/mod-sim_params_it-0_t-500_spp-spp_0.csv")
+vcf <- read.vcfR("data/mod-sim_params_it-0_t-4000_spp-spp_0.vcf")
+geo <- read.csv("data/mod-sim_params_it-0_t-4000_spp-spp_0.csv")
 coords <- geo[,c("idx","x","y")]
 
-set.seed(42)
+set.seed(22)
 l <- sample(nrow(vcf@gt), 10000)
 si <- sample(nrow(coords), 200)
 #write.csv( data.frame(loci = l, inds = si), "samples_seed42.csv", row.names = FALSE)
@@ -73,7 +73,7 @@ cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-tr <- sim(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))s
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
 stopCluster(cl)
 
@@ -85,7 +85,7 @@ plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, z
 plot(tr[["res"]][[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k$pi, col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
+plot(tr_k[[1]], col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
 
 plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
@@ -108,6 +108,7 @@ for(i in c(1, 2, 4, 8)){
 }
 
 ```
+
 ```{r, fig.width = 16, fig.height = 4}
 par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
 
