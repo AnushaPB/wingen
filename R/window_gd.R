@@ -16,7 +16,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
     vcf <- vcfR::read.vcfR(vcf)
@@ -32,7 +32,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
     # convert from vcf to genind
     gen <- vcfR::vcfR2genind(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_ar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_ar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "allelic_richness"
 
@@ -42,7 +42,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
     # convert from vcf to heterozygosity matrix
     gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "heterozygosity"
   }
@@ -51,7 +51,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_pi, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel, nloci)
+    results <- window_gd_general(gen, coords, lyr, stat = calc_pi, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, nloci)
 
     names(results[[1]]) <- "pi"
    }
@@ -60,7 +60,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
     #convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, fact, wdim, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "biallelic_richness"
 
@@ -77,8 +77,8 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
 #' @param coords coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),
 #' @param lyr RasterLayer to slide window across
 #' @param stat function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)
-#' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
@@ -96,7 +96,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", fact = 0, wdim = 5, rarify 
 #'
 #' @examples
 #'
-window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, fact = 0, wdim = 10, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
+window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
 
   # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
 

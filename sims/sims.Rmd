@@ -17,7 +17,7 @@ library(purrr)
 
 library(adegenet)
 library(hierfstat)
-source("sim_functions.R")
+source("sims_functions.R")
 ```
 
 
@@ -73,7 +73,7 @@ cores <- 2
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-tr <- sim(subvcf, subcoords, lyr, stat = "het", fact = 3, wdim = 5, rarify_n = 4, rarify_nit = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 5, fact = 3, rarify_n = 4, rarify_nit = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
 stopCluster(cl)
 
@@ -252,7 +252,7 @@ stk <- list()
 i = 1
 for(f in c(2, 4, 8)){
   for(w in c(3, 5, 7)){
-    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", fact = f, wdim = w, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
+    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
     stk[[i]] <-  res[[1]]
     plot(res[[1]], col = magma(100))
     i <- i + 1
@@ -391,9 +391,9 @@ par(pty ="s")
 plot(dr)
 points(dcoords)
 
-wr <- sim(dvcf, dcoords, dr, stat = "het", fact = 0, wdim = 7, min_n = 6, rarify = FALSE, parallel = TRUE)
+wr <- sim(dvcf, dcoords, dr, stat = "het", wdim = 7, fact = 0, min_n = 6, rarify = FALSE, parallel = TRUE)
 
-wor <- sim(dvcf, dcoords, dr, stat = "het", fact = 0, wdim = 7, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
+wor <- sim(dvcf, dcoords, dr, stat = "het", wdim = 7, fact = 0, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
 
 plot(wr$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
 plot(wor$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
@@ -473,8 +473,8 @@ subcoords <- subcoords[match(colnames(subvcf@gt[,-1]), subcoords$idx),]
 # check match
 all(colnames(subvcf@gt)[-1] == as.character(subcoords$idx))
 
-nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", fact = 3, wdim = 5, rarify = FALSE, min_n = 4, nloci = nrow(subvcf@gt))
-yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", fact = 3, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5, nloci = nrow(subvcf@gt))
+nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3, rarify = FALSE, min_n = 4, nloci = nrow(subvcf@gt))
+yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3,rarify = TRUE, rarify_n = 4, rarify_nit = 5, nloci = nrow(subvcf@gt))
 par(mfrow = c(1,3))
 plot(nr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
 plot(yr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
