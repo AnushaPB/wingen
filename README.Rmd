@@ -13,6 +13,14 @@ knitr::opts_chunk$set(
 
 # wingen <img src="man/figures/logo.png" align="right" height=150 />
 
+```{r, echo=FALSE, include=FALSE}
+if(file.exists("token.R") & require("covr",character.only = TRUE)){
+  source("token.R")
+  covr::codecov(token = cov_token())
+}
+```
+
+
 <!-- badges: start -->
 <!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
 [![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
@@ -44,8 +52,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 5,
           wdim = 3,
+          fact = 5,
           rarify = TRUE,
           nloci = 1000)
 
