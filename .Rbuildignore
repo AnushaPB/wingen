@@ -20,3 +20,6 @@
 ^vignettes/wingen-vignette_cache$
 ^vignettes/wingen-vignette_files$
 ^codecov\.yml$
+^sims_nlm$
+^empex$
+^vignettes$
