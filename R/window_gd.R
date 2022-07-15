@@ -82,7 +82,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param rarify if rarify = TRUE, rarefaction is performed
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
-#' @param min_n min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)
+#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
 #' @param nloci for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
@@ -99,6 +99,10 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
 
   # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
+
+  # format coords
+  coords <- data.frame(coords)
+  colnames(coords) <- c("x", "y")
 
   # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)
@@ -414,8 +418,19 @@ get_adj <- function(i, r, n, coord_cells){
   return(sub)
 }
 
-preview_window <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0){
-  if(fact != 0) lyr <- aggregate(lyr, fact)
+#' Generate preview of moving window and sample counts
+#'
+#' @param coords coordinates (two columns, the first should be x and the second should be y)
+#' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
+#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
+#' @inheritParams window_gd
+#'
+#' @return
+#' @export
+#'
+#' @examples
+preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0){
+  if(fact != 0) lyr <- raster::aggregate(lyr, fact)
 
   # convert wdim to matrix
   nmat <- wdim_to_mat(wdim)
@@ -423,7 +438,7 @@ preview_window <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min
   # get center of raster
   e <- as.vector(extent(lyr))
   c <- c(mean(e[c(1,2)]),mean(e[c(3,4)]))
-  center <- cellFromXY(lyr, c)
+  center <- raster::cellFromXY(lyr, c)
 
   # get adjacent cells to center cell
   adjc <- raster::adjacent(lyr, center, directions = nmat)
@@ -434,9 +449,9 @@ preview_window <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
-  raster::plot(lyrw, col = mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
+  raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   legend("bottomleft", c("raster layer", "window", "focal cell"), col = mako(3, direction = -1), pch = 15)
-  if(!is.null(coords)) points(coords, pch = 3)
+  if(!is.null(coords)) points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
 
   if(sample_count){
 
@@ -445,8 +460,8 @@ preview_window <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min
 
     # count
     lyrc <- lyr
-    nc <- map_dbl(1:ncell(lyr), function(x, lyr, nmat, coord_cells){sub <- get_adj(x, lyr, nmat, coord_cells); return(length(sub))}, lyr, nmat, coord_cells)
-    lyrc <- setValues(lyr, nc)
+    nc <- purrr::map_dbl(1:ncell(lyr), function(x, lyr, nmat, coord_cells){sub <- get_adj(x, lyr, nmat, coord_cells); return(length(sub))}, lyr, nmat, coord_cells)
+    lyrc <- raster::setValues(lyr, nc)
 
     lyrc[lyrc < min_n] <- NA
     raster::plot(lyrc, col = mako(100), box = FALSE, axes = FALSE, main = "sample count")
