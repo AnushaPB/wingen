@@ -9,6 +9,8 @@ sample_gd(gen, sub, stat, nloci = NULL)
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
 
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+
 \item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{

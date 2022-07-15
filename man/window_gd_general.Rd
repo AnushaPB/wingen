@@ -9,8 +9,8 @@ window_gd_general(
   coords,
   lyr,
   stat = calc_mean_ar,
+  wdim = 5,
   fact = 0,
-  wdim = 10,
   rarify = FALSE,
   rarify_n = 4,
   rarify_nit = 10,
@@ -27,9 +27,11 @@ window_gd_general(
 
 \item{lyr}{RasterLayer to slide window across}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created}
+
+\item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed}
 
@@ -37,7 +39,7 @@ window_gd_general(
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
-\item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 

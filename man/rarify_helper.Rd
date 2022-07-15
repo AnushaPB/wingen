@@ -13,6 +13,8 @@ rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloci = NULL)
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
 \item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}

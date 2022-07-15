@@ -9,8 +9,8 @@ window_gd(
   coords,
   lyr,
   stat = "pi",
-  fact = 0,
   wdim = 5,
+  fact = 0,
   rarify = FALSE,
   rarify_n = 4,
   rarify_nit = 5,
@@ -29,9 +29,9 @@ window_gd(
 
 \item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
-
 \item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created}
+
+\item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed}
 
@@ -39,7 +39,7 @@ window_gd(
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
-\item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 

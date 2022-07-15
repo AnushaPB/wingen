@@ -30,13 +30,15 @@ window_helper(
 
 \item{nmat}{neighborhood matrix}
 
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+
 \item{rarify}{if rarify = TRUE, rarefaction is performed}
 
 \item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction}
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
-\item{min_n}{min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
