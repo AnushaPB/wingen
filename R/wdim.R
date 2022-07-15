@@ -20,14 +20,16 @@ wdim_to_mat <- function(wdim) {
 
   if (length(wdim) == 2) {
     n <- matrix(1, wdim[1], wdim[2])
+    # focal cell (center of matrix) has to be zero
+    n[wdim[1] / 2 + 0.5, wdim[2] / 2 + 0.5] <- 0
   } else if (length(wdim) == 1) {
     n <- matrix(1, wdim, wdim)
+    # focal cell (center of matrix) has to be zero
+    n[wdim / 2 + 0.5, wdim / 2 + 0.5] <- 0
   } else {
     stop("wdim must be a number or a vector of length 2")
   }
 
-  # focal cell (center of matrix) has to be zero
-  n[wdim / 2 + 0.5, wdim / 2 + 0.5] <- 0
 
   return(n)
 }
