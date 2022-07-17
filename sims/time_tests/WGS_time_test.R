@@ -2,7 +2,7 @@ library(wingen)
 library(foreach)
 library(doParallel)
 library(here)
-source(here("sims/sim_functions.R"))
+source(here("sims/sims_functions.R"))
 
 set.seed(42)
 

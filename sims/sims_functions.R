@@ -73,8 +73,7 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
   return(list(pt = pt, res = res))
 }
 
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 2, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
-
+time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
   # reassign argument
   assign(var, val)
 
