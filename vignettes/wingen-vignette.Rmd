@@ -50,18 +50,39 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 
 ### Run sliding window calculations
 
-CLEAN THIS UP: 
-Main arguments:
-1. *vcf* - 
-2. *coords* -
-3. *lyr* - 
-4. *stat* - We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data, though additional functionality may become available in the future. In addition, there are two functions for calculating allelic richness: (1) “allelic.richness” which uses the allelic.richness function from the “hierfstat” package and (2) “biallelic.richness” which provides a much faster calculation of allelic richness, but only works for bi-allelic data. 
+*Main arguments:*
+
+1. *vcf* - object of type vcf with genotypic data. The order of this file matters! the coordinate and genetic data should be in the same order, as there are currently no checks for this.
+
+
+2. *coords* - a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e. Longitude) and the second should be y (i.e. Latitude). 
+
+
+3. *lyr* - a RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
+
+
+4. *stat* - the genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) “allelic.richness” which uses the allelic.richness function from the “hierfstat” package and (2) “biallelic.richness” which provides a much faster calculation of allelic richness, but only works for bi-allelic data. 
+
+
 5. *fact* - to decrease computational time, we provide the option to aggregate the input raster layer by some factor defined using the “fact” argument. Increasing “fact” will decrease the number of cells and thereby decrease the number of calculations, with the trade-off of decreasing the resolution of the output layers. Users should keep in mind that if they increase “fact” they may simultaneously want to decrease “wdim” since the proportion of the landscape covered by the neighborhood matrix would otherwise increase substantially. 
-6. *wdim* -  used to create the neighborhood matrix for the sliding window based on the dimensions provided. This argument can either be set to one value (e.g. 3) which will create a square window (e.g. 3 x 3), or two values can be provided to create a rectangular window (e.g. 3 x 5). We encourage users to experiment with different values of  “wdim” to determine the sensitivity of their results to this parameter. Ideally, “wdim” would be set with some knowledge of the study system in mind (e.g. the dispersal patterns and/or neighborhood size of the study organism). 
+
+
+6. *wdim* -  used to create the neighborhood matrix for the moving window based on the dimensions provided. This argument can either be set to one value (e.g. 3) which will create a square window (e.g. 3 x 3), or two values can be provided to create a rectangular window (e.g. 3 x 5). We encourage users to experiment with different values of  “wdim” to determine the sensitivity of their results to this parameter. Ideally, “wdim” would be set with some knowledge of the study system in mind (e.g. the dispersal patterns and/or neighborhood size of the study organism). A preview of the window size relative to the landscape can be obtained using the \code{preview_window()} function
+
+
 7. *rarify* - Users have the option to perform rarefaction by setting the “rarify” argument to TRUE. If “rarify = TRUE”, users then define “rarify_n” as the number of samples to rarify to and “rarify_nit” as the number of iterations for rarefaction (e.g. if rarify_n = 4 and rarify_nit = 5, for each sample set, four random samples will be drawn five times). As the window moves across the landscape, three things can occur based on the number of samples in the window: (1) if the number of samples is less than “rarify_n”, genetic diversity is not calculated and a raster value of “NA” is assigned, (2) if the number of samples is equal to “rarify_n” the genetic diversity statistic is calculated for those samples, (3) if the number of samples is greater than “rarify_n,” rarefaction is implemented and that set of samples is subsampled “rarify_nit” times to a size of “rarify_n” and the mean (or another summary statistic set using “fun”) of those “rarify_nit” iterations is used. We suggest that users select “rarify_n” and “rarify_nit” such that the number of possible ways to choose “rarify_n” from a sample of size “rarify_n” plus one is greater than “rarify_nit” in order for there to always be “rarify_nit” number of unique combinations of size “rarify_n”. If “rarify = FALSE”, rarefaction is not performed and only steps (1) and (2) occur such that: (1) if the number of samples in the window is less than the “min_n” argument, genetic diversity is not calculated and a raster value of “NA” is assigned and (2) if the number of samples is equal to or greater than “min_n” the genetic diversity statistic is calculated for those samples. We highly encourage users to perform rarefaction as genetic diversity statistics are sensitive to sample size. The main benefit of not performing rarefaction is decreased computational time, however this is not worth the trade-off in inaccuracy unless you are confident that there is no effect of rarefaction after performing your analysis with and without rarefaction.
-8. *parallel* - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages (CITE) To perform parallelization on a Windows operating system a cluster must first be initialized using a few lines of code, a process which we describe in the vignette of this package. All other minor arguments to window_gd() are described in the package documentation.
 
 
+8. *parallel* - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages. To perform parallelization on a Windows operating system a cluster must first be initialized using a few lines of code, a process which we describe in the vignette of this package. 
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+preview_gd(lotr_lyr,
+           lotr_coords,
+           wdim = 3, 
+           fact = 5, 
+           sample_count = TRUE, 
+           min_n = 0)
+```
 
 
 ```{r sliding window, fig.width = 5, fig.height = 5, cache = TRUE}
@@ -69,22 +90,34 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 3,
-          wdim = 5,
+          fact = 5,
+          wdim = 3,
           rarify = TRUE,
           nloci = 1000)
 
+# NOTE:  the nloci argument is used in the calculation of pi. 
+# if nloci=NULL (default), the function returns the sum over SNPs of nucleotide diversity
+# Otherwise, the function returns the average nucleotide diversity per nucleotide given the length nloci of the sequence 
 
+# the plot_gd function plots the genetic diversity layer
 plot_gd(wgd, main = "Window pi")
+
+# the plot_count function plots the sample count layer
 plot_count(wgd, main = "Window sample counts")
 ```
 
 ### Krige results
 
-Kriging is performed by first transforming the sliding window layer into a set of coordinates with corresponding genetic diversity (or sample count) values and then interpolating using these coordinates across the grid provided. Because of this, it is important to keep in mind how the coordinates from the sliding window raster and the grid align. If the resolution of the sliding window raster is much less than that of the grid, there are fewer points for interpolation which can result in grid-like artifacts during kriging. To deal with this issue, users can either (1) resample their sliding window raster layers and grid layers to the same resolution by using the “resample” argument or (2) manually disaggregate or aggregate either the sliding window or grid layers using the “r_agg”, “r_disagg”, “grd_agg”, or “grd_disagg” arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the “grd_disagg” argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a RasterLayer. Keep in mind that increasing the resolution of the sliding window layer (i.e. either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, however to a lesser extent. Additional information about the krig_gd() arguments can be found in the package documentation. The output of this function is a RasterStack of the kriged input layers. 
+To produce smoother maps of genetic diversity, we provide the function krig_gd() which creates a spatially interpolated raster from the moving window raster produced by window_gd(). This function uses the autoKrige() function from the R package “automap” to perform kriging on the moving window raster using an automatically generated variogram. Note that the RasterStack from window_gd() including both the genetic diversity layer and the sample count layer can be used and will generate kriged maps of both genetic diversity and sample count. 
+
+
+Kriging is performed by first transforming the sliding window layer into a set of coordinates with corresponding genetic diversity (or sample count) values and then interpolating using these coordinates across the grid provided. Because of this, it is important to keep in mind how the coordinates from the sliding window raster and the grid align. If the resolution of the sliding window raster is much less than that of the grid, there are fewer points for interpolation which can result in grid-like artifacts during kriging. 
+
+
+To deal with this issue, users can either (1) resample their sliding window raster layers and grid layers to the same resolution by using the “resample” argument or (2) manually disaggregate or aggregate either the sliding window or grid layers using the “r_agg”, “r_disagg”, “grd_agg”, or “grd_disagg” arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the “grd_disagg” argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a RasterLayer. Keep in mind that increasing the resolution of the sliding window layer (i.e. either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, however to a lesser extent. Additional information about the krig_gd() arguments can be found in the package documentation. The output of this function is a RasterStack of the kriged input layers. 
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
-kgd <- krig_gd(wgd, lotr_lyr)
+kgd <- krig_gd(wgd, lotr_lyr, disagg_grd = 5)
 
 plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")

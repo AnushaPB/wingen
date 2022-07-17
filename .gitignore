@@ -6,6 +6,13 @@ sims/bdrive/
 sims/GNX_mod-sims_params
 sims/outputs
 sims/*.csv
+sims_nlm/data
+
+#EMPIRICAL
+empex/data
+
+# private token
+token.R
 
 # History files
 .Rhistory

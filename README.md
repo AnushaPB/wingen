@@ -45,8 +45,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 5,
           wdim = 3,
+          fact = 5,
           rarify = TRUE,
           nloci = 1000)
 

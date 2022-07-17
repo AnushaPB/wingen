@@ -48,11 +48,11 @@ usethis::use_testthat()
 usethis::use_data_raw()
 ```
 ```{r}
-usethis::use_build_ignore("sims/")
+usethis::use_build_ignore("sims")
 
-usethis::use_build_ignore("sims_nlm/")
+usethis::use_build_ignore("sims_nlm")
 
-usethis::use_build_ignore("empex/")
+usethis::use_build_ignore("empex")
 
 # THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
 usethis::use_build_ignore("inst/extdata/")
@@ -64,6 +64,13 @@ usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
 usethis::use_build_ignore("vignettes/wingen-vignette_files/")
 
 usethis::use_build_ignore("data-raw")
+
+
+usethis::use_build_ignore("token")
+
+
+usethis::use_build_ignore(".gitignore")
+usethis::use_build_ignore(".github")
 
 #TEMP ADD THIS BACK LATER
 usethis::use_build_ignore("vignettes")

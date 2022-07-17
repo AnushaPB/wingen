@@ -1,0 +1,33 @@
+---
+title: "empex"
+output: html_document
+---
+```{r, fig.width=5,fig.height=5}
+vcf <- read.vcfR("data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf")
+coords <- read.table("data/Scelop.coord")
+
+lyr <- raster(("data/CA_rPCA1.tif"))
+plot(lyr)
+points(coords)
+```
+
+```{r, fig.width=5, fig.height=5}
+preview_window(lyr, coords, fact = 50, wdim = 5, min_n = 4)
+
+wg <- window_gd(vcf, coords, lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5)
+plot_gd(wg)
+kg <- krig_gd(wg, lyr, agg_grd = 10)
+mg <- mask_gd(kg, 4)
+
+wg2 <- window_gd(vcf, coords, lyr, stat = "pi", fact = 50, wdim = 5, rarify = FALSE, min_n = 4)
+kg2 <- krig_gd(wg2, lyr, agg_grd = 10)
+mg2 <- mask_gd(kg2, 4)
+
+par(mar = rep(0,4), oma = rep(0,4))
+plot_gd(mg)
+points(coords, pch = 3, col = mako(1, begin = 0.8), lwd = 1.5, cex = 0.8)
+
+plot_gd(mg2)
+points(coords)
+```
+

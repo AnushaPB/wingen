@@ -20,6 +20,33 @@ test_that("wdim_check fixes wdim", {
   expect_warning(wdim_check(4))
 })
 
+test_that("returns matrix with only one zero", {
+  n <- wdim_to_mat(c(3,5))
+
+  # only ones and zeroes
+  expect_equal(unique(as.vector(n)), c(1,0))
+
+  # only one zero
+  expect_equal(sum(as.vector(n) == 0), 1)
+
+  # zero is at center
+  center <- n[nrow(n)/2 + 0.5,ncol(n)/2 + 0.5]
+  expect_equal(center, 0)
+
+  n <- wdim_to_mat(3)
+
+  # only ones and zeroes
+  expect_equal(unique(as.vector(n)), c(1,0))
+
+  # only one zero
+  expect_equal(sum(as.vector(n) == 0), 1)
+
+  # zero is at center
+  center <- n[nrow(n)/2 + 0.5,ncol(n)/2 + 0.5]
+  expect_equal(center, 0)
+
+})
+
 test_that("biallelic richness is calculated correctly", {
   expected <- c(1, 2, 2, 2, 2, 2, 2, 2, 1)
   all_possible_combos <- t(expand.grid(0:2, 0:2))
@@ -29,3 +56,4 @@ test_that("biallelic richness is calculated correctly", {
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")
 })
+
