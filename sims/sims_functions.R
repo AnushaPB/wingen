@@ -197,7 +197,7 @@ get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, f
   if(file.name != "FULL" & !is.null(nsamp)){ presentFile <- presentFile & grepl(paste0("nsamp", nsamp), listFiles)}
   locFile <- listFiles[presentFile]
 
-  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, measure, "- skipping")); return()}
+  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, measure, "- returning NULL")); return(NULL)}
   file <- here(rootPath, locFile)
   r <- raster::stack(file)
   r <- r[[seq(1, nlayers(r),2)]]
