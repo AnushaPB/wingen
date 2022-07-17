@@ -1,10 +1,10 @@
 load_middle_earth <- function(){
   # load genetic data
-  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-4000_spp-spp_0.vcf"))
+  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-10000_spp-spp_0.vcf"))
   assign("vcf", vcf, envir = .GlobalEnv)
 
   # load coords
-  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-4000_spp-spp_0.csv"))
+  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-10000_spp-spp_0.csv"))
   coords <- geo[,c("idx", "x", "y")]
   coords$y <- -coords$y
   assign("coords", coords, envir = .GlobalEnv)
