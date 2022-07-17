@@ -14,7 +14,6 @@ library(here)
 library(ggplot2)
 library(dplyr)
 library(purrr)
-
 library(adegenet)
 library(hierfstat)
 source("sims_functions.R")
@@ -23,8 +22,8 @@ source("sims_functions.R")
 
 # system time sims
 ```{r}
-vcf <- read.vcfR("data/mod-sim_params_it-0_t-8000_spp-spp_0.vcf")
-geo <- read.csv("data/mod-sim_params_it-0_t-8000_spp-spp_0.csv")
+vcf <- read.vcfR("data/mod-sim_params_it-0_t-10000_spp-spp_0.vcf")
+geo <- read.csv("data/mod-sim_params_it-0_t-10000_spp-spp_0.csv")
 coords <- geo[,c("idx","x","y")]
 
 set.seed(22)
@@ -69,7 +68,8 @@ legend(0,-80,
 
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
-preview_gd(lyr, subcoords, wdim = 5, fact = 3)
+preview_gd(lyr, subcoords, wdim = 5, fact = 3, sample_count = FALSE)
+
 cores <- 2
 cl <- makeCluster(cores)
 registerDoParallel(cl)
