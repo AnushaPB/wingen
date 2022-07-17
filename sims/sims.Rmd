@@ -75,7 +75,6 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 5, fact = 3, rarify_n = 4, rarify_nit = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
-
 stopCluster(cl)
 
 tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3)
