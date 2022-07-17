@@ -73,8 +73,7 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
   return(list(pt = pt, res = res))
 }
 
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 2, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
-
+time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
   # reassign argument
   assign(var, val)
 
@@ -104,7 +103,7 @@ time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 
 
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 5, fact = 3, rarify, rarify_n = 10, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 5, fact = 3, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
 
   df <- data.frame(time = (Sys.time() - ptm),
                    fact = 3,
