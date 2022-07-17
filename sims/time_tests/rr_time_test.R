@@ -2,7 +2,7 @@ library(wingen)
 library(foreach)
 library(doParallel)
 library(here)
-source(here("sims/sim_functions.R"))
+source(here("sims/sims_functions.R"))
 
 set.seed(42)
 
@@ -27,8 +27,12 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr")
+cores <- 10
+cl <- makeCluster(cores)
+registerDoParallel(cl)
 
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = TRUE, file.name = "rr")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
+
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
 
 stopCluster(cl)

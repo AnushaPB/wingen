@@ -255,7 +255,7 @@ params = {
 #-------------#
     'model': {
         #total Model runtime (in timesteps)
-        'T':            501,
+        'T':            10001,
         #min burn-in runtime (in timesteps)
         'burn_T':       30,
         #seed number
@@ -296,7 +296,7 @@ params = {
                 #collection radius around points, for point & transect sampling
                 'radius':               None,
                 #when to collect data
-                'when':                 100,
+                'when':                 1000,
                 #whether to save current Layers when data is collected
                 'include_landscape':    False,
                 #whether to include fixed loci in VCF files
