@@ -134,8 +134,8 @@ params = {
                     'n_births_distr_lambda':    1,
                     #whether n births should be fixed at n_births_dist_lambda
                     'n_births_fixed':           True,
-                    #radius of mate-search area (None, for panmixia) NOTE: changed from 10 to 1
-                    'mating_radius':            1,
+                    #radius of mate-search area (None, for panmixia) NOTE: changed from 10 to 2
+                    'mating_radius':            2,
                     #whether individs should choose nearest neighs as mates
                     'choose_nearest_mate':        False,
                     #whether mate-choice should be inverse distance-weighted
@@ -180,6 +180,16 @@ params = {
                     'dispersal_distance_distr_param2':      0.1,
                     #dispersal distance distr to use ('lognormal','levy','wald')
                     'dispersal_distance_distr':             'lognormal',
+                    'move_surf'     : {
+                      #move-surf Layer name
+                      'layer':                'lyr_1',
+                      #whether to use mixture distrs
+                      'mixture':              True,
+                      #concentration of distrs
+                      'vm_distr_kappa':       12,
+                      #length of approximation vectors for distrs
+                      'approx_len':       5000,
+                      },
                     },    # <END> 'movement'
 
 
@@ -193,11 +203,11 @@ params = {
                     #num of loci
                     'L':                        150000,
                     #fixed starting allele freq; None/False -> rand; True -> 0.5
-                    'start_p_fixed':            0.5,
+                    'start_p_fixed':            0,
                     #whether to start neutral locus freqs at 0
                     'start_neut_zero':          False,
                     #genome-wide per-base neutral mut rate (0 to disable)
-                    'mu_neut':                  0,
+                    'mu_neut':                  1e-9,
                     #genome-wide per-base deleterious mut rate (0 to disable)
                     'mu_delet':                 0,
                     #shape of distr of deleterious effect sizes
