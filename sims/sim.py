@@ -227,7 +227,7 @@ params = {
                     #num of loci
                     'L':                        150000,
                     #fixed starting allele freq; None/False -> rand; True -> 0.5
-                    'start_p_fixed':            0,
+                    'start_p_fixed':            None,
                     #whether to start neutral locus freqs at 0
                     'start_neut_zero':          False,
                     #genome-wide per-base neutral mut rate (0 to disable)
@@ -330,7 +330,7 @@ params = {
                 #collection radius around points, for point & transect sampling
                 'radius':               None,
                 #when to collect data
-                'when':                 1000,
+                'when':                 500,
                 #whether to save current Layers when data is collected
                 'include_landscape':    False,
                 #whether to include fixed loci in VCF files
