@@ -90,23 +90,21 @@ params = {
                 #### layer num. 0: change parameters ####
                 #########################################
 
-                #landscape-change events for this Layer
-                'change': 
-                    0: {
-                        #array or file for final raster of event, or directory
-                        #of files for each stepwise change in event
-                        'change_rast': nlm_change,
-                        #starting timestep of event
-                        'start_t':          9900,
-                        #ending timestep of event
-                        'end_t':            9901,
-                        #number of stepwise changes in event
-                        'n_steps':          1,
-                        }, # <END> event 
-                        
-                    }, # <END> 'change
-                    
-                }, # <END> layer num. 0
+                  #landscape-change events for this Layer
+                  'change': {
+                      0: {
+                          #array or file for final raster of event, or directory
+                          #of files for each stepwise change in event
+                          'change_rast': nlm_change,
+                          #starting timestep of event
+                          'start_t':          9900,
+                          #ending timestep of event
+                          'end_t':            9901,
+                          #number of stepwise changes in event
+                          'n_steps':          1,
+                          }, # <END> event 0
+                      }, # <END> 'change'
+                  }, # <END> layer num. 0
 
             },  # <END> layer num. 1
 
