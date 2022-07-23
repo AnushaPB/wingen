@@ -17,6 +17,7 @@
 #' plot_count(wpi)
 #'
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
     vcf <- vcfR::read.vcfR(vcf)
@@ -82,7 +83,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param rarify if rarify = TRUE, rarefaction is performed
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
-#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)
+#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
 #' @param nloci for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
@@ -97,8 +98,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @examples
 #'
 window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
-
-  # TODO: ADD FUNCTIONALITY SO RARIFY CAN EQUAL 1
 
   # format coords
   coords <- data.frame(coords)
@@ -160,6 +159,10 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, f
 #'
 #' @examples
 window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci = NULL){
+
+  # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
+  if(rarify) min_n <- rarify_n
+
   # skip if raster value is NA
   if (is.na(lyr[i])) {
     return(data.frame(gd = NA, ns = NA))
@@ -283,7 +286,7 @@ calc_mean_ar <- function(genind){
   genind$pop <- rep(factor(1), nrow(genind$tab))
   #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == nloci)
   ar <- hierfstat::allelic.richness(genind)$Ar[,1]
-  gd <- mean(stats::na.omit(ar))
+  gd <- mean(ar, na.rm = TRUE)
   return(gd)
 }
 
@@ -298,13 +301,7 @@ calc_mean_ar <- function(genind){
 #'
 #' @examples
 calc_mean_het <- function(hetmat){
-  # if hetmat is not a matrix (e.g. has NULL dimensions/is a vector or has one value, calculate and return the mean)
-  if(is.null(dim(hetmat)) & length(hetmat) > 0){
-    return(stats::na.omit(mean(hetmat)))
-  }
-
   gd <- mean(hetmat, na.rm = TRUE)
-
   return(gd)
 }
 
@@ -337,9 +334,9 @@ calc_pi <- function(dos, nloci = NULL){
 #'
 #' @examples
 calc_mean_biar <- function(dos){
-  if(!all(dos %in% c(0,1,2))){stop("to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")}
+  if(!all(dos %in% c(0,1,2,NA))){stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")}
   ar_by_locus <- apply(dos, 2, helper_calc_biar)
-  mean_ar <- mean(stats::na.omit(ar_by_locus))
+  mean_ar <- mean(ar_by_locus, na.rm = TRUE)
   return(mean_ar)
 }
 
@@ -354,7 +351,7 @@ calc_mean_biar <- function(dos){
 #'
 #' @examples
 helper_calc_biar <- function(loc){
-  uq <- stats::na.omit(unique(loc))
+  uq <- mean(unique(loc), na.rm = TRUE)
   if (1 %in% uq){
     return(2)
   } else if (0 %in% uq & 2 %in% uq){
@@ -425,7 +422,7 @@ get_adj <- function(i, r, n, coord_cells){
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @inheritParams window_gd
 #'
-#' @return
+#' @return plots example window and sample counts (if sample_count = TRUE)
 #' @export
 #'
 #' @examples

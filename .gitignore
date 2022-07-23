@@ -9,6 +9,7 @@ sims/*.csv
 sims_nlm/data
 !sims/data/samples_seed42.csv
 !sims/data/bottleneck_lyr.csv
+!sims/data/init_lyr.csv
 !sims/data/middle_earth.csv
 
 #EMPIRICAL

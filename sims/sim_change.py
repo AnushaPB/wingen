@@ -4,8 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from nlmpy import nlmpy
 
-# nlm = nlmpy.mpd(100, 100, 0.5)
-nlm = np.genfromtxt("data/middle_earth.csv", delimiter=',')
+# get layers
+nlm = np.genfromtxt("data/init_lyr.csv", delimiter=',')
 nlm_change = np.genfromtxt("data/bottleneck_lyr.csv", delimiter=',')
 dim = nlm.shape[1]
 
@@ -95,8 +95,8 @@ params = {
 
                     0: {
                         'change_rast': nlm_change,
-                        'start_t': 9900,
-                        'end_t': 9901,
+                        'start_t': 2000,
+                        'end_t': 2001,
                         'n_steps': 1
                     },  # <END> event 0
 
@@ -273,7 +273,7 @@ params = {
 #-------------#
     'model': {
         #total Model runtime (in timesteps)
-        'T':            10001,
+        'T':            5001,
         #min burn-in runtime (in timesteps)
         'burn_T':       30,
         #seed number
@@ -314,7 +314,7 @@ params = {
                 #collection radius around points, for point & transect sampling
                 'radius':               None,
                 #when to collect data
-                'when':                 1000,
+                'when':                  [0, 1000, 1500, 1900, 1990, 2000, 2010, 2100, 2500, 3000, 4000, 5000],
                 #whether to save current Layers when data is collected
                 'include_landscape':    False,
                 #whether to include fixed loci in VCF files
