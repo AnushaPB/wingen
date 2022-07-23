@@ -334,7 +334,7 @@ calc_pi <- function(dos, nloci = NULL){
 #'
 #' @examples
 calc_mean_biar <- function(dos){
-  if(!all(dos %in% c(0,1,2))){stop("to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")}
+  if(!all(dos %in% c(0,1,2,NA))){stop("to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")}
   ar_by_locus <- apply(dos, 2, helper_calc_biar)
   mean_ar <- mean(ar_by_locus, na.rm = TRUE)
   return(mean_ar)
