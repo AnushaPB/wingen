@@ -6,20 +6,52 @@ output: html_document
 vcf <- read.vcfR("data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf")
 coords <- read.table("data/Scelop.coord")
 
-lyr <- raster(("data/CA_rPCA1.tif"))
-plot(lyr)
-points(coords)
+CA_lyr <- raster(("data/CA_rPCA1.tif"))
+
+states <- rgdal::readOGR("cb_2018_us_state_5m.shp")
+PNW <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")),]
+plot(PNW)
+```
+
+
+```{r, fig.width = 5, fig.height = 5}
+
+lyr <- coords_to_lyr(coords, disagg = 4)
+
+w = 5
+f = 0
+preview_gd(lyr, coords, wdim = w, fact = f, min_n = 4, sample_count = FALSE)
+hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+
+pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+
+#ag <- window_gd(vcf, coords, lyr, stat = "allelic.richness", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+
+par(mar = rep(0,4))
+plot_gd(hg, PNW)
+plot_gd(pg, PNW)
+#plot_gd(ag, PNW)
+
+khg <- krig_gd(hg, lyr, disagg_r = 3, disagg_grd = 3)
+mhg <- mask_gd(khg, 2)
+kpg <- krig_gd(pg, lyr, disagg_r = 3, disagg_grd = 3)
+mpg <- mask_gd(kpg, 2)
+
+par(mar = rep(0,4))
+plot_gd(mhg, PNW)
+plot_gd(mpg, PNW)
+
 ```
 
 ```{r, fig.width=5, fig.height=5}
-preview_window(lyr, coords, fact = 50, wdim = 5, min_n = 4)
+preview_gd(lyr, coords, wdim = w, fact = f, min_n = 4, sample_count = FALSE)
 
-wg <- window_gd(vcf, coords, lyr, stat = "pi", fact = 50, wdim = 5, rarify = TRUE, rarify_n = 4, rarify_nit = 5)
+wg <- window_gd(vcf, coords, lyr, stat = "het", wdim = w, fact = f, rarify = TRUE, rarify_n = 4, rarify_nit = 5)
 plot_gd(wg)
 kg <- krig_gd(wg, lyr, agg_grd = 10)
 mg <- mask_gd(kg, 4)
 
-wg2 <- window_gd(vcf, coords, lyr, stat = "pi", fact = 50, wdim = 5, rarify = FALSE, min_n = 4)
+wg2 <- window_gd(vcf, coords, lyr, stat = "het", wdim = w, fact = f, rarify = FALSE, min_n = 4)
 kg2 <- krig_gd(wg2, lyr, agg_grd = 10)
 mg2 <- mask_gd(kg2, 4)
 
