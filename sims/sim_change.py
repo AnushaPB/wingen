@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from nlmpy import nlmpy
 
 # get layers
-nlm = np.genfromtxt("data/init_lyr.csv", delimiter=',')
-nlm_change = np.genfromtxt("data/bottleneck_lyr.csv", delimiter=',')
+init_lyr = np.genfromtxt("data/init_lyr.csv", delimiter=',')
+bc_lyr = np.genfromtxt("data/bottleneck_lyr.csv", delimiter=',')
 dim = nlm.shape[1]
 
 
@@ -73,7 +73,7 @@ params = {
                     # parameters for a 'defined'-type Layer
                     'defined': {
                         # raster to use for the Layer
-                        'rast': nlm,
+                        'rast': init_lyr,
                         # point coordinates
                         'pts': None,
                         # point values
@@ -94,7 +94,7 @@ params = {
                 'change': {
 
                     0: {
-                        'change_rast': nlm_change,
+                        'change_rast': bc_lyr,
                         'start_t': 2000,
                         'end_t': 2001,
                         'n_steps': 1
