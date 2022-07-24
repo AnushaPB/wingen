@@ -159,6 +159,8 @@ for(nsamp in c(200)){
     for(d in datasets){ 
       for(rarify in c("TRUE", "FALSE")){
         r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = nsamp)
+        if(is.null(r)) next
+        r <- mask(r, msk_lyr)
         #if(is.null(r)) next
         #r <- mask(r, msk_lyr)
         plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(d, m, rarify))          
@@ -181,11 +183,12 @@ for(nsamp in c(200)){
     for(rarify in c("TRUE", "FALSE")){
       for(d in datasets){
         r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = nsamp)
+        if(is.null(r)) next
         r <- mask(r, msk_lyr)
         if(m == "pi"){zlim = c(0.1,0.5)}
         if(m == "biallelic_richness"){zlim = c(1.1,2)}
-        if(m == "heterozygosity"){zlim = c(0.05,0.40)}
-         plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
+        if(m == "heterozygosity"){zlim = c(0.05,0.12)}
+        plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
          plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)          
       }
     }
