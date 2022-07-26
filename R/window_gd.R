@@ -42,6 +42,8 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
   if(stat == "het" | stat == "heterozygosity"){
     # convert from vcf to heterozygosity matrix
     gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
+    # IMPORTANT: transform matrix so that rows are individuals and cols are loci
+    gen <- t(gen)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
@@ -98,7 +100,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @examples
 #'
 window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
-
   # format coords
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
@@ -107,7 +108,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 5, f
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
-  if(fact == 0){lyr <- lyr * 0} else {lyr <- raster::aggregate(lyr, fact) * 0}
+  if(fact == 0){lyr <- lyr * 0} else {lyr <- raster::aggregate(lyr, fact, fun = mean) * 0}
 
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
@@ -267,7 +268,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci 
 #'
 #' @examples
 sample_gd <- function(gen, sub, stat, nloci = NULL) {
-  if(is.null(nloci)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], nloci)}
+  if(is.null(nloci) | !identical(stat, calc_pi)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], nloci)}
   return(gd)
 }
 
