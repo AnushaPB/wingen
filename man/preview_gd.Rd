@@ -2,7 +2,7 @@
 % Please edit documentation in R/window_gd.R
 \name{preview_gd}
 \alias{preview_gd}
-\title{Generate preview of moving window}
+\title{Generate preview of moving window and sample counts}
 \usage{
 preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 }
@@ -19,6 +19,9 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
 }
+\value{
+plots example window and sample counts (if sample_count = TRUE)
+}
 \description{
-Generate preview of moving window
+Generate preview of moving window and sample counts
 }

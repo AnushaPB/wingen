@@ -39,7 +39,7 @@ window_gd(
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
-\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if provided, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
