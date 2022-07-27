@@ -1,4 +1,16 @@
-coords_to_lyr <- function(coords, buffer = 1, agg = NULL, disagg = NULL, plot = TRUE){
+#' Create RasterLayer from coordinates
+#'
+#' @param coords coordinates (two columns, the first should be x and the second should be y)
+#' @param buffer buffer to add to edge of raster (defaults to 0)
+#' @param agg aggregation factor to apply to raster (defaults to NULL)
+#' @param disagg disaggregation factor to apply to raster (defaults to NULL)
+#' @param plot whether to plot resulting raster with coords (defaults to FALSE)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+coords_to_lyr <- function(coords, buffer = 0, agg = NULL, disagg = NULL, plot = FALSE){
   colnames(coords) <- c("x", "y")
   # coords
   xmin <- min(coords$x, na.rm = TRUE) - buffer

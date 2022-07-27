@@ -4,7 +4,13 @@
 \alias{plot_count}
 \title{Plot sample counts}
 \usage{
-plot_count(x, col = viridis::mako(100), zlim = NULL, main = NULL)
+plot_count(
+  x,
+  col = viridis::mako(100),
+  zlim = NULL,
+  main = NULL,
+  legend = legend
+)
 }
 \arguments{
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where second layer is sample counts)}
