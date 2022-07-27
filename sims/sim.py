@@ -203,7 +203,7 @@ params = {
                     #num of loci
                     'L':                        150000,
                     #fixed starting allele freq; None/False -> rand; True -> 0.5
-                    'start_p_fixed':            None,
+                    'start_p_fixed':            0,
                     #whether to start neutral locus freqs at 0
                     'start_neut_zero':          False,
                     #genome-wide per-base neutral mut rate (0 to disable)
