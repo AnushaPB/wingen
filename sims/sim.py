@@ -134,8 +134,8 @@ params = {
                     'n_births_distr_lambda':    1,
                     #whether n births should be fixed at n_births_dist_lambda
                     'n_births_fixed':           True,
-                    #radius of mate-search area (None, for panmixia) NOTE: changed from 10 to 2
-                    'mating_radius':            2,
+                    #radius of mate-search area (None, for panmixia) NOTE: changed from 10 to 5
+                    'mating_radius':            5,
                     #whether individs should choose nearest neighs as mates
                     'choose_nearest_mate':        False,
                     #whether mate-choice should be inverse distance-weighted
@@ -207,7 +207,7 @@ params = {
                     #whether to start neutral locus freqs at 0
                     'start_neut_zero':          False,
                     #genome-wide per-base neutral mut rate (0 to disable)
-                    'mu_neut':                  1e-9,
+                    'mu_neut':                  0,
                     #genome-wide per-base deleterious mut rate (0 to disable)
                     'mu_delet':                 0,
                     #shape of distr of deleterious effect sizes
@@ -306,7 +306,7 @@ params = {
                 #collection radius around points, for point & transect sampling
                 'radius':               None,
                 #when to collect data
-                'when':                 500,
+                'when':                 1000,
                 #whether to save current Layers when data is collected
                 'include_landscape':    False,
                 #whether to include fixed loci in VCF files
