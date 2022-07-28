@@ -7,6 +7,7 @@
 krig_gd(
   r,
   grd = NULL,
+  indices = 1,
   coords = NULL,
   xy = FALSE,
   resample = FALSE,
@@ -23,19 +24,21 @@ krig_gd(
 
 \item{grd}{object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
 
+\item{indices}{integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)}
+
 \item{coords}{if provided, kriging will occur based only on values at these coordinates}
 
 \item{xy}{whether to co-krige with x and y (~x+y)}
 
-\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r. Defaults to FALSE but we \emph{highly recommend setting this to either "grd" or "r"}}
+\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)}
 
-\item{agg_grd}{factor to use for aggregation of grd, if provided}
+\item{agg_grd}{factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
 
-\item{disagg_grd}{factor to use for disaggregation of grd, if provided}
+\item{disagg_grd}{factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
 
-\item{agg_r}{factor to use for aggregation of r, if provided}
+\item{agg_r}{factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)}
 
-\item{disagg_r}{factor to use for disaggregation, of r if provided}
+\item{disagg_r}{factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
 
 \item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 

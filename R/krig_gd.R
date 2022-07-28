@@ -2,6 +2,7 @@
 #' Raster interpolation using 'autoKrige'
 #'
 #' @param r RasterLayer or RasterStack
+#' @param indices integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
 #' @inheritParams krig_gd_lyr
 #' @return RasterLayer or RasterStack
 #' @export
@@ -15,8 +16,14 @@
 #' plot_count(kpi)
 #'
 
-krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
+krig_gd <- function(r, grd = NULL, indices = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
 
+  # subset desired layers
+  if(nlayers(r) > 1){
+    r <- r[[indices]]
+  }
+
+  # convert from stack to list
   rls <- raster::as.list(r)
 
   if(is.null(grd)){
@@ -24,9 +31,10 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, 
     warning("no grd provided, defaults to using first raster layer to create grd")
   }
 
+  # krige
   rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, resample, agg_grd, disagg_grd, agg_r, disagg_r, n_cell)
+  # convert from list to stack
   rstk <- raster::stack(rstk)
-
   names(rstk) <- names(r)
 
   return(rstk)
@@ -56,7 +64,7 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, 
 #' @examples
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
 
-  #TODO: FIXCOORDSS
+  #TODO: FIX COORDSS
   # if grd is NULL use r
   if(is.null(grd)) grd <- r
 
