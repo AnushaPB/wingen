@@ -40,11 +40,11 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, 
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates
 #' @param xy whether to co-krige with x and y (~x+y)
-#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r. Defaults to FALSE but we *highly recommend setting this to either "grd" or "r"*
-#' @param agg_grd factor to use for aggregation of grd, if provided
-#' @param disagg_grd factor to use for disaggregation of grd, if provided
-#' @param agg_r factor to use for aggregation of r, if provided
-#' @param disagg_r factor to use for disaggregation, of r if provided
+#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
+#' @param agg_grd factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
+#' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
+#' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
+#' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
 #'
@@ -55,6 +55,10 @@ krig_gd <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, 
 #'
 #' @examples
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
+
+  #TODO: FIXCOORDSS
+  # if grd is NULL use r
+  if(is.null(grd)) grd <- r
 
   # Transform raster layer
   if(class(grd) == "RasterLayer"){
@@ -67,6 +71,8 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   krig_df <- data.frame(raster::rasterToPoints(r))
 
   if(!is.null(coords)){
+    coords <- data.frame(coords)
+    colnames(coords) <- c("x", "y")
     rex <- raster::extract(r, coords)
     krig_df <- data.frame(coords, layer = rex)
   }
