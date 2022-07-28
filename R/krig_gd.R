@@ -13,7 +13,6 @@
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' plot_gd(kpi, main = "Kriged Pi")
-#' plot_count(kpi)
 #'
 
 krig_gd <- function(r, grd = NULL, indices = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
