@@ -26,7 +26,30 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 # confirm that correct set is being used
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-# run test
+# run test 200
+
+cores <- 10
+cl <- makeCluster(cores)
+registerDoParallel(cl)
+
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
+
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
+
+stopCluster(cl)
+
+# run test 100
+
+# subset coordinates (using first 100 of already subsampled dataframe)
+coords <- coords[1:100,]
+# subset vcf (loci have already been subset previously)
+vcf <- vcf[, c(1, 1:100 + 1)]
+
+# check match
+stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
+
+# confirm that correct set is being used
+message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 cores <- 10
 cl <- makeCluster(cores)
