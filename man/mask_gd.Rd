@@ -2,39 +2,33 @@
 % Please edit documentation in R/mask_gd.R
 \name{mask_gd}
 \alias{mask_gd}
-\title{Mask diversity map based on sample number}
+\title{Mask genetic diversity map}
 \usage{
-mask_gd(
-  x,
-  min_n,
-  plot = FALSE,
-  bkg.col = "white",
-  col.pal = viridis::magma(100)
-)
+mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
 }
 \arguments{
-\item{x}{RasterStack where the first layer is genetic diversity and the second layer is sample count}
+\item{x}{Raster object to mask}
 
-\item{min_n}{minimum number of samples (everything less than this number is masked)}
+\item{mask}{Raster object or Spatial object to use as mask}
 
-\item{plot}{whether to plot results}
+\item{resample}{if x and mask are non matching rasters, which layer to resample to match them (defaults to "y")}
 
-\item{bkg.col}{background color for plotting map}
+\item{minval}{if mask is a Raster object, value of mask below which to mask}
 
-\item{col.pal}{color palette to use for plotting}
+\item{maxval}{if mask is a Raster object, value of mask above which to mask}
 }
 \value{
 RasterLayer
 }
 \description{
-Mask diversity map based on sample number
+Mask genetic diversity map
 }
 \examples{
 library("raster")
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
-mpi <- mask_gd(kpi, min_n = 3)
+mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 plot_gd(mpi, main = "Kriged and Masked Pi")
 
 }
