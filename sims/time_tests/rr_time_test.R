@@ -4,7 +4,6 @@ library(doParallel)
 library(here)
 source(here("sims/sims_functions.R"))
 
-set.seed(42)
 
 # load vcf, coords, and lyr
 load_middle_earth()
@@ -13,6 +12,7 @@ load_middle_earth()
 #IDS <- read.csv(here("sims/data/samples_seed42.csv"))
 # get indexes of individuals
 #si <- IDS$inds
+set.seed(42)
 si <- sample(nrow(coords), 200, replace = FALSE)
 # sample loci
 l <- sample(nrow(vcf@gt), 10000)
