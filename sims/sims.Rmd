@@ -22,12 +22,22 @@ source("sims_functions.R")
 
 # load sims
 ```{r}
-vcf <- read.vcfR("data/mod-sim_change_it-0_t-2100_spp-spp_0.vcf")
-geo <- read.csv("data/mod-sim_change_it-0_t-2100_spp-spp_0.csv")
+
+vcf <- read.vcfR("data/mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
+
+lyr <- read.csv("data/middle_earth.csv", header = FALSE)
+lyr <- raster(as.matrix(lyr))
+extent(lyr) <- extent(0,100,-100,0)
+bkg <- lyr
+bkg[bkg < 0.01] <- NA
+
+geo <- read.csv("data/mod-sim_params_it-0_t-1000_spp-spp_0.csv")
 coords <- geo[,c("idx","x","y")]
+coords$y <- -coords$y
 
 set.seed(42)
-if(!file.exists("samples_seed42.csv")){
+
+if(TRUE){
   message("creating new file")
   si <- sample(nrow(coords), 200)
   write.csv( data.frame(inds = si), here("sims", "data", "samples_seed42.csv"), row.names = FALSE)
@@ -42,7 +52,6 @@ l <- sample(nrow(vcf@gt), 10000)
 
 subvcf <- vcf[l, c(1, si + 1)]
 
-coords$y <- -coords$y
 subcoords <- coords[si,]
 subcoords <- subcoords[,c("x","y")]
 
@@ -53,10 +62,6 @@ all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si]))
 ```
 
 ```{r,  fig.width = 6, fig.height = 6}
-lyr <- read.csv("data/middle_earth.csv", header = FALSE)
-lyr <- raster(as.matrix(lyr))
-extent(lyr) <- extent(0,100,-100,0)
-
 kde <- raster(MASS::kde2d(coords$x, coords$y, h = c(10,10), n = 100, lims = c(0,100,-100,0)))
 
 par(mar = rep(2,4))
@@ -75,77 +80,32 @@ legend(0,-80,
 
 ```
 
+```{r, fig.width = 6, fig.height = 6, cache = TRUE}
+tr <- sim(subvcf, subcoords, lyr, stat = "pi", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
+
+par(mar = rep(0,4), oma = rep(0,4), pty = "s")
+plot_gd(tr$res, bkg, breaks = 10, zlim = c(0,0.30))
+plot_count(tr$res, zlim = c(0,12))
+
+tr_k <- krig_gd(tr[["res"]][[1]], lyr, disagg_grd = 2)
+tr_k[tr_k < 0] <- 0
+tr_k_count <- krig_gd(tr[["res"]][[2]], lyr, agg_r = 2, disagg_grd = 2)
+tr_k_count[tr_k_count < 0] <- 0
+tr_k_mask <- mask_gd(tr_k, tr_k_count, minval = 1)
+
+par(mar = rep(1,4), oma = rep(1,4), pty = "s")
+
+plot_gd(tr_k, bkg, breaks = 10, zlim = c(0,0.30))
+plot_gd(tr_k_mask, bkg, breaks = 10, zlim = c(0,0.30))
+plot_count(tr_k_count, zlim = c(0,12))
+```
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 preview_gd(lyr, subcoords, wdim = 3, fact = 3, sample_count = FALSE)
 
-tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 5, fact = 3, rarify_n = 4, rarify_nit = 5, rarify = TRUE, parallel = TRUE, nloci = nrow(subvcf@gt))
-
-tr_k <- krig_gd(tr[["res"]], lyr, disagg_grd = 3)
-tr_k_mask <- mask_gd(tr_k, 5)
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr[["res"]][[1]], col = viridis::magma(100, alpha = 1.0), main = "Window Pi", axes = FALSE, box = TRUE, legend = TRUE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k[[1]], col = viridis::magma(100), main = "Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-plot(tr_k_mask, col = viridis::magma(100), main = "Kriged and Masked Pi", axes = FALSE, box = TRUE, legend = FALSE, add = TRUE)
-
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot(tr[["res"]]$sample_count, col = viridis::mako(100, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
-plot(tr_k$sample_count, col = viridis::mako(100), axes = FALSE, box = TRUE, legend = FALSE)
-
 ```
 
 
-```{r, fig.width = 16, fig.height = 4}
-par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
-
-tr_k_2 <- krig_gd(tr[["res"]], lyr, disagg_grd = 2, resample = TRUE)
-for(i in c(1, 2, 4, 8)){
-  tr_k_mask <- mask_gd(tr_k_2, i)
-  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
-}
-
-```
-
-```{r, fig.width = 16, fig.height = 4}
-par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
-
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 2, resample = FALSE)
-for(i in c(1, 2, 4, 8)){
-  tr_k_mask <- mask_gd(tr_k_2F, i)
-  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
-}
-
-```
-```{r, fig.width = 16, fig.height = 4}
-par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
-
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 1, resample = FALSE)
-for(i in c(1, 2, 4, 8)){
-  tr_k_mask <- mask_gd(tr_k_2F, i)
-  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
-}
-
-```
-```{r, fig.width = 16, fig.height = 4}
-par(mfrow = c(1,4), mar = rep(1,4), oma = rep(0,4), pty = "s")
-
-tr_k_2F <- krig_gd(tr[["res"]], lyr, disagg_grd = 3, resample = FALSE)
-for(i in c(1, 2, 4, 8)){
-  tr_k_mask <- mask_gd(tr_k_2F, i)
-  plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-  plot(tr_k_mask, col = viridis::magma(100), axes = FALSE, box = TRUE, legend = FALSE, add = TRUE, zlim = c(0.18, 0.47))
-}
-
-```
 # Comparison of measures
 
 ```{r, fig.width = 6, fig.height = 8}
@@ -161,22 +121,20 @@ for(nsamp in c(200)){
         r <- get_divout(file.name = d, rarify = rarify, measure = m, nsamp = nsamp)
         if(is.null(r)) next
         r <- mask(r, msk_lyr)
-        #if(is.null(r)) next
-        #r <- mask(r, msk_lyr)
         plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(d, m, rarify))          
       }
     }
   }
 }
 
-plot_gd(msk_lyr)
+plot_count(msk_lyr)
 preview_gd(lyr, subcoords, wdim = 5, fact = 3, min_n = 4)
 points(subcoords)
 ```
 
 ```{r, fig.width = 7.5, fig.height = 5}
 # {PLOT CODE}
-for(nsamp in c(200)){
+for(nsamp in c(100, 200)){
   msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = nsamp)
   for(m in measures){
     par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
@@ -185,11 +143,64 @@ for(nsamp in c(200)){
         r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = nsamp)
         if(is.null(r)) next
         r <- mask(r, msk_lyr)
-        if(m == "pi"){zlim = c(0.1,0.5)}
-        if(m == "biallelic_richness"){zlim = c(1.1,2)}
-        if(m == "heterozygosity"){zlim = c(0.05,0.12)}
+        if(m == "pi"){zlim <- c(0, 0.30)}
+        if(m == "biallelic_richness"){zlim <- c(1, 1.75)}
+        if(m == "heterozygosity"){zlim <- c(0, 0.30)}
         plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, zlim = c(0.01,1), legend = FALSE)
-         plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)          
+        plot(r,  col = magma(100), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE, add = TRUE)    
+      }
+    
+    }
+  }
+}
+
+#legendplots
+plot(r, zlim = c(0,0.30),  col = magma(100))
+plot(r, zlim = c(1,1.75),  col = magma(100))
+```
+
+```{r, fig.width = 7.5, fig.height = 5}
+
+for(nsamp in c(100, 200)){
+  for(m in measures){
+    par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
+    for(rarify in c("TRUE", "FALSE")){
+      for(d in datasets){
+        rfile <- here("sims", "outputs", "krige", 
+                      paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
+        if(file.exists(rfile)){
+          r <- raster(rfile)
+        } else{
+          r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = nsamp)
+          if(is.null(r)) next
+          r <- krig_gd(r, lyr, disagg_grd = 2)
+          writeRaster(r, rfile, overwrite = TRUE)
+        }
+        
+        if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
+        if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
+        if(m == "heterozygosity") {zlim <- c(0,0.4); r[r < 0] <- 0}
+        r <- mask_gd(r, lyr, minval = 0.01)
+        plot(r,  col = magma(10), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE)    
+      }
+    }
+  }
+}
+
+for(nsamp in c(100)){
+  for(m in measures){
+    par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
+    for(rarify in c("TRUE", "FALSE")){
+      for(d in datasets){
+        rfile <- here("sims", "outputs", "krige", 
+                      paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
+        r <- raster(rfile)
+        
+        if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
+        if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
+        if(m == "heterozygosity") {zlim <- c(-0.02,0.4)}
+        r <- mask_gd(r, lyr, minval = 0.01)
+        plot(r,  col = magma(10), box = TRUE, axes = FALSE, main = "", legend = FALSE)    
       }
     }
   }
@@ -197,17 +208,6 @@ for(nsamp in c(200)){
 
 ```
 
-
-```{r}
-# demonstrate that allelic richness and biallelic richness are the same 
-wgs_ar <- stack("outputs/WGS_200ind_allelic_richness.tif")[[1]]
-
-wgs_bar <- stack("outputs/WGS_200ind_biallelic_richness.tif")[[1]]
-
-par(mfrow = c(1,2))
-lapply(list(wgs_bar, wgs_ar), raster::plot, col = magma(100), box = FALSE, axes = FALSE)
-
-```
 
 ## Timing
 ```{r}
@@ -221,21 +221,30 @@ tdf <- dplyr::bind_rows(
   map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "TRUE", nsamp = 200)
 )
 
-tdf[tdf$dataset == "rr", "dataset"] <- "RADseq-type dataset (10,000 loci)"
-tdf[tdf$dataset == "WGS", "dataset"] <- "WGS-type dataset (100,000 loci)"
+tdf[tdf$dataset == "rr", "dataset"] <- "10,000 loci (w/o Parallelization)"
+tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
 
-ggplot(data = tdf) +
+ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
-  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "darkgray") +
+  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "darkgray", fontface = "italic") +
   geom_hline(yintercept = 60*5, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "gray") +
-  geom_bar(aes(x = factor(nsamp), y = time, fill = stat), 
-           stat = "identity", 
-           position=position_dodge()) +
+  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
+  geom_hline(yintercept = 60*10, linetype = "dashed", col = "gray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*10, label = "10 min", vjust = -1, hjust = -0.4), col = "lightgray", fontface = "italic") +
+  geom_col(position=position_dodge()) +
+  geom_text(aes(label = round(time, 0), col = stat), 
+            vjust = -1, position=position_dodge(width = .9)) + 
+  scale_color_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
+                              "allelic richness"=mako(3, begin = 0.3, end = 0.8)[2],
+                              "heterozygosity"=mako(3, begin = 0.3, end = 0.8)[3])) +
+  scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
+                              "allelic richness"=mako(3, begin = 0.3, end = 0.8)[2],
+                              "heterozygosity"=mako(3, begin = 0.3, end = 0.8)[3])) +
+  guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
-  scale_fill_viridis_d(option = "mako", begin = 0.3, end = 0.8, name = "statistic") +
   xlab("number of samples") +
   ylab("time (seconds)") +
+  ylim(0,650) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
@@ -248,6 +257,7 @@ ggplot(data = tdf) +
 load("RData/ar_results.RData")
 
 ```
+
 ## Window vs aggregation factor
 
 ```{r, fig.width = 5, fig.height = 5}
@@ -255,31 +265,102 @@ cores <- 6
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
-stk <- list()
+stk1 <- list()
+stk2 <- list()
 
 i = 1
-for(f in c(2, 4, 8)){
+for(f in c(2, 3, 4)){
   for(w in c(3, 5, 7)){
-    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 4, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
-    stk[[i]] <-  res[[1]]
+    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
+    tr_k <- krig_gd(res[[1]], lyr, disagg_grd = 2)
+    bkg <- resample(bkg, tr_k)
+    tr_k_mask <- mask(tr_k, bkg)
+    stk1[[i]] <-  tr_k_mask
+    stk2[[i]] <-  res[[1]]
+    writeRaster(stk1[[i]], here("sims","outputs", "wftest", paste0(f,w,".tif")))
+    writeRaster(stk2[[i]], here("sims","outputs", "wftest", paste0(f,w,"krig.tif")))
     plot(res[[1]], col = magma(100))
     i <- i + 1
   }
 }
 
-i = 1
 par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
-for(f in c(2, 4, 8)){
-  for(w in c(3, 5, 7)){
+for(f in c(4,3,2)){
+  for(w in c(3,5,7)){
+    r <- raster(here("sims","outputs", "wftest", paste0(f,w,".tif")))
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(stk[[i]], col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(0.2, 0.5), add = TRUE)
+    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(-0.02, 0.41), add = TRUE)
     rect(0, -105, 100, 0, border = "black")
     i <- i + 1
   }
 }
-plot(stk[[1]], zlim = c(0.23, 0.48), col = magma(100) )
+
+par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
+for(f in c(4,3,2)){
+  for(w in c(3,5,7)){
+    r <- raster(here("sims","outputs", "wftest", paste0(f,w,"krig.tif")))
+    plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
+    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(-0.02, 0.41), add = TRUE)
+    rect(0, -105, 100, 0, border = "black")
+    i <- i + 1
+  }
+}
+
+plot(stk2[[i-1]], col = magma(10), axes = FALSE, box = FALSE, zlim = c(-0.02, 0.41))
 ```
 
+# Time comparison
+
+Data generated with krig_plots.R
+
+```{r, fig.width = 8, fig.height = 9}
+bkg <- lyr
+bkg[bkg < 0.01] <- NA
+bkg <- disaggregate(bkg, 2)
+
+stk <- list()
+i = 1
+par(mfrow = c(3,3), mar = rep(1,4))
+
+for (m in c("pi", "biallelic.richness", "het")){
+  for (n in c(1000, 5000, 10000)){
+   tr_k <- raster(here("sims", "outputs", paste0(m,"_",n,"krig.tif")))
+
+   tr_k <- resample(tr_k, bkg)
+
+   tr_k_mask <- mask(tr_k, bkg)
+
+   plot(tr_k_mask, col = viridis::magma(10, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
+   
+   stk[[i]] <- tr_k_mask
+   i <- i+1
+ }
+}
+
+```
+```{r, fig.width = 8, fig.height = 9.65}
+par(mfrow = c(4,3), mar = rep(0.5,4), oma = rep(2,4))
+
+for(n in c(1000,5000,10000)){
+  kde <- raster(here("sims", "outputs", paste0(n,"_kde.tif")))
+  plot(kde, col = viridis::magma(10, alpha = 1.0), zlim = c(0, 0.0008390501), axes = FALSE, box = TRUE, legend = FALSE)
+}
+
+i=1
+for (m in c("pi", "biallelic.richness", "het")){
+ for (n in c(1000, 5000, 10000)){
+   tr_k_mask <- stk[[i]]
+     
+   if(m == "pi") {zlim <- c(0, 0.3); tr_k_mask[tr_k_mask < 0] <- 0}
+   if(m == "biallelic.richness") {zlim <- c(1, 1.5); tr_k_mask[tr_k_mask < 1] <- 1}
+   if(m == "het") {zlim <- c(0,0.3); tr_k_mask[tr_k_mask < 0] <- 0}
+
+   plot(tr_k_mask, col = viridis::magma(10, alpha = 1.0), zlim = zlim, axes = FALSE, box = TRUE, legend = FALSE)
+   
+   i <- i+1
+ }
+}
+```
 #
 # IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
 
@@ -703,9 +784,5 @@ plot_gd(mask(r3, r1), zlim = c(0.25, 0.45))
 plot_gd(mask(r5, r1), zlim = c(0.25, 0.45))
 plot_gd(mask(rF, r1), zlim = c(0.25, 0.45))
 ```
-# NEW SIMS
-```{r}
-hf <- raster("outputs/FULL_rarifyTRUE_nsamp1450_nloci150000_heterozygosity.tif")
-plot(hf, col = magma(100))
-```
+
 
