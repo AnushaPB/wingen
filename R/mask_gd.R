@@ -1,11 +1,11 @@
 
-#' Mask diversity map based on sample number
+#' Mask genetic diversity map
 #'
-#' @param x RasterStack where the first layer is genetic diversity and the second layer is sample count
-#' @param min_n minimum number of samples (everything less than this number is masked)
-#' @param plot whether to plot results
-#' @param bkg.col background color for plotting map
-#' @param col.pal color palette to use for plotting
+#' @param x Raster object to mask
+#' @param mask Raster object or Spatial object to use as mask
+#' @param resample if x and mask are non matching rasters, which layer to resample to match them (defaults to "y")
+#' @param minval if mask is a Raster object, value of mask below which to mask
+#' @param maxval if mask is a Raster object, value of mask above which to mask
 #'
 #' @return RasterLayer
 #' @export
@@ -15,27 +15,33 @@
 #' load_mini_ex()
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
 #' kpi <- krig_gd(wpi, mini_lyr)
-#' mpi <- mask_gd(kpi, min_n = 3)
+#' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
-mask_gd <- function(x, min_n, plot = FALSE, bkg.col = "white", col.pal = viridis::magma(100)){
+#' @examples
+mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL){
 
-  sc_index <- grepl("^sample_count", names(x))
-  ar <- x[[which(!sc_index)]]
-  counts <- x[[which(sc_index)]]
+  # match raster layers
+  if(class(mask) == "RasterLayer" | class(mask) == "RasterStack" | class(mask) == "RasterBrick" ){
 
-  for(i in 1:raster::nlayers(ar)){
-    counts[[i]][counts[[i]] < min_n] <- NA
-    ar[[i]] <- raster::mask(ar[[i]], counts[[i]])
-  }
-
-
-  if(plot){
-    for(i in 1:raster::nlayers(ar)){
-      raster::plot(x[[which(!sc_index)]][[i]], col = bkg.col,  box = FALSE, axes = FALSE, legend = FALSE,  main = names(ar[[i]]))
-      raster::plot(ar[[i]], col = col.pal, box = FALSE, axes = FALSE, add = TRUE)
+    # mask areas below min/max val if provided
+    if(!is.null(minval)){
+      mask[mask < minval] <- NA
     }
+
+    if(!is.null(maxval)){
+      mask[mask > maxval] <- NA
+    }
+
+    if(!compareRaster(x, mask, stopiffalse = FALSE)){
+      if(resample == "mask") mask <- raster::resample(mask, x)
+      if(resample == "x") x <- raster::resample(x, mask)
+    }
+
   }
 
-  return(ar)
+  # mask
+  x <- raster::mask(x, mask)
+
+  return(x)
 }
