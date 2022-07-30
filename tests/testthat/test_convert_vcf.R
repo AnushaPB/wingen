@@ -90,7 +90,7 @@ test_that("check that vcf to genind conversion is correct", {
   tab <- apply(tab, 2, as.character)
 
   # make logical comparison of possible reference alleles (0 = both FALSE, 1 = at least one TRUE, 2 = both true)
-  sum_log <- (gt_dos == tab) + (gt_dos2 == tab)
+  sum_log <- (gt_dos1 == tab) + (gt_dos2 == tab)
 
   # checks that in at least one comparison the result is true
   expect_true(all(sum_log > 0))

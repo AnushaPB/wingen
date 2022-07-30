@@ -19,7 +19,7 @@ test_that("krig_gd returns warning when provided crs", {
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)
-  crs(grd) <- "+init=epsg:4121 +proj=longlat +ellps=GRS80 +datum=GGRS87 +no_defs +towgs84=-199.87,74.79,246.62"
+  raster::crs(grd) <- "+init=epsg:4121 +proj=longlat +ellps=GRS80 +datum=GGRS87 +no_defs +towgs84=-199.87,74.79,246.62"
 
   warnings <- capture_warnings(kpi <- krig_gd(wpi, grd))
   expect_equal(warnings[1], "the provided raster and grid have different crs")
@@ -32,7 +32,7 @@ test_that("raster_transform transformations are correct", {
 
   data("mini_lyr")
   grd <- mini_lyr
-  r <- aggregate(mini_lyr, 2)
+  r <- raster::aggregate(mini_lyr, 2)
 
   # test pass through
   noTransform <- raster_transform(r, grd)

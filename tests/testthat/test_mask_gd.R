@@ -7,5 +7,5 @@ test_that("mask_gd returns expected output", {
 
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
-  expect_true(cellStats(is.na(mpi) == (mini_lyr < 2), all))
+  expect_true(raster::cellStats(is.na(mpi) == (mini_lyr < 2), all))
 })
