@@ -100,9 +100,13 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @examples
 #'
 window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
+
   # format coords
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
+
+  # confirm that coords and gen align
+  if(nrow(coords) != nrow(gen)){ stop("number of individuals in coordinates and genetic data do not match")}
 
   # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)

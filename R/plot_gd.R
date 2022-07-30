@@ -47,8 +47,8 @@ plot_count <- function(x, index = 2, breaks = 10, col = viridis::mako(breaks), z
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
 
-  if(nlayers(x) > 1) raster::plot(x[[index]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
-  if(nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+  if(raster::nlayers(x) > 1) raster::plot(x[[index]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+  if(raster::nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
 
   })
 }

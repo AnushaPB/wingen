@@ -18,7 +18,7 @@
 krig_gd <- function(r, grd = NULL, indices = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
 
   # subset desired layers
-  if(nlayers(r) > 1){
+  if(raster::nlayers(r) > 1){
     r <- r[[indices]]
   }
 
