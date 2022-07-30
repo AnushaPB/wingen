@@ -8,7 +8,7 @@ plot_gd(
   x,
   bkg = NULL,
   col = viridis::magma(breaks),
-  breaks = 100,
+  breaks = 10,
   zlim = NULL,
   main = NULL,
   legend = TRUE,

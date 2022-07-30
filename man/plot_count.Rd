@@ -6,7 +6,9 @@
 \usage{
 plot_count(
   x,
-  col = viridis::mako(100),
+  index = 2,
+  breaks = 10,
+  col = viridis::mako(breaks),
   zlim = NULL,
   main = NULL,
   legend = TRUE,
@@ -15,15 +17,17 @@ plot_count(
 )
 }
 \arguments{
-\item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where second layer is sample counts)}
+\item{x}{RasterLayer of counts or RasterStack where indexed layer is sample counts}
+
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to 2)}
+
+\item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
 \item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
 
 \item{zlim}{limits of the color scale values}
 
 \item{main}{character. Main plot title}
-
-\item{breaks}{number of breaks to use in color scale (defaults to 10)}
 }
 \value{
 plot of sample counts
