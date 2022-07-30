@@ -24,7 +24,14 @@ devtools::install_github("AnushaPB/wingen")
 
 ``` r
 library(wingen)
+devtools::load_all()
+```
 
+    i Loading wingen
+
+    Warning: package 'testthat' was built under R version 4.1.3
+
+``` r
 # load example data
 load_middle_earth_ex()
 ```
@@ -33,7 +40,7 @@ load_middle_earth_ex()
     ------------- middle earth example -------------
      
     Objects loaded: 
-    *lotr_vcf* vcfR object (1000 loci x 200 samples) 
+    *lotr_vcf* vcfR object (100 loci x 100 samples) 
     *lotr_coords* dataframe with x and y coordinates 
     *lotr_lyr* middle earth RasterLayer (100 x 100) 
 
@@ -54,13 +61,14 @@ wgd <- window_gd(lotr_vcf,
 kgd <- krig_gd(wgd, lotr_lyr)
 
 # Mask results
-mgd <- mask_gd(kgd, min_n = 2)
+mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 
 # Plot results
-par(mfrow = c(1,3), oma = rep(2,4), mar = rep(2,4))
-plot_gd(wgd, main = "Window pi")
-plot_gd(kgd, main = "Kriged pi")
-plot_gd(mgd, main = "Kriged & masked pi")
+par(mfrow = c(1,4), oma = rep(2,4), mar = rep(2,4))
+plot_gd(wgd, main = "Window pi", bkg = lotr_lyr)
+plot_gd(kgd, main = "Kriged pi", breaks = 10)
+plot_gd(mgd, main = "Kriged & masked pi", breaks = 10)
+plot_count(wgd, main = "Window counts")
 ```
 
 <img src="man/figures/README-example-1.png" width="100%" />
