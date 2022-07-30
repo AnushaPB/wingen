@@ -19,7 +19,7 @@ plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zl
 
     if(!is.null(bkg)) {
       raster::plot(x[[1]], col = "white", legend = FALSE, main = main, axes = FALSE, box = FALSE)
-      raster::plot(bkg, col = "lightgray", border = "white", axes = FALSE, box = FALSE, add = TRUE, legend = FALSE)
+      raster::plot(bkg[[1]], col = "lightgray", border = "white", axes = FALSE, box = FALSE, add = TRUE, legend = FALSE)
       raster::plot(x[[1]], col = col, zlim = zlim, add = TRUE, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
     } else {
       raster::plot(x[[1]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width,  axis.args = axis.args)
