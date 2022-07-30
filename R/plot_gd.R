@@ -1,6 +1,7 @@
 #' Plot genetic diversity results
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
+#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to 1)
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param bkg RasterLayer or other spatial object that will be plotted as the "background" in gray
@@ -11,18 +12,48 @@
 #' @export
 #'
 #' @examples
-plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
+plot_gd <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
+  if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer  (to change this behavior use the index argument)")
 
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
-    if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, using first layer")
 
     if(!is.null(bkg)) {
-      raster::plot(x[[1]], col = "white", legend = FALSE, main = main, axes = FALSE, box = FALSE)
-      raster::plot(bkg[[1]], col = "lightgray", border = "white", axes = FALSE, box = FALSE, add = TRUE, legend = FALSE)
-      raster::plot(x[[1]], col = col, zlim = zlim, add = TRUE, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+
+      raster::plot(x[[index]],
+                   col = "white",
+                   legend = FALSE,
+                   main = main,
+                   axes = FALSE,
+                   box = FALSE)
+
+      raster::plot(bkg[[1]],
+                   col = "lightgray",
+                   border = "white",
+                   axes = FALSE,
+                   box = FALSE,
+                   add = TRUE,
+                   legend = FALSE)
+
+      raster::plot(x[[index]],
+                   col = col,
+                   zlim = zlim,
+                   add = TRUE,
+                   axes = FALSE,
+                   box = FALSE,
+                   legend = legend,
+                   legend.width =legend.width,
+                   axis.args = axis.args)
     } else {
-      raster::plot(x[[1]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width,  axis.args = axis.args)
+      raster::plot(x[[index]],
+                   col = col,
+                   zlim = zlim,
+                   main = main,
+                   axes = FALSE,
+                   box = FALSE,
+                   legend = legend,
+                   legend.width = legend.width,
+                   axis.args = axis.args)
     }
   }
   )
@@ -32,7 +63,7 @@ plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zl
 #' Plot sample counts
 #'
 #' @param x RasterLayer of counts or RasterStack where indexed layer is sample counts
-#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to 2)
+#' @param index if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to 2)
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param zlim limits of the color scale values
@@ -44,11 +75,30 @@ plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zl
 #' @examples
 plot_count <- function(x, index = 2, breaks = 10, col = viridis::mako(breaks), zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
 
+  if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
+
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
 
-  if(raster::nlayers(x) > 1) raster::plot(x[[index]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
-  if(raster::nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+  if(raster::nlayers(x) > 1) raster::plot(x[[index]],
+                                          col = col,
+                                          zlim = zlim,
+                                          main = main,
+                                          axes = FALSE,
+                                          box = FALSE,
+                                          legend = legend,
+                                          legend.width = legend.width,
+                                          axis.args = axis.args)
+
+  if(raster::nlayers(x) == 1) raster::plot(x,
+                                           col = col,
+                                           zlim = zlim,
+                                           main = main,
+                                           axes = FALSE,
+                                           box = FALSE,
+                                           legend = legend,
+                                           legend.width = legend.width,
+                                           axis.args = axis.args)
 
   })
 }

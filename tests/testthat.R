@@ -9,4 +9,4 @@
 library(testthat)
 library(wingen)
 
-test_check("wingen")
+devtools::test()

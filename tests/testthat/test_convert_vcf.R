@@ -61,30 +61,41 @@ test_that("check vcf to dosage matrix conversion is correct", {
 test_that("check that vcf to genind conversion is correct", {
   data("mini_vcf")
   expect_warning(genind <- vcf_to_genind(mini_vcf))
-  # get table and retain only columns with a .0 in it (for genind objects each allele is a column,
+  # get table and retain only unique columns (for genind objects each allele is a column,
   # so by removing every other you get basically a dosage matrix)
   alleles <- colnames(genind@tab)
   allele0 <- stringr::str_split_fixed(alleles, "[.]", n = 2)
-  keep <- alleles[allele0[,2] == "0"]
+  keep <- alleles[!duplicated(allele0[,1])]
 
+  # check number of loci match
+  expect_equal(length(keep), nrow(mini_vcf@gt))
+
+  # get tables of genotypes
   tab <- genind@tab[, keep]
   gt <- t(mini_vcf@gt[,-1])
 
-  gt0 <- which(gt == "0|0", arr.ind = TRUE)
-  gt1 <- rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))
-  gt2 <- which(gt == "1|1", arr.ind = TRUE)
+  # since for genind a homozygote can either be 2 or 0 depending on the ref allele selected make
+  # two dosage matrices for each possible ref allele
+  gt_dos1 <- gt
+  gt_dos1[which(gt == "0|0", arr.ind = TRUE)] <- 2
+  gt_dos1[rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))] <- 1
+  gt_dos1[which(gt == "1|1", arr.ind = TRUE)] <- 0
 
-  # NOTE: genind is coded opposite to dosage (e.g. 0 is 2 and 2 is 0)
-  tab0 <- which(tab == 2, arr.ind = TRUE)
-  tab1 <- which(tab == 1, arr.ind = TRUE)
-  tab2 <- which(tab == 0, arr.ind = TRUE)
+  gt_dos2 <- gt
+  gt_dos2[which(gt == "0|0", arr.ind = TRUE)] <- 0
+  gt_dos2[rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))] <- 1
+  gt_dos2[which(gt == "1|1", arr.ind = TRUE)] <- 2
 
-  # Reorder heterozygotes to match (since rowbind was used to create gt1)
-  tab1 <- tab1[order(rownames(tab1), tab1[,1], tab1[,2]),]
-  gt1 <- gt1[order(rownames(gt1), gt1[,1], gt1[,2]),]
+  # turn into character for comparison
+  tab <- apply(tab, 2, as.character)
 
-  expect_equal(gt0, tab0)
-  expect_equal(gt1, tab1)
-  expect_equal(gt2, tab2)
+  # make logical comparison of possible reference alleles (0 = both FALSE, 1 = at least one TRUE, 2 = both true)
+  sum_log <- (gt_dos == tab) + (gt_dos2 == tab)
+
+  # checks that in at least one comparison the result is true
+  expect_true(all(sum_log > 0))
+
+  # checks that all of the cases where true occurs twice are heterozygotes (e.g. 1)
+  expect_true(all((sum_log == 2) == (tab == "1")))
 })
 

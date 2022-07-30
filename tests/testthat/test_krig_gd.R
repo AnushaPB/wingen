@@ -1,14 +1,12 @@
 test_that("krig_gd returns expected output", {
-  library("raster")
   load_mini_ex()
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
-  expect_warning(expect_warning(kpi <- krig_gd(wpi, mini_lyr)))
+  expect_warning(kpi <- krig_gd(wpi, mini_lyr))
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
 })
 
 test_that("krig_gd returns warning when not provided grd", {
-  library("raster")
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
 
   warnings <- capture_warnings(kpi <- krig_gd(wpi))
@@ -18,7 +16,6 @@ test_that("krig_gd returns warning when not provided grd", {
 
 
 test_that("krig_gd returns warning when provided crs", {
-  library("raster")
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)
@@ -27,8 +24,6 @@ test_that("krig_gd returns warning when provided crs", {
   warnings <- capture_warnings(kpi <- krig_gd(wpi, grd))
   expect_equal(warnings[1], "the provided raster and grid have different crs")
   expect_equal(warnings[2], "NaNs produced")
-  expect_equal(warnings[3], "the provided raster and grid have different crs")
-  expect_equal(warnings[4], "NaNs produced")
 
 })
 
@@ -78,3 +73,4 @@ test_that("raster_transform transformations are correct", {
   expect_error(raster_transform(r, grd, agg_r = 2, disagg_r = 2))
   expect_error(raster_transform(r, grd, agg_grd = 2, disagg_grd = 2))
 })
+
