@@ -1,0 +1,87 @@
+---
+title: "heterozygosity_toyex"
+output: html_document
+---
+```{r}
+library(wingen)
+library(raster)
+library(vcfR)
+library(viridis)
+library(foreach)
+library(doParallel)
+library(here)
+library(ggplot2)
+library(dplyr)
+library(purrr)
+library(adegenet)
+library(hierfstat)
+source("sims_functions.R")
+```
+
+
+```{r, fig.width = 10.5, fig.height = 2.5}
+
+
+m <- matrix(FALSE, ncol = 5, nrow = 10)
+r1 <- raster(m)
+extent(r1) <- c(0, 5, 0, 10)
+m <- matrix(TRUE, ncol = 5, nrow = 10)
+r2 <- raster(m)
+extent(r2) <- c(5, 10, 0, 10)
+pts <- rbind.data.frame(rasterToPoints(r1), rasterToPoints(r2))
+
+
+dcoords <- pts[,c("x","y")]
+gen <- data.frame(v = pts[,"layer"])
+gen$v2 <- c(rep(0, 25), rep(1, 25), rep(0, 25), rep(1, 25))
+gen$v3 <- c(rep(0, 50), rep(1, 50))
+gen <- as.matrix(gen)        
+
+dr <- raster(matrix(1, ncol = 20, nrow = 29))
+extent(dr) <- c(0,10,0,10)
+par(pty ="s")
+plot(dr)
+points(dcoords)
+
+dr <- coords_to_lyr(dcoords, buffer = 1, plot = TRUE, disagg = 2)
+
+r1 <- window_gd_general(as.matrix(gen[,1]), 
+                             dcoords, 
+                             dr, 
+                             stat = calc_mean_het, 
+                             wdim = 3, 
+                             fact = 0,
+                             min_n = 1)
+
+r2 <- window_gd_general(as.matrix(gen[,2]), 
+                             dcoords, 
+                             dr, 
+                             stat = calc_mean_het, 
+                             wdim = 3, 
+                             fact = 0,
+                             min_n = 1)
+
+r3 <- window_gd_general(as.matrix(gen[,3]), 
+                             dcoords, 
+                             dr, 
+                             stat = calc_mean_het, 
+                             wdim = 3, 
+                             fact = 0,
+                             min_n = 1)
+
+results <- window_gd_general(gen, 
+                             dcoords, 
+                             dr, 
+                             stat = calc_mean_het, 
+                             wdim = 3, 
+                             fact = 0,
+                             min_n = 1)
+
+par(mfrow = c(1,5), mar = rep(2,4), oma = rep(2,4))
+plot_gd(r1, main = "locus 1", legend = FALSE)
+plot_gd(r2, main = "locus 2", legend = FALSE)
+plot_gd(r3, main = "locus 3", legend = FALSE)
+plot_gd(mean(r1[[1]], r2[[1]], r3[[1]]), legend  = FALSE, main = "mean of loci rasters")
+plot_gd(results, main = "window_gd of all loci")
+
+```
