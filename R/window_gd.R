@@ -356,7 +356,7 @@ calc_mean_biar <- function(dos){
 #'
 #' @examples
 helper_calc_biar <- function(loc){
-  uq <- mean(unique(loc), na.rm = TRUE)
+  uq <- unique(loc, na.rm = TRUE)
   if (1 %in% uq){
     return(2)
   } else if (0 %in% uq & 2 %in% uq){
