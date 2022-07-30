@@ -9,7 +9,7 @@
 [![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
 <!-- badges: end -->
 
-Create maps of genetic diversity using a sliding window approach.
+Create maps of genetic diversity using a moving window approach.
 
 ## Installation
 
@@ -24,14 +24,7 @@ devtools::install_github("AnushaPB/wingen")
 
 ``` r
 library(wingen)
-devtools::load_all()
-```
 
-    i Loading wingen
-
-    Warning: package 'testthat' was built under R version 4.1.3
-
-``` r
 # load example data
 load_middle_earth_ex()
 ```
@@ -47,7 +40,7 @@ load_middle_earth_ex()
     ------------------------------------------------
 
 ``` r
-# Run sliding window calculations of pi with rarefaction
+# Run moving window calculations of pi with rarefaction
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
