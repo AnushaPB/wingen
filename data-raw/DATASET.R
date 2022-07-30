@@ -1,7 +1,7 @@
 # Code to create middle earth example data -------------------------------------------------------------
 
 # load coords
-lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-500_spp-spp_0.csv") %>%
+lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv") %>%
   dplyr::select(idx, x, y) %>%
   dplyr::mutate(y = -y)
 
@@ -10,7 +10,7 @@ samples <- read.csv("inst/extdata/samples_seed42.csv")
 lotr_coords <- lotr_coords[samples$inds, ]
 
 # load genetic data
-vcf <- vcfR::read.vcfR("inst/extdata/mod-sim_params_it-0_t-500_spp-spp_0.vcf")
+vcf <- vcfR::read.vcfR("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
 
 # subsample loci and individuals
 # note: first column is FORMAT, hence c(1, samples + 1)
