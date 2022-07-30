@@ -6,11 +6,13 @@
 #' @param disagg disaggregation factor to apply to raster (defaults to NULL)
 #' @param plot whether to plot resulting raster with coords (defaults to FALSE)
 #'
-#' @return
+#' @return RasterLayer
 #' @export
 #'
 #' @examples
-coords_to_lyr <- function(coords, buffer = 0, agg = NULL, disagg = NULL, plot = FALSE){
+#' load_mini_ex()
+#' coords_to_raster(mini_coords, buffer = 10, plot = TRUE)
+coords_to_raster <- function(coords, buffer = 0, agg = NULL, disagg = NULL, plot = FALSE){
   colnames(coords) <- c("x", "y")
   # coords
   xmin <- min(coords$x, na.rm = TRUE) - buffer
