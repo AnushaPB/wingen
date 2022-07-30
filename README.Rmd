@@ -57,9 +57,9 @@ mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 
 # Plot results
 par(mfrow = c(1,4), oma = rep(2,4), mar = rep(2,4))
-plot_gd(wgd, main = "Window pi", bkg = lotr_lyr)
-plot_gd(kgd, main = "Kriged pi", breaks = 10)
-plot_gd(mgd, main = "Kriged & masked pi", breaks = 10)
+plot_gd(wgd, bkg = mgd,  main = "Window pi")
+plot_gd(kgd, main = "Kriged pi")
+plot_gd(mgd, main = "Kriged & masked pi")
 plot_count(wgd, main = "Window counts")
 ```
 
