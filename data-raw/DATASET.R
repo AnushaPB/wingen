@@ -1,13 +1,20 @@
 # Code to create middle earth example data -------------------------------------------------------------
 
+# load and save raster layer
+lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
+lotr_lyr <- raster::raster(as.matrix(lyr))
+raster::extent(lotr_lyr) <- raster::extent(0,100,-100,0)
+usethis::use_data(lotr_lyr, overwrite = TRUE)
+
 # load coords
 lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv") %>%
   dplyr::select(idx, x, y) %>%
   dplyr::mutate(y = -y)
 
 # get subsample
-samples <- read.csv("inst/extdata/samples_seed42.csv")
-samples <- samples$inds[1:100]
+p <- extract(lotr_lyr, lotr_coords[,c("x","y")])
+set.seed(42)
+samples <- sample(nrow(lotr_coords), 100, prob = 1/p)
 lotr_coords <- lotr_coords[samples, ]
 
 # load genetic data
@@ -24,11 +31,6 @@ lotr_coords <- lotr_coords %>% dplyr::select(x, y)
 usethis::use_data(lotr_coords, overwrite = TRUE)
 usethis::use_data(lotr_vcf, overwrite = TRUE)
 
-# load and save raster layer
-lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
-lotr_lyr <- raster::raster(as.matrix(lyr))
-raster::extent(lotr_lyr) <- raster::extent(0,100,-100,0)
-usethis::use_data(lotr_lyr, overwrite = TRUE)
 
 # Code to create tiny example dataset ------------------------------------------------------------------
 mini_lyr <- raster::aggregate(lotr_lyr, 10)

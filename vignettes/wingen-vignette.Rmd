@@ -84,10 +84,10 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 preview_gd(lotr_lyr,
            lotr_coords,
-           wdim = 3, 
-           fact = 5, 
+           wdim = 5, 
+           fact = 3, 
            sample_count = TRUE, 
-           min_n = 0)
+           min_n = 2)
 ```
 
 ```{r sliding window, fig.width = 5, fig.height = 5, cache = TRUE}
@@ -95,8 +95,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 5,
-          wdim = 3,
+          wdim = 5,
+          fact = 3,
           rarify = TRUE,
           rarify_n = 2,
           rarify_nit = 5,
@@ -125,6 +125,7 @@ To deal with this issue, users can either (1) resample their sliding window rast
 
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
+# note: this step can take a little while
 kgd <- krig_gd(wgd, indices = 1:2, lotr_lyr, disagg_grd = 2)
 
 plot_gd(kgd, main = "Kriged pi")
