@@ -1,4 +1,13 @@
 
+# file types
+*.tif
+*.cpg
+*.dbg
+*.dbf
+*.prj
+*.shp*
+*.shx
+
 # SIMS
 sims/RData/
 sims/data/
