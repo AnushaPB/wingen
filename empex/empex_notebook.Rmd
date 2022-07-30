@@ -6,9 +6,7 @@ output: html_document
 vcf <- read.vcfR("data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf")
 coords <- read.table("data/Scelop.coord")
 
-CA_lyr <- raster(("data/CA_rPCA1.tif"))
-
-states <- rgdal::readOGR("cb_2018_us_state_5m.shp")
+states <- rgdal::readOGR("TIGRIS_USA/cb_2018_us_state_5m.shp")
 
 conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")),]
 
