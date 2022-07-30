@@ -7,14 +7,15 @@ lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv")
 
 # get subsample
 samples <- read.csv("inst/extdata/samples_seed42.csv")
-lotr_coords <- lotr_coords[samples$inds, ]
+samples <- samples$inds[1:100]
+lotr_coords <- lotr_coords[samples, ]
 
 # load genetic data
 vcf <- vcfR::read.vcfR("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
 
 # subsample loci and individuals
 # note: first column is FORMAT, hence c(1, samples + 1)
-lotr_vcf <- vcf[sample(1:nrow(vcf@gt), 1000), c(1, samples$inds + 1)]
+lotr_vcf <- vcf[sample(1:nrow(vcf@gt), 100), c(1, samples + 1)]
 # check to make sure order and IDs are the same
 stopifnot(colnames(lotr_vcf@gt)[-1] == lotr_coords$idx)
 
