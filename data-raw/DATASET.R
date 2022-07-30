@@ -12,6 +12,7 @@ lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv")
   dplyr::mutate(y = -y)
 
 # get subsample
+# use lotr layer as probability so that sampling is more even across the landscape
 p <- extract(lotr_lyr, lotr_coords[,c("x","y")])
 set.seed(42)
 samples <- sample(nrow(lotr_coords), 100, prob = 1/p)
