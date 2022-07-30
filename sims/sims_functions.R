@@ -1,10 +1,10 @@
 load_middle_earth <- function(){
   # load genetic data
-  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-10000_spp-spp_0.vcf"))
+  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
   assign("vcf", vcf, envir = .GlobalEnv)
 
   # load coords
-  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-10000_spp-spp_0.csv"))
+  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
   coords <- geo[,c("idx", "x", "y")]
   coords$y <- -coords$y
   assign("coords", coords, envir = .GlobalEnv)
@@ -103,17 +103,17 @@ time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 
 
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 5, fact = 3, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, nloci = nrow(vcf@gt))
 
   df <- data.frame(time = (Sys.time() - ptm),
                    fact = 3,
-                   wdim = 5)
+                   wdim = 3)
 
   if(rarify){
-    df$rarify_n <- 4
+    df$rarify_n <- 2
     df$rarify_nit <- 5
   } else {
-    df$min_n <- 4
+    df$min_n <- 2
   }
 
   # make ls of results
