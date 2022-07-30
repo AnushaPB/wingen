@@ -1,6 +1,5 @@
 
 test_that("window_gd returns expected output", {
-  library("raster")
   load_mini_ex()
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   expect_s4_class(wpi, "RasterStack")
@@ -54,6 +53,6 @@ test_that("biallelic richness is calculated correctly", {
   expect_equal(ar_vals, expected)
   expect_equal(calc_mean_biar(all_possible_combos), mean(expected))
 
-  expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be 0, 1 or 2")
+  expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 })
 
