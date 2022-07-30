@@ -73,34 +73,6 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
   return(list(pt = pt, res = res))
 }
 
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
-  # reassign argument
-  assign(var, val)
-
-  ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, nloci)
-  #plot(gdmapr, col = magma(100))
-
-  msk_count <- mask(gdmapr[[2]], gdmapr[[1]])
-  if(rarify){
-    no_rarify <- cellStats(msk_count == rarify_n, "sum", na.rm = TRUE)*rarify_n
-    yes_rarify <- cellStats(msk_count > rarify_n, "sum", na.rm = TRUE)*rarify_n*rarify_nit
-    total_count = yes_rarify + no_rarify
-  } else {
-    total_count <- cellStats(msk_count, "sum", na.rm = TRUE)
-  }
-
-
-  df <- data.frame(time = (Sys.time() - ptm),
-                   total_count = total_count,
-                   ncell = ncell(aggregate(lyr, fact)),
-                   wsize = wdim*wdim,
-                   wprop = wdim*wdim/ncell(aggregate(lyr, fact)),
-                   fact = fact)
-
-  return(list(df, gdmapr))
-}
-
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
   ptm <- Sys.time()
   gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 5, fact = 3, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
@@ -119,7 +91,6 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   # make ls of results
   results <- list(df, gdmapr)
 
-  # temp: see results as they get output
   write_rast_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
 
   message("calculation of ", stat, " complete...")
@@ -198,6 +169,7 @@ get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, f
 
   if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, measure, "- returning NULL")); return(NULL)}
   file <- here(rootPath, locFile)
+  if(length(file) > 1) {print(file); stop("more than one file provided")}
   r <- raster::stack(file)
   r <- r[[seq(1, nlayers(r),2)]]
 
@@ -224,4 +196,34 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   r$dataset <- file.name
 
   return(r)
+}
+
+
+#OLD?:
+time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
+  # reassign argument
+  assign(var, val)
+
+  ptm <- Sys.time()
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, nloci)
+  #plot(gdmapr, col = magma(100))
+
+  msk_count <- mask(gdmapr[[2]], gdmapr[[1]])
+  if(rarify){
+    no_rarify <- cellStats(msk_count == rarify_n, "sum", na.rm = TRUE)*rarify_n
+    yes_rarify <- cellStats(msk_count > rarify_n, "sum", na.rm = TRUE)*rarify_n*rarify_nit
+    total_count = yes_rarify + no_rarify
+  } else {
+    total_count <- cellStats(msk_count, "sum", na.rm = TRUE)
+  }
+
+
+  df <- data.frame(time = (Sys.time() - ptm),
+                   total_count = total_count,
+                   ncell = ncell(aggregate(lyr, fact)),
+                   wsize = wdim*wdim,
+                   wprop = wdim*wdim/ncell(aggregate(lyr, fact)),
+                   fact = fact)
+
+  return(list(df, gdmapr))
 }
