@@ -62,7 +62,7 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
   res <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify = rarify, rarify_n, rarify_nit, min_n, fun = mean, parallel, nloci)
 
   # Stop the clock
-  pt <- (Sys.time() - ptm)
+  pt <- as.numeric(Sys.time() - ptm, units = "secs")
 
   plot(res,  col = magma(100))
 
@@ -77,7 +77,7 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   ptm <- Sys.time()
   gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 5, fact = 3, rarify, rarify_n = 4, rarify_nit = 5, min_n = 4, fun = mean, parallel, nloci = nrow(vcf@gt))
 
-  df <- data.frame(time = (Sys.time() - ptm),
+  df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
                    fact = 3,
                    wdim = 5)
 
@@ -218,7 +218,7 @@ time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 
   }
 
 
-  df <- data.frame(time = (Sys.time() - ptm),
+  df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
                    total_count = total_count,
                    ncell = ncell(aggregate(lyr, fact)),
                    wsize = wdim*wdim,
