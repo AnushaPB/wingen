@@ -66,7 +66,7 @@ kde <- raster(MASS::kde2d(coords$x, coords$y, h = c(10,10), n = 100, lims = c(0,
 
 par(mar = rep(2,4))
 plot(lyr, col = viridis::magma(100), main = "Carrying Capacity", axes = FALSE, box = FALSE)
-plot(kde, col = viridis::magma(100), main = "Population Density", axes = FALSE, box = FALSE)
+plot(kde, col = viridis::magma(10), main = "Population Density", axes = FALSE, box = FALSE)
 plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), main = "Distribution of Individuals", axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.4), xlab = "", ylab = "")
 points(subcoords$x, subcoords$y, pch = 16, cex = 1, col = mako(1, begin = 0.2, alpha = 0.9), xlab = "", ylab = "")
@@ -81,7 +81,7 @@ legend(0,-80,
 ```
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
-tr <- sim(subvcf, subcoords, lyr, stat = "pi", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot_gd(tr$res, bkg, breaks = 10, zlim = c(0,0.30))
@@ -112,7 +112,7 @@ preview_gd(lyr, subcoords, wdim = 3, fact = 3, sample_count = FALSE)
 
 measures <- c("pi", "biallelic_richness", "heterozygosity")
 datasets <- c("rr", "WGS", "FULL")
-for(nsamp in c(200)){
+for(nsamp in c(100, 200)){
   msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = nsamp)
   for(m in measures){
     par(mfrow = c(3, 2), mar = rep(2,4))
@@ -164,6 +164,7 @@ plot(r, zlim = c(1,1.75),  col = magma(100))
 for(nsamp in c(100, 200)){
   for(m in measures){
     par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
+    
     for(rarify in c("TRUE", "FALSE")){
       for(d in datasets){
         rfile <- here("sims", "outputs", "krige", 
@@ -187,7 +188,14 @@ for(nsamp in c(100, 200)){
   }
 }
 
-for(nsamp in c(100)){
+n100 <- raster(here("sims", "outputs", "n100_count.tif"))
+n100k <- krig_gd(n100, lyr, agg_r = 2, disagg_grd = 2)
+n200 <- raster(here("sims", "outputs", "n200_count.tif"))
+n200k <- krig_gd(n200, lyr, agg_r = 2, disagg_grd = 2)
+
+for(nsamp in c(100, 200)){
+  if(nsamp == 100) msk <- n100k
+  if(nsamp == 200) msk <- n200k
   for(m in measures){
     par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
     for(rarify in c("TRUE", "FALSE")){
@@ -196,11 +204,23 @@ for(nsamp in c(100)){
                       paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
         r <- raster(rfile)
         
-        if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
-        if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
-        if(m == "heterozygosity") {zlim <- c(-0.02,0.4)}
-        r <- mask_gd(r, lyr, minval = 0.01)
-        plot(r,  col = magma(10), box = TRUE, axes = FALSE, main = "", legend = FALSE)    
+        if(nsamp == 100){
+          if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
+          if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
+          if(m == "heterozygosity") {zlim <- c(0,0.6); r[r < 0] <- 0}
+        }
+        if(nsamp == 200){
+          if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
+          if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
+          if(m == "heterozygosity") {zlim <- c(0,0.3); r[r < 0] <- 0}
+        }
+        
+        r <- mask_gd(r, msk, minval = 1)
+        
+        plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, 
+             zlim = c(0.01,1), legend = FALSE)
+        plot(r,  col = magma(10), box = TRUE, axes = FALSE, 
+             main = "", zlim = zlim, legend = FALSE, add = TRUE)    
       }
     }
   }
@@ -226,14 +246,14 @@ tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
 
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
-  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "darkgray", fontface = "italic") +
-  geom_hline(yintercept = 60*5, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
-  geom_hline(yintercept = 60*10, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 60*10, label = "10 min", vjust = -1, hjust = -0.4), col = "lightgray", fontface = "italic") +
+  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
+  geom_hline(yintercept = 120, linetype = "dashed", col = "gray", lwd = 1) + 
+  geom_text(aes(factor(200), 120, label = "2 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 180, linetype = "dashed", col = "lightgray", lwd = 1) + 
+  geom_text(aes(factor(200), 180, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
-            vjust = -1, position=position_dodge(width = .9)) + 
+            vjust = -0.5, position=position_dodge(width = .9)) + 
   scale_color_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"=mako(3, begin = 0.3, end = 0.8)[2],
                               "heterozygosity"=mako(3, begin = 0.3, end = 0.8)[3])) +
@@ -244,7 +264,7 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("number of samples") +
   ylab("time (seconds)") +
-  ylim(0,650) +
+  ylim(0,200) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
@@ -289,7 +309,7 @@ for(f in c(4,3,2)){
   for(w in c(3,5,7)){
     r <- raster(here("sims","outputs", "wftest", paste0(f,w,".tif")))
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(-0.02, 0.41), add = TRUE)
+    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, add = TRUE)
     rect(0, -105, 100, 0, border = "black")
     i <- i + 1
   }
@@ -300,7 +320,7 @@ for(f in c(4,3,2)){
   for(w in c(3,5,7)){
     r <- raster(here("sims","outputs", "wftest", paste0(f,w,"krig.tif")))
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, zlim = c(-0.02, 0.41), add = TRUE)
+    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, add = TRUE)
     rect(0, -105, 100, 0, border = "black")
     i <- i + 1
   }
@@ -362,32 +382,30 @@ for (m in c("pi", "biallelic.richness", "het")){
 }
 ```
 #
-# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
-
 ```{r, fig.width = 4, fig.height = 4}
 set.seed(42)
 
-resf <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 5, rarify = TRUE, rarify_n = 10, rarify_nit = 10)
+resf <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 3, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
 
 plot_time_test(resf, stat = "fact")
 plot_time_test(resf, stat = "ncell")
 plot_time_test(resf, stat = "total_count")
 ```
 
-```{r, fig.width = 10, fig.height = 5}
-plot_rast_test(resf)
-```
-
-```{r, fig.width = 16, fig.height = 4}
+```{r, fig.width = 4, fig.height = 4}
 set.seed(42)
 
-resw <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 3, stat = "pi", rarify = TRUE, rarify_n = 4, rarify_nit = 5)
+resw2 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 2, stat = "pi", rarify = FALSE, min_n = 1)
 
-plot_time_test(resw)
+plot_time_test(resw2, stat = "wsize")
 
-resw <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 5, stat = "pi", rarify = TRUE, rarify_n = 4, rarify_nit = 5)
+resw3 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 3, stat = "pi", rarify = FALSE, min_n = 1)
 
-plot_time_test(resw)
+plot_time_test(resw3,  stat = "wsize")
+
+resw4 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 4, stat = "pi", rarify = FALSE, min_n = 1)
+
+plot_time_test(resw4,  stat = "wsize")
 
 ```
 
@@ -395,27 +413,8 @@ plot_time_test(resw)
 plot_rast_test(resw)
 ```
 
-```{r, fig.width = 16, fig.height = 4}
-set.seed(42)
+# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
 
-resfr <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 5, rarify = FALSE, min_n = 10)
-
-plot_time_test(resfr)
-
-```
-
-```{r, fig.width = 10, fig.height = 4}
-plot_rast_test(resfr)
-```
-
-```{r, fig.width = 16, fig.height = 4}
-set.seed(42)
-
-reswr <- purrr::map(c(5, 7, 9, 11, 13), time_test, "wdim", subvcf, subcoords, lyr, fact = 4, stat = "pi", rarify = FALSE, min_n = 10)
-
-plot_time_test(reswr)
-
-```
 # REALIZATION: TIME CHANGING MIGHT HAVE TO DO WITH EDGE OF LANDSCAPE, NOT WINDOW SIZE EXACLTY - MAY NEED TO TRY FAKE LANDSCAPE WITH PERFECT EVEN SAMPLING TO GET CALCS RIGHT
 (replicate the vcf from one individual multiple times evenly across a landscape, also check if there is a diff based on the value but there shouldn't be)
 
@@ -435,11 +434,28 @@ plot(dr)
 points(dcoords)
 ```
 note: rarify_n needs to be 2 so that landscape/sampling doesn't affect the results (e.g. you don't want any NA values)
+```{r, fig.width = 4, fig.height = 4}
+set.seed(42)
+
+resw2 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 2, stat = "pi", rarify = FALSE, min_n = 2)
+
+
+resw3 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 3, stat = "pi", rarify = FALSE, min_n = 2)
+
+
+resw4 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 4, stat = "pi", rarify = FALSE, min_n = 2)
+
+plot_time_test(resw2, stat = "wsize")
+plot_time_test(resw3,  stat = "wsize")
+plot_time_test(resw4,  stat = "wsize")
+
+```
+
 ```{r}
 dr100 <- raster(matrix(1, ncol = 100, nrow = 100))
-resf3 <- purrr::map(c(2, 3, 5, 10, 20), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 3, rarify = FALSE, min_n = 1)
+resf3 <- purrr::map(c(2, 3, 4, 5, 6, 7), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 3, rarify = FALSE, min_n = 2)
 
-plot_time_test(resf5, stat = "fact")
+plot_time_test(resf3, stat = "fact")
 ```
 # FIGURE OUT THIS WEIRDNESS:
 ```{r}

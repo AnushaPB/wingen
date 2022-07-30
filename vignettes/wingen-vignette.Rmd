@@ -48,7 +48,10 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 
 ## Main functions
 
+
 ### Run sliding window calculations
+
+----------------------------------------------------------------------------------------------------------
 
 *Main arguments:*
 
@@ -75,24 +78,28 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 
 8. *parallel* - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages. To perform parallelization on a Windows operating system a cluster must first be initialized using a few lines of code, a process which we describe in the vignette of this package. 
 
+----------------------------------------------------------------------------------------------------------
+
+
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 preview_gd(lotr_lyr,
            lotr_coords,
-           wdim = 3, 
-           fact = 5, 
+           wdim = 5, 
+           fact = 3, 
            sample_count = TRUE, 
-           min_n = 0)
+           min_n = 2)
 ```
-
 
 ```{r sliding window, fig.width = 5, fig.height = 5, cache = TRUE}
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          fact = 5,
-          wdim = 3,
+          wdim = 5,
+          fact = 3,
           rarify = TRUE,
+          rarify_n = 2,
+          rarify_nit = 5,
           nloci = 1000)
 
 # NOTE:  the nloci argument is used in the calculation of pi. 
@@ -116,8 +123,10 @@ Kriging is performed by first transforming the sliding window layer into a set o
 
 To deal with this issue, users can either (1) resample their sliding window raster layers and grid layers to the same resolution by using the “resample” argument or (2) manually disaggregate or aggregate either the sliding window or grid layers using the “r_agg”, “r_disagg”, “grd_agg”, or “grd_disagg” arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the “grd_disagg” argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a RasterLayer. Keep in mind that increasing the resolution of the sliding window layer (i.e. either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, however to a lesser extent. Additional information about the krig_gd() arguments can be found in the package documentation. The output of this function is a RasterStack of the kriged input layers. 
 
+
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
-kgd <- krig_gd(wgd, lotr_lyr, disagg_grd = 5)
+# note: this step can take a little while
+kgd <- krig_gd(wgd, indices = 1:2, lotr_lyr, disagg_grd = 2)
 
 plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
@@ -125,25 +134,31 @@ plot_count(kgd, main = "Kriged sample counts")
 
 ### Mask results
 
+Mask using habitat suitability: 
+
 ```{r mask results, fig.width = 5, fig.height = 5}
-mgd <- mask_gd(kgd, min_n = 3)
+mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 
 plot_gd(mgd, main = "Kriged & masked pi")
 ```
+Mask using counts layer: 
 
+```{r mask results, fig.width = 5, fig.height = 5}
+mgd <- mask_gd(kgd[["pi"]], kgd[["sample_count"]], minval = 2)
+
+plot_gd(mgd, main = "Kriged & masked pi")
+```
+You can also add a "background" to this plot in the form of a RasterLayer or other spatial object (e.g. a country boundary) which can help provide geographic context:
+
+```{r}
+# Create a "range map" for this species by masking areas of very low suitability
+range_map <- lotr_lyr
+range_map[range_map < 0.01] <- NA
+
+plot_gd(mgd, bkg = range_map, main = "Kriged & masked pi")
+```
 
 ## Parallelization
-
-```{r no parallelization}
-system.time(wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "pi",
-          fact = 3,
-          wdim = 5,
-          rarify = TRUE,
-          nloci = 1000))
-```
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
 cores <- 5
@@ -157,6 +172,8 @@ wgd <- window_gd(lotr_vcf,
           stat = "pi",
           fact = 3,
           wdim = 5,
+          rarify_n = 2,
+          rarify_nit = 5,
           rarify = TRUE,
           nloci = 1000, 
           parallel = TRUE)
@@ -174,6 +191,8 @@ pi_wgd <- window_gd(lotr_vcf,
           stat = "pi",
           fact = 3,
           wdim = 5,
+          rarify_n = 2,
+          rarify_nit = 5,
           rarify = TRUE,
           nloci = 1000)
 
@@ -183,12 +202,16 @@ het_wgd <- window_gd(lotr_vcf,
           stat = "het",
           fact = 3,
           wdim = 5,
+          rarify_n = 2,
+          rarify_nit = 5,
           rarify = TRUE)
 
 AR_wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "biallelic.richness",
+          rarify_n = 2,
+          rarify_nit = 5,
           fact = 3,
           wdim = 5,
           rarify = TRUE)

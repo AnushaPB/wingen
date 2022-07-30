@@ -19,7 +19,7 @@ plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zl
 
     if(!is.null(bkg)) {
       raster::plot(x[[1]], col = "white", legend = FALSE, main = main, axes = FALSE, box = FALSE)
-      raster::plot(bkg, col = "lightgray", border = "white", axes = FALSE, box = FALSE, add = TRUE, legend = FALSE)
+      raster::plot(bkg[[1]], col = "lightgray", border = "white", axes = FALSE, box = FALSE, add = TRUE, legend = FALSE)
       raster::plot(x[[1]], col = col, zlim = zlim, add = TRUE, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
     } else {
       raster::plot(x[[1]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width,  axis.args = axis.args)
@@ -42,13 +42,13 @@ plot_gd <- function(x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zl
 #' @export
 #'
 #' @examples
-plot_count <- function(x, index = 2, col = viridis::mako(10), zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
+plot_count <- function(x, index = 2, breaks = 10, col = viridis::mako(breaks), zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
 
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
 
-  if(nlayers(x) > 1) raster::plot(x[[index]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
-  if(nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+  if(raster::nlayers(x) > 1) raster::plot(x[[index]], col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
+  if(raster::nlayers(x) == 1) raster::plot(x, col = col, zlim = zlim, main = main, axes = FALSE, box = FALSE, legend = legend, legend.width = legend.width, axis.args = axis.args)
 
   })
 }
