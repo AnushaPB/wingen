@@ -1,4 +1,5 @@
 test_that("krig_gd returns expected output", {
+  library("raster")
   load_mini_ex()
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   expect_warning(kpi <- krig_gd(wpi, mini_lyr))
@@ -7,6 +8,7 @@ test_that("krig_gd returns expected output", {
 })
 
 test_that("krig_gd returns warning when not provided grd", {
+  library("raster")
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
 
   warnings <- capture_warnings(kpi <- krig_gd(wpi))
@@ -16,6 +18,7 @@ test_that("krig_gd returns warning when not provided grd", {
 
 
 test_that("krig_gd returns warning when provided crs", {
+  library("raster")
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)

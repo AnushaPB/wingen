@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 [![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
 <!-- badges: end -->
 
-Create maps of genetic diversity using a sliding window approach.
+Create maps of genetic diversity using a moving window approach.
 
 ## Installation
 
@@ -33,13 +33,13 @@ devtools::install_github("AnushaPB/wingen")
 
 ```{r, comment=NA}
 library(wingen)
-devtools::load_all()
+
 # load example data
 load_middle_earth_ex()
 ```
 
 ```{r example, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 3, fig.width = 12}
-# Run sliding window calculations of pi with rarefaction
+# Run moving window calculations of pi with rarefaction
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,

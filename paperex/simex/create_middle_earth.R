@@ -1,4 +1,8 @@
 library("raster")
+library("here")
+
+# working path
+wdir <- here("paperex", "simex")
 
 # function to rescale raster from 0 to 1
 rescale <- function(x, x.min = NULL, x.max = NULL, new.min = 0, new.max = 1) {
@@ -9,17 +13,17 @@ rescale <- function(x, x.min = NULL, x.max = NULL, new.min = 0, new.max = 1) {
 
 #DATA SOURCE: https://scholarworks.wm.edu/asoer/3/
 
-if(!file.exists("sims/data/DEM_middle_earth.tif")){
+if(!file.exists(wdir, "data", "DEM_middle_earth.tif")){
   # load data
-  e1 <- raster("sims/data/DEM_50m_Quad1.tif")
-  e2 <- raster("sims/data/DEM_50m_Quad2.tif")
-  e3 <- raster("sims/data/DEM_50m_Quad3.tif")
-  e4 <- raster("sims/data/DEM_50m_Quad4.tif")
+  e1 <- raster(wdir, here("data", "DEM_50m_Quad1.tif"))
+  e2 <- raster(wdir, here("data", "DEM_50m_Quad2.tif"))
+  e3 <- raster(wdir, here("data", "DEM_50m_Quad3.tif"))
+  e4 <- raster(wdir, here("data", "DEM_50m_Quad4.tif"))
 
   # stich together
   stitched <- merge(e1, e2, e3, e4)
   plot(stitched)
-  writeRaster(stitched, "sims/data/DEM_middle_earth.tif", overwrite = TRUE)
+  writeRaster(stitched, here(wdir, "data", "DEM_middle_earth.tif"), overwrite = TRUE)
 }
 
 # Aggregate stitched layer
@@ -47,9 +51,13 @@ m <- as.matrix(rms)
 final_mat[is.na(final_mat)] <- 0
 
 # write out matrix for gnx
-write.table(final_mat, "sims/data/middle_earth.csv", sep = ",", row.names = FALSE, col.names = FALSE)
+write.table(final_mat,
+            here(wdir, "data", "middle_earth.csv"),
+            sep = ",",
+            row.names = FALSE,
+            col.names = FALSE)
 
 # read in matrix and plot to confirm it looks right
-rmr <- read.csv("sims/data/middle_earth.csv", header = FALSE)
+rmr <- read.csv(here(wdir, "data", "middle_earth.csv"), header = FALSE)
 rmr <- as.matrix(rmr)
 plot(raster(rmr))
