@@ -329,7 +329,7 @@ params = {
     } # <END> params
 
 #make our params dict into a proper Geonomics ParamsDict object
-params = gnx.make_params_dict(params, 'sim_params')
+params = gnx.make_params_dict(params, 'sim')
 #then use it to make a model
 mod = gnx.make_model(parameters = params, verbose=True)
 mod.run()

@@ -9,20 +9,17 @@
 *.shx
 
 # SIMS
-sims/RData/
-sims/data/
-sims/bdrive/
-sims/GNX_mod-sims_params
-sims/outputs
-sims/*.csv
-sims_nlm/data
-!sims/data/samples_seed42.csv
-!sims/data/bottleneck_lyr.csv
-!sims/data/init_lyr.csv
-!sims/data/middle_earth.csv
+paperex/simex/RData/
+paperex/simex/data/
+paperex/simex/bdrive/
+paperex/simex/GNX_mod-sims_params
+paperex/simex/outputs
+paperex/simex/*.csv
+!paperex/simex/data/samples_seed42.csv
+!paperex/simex/data/middle_earth.csv
 
 #EMPIRICAL
-empex/data
+paperex/empex/data
 
 # private token
 token.R

@@ -1,5 +1,5 @@
 ---
-title: "sims"
+title: "Simulation Example"
 output: html_document
 ---
  
@@ -16,22 +16,25 @@ library(dplyr)
 library(purrr)
 library(adegenet)
 library(hierfstat)
-source("sims_functions.R")
+
+wdir <- here("paperex", "simex")
+source(here(wdir, "sims_functions.R"))
+
 ```
 
 
 # load sims
 ```{r}
 
-vcf <- read.vcfR("data/mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
+vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
 
-lyr <- read.csv("data/middle_earth.csv", header = FALSE)
+lyr <- read.csv(here(wdir, "data", "middle_earth.csv", header = FALSE))
 lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
 bkg <- lyr
 bkg[bkg < 0.01] <- NA
 
-geo <- read.csv("data/mod-sim_params_it-0_t-1000_spp-spp_0.csv")
+geo <- read.csv(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
 coords <- geo[,c("idx","x","y")]
 coords$y <- -coords$y
 
@@ -40,10 +43,10 @@ set.seed(42)
 if(TRUE){
   message("creating new file")
   si <- sample(nrow(coords), 200)
-  write.csv( data.frame(inds = si), here("sims", "data", "samples_seed42.csv"), row.names = FALSE)
+  write.csv( data.frame(inds = si), here(wdir, "data", "samples_seed42.csv"), row.names = FALSE)
 } else {
   message("loading existing file")
-  df <- read.csv( here("sims", "data", "samples_seed42.csv"))
+  df <- read.csv(here(wdir, "data", "samples_seed42.csv"))
   si <- df$inds
 }
 
@@ -102,7 +105,6 @@ plot_count(tr_k_count, zlim = c(0,12))
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
 preview_gd(lyr, subcoords, wdim = 3, fact = 3, sample_count = FALSE)
-
 ```
 
 
@@ -167,7 +169,7 @@ for(nsamp in c(100, 200)){
     
     for(rarify in c("TRUE", "FALSE")){
       for(d in datasets){
-        rfile <- here("sims", "outputs", "krige", 
+        rfile <- here(wdir, "outputs", "krige", 
                       paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
         if(file.exists(rfile)){
           r <- raster(rfile)
@@ -188,9 +190,9 @@ for(nsamp in c(100, 200)){
   }
 }
 
-n100 <- raster(here("sims", "outputs", "n100_count.tif"))
+n100 <- raster(here(wdir, "outputs", "n100_count.tif"))
 n100k <- krig_gd(n100, lyr, agg_r = 2, disagg_grd = 2)
-n200 <- raster(here("sims", "outputs", "n200_count.tif"))
+n200 <- raster(here(wdir, "outputs", "n200_count.tif"))
 n200k <- krig_gd(n200, lyr, agg_r = 2, disagg_grd = 2)
 
 for(nsamp in c(100, 200)){
@@ -200,7 +202,7 @@ for(nsamp in c(100, 200)){
     par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
     for(rarify in c("TRUE", "FALSE")){
       for(d in datasets){
-        rfile <- here("sims", "outputs", "krige", 
+        rfile <- here(wdir, "outputs", "krige", 
                       paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
         r <- raster(rfile)
         
@@ -273,11 +275,6 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
 
 ```
 
-```{r}
-load("RData/ar_results.RData")
-
-```
-
 ## Window vs aggregation factor
 
 ```{r, fig.width = 5, fig.height = 5}
@@ -297,8 +294,8 @@ for(f in c(2, 3, 4)){
     tr_k_mask <- mask(tr_k, bkg)
     stk1[[i]] <-  tr_k_mask
     stk2[[i]] <-  res[[1]]
-    writeRaster(stk1[[i]], here("sims","outputs", "wftest", paste0(f,w,".tif")))
-    writeRaster(stk2[[i]], here("sims","outputs", "wftest", paste0(f,w,"krig.tif")))
+    writeRaster(stk1[[i]], here(wdir, "outputs", "wftest", paste0(f,w,".tif")))
+    writeRaster(stk2[[i]], here(wdir, "outputs", "wftest", paste0(f,w,"krig.tif")))
     plot(res[[1]], col = magma(100))
     i <- i + 1
   }
@@ -307,26 +304,25 @@ for(f in c(2, 3, 4)){
 par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
 for(f in c(4,3,2)){
   for(w in c(3,5,7)){
-    r <- raster(here("sims","outputs", "wftest", paste0(f,w,".tif")))
+    r <- raster(here(wdir, "outputs", "wftest", paste0(f,w,".tif")))
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
     plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, add = TRUE)
     rect(0, -105, 100, 0, border = "black")
-    i <- i + 1
   }
 }
 
 par(mfrow = c(3,3), mar = rep(0,4), oma = rep(0,4), pty = "s")
 for(f in c(4,3,2)){
   for(w in c(3,5,7)){
-    r <- raster(here("sims","outputs", "wftest", paste0(f,w,"krig.tif")))
+    r <- raster(here(wdir, "outputs", "wftest", paste0(f,w,"krig.tif")))
     plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
-    plot(r, col = magma(10), axes = FALSE, box = FALSE, legend = FALSE, add = TRUE)
+    plot(r, col = magma(100), axes = FALSE, box = FALSE, legend = FALSE, add = TRUE, zlim = c(0,0.3))
     rect(0, -105, 100, 0, border = "black")
-    i <- i + 1
   }
 }
 
-plot(stk2[[i-1]], col = magma(10), axes = FALSE, box = FALSE, zlim = c(-0.02, 0.41))
+plot(r, col = magma(100), zlim = c(0,0.3), legend.only = TRUE)
+
 ```
 
 # Time comparison
@@ -344,7 +340,7 @@ par(mfrow = c(3,3), mar = rep(1,4))
 
 for (m in c("pi", "biallelic.richness", "het")){
   for (n in c(1000, 5000, 10000)){
-   tr_k <- raster(here("sims", "outputs", paste0(m,"_",n,"krig.tif")))
+   tr_k <- raster(here(wdir, "outputs", paste0(m, "_", n, "krig.tif")))
 
    tr_k <- resample(tr_k, bkg)
 
@@ -362,7 +358,7 @@ for (m in c("pi", "biallelic.richness", "het")){
 par(mfrow = c(4,3), mar = rep(0.5,4), oma = rep(2,4))
 
 for(n in c(1000,5000,10000)){
-  kde <- raster(here("sims", "outputs", paste0(n,"_kde.tif")))
+  kde <- raster(here(wdir, "outputs", paste0(n,"_kde.tif")))
   plot(kde, col = viridis::magma(10, alpha = 1.0), zlim = c(0, 0.0008390501), axes = FALSE, box = TRUE, legend = FALSE)
 }
 
@@ -593,10 +589,8 @@ plot(mask(full_ar, nr)[[1]], col = magma(100))
 
 
 # check grid alignment
+
 ```{r, fig.width = 10, fig.height = 20}
-library(wingen)
-library(raster)
-library("viridis")
 data("lotr_lyr")
 
 lyr <- init(lotr_lyr, 'chess')
@@ -629,176 +623,6 @@ points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3
 
 
 ```
-# Heterozygosity is weird
-```{r, fig.width = 10, fig.height = 5}
-#hetmat <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
 
-#write.csv(hetmat, "hetmat_full.csv")
-hetmat <- read.csv("hetmat_full.csv")
-hetmat <- hetmat[,-1]
-hetmat <- as.matrix(hetmat)
-
-rM <- rowMeans(hetmat)
-hist(rM)
-cM <- colMeans(hetmat)
-hist(cM)
-M <- mean(hetmat)
-
-rM100 <- rowMeans(hetmat[, 1:100], na.rm = TRUE)
-cM100 <- colMeans(hetmat[, 1:100], na.rm = TRUE)
-M100 <- mean(hetmat[, 1:100], na.rm = TRUE)
-
-rM200 <- rowMeans(hetmat[, 1:200], na.rm = TRUE)
-cM200 <- colMeans(hetmat[, 1:200], na.rm = TRUE)
-M200 <- mean(hetmat[, 1:200], na.rm = TRUE)
-
-par(mfrow = c(1,2), pty = "s")
-plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Loci Averages (n = 150k)")
-polygon(density(rM), col = rgb(1,1,0,0.5))
-polygon(density(rM100), col = rgb(0,1,1,0.5))
-polygon(density(rM200), col = rgb(1,0,1,0.5))
-
-legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
-
-
-plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Individual Averages (n = 1k)")
-polygon(density(cM), col = rgb(1,1,0,0.5))
-polygon(density(cM100), col = rgb(0,1,1,0.5))
-polygon(density(cM200), col = rgb(1,0,1,0.5))
-
-legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
-
-mean(cM)
-mean(rM)
-M
-mean(cM100)
-mean(rM100)
-M100
-mean(cM200)
-mean(rM200)
-M200
-
-
-```
-
-```{r, fig.width = 15, fig.height=3}
-msk_lyr <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = 100)
-
-
-par(mfrow = c(1,5))
-for(i in c(100, 200, 300, 500)){
-  r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = i)
-  r <- mask(r, msk_lyr)
-  plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(i), zlim = c(0.3,0.5))    
-}
-
-
-msk_lyr <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = 200)
-
-par(mfrow = c(1,5))
-for(i in c(200, 300, 500)){
-  r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = i)
-  r <- mask(r, msk_lyr)
-  plot(r,  col = magma(100), box = FALSE, axes = FALSE, main = paste(i), zlim = c(0.3,0.5))    
-}
-```
-
-```{r, fig.width = 5, fig.height = 5}
-plot(1, type = "n", xlim = c(0, 0.7), ylim = c(0,15), ylab = "density", xlab = "H", main = "Individual Averages (n = 1k)")
-polygon(density(cM), col = rgb(1,1,0,0.5))
-polygon(density(cM100), col = rgb(0,1,1,0.5))
-polygon(density(cM200), col = rgb(1,0,1,0.5))
-
-r <- get_divout(file.name = "WGS", rarify = TRUE, measure = "heterozygosity", nsamp = "100")
-r100 <- na.omit(getValues(r[[1]]))
-
-r <- get_divout(file.name = "WGS", rarify = TRUE, measure = "heterozygosity", nsamp = "200")
-r200 <- na.omit(getValues(r[[1]]))
-
-r <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "300")
-r300 <- na.omit(getValues(r[[1]]))
-
-r <- get_divout(file.name = "FULL", rarify = TRUE, measure = "heterozygosity")
-rFULL <- na.omit(getValues(r[[1]]))
-
-
-par(pty = "s")
-plot(1, type = "n", xlim = c(0.3, 0.5), ylim = c(0,45), ylab = "density", xlab = "H", main = "Raster Values")
-polygon(density(rFULL), col = rgb(1,1,0,0.5))
-polygon(density(r100), col = rgb(0,1,1,0.5))
-polygon(density(r200), col = rgb(1,0,1,0.5))
-legend("topright",c("full", "100 samples", "200 samples"), col = c("yellow", "cyan", "magenta"), pch = 15)
-
-```
-
-```{r, fig.height = 5, fig.width = 5}
-par(mfrow = c(2,2), mar = rep(2,4))
-
-for(nsamp in c(100, 200)){
-    rs <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = nsamp)
-    plot(rs,  col = magma(100), box = FALSE, axes = FALSE)          
-  
-    r <- get_divout(file.name = "FULL", rarify = "TRUE", measure = "heterozygosity")
-    r <- mask(r, rs)
-    plot(r,  col = magma(100), box = FALSE, axes = FALSE) 
-}
-
-mr <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = 100)
-for(nsamp in c(100, 200)){
-    rs <- get_divout(file.name = "WGS", rarify = "TRUE", measure = "heterozygosity", nsamp = nsamp)
-    rs <- mask(rs, mr)
-    plot(rs,  col = magma(100), box = FALSE, axes = FALSE, zlim =  c(0.3,0.5))          
-  
-    r <- get_divout(file.name = "FULL", rarify = "TRUE", measure = "heterozygosity")
-    r <- mask(r, mr)
-    plot(r,  col = magma(100), box = FALSE, axes = FALSE, zlim = c(0.3,0.5)) 
-}
-```
-
-
-```{r, fig.width = 5, fig.height = 5}
-
-r1 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "100")
-r100 <- na.omit(getValues(r1[[1]]))
-
-r3 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "300")
-r300 <- na.omit(getValues(r3[[1]]))
-
-r5 <- get_divout(file.name = "vn", rarify = TRUE, measure = "heterozygosity", nsamp = "500")
-r500 <- na.omit(getValues(r5[[1]]))
-
-rF <- get_divout(file.name = "FULL", rarify = TRUE, measure = "heterozygosity")
-rFULL <- na.omit(getValues(rF[[1]]))
-
-
-
-cp <- viridis::plasma(4, 0.5)
-par(pty = "s")
-plot(1, type = "n", xlim = c(0.3, 0.5), ylim = c(0,45), ylab = "density", xlab = "H", main = "Raster Values")
-
-polygon(density(rFULL), col = cp[4])
-polygon(density(r500), col = cp[3])
-polygon(density(r300), col = cp[2])
-polygon(density(r100), col = cp[1])
-legend("topright",c("100", "300", "500", "FULL"), col = cp, pch = 15)
-
-```
-```{r, fig.height = 8, fig.width = 10}
-par(pty = "s", mfrow = c(3,4), mar = rep(1,4))
-plot_gd(r1)
-plot_gd(r3)
-plot_gd(r5)
-plot_gd(rF)
-
-plot_gd(r1)
-plot_gd(mask(r3, r1))
-plot_gd(mask(r5, r1))
-plot_gd(mask(rF, r1))
-
-plot_gd(r1, zlim = c(0.25, 0.45))
-plot_gd(mask(r3, r1), zlim = c(0.25, 0.45))
-plot_gd(mask(r5, r1), zlim = c(0.25, 0.45))
-plot_gd(mask(rF, r1), zlim = c(0.25, 0.45))
-```
 
 
