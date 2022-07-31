@@ -4,10 +4,12 @@ on:
   push:
     paths: 
       - "R/**.R"
+      - "tests/testthat/**.R"
       - .github/workflows/test-coverage.yml
   pull_request:
      paths: 
       - "R/**.R"
+      - "tests/testthat/**.R"
       - .github/workflows/test-coverage.yml
 
 name: test-coverage
