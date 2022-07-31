@@ -13,7 +13,7 @@ coords <- coords[,c("x","y")]
 # confirm that correct set is being used
 message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-cores <- 10
+cores <- 20
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 

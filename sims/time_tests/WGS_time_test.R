@@ -28,7 +28,7 @@ message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
-cores <- 10
+cores <- 5
 cl <- makeCluster(cores)
 registerDoParallel(cl)
 
