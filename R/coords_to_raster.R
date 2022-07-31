@@ -13,7 +13,11 @@
 #' load_mini_ex()
 #' coords_to_raster(mini_coords, buffer = 10, plot = TRUE)
 coords_to_raster <- function(coords, buffer = 0, agg = NULL, disagg = NULL, plot = FALSE){
+
+  # format coords
+  coords <- as.data.frame(coords)
   colnames(coords) <- c("x", "y")
+
   # coords
   xmin <- min(coords$x, na.rm = TRUE) - buffer
   xmax <- max(coords$x, na.rm = TRUE) + buffer
@@ -24,18 +28,18 @@ coords_to_raster <- function(coords, buffer = 0, agg = NULL, disagg = NULL, plot
   m <- matrix(nrow = (ymax - ymin), ncol = (xmax - xmin))
 
   # turn into raster
-  r <- raster(m)
+  r <- raster::raster(m)
 
   # set extent
-  extent(r) <- c(xmin, xmax, ymin, ymax)
+  raster::extent(r) <- c(xmin, xmax, ymin, ymax)
 
   # aggregate or disaggregate
-  if(!is.null(agg)) r <- aggregate(r, agg)
-  if(!is.null(disagg)) r <- disaggregate(r, disagg)
+  if(!is.null(agg)) r <- raster::aggregate(r, agg)
+  if(!is.null(disagg)) r <- raster::disaggregate(r, disagg)
 
   # assign values to make it easier to visualize the resolution
-  r <- init(r)
-  r[] <- 1:ncell(r)
+  r <- raster::init(r)
+  r[] <- 1:raster::ncell(r)
 
   # plot raster
   if(plot){

@@ -1,0 +1,10 @@
+---
+title: "README"
+output: html_document
+---
+
+# Examples from Bishop et al. 202X
+
+## Simulation Example
+
+## Empirical Example
