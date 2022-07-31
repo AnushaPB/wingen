@@ -1,16 +1,23 @@
+get_exdir <- function(){
+  return(here::here("paperex", "simex"))
+}
+
 load_middle_earth <- function(){
+  # get wdir
+  wdir <- get_exdir()
+
   # load genetic data
-  vcf <- vcfR::read.vcfR(here::here("sims/data/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
+  vcf <- vcfR::read.vcfR(here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
   assign("vcf", vcf, envir = .GlobalEnv)
 
   # load coords
-  geo <- read.csv(here::here("sims/data/mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
+  geo <- read.csv(here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
   coords <- geo[,c("idx", "x", "y")]
   coords$y <- -coords$y
   assign("coords", coords, envir = .GlobalEnv)
 
   # load rasters
-  lyr <- read.csv(here::here("sims/data/middle_earth.csv"), header = FALSE)
+  lyr <- read.csv(here::here(wdir, "data", "middle_earth.csv"), header = FALSE)
   lyr <- raster::raster(as.matrix(lyr))
   raster::extent(lyr) <- raster::extent(0,100,-100,0)
   assign("lyr", lyr, envir = .GlobalEnv)
@@ -74,6 +81,10 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
 }
 
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
+
+  # get wdir
+  wdir <- get_exdir()
+
   ptm <- Sys.time()
   gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, nloci = nrow(vcf@gt))
 
@@ -91,7 +102,7 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   # make ls of results
   results <- list(df, gdmapr)
 
-  write_rast_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
 
   message("calculation of ", stat, " complete...")
 
@@ -99,9 +110,12 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
 }
 
 run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name, stats =  c("pi", "het", "biallelic.richness")){
+  # get wdir
+  wdir <- get_exdir()
+
   results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
-  write_time_test(results, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
-  purrr::map(results, write_rast_test, here(paste0("sims/outputs/", file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
+  purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
 }
 
 
@@ -158,7 +172,7 @@ write_rast_helper <- function(resl, file.name){
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
 
-get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, file.type = ".tif", rootPath = here("sims/outputs")){
+get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
   # Code to search for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
   presentFile <- grepl(file.name, listFiles) & grepl(file.type, listFiles)
@@ -176,7 +190,7 @@ get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, f
   return(r)
 }
 
-get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL, file.type = ".csv", rootPath = here("sims/outputs")){
+get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL, file.type = ".csv", rootPath = here(get_exdir(), "outputs")){
   # Code to search for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
   presentFile <- grepl(paste0(file.name, "_rarify"), listFiles) & grepl(file.type, listFiles)
