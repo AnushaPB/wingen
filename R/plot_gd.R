@@ -1,10 +1,10 @@
 #' Plot genetic diversity results
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
-#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to 1)
+#' @param bkg RasterLayer or other spatial object that will be plotted as the "background" in gray
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
-#' @param bkg RasterLayer or other spatial object that will be plotted as the "background" in gray
+#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to 1)
 #' @param zlim limits of the color scale values
 #' @inheritParams raster::plot
 #'
@@ -12,7 +12,7 @@
 #' @export
 #'
 #' @examples
-plot_gd <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
+plot_gd <- function(x, bkg = NULL, index = 1, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
   if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer  (to change this behavior use the index argument)")
 
   # suppress annoying and irrelevant plot warnings
@@ -27,7 +27,7 @@ plot_gd <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), brea
                    axes = FALSE,
                    box = FALSE)
 
-      raster::plot(bkg[[1]],
+      raster::plot(bkg,
                    col = "lightgray",
                    border = "white",
                    axes = FALSE,

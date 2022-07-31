@@ -106,7 +106,11 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
   colnames(coords) <- c("x", "y")
 
   # confirm that coords and gen align
-  if(nrow(coords) != nrow(gen)){ stop("number of individuals in coordinates and genetic data do not match")}
+  if(class(gen)[1] == "genind"){
+    if(nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
+  } else {
+    if(nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
+  }
 
   # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)
@@ -288,11 +292,24 @@ sample_gd <- function(gen, sub, stat, nloci = NULL) {
 #'
 #' @examples
 calc_mean_ar <- function(genind){
+  ar <- helper_calc_ar(genind)
+  gd <- mean(ar, na.rm = TRUE)
+  return(gd)
+}
+
+#' Helper function to calculate allelic richness
+#'
+#' @param genind
+#'
+#' @return
+#' @export
+#'
+#' @examples
+helper_calc_ar <- function(genind){
   genind$pop <- rep(factor(1), nrow(genind$tab))
   #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == nloci)
   ar <- hierfstat::allelic.richness(genind)$Ar[,1]
-  gd <- mean(ar, na.rm = TRUE)
-  return(gd)
+  return(ar)
 }
 
 #' Calculate mean heterozygosity
@@ -339,7 +356,7 @@ calc_pi <- function(dos, nloci = NULL){
 #'
 #' @examples
 calc_mean_biar <- function(dos){
-  if(!all(dos %in% c(0,1,2,NA))){stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")}
+  if(!all(dos %in% c(0, 1, 2, NA))){stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")}
   ar_by_locus <- apply(dos, 2, helper_calc_biar)
   mean_ar <- mean(ar_by_locus, na.rm = TRUE)
   return(mean_ar)

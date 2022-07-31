@@ -46,7 +46,7 @@ test_that("returns matrix with only one zero", {
 
 })
 
-test_that("biallelic richness is calculated correctly", {
+test_that("biallelic richness is calculated correctly for all possible combos", {
   expected <- c(1, 2, 2, 2, 2, 2, 2, 2, 1)
   all_possible_combos <- t(expand.grid(0:2, 0:2))
   ar_vals <- apply(all_possible_combos, 2, helper_calc_biar)
@@ -54,5 +54,58 @@ test_that("biallelic richness is calculated correctly", {
   expect_equal(calc_mean_biar(all_possible_combos), mean(expected))
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
+})
+
+
+test_that("allelic richness is calculated correctly", {
+  load_mini_ex()
+
+  # note: this was calculated manually
+  expected <- c(1, 2, 1, 2, 2, 1, 2, 2, 2, 2)
+
+  expect_warning(gen <- vcf_to_genind(mini_vcf))
+  observed_ar <- helper_calc_ar(gen)
+
+  dos <- vcf_to_dosage(mini_vcf)
+  observed_bar <- apply(dos, 2, helper_calc_biar)
+
+  expect_true(all(observed_bar == expected))
+  expect_true(all(observed_ar == expected))
+  expect_true(all(observed_bar == observed_ar))
+
+  expected_mean <- mean(expected)
+  observed_bar_mean <- calc_mean_biar(dos)
+  observed_ar_mean <- calc_mean_ar(gen)
+
+  expect_true(all(observed_bar_mean == expected_mean))
+  expect_true(all(observed_ar_mean == expected_mean))
+  expect_true(all(observed_bar_mean == observed_ar_mean))
+
+  # check rasters
+  set.seed(22)
+  trab <- window_gd(mini_vcf,
+                    mini_coords,
+                    mini_lyr,
+                    stat = "biallelic.richness",
+                    wdim = 3,
+                    fact = 3,
+                    rarify_n = 2,
+                    rarify_nit = 5,
+                    rarify = TRUE,
+                    parallel = FALSE)
+  set.seed(22)
+  tra <- window_gd(mini_vcf,
+                   mini_coords,
+                   mini_lyr,
+                   stat = "allelic.richness",
+                   wdim = 3,
+                   fact = 3,
+                   rarify_n = 2,
+                   rarify_nit = 5,
+                   rarify = TRUE,
+                   parallel = FALSE)
+
+  names(tra) <- names(trab) <- NULL
+  expect_equal(trab, tra)
 })
 
