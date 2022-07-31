@@ -28,7 +28,7 @@ source(here(wdir, "sims_functions.R"))
 
 vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
 
-lyr <- read.csv(here(wdir, "data", "middle_earth.csv", header = FALSE))
+lyr <- read.csv(here(wdir, "data", "middle_earth.csv"), header = FALSE)
 lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
 bkg <- lyr
@@ -136,6 +136,9 @@ points(subcoords)
 
 ```{r, fig.width = 7.5, fig.height = 5}
 # {PLOT CODE}
+
+measures <- c("pi", "biallelic_richness", "heterozygosity")
+datasets <- c("rr", "WGS", "FULL")
 for(nsamp in c(100, 200)){
   msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, measure = "pi", nsamp = nsamp)
   for(m in measures){
