@@ -37,7 +37,13 @@
     <loc>/reference/check_data.html</loc>
   </url>
   <url>
+    <loc>/reference/coords_to_raster.html</loc>
+  </url>
+  <url>
     <loc>/reference/get_adj.html</loc>
+  </url>
+  <url>
+    <loc>/reference/helper_calc_ar.html</loc>
   </url>
   <url>
     <loc>/reference/helper_calc_biar.html</loc>
@@ -56,6 +62,15 @@
   </url>
   <url>
     <loc>/reference/load_mini_ex.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lotr_coords.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lotr_lyr.html</loc>
+  </url>
+  <url>
+    <loc>/reference/lotr_vcf.html</loc>
   </url>
   <url>
     <loc>/reference/mask_gd.html</loc>
@@ -88,6 +103,9 @@
     <loc>/reference/plot_gd.html</loc>
   </url>
   <url>
+    <loc>/reference/preview_gd.html</loc>
+  </url>
+  <url>
     <loc>/reference/rarify_gd.html</loc>
   </url>
   <url>
@@ -97,10 +115,16 @@
     <loc>/reference/raster_to_grid.html</loc>
   </url>
   <url>
+    <loc>/reference/raster_transform.html</loc>
+  </url>
+  <url>
     <loc>/reference/sample_gd.html</loc>
   </url>
   <url>
     <loc>/reference/spdf_to_grid.html</loc>
+  </url>
+  <url>
+    <loc>/reference/vcf_check.html</loc>
   </url>
   <url>
     <loc>/reference/vcf_to_dosage.html</loc>

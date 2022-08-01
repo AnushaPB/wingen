@@ -7,6 +7,7 @@
 plot_gd(
   x,
   bkg = NULL,
+  index = 1,
   col = viridis::magma(breaks),
   breaks = 10,
   zlim = NULL,
@@ -20,6 +21,8 @@ plot_gd(
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}
 
 \item{bkg}{RasterLayer or other spatial object that will be plotted as the "background" in gray}
+
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to 1)}
 
 \item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
 

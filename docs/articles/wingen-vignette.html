@@ -77,6 +77,9 @@
 
     
     
+<div class="section level2">
+<h2 id="wingen">Wingen<a class="anchor" aria-label="anchor" href="#wingen"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">wingen</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span>
@@ -84,180 +87,274 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/foreach" class="external-link">foreach</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/RevolutionAnalytics/doparallel" class="external-link">doParallel</a></span><span class="op">)</span></code></pre></div>
-<div class="section level2">
-<h2 id="load-middle-earth-example">Load middle earth example<a class="anchor" aria-label="anchor" href="#load-middle-earth-example"></a>
-</h2>
-<p>The middle earth example dataset contains three objects which are loaded by ‘load_middle_earth_ex()’ [Add more detail about this simulation here]</p>
+<div class="section level3">
+<h3 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h3>
+<p>In short, wingen uses a moving window approach to create maps of genetic diversity. The method and its rationale is described in the package paper:</p>
+<p>[CITATION]</p>
+<p>In it, we describe wingen in this paper as follows:</p>
+<p><em>"(wingen) creates continuous maps of pi, heterozygosity, and allelic richness from standard genotypic and spatial data using a moving window approach. In our approach, the landscape is divided up into cells and genetic diversity is calculated from samples falling within a window (i.e. a box) around each cell (Fig 1). In such a way, the neighborhood around each cell, as defined by the window dimensions, is treated as a population for estimating genetic diversity. The output is a map in which each cell represents the genetic diversity of the neighborhood around it. Because these neighborhoods can contain different numbers of samples, we provide options for rarefaction to control for the effects of sample size differences on measures of genetic diversity. </em></p>
+<p><em>We also include options for spatial interpolation to create smoother genetic diversity surfaces from the moving window maps. To do this, we use a type of interpolation known as kriging, which estimates values at unknown points using a spatial model known as a variogram. Using kriging based interpolation allows for smoothing out of discontinuities created by the moving window. Finally, the original moving window map as well as the kriged surfaces can be masked to exclude regions that were not sampled or were undersampled. Altogether, wingen provides the tools to create informative maps of genetic diversity that can be used in conservation or population genetic analyses."</em></p>
+</div>
+<div class="section level3">
+<h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+</h3>
+<p>To demonstrate how wingen works we will use a subset the data from the simulation example from the package paper (Bishop et al., 202X). These simulations were created using Geonomics (Terasaki Hart et al., 2022) to generate a realistic landscape genomic dataset. In this simulation, spatial variation in genetic diversity is produced by varying population size and gene flow across the landscape via heterogenous carrying capacity and conductance surfaces. These surfaces are based on an example digital elevation model of Tolkien’s Middle Earth produced by the Center for Geospatial Analysis at William &amp; Mary (Robert, 2020).</p>
+<div class="section level4">
+<h4 id="load-middle-earth-example">Load middle earth example<a class="anchor" aria-label="anchor" href="#load-middle-earth-example"></a>
+</h4>
+<p>The smaller middle earth example dataset used in our example contains three objects which are loaded by <code>load_middle_earth_ex</code>:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>lotr_vcf</strong> - a vcfR object containing the genetic data</p></li>
+<li><p><strong>lotr_coords</strong> - a dataframe object containing sample coordinates</p></li>
+<li><p><strong>lotr_lyr</strong> - a raster object of the landscape (higher values indicate greater connectivity/carrying capacity)</p></li>
+</ol>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## <span style="color: #00BBBB; font-weight: bold;">------------ middle earth loaded -------------</span></span>
-<span class="co"><span style="color: #00BBBB; font-weight: bold;">## </span> </span>
-<span class="co"><span style="color: #0000BB;">## Added to GlobalEnv:</span> </span>
-<span class="co"><span style="color: #BBBB00; font-weight: bold;">## vcf</span> <span style="color: #BBBB00;">vcfR object with (1000 loci x 200 samples)</span> </span>
-<span class="co"><span style="color: #00BB00; font-weight: bold;">## coords</span> <span style="color: #00BB00;">dataframe with x and y coordinates</span> </span>
-<span class="co"><span style="color: #BB00BB; font-weight: bold;">## lyr</span> <span style="color: #BB00BB;">middle earth RasterLayer (100 x 100)</span> </span>
-<span class="co"><span style="color: #00BBBB; font-weight: bold;">## </span></span>
-<span class="co"><span style="color: #00BBBB; font-weight: bold;">## ----------------------------------------------</span></span></code></pre>
-<pre><code><span class="co">## </span></code></pre>
+<code class="sourceCode R"><span class="fu"><a href="../reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; </span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">#&gt; ------------- middle earth example -------------</span></span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">#&gt; </span> </span>
+<span class="co"><span style="color: #0000BB;">#&gt; Objects loaded:</span> </span>
+<span class="co"><span style="color: #BBBB00; font-weight: bold;">#&gt; *lotr_vcf*</span> <span style="color: #BBBB00;">vcfR object (100 loci x 100 samples)</span> </span>
+<span class="co"><span style="color: #00BB00; font-weight: bold;">#&gt; *lotr_coords*</span> <span style="color: #00BB00;">dataframe with x and y coordinates</span> </span>
+<span class="co"><span style="color: #BB00BB; font-weight: bold;">#&gt; *lotr_lyr*</span> <span style="color: #BB00BB;">middle earth RasterLayer (100 x 100)</span> </span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">#&gt; </span></span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">#&gt; ------------------------------------------------</span></span>
+<span class="co"><span style="color: #00BBBB; font-weight: bold;">#&gt; </span></span>
+<span class="co">#&gt; </span>
+
+<span class="co"># Genetic data</span>
+<span class="va">lotr_vcf</span>
+<span class="co">#&gt; ***** Object of Class vcfR *****</span>
+<span class="co">#&gt; 100 samples</span>
+<span class="co">#&gt; 1 CHROMs</span>
+<span class="co">#&gt; 100 variants</span>
+<span class="co">#&gt; Object size: 0.1 Mb</span>
+<span class="co">#&gt; 0 percent missing data</span>
+<span class="co">#&gt; *****        *****         *****</span>
+
+<span class="co"># Coordinates</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lotr_coords</span><span class="op">)</span>
+<span class="co">#&gt;             x         y</span>
+<span class="co">#&gt; 538  88.73547 -66.61610</span>
+<span class="co">#&gt; 1397 78.50479 -23.24048</span>
+<span class="co">#&gt; 1200 14.32163 -25.99363</span>
+<span class="co">#&gt; 952  89.86373 -65.49860</span>
+<span class="co">#&gt; 1177 45.42427 -23.13054</span>
+<span class="co">#&gt; 383  98.89395 -13.88943</span>
+
+<span class="co"># Raster data</span>
+<span class="va">lotr_lyr</span>
+<span class="co">#&gt; class      : RasterLayer </span>
+<span class="co">#&gt; dimensions : 100, 100, 10000  (nrow, ncol, ncell)</span>
+<span class="co">#&gt; resolution : 1, 1  (x, y)</span>
+<span class="co">#&gt; extent     : 0, 100, -100, 0  (xmin, xmax, ymin, ymax)</span>
+<span class="co">#&gt; crs        : NA </span>
+<span class="co">#&gt; source     : memory</span>
+<span class="co">#&gt; names      : layer </span>
+<span class="co">#&gt; values     : 0, 1  (min, max)</span>
+
+<span class="co"># Map of data</span>
+<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lotr_lyr</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">lotr_coords</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">mako</a></span><span class="op">(</span><span class="fl">1</span>, begin <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">3</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/load%20example%20data-1.png" width="480"> If users don’t have a raster layer of their landscape they can generate one from their coordinates using the <code>coords_to_raster</code> function. The resolution of this raster can be either tuned with the <em>agg</em> (to aggregation) and <em>disagg</em> (to disaggregate) arguments or defined using the <em>res</em> argument. The <em>res</em> argument can either be a single value (e.g. 0.00833) or a vector of two values with the x and y resolutions.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">ex_raster1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coords_to_raster.html">coords_to_raster</a></span><span class="op">(</span><span class="va">lotr_coords</span>, buffer <span class="op">=</span> <span class="fl">1</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-2-1.png" width="480"></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">ex_raster2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coords_to_raster.html">coords_to_raster</a></span><span class="op">(</span><span class="va">lotr_coords</span>, buffer <span class="op">=</span> <span class="fl">1</span>, agg <span class="op">=</span> <span class="fl">2</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-2-2.png" width="480"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Genetic data</span>
-<span class="va">vcf</span></code></pre></div>
-<pre><code><span class="co">## ***** Object of Class vcfR *****</span>
-<span class="co">## 200 samples</span>
-<span class="co">## 1 CHROMs</span>
-<span class="co">## 1,000 variants</span>
-<span class="co">## Object size: 1.7 Mb</span>
-<span class="co">## 0 percent missing data</span>
-<span class="co">## *****        *****         *****</span></code></pre>
+<code class="sourceCode R">
+<span class="va">ex_raster3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coords_to_raster.html">coords_to_raster</a></span><span class="op">(</span><span class="va">lotr_coords</span>, buffer <span class="op">=</span> <span class="fl">1</span>, disagg <span class="op">=</span> <span class="fl">4</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-2-3.png" width="480"></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="va">ex_raster4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/coords_to_raster.html">coords_to_raster</a></span><span class="op">(</span><span class="va">lotr_coords</span>, buffer <span class="op">=</span> <span class="fl">1</span>, res <span class="op">=</span> <span class="fl">10</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-2-4.png" width="480"></p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
+</h3>
+<p>The workflow of wingen uses three main functions:</p>
+<ol style="list-style-type: decimal">
+<li><p><code>window_gd</code> to generate moving window maps of genetic diversity</p></li>
+<li><p><code>krige_gd</code> to use kriging to interpolate the sliding window maps</p></li>
+<li><p><code>mask_gd</code> to mask areas of the maps from (1) and (2) (e.g. to exclude undersampled areas)</p></li>
+</ol>
+<div class="section level4">
+<h4 id="run-sliding-window-calculations">Run sliding window calculations<a class="anchor" aria-label="anchor" href="#run-sliding-window-calculations"></a>
+</h4>
+<hr>
+<p>The main arguments to <code>window_gd</code> are:</p>
+<ol style="list-style-type: decimal">
+<li><p><em>vcf</em> - object of type vcf with genotypic data. The order of this file matters! the coordinate and genetic data should be in the same order, as there are currently no checks for this.</p></li>
+<li><p><em>coords</em> - a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e. Longitude) and the second should be y (i.e. Latitude).</p></li>
+<li><p><em>lyr</em> - a RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area.</p></li>
+<li><p><em>stat</em> - the genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) “allelic.richness” which uses the allelic.richness function from the “hierfstat” package and (2) “biallelic.richness” which provides a much faster calculation of allelic richness, but only works for bi-allelic data.</p></li>
+<li><p><em>fact</em> - to decrease computational time, we provide the option to aggregate the input raster layer by some factor defined using the “fact” argument. Increasing “fact” will decrease the number of cells and thereby decrease the number of calculations, with the trade-off of decreasing the resolution of the output layers. Users should keep in mind that if they increase “fact” they may simultaneously want to decrease “wdim” since the proportion of the landscape covered by the neighborhood matrix would otherwise increase substantially.</p></li>
+<li><p><em>wdim</em> - used to create the neighborhood matrix for the moving window based on the dimensions provided. This argument can either be set to one value (e.g. 3) which will create a square window (e.g. 3 x 3), or two values can be provided to create a rectangular window (e.g. 3 x 5). We encourage users to experiment with different values of “wdim” to determine the sensitivity of their results to this parameter. Ideally, “wdim” would be set with some knowledge of the study system in mind (e.g. the dispersal patterns and/or neighborhood size of the study organism). A preview of the window size relative to the landscape can be obtained using the <code>preview_window</code> function</p></li>
+<li><p><em>rarify</em> - Users have the option to perform rarefaction by setting the “rarify” argument to TRUE. If “rarify = TRUE”, users then define “rarify_n” as the number of samples to rarify to and “rarify_nit” as the number of iterations for rarefaction (e.g. if rarify_n = 4 and rarify_nit = 5, for each sample set, four random samples will be drawn five times). As the window moves across the landscape, three things can occur based on the number of samples in the window: (1) if the number of samples is less than “rarify_n”, genetic diversity is not calculated and a raster value of “NA” is assigned, (2) if the number of samples is equal to “rarify_n” the genetic diversity statistic is calculated for those samples, (3) if the number of samples is greater than “rarify_n,” rarefaction is implemented and that set of samples is subsampled “rarify_nit” times to a size of “rarify_n” and the mean (or another summary statistic set using “fun”) of those “rarify_nit” iterations is used. We suggest that users select “rarify_n” and “rarify_nit” such that the number of possible ways to choose “rarify_n” from a sample of size “rarify_n” plus one is greater than “rarify_nit” in order for there to always be “rarify_nit” number of unique combinations of size “rarify_n”. If “rarify = FALSE”, rarefaction is not performed and only steps (1) and (2) occur such that: (1) if the number of samples in the window is less than the “min_n” argument, genetic diversity is not calculated and a raster value of “NA” is assigned and (2) if the number of samples is equal to or greater than “min_n” the genetic diversity statistic is calculated for those samples. We highly encourage users to perform rarefaction as genetic diversity statistics are sensitive to sample size. The main benefit of not performing rarefaction is decreased computational time, however this is not worth the trade-off in inaccuracy unless you are confident that there is no effect of rarefaction after performing your analysis with and without rarefaction.</p></li>
+<li><p><em>parallel</em> - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages. To perform parallelization on a Windows operating system a cluster must first be initialized using a few lines of code, a process which we describe later on.</p></li>
+</ol>
+<hr>
+<p>Before running <code>window_gd</code> users can preview the moving window and the counts within each cell of the raster to get a sense of how big the window is and what the density of counts looks like across the landscape. Here we provide the raster layer (lotr_lyr), the coordinates (lotr_coords), the window dimensions (5), the aggregation factor (3), and the minimum sample number (min_n). Min_n will be used to mask the sample count layer to show how much of the landscape will be excluded due to low sample counts (note: min_n is equivalent to rarify_n if rarefaction is used)</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Coordinates</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/headtail.html" class="external-link">head</a></span><span class="op">(</span><span class="va">coords</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##             x          y</span>
-<span class="co">## 881 74.829415 -20.565023</span>
-<span class="co">## 341 14.052468 -15.425978</span>
-<span class="co">## 560  4.126699  -5.332612</span>
-<span class="co">## 135 88.893018 -65.835666</span>
-<span class="co">## 363 86.545357 -21.280152</span>
-<span class="co">## 106 74.171030 -28.331393</span></code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Raster data</span>
-<span class="va">lyr</span></code></pre></div>
-<pre><code><span class="co">## class      : RasterLayer </span>
-<span class="co">## dimensions : 100, 100, 10000  (nrow, ncol, ncell)</span>
-<span class="co">## resolution : 1, 1  (x, y)</span>
-<span class="co">## extent     : 0, 100, -100, 0  (xmin, xmax, ymin, ymax)</span>
-<span class="co">## crs        : NA </span>
-<span class="co">## source     : memory</span>
-<span class="co">## names      : layer </span>
-<span class="co">## values     : 0, 1  (min, max)</span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Map of data</span>
-<span class="fu"><a href="https://rdrr.io/pkg/raster/man/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">lyr</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">magma</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span>, box <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/points.html" class="external-link">points</a></span><span class="op">(</span><span class="va">coords</span>, col <span class="op">=</span> <span class="fu"><a href="https://sjmgarnier.github.io/viridisLite/reference/viridis.html" class="external-link">mako</a></span><span class="op">(</span><span class="fl">1</span>, begin <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span>, pch <span class="op">=</span> <span class="fl">3</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></code></pre></div>
-<p><img src="wingen-vignette_files/figure-html/load%20example%20data-1.png" width="480"></p>
-</div>
-<div class="section level2">
-<h2 id="main-functions">Main functions<a class="anchor" aria-label="anchor" href="#main-functions"></a>
-</h2>
-<div class="section level3">
-<h3 id="run-sliding-window-calculations">Run sliding window calculations<a class="anchor" aria-label="anchor" href="#run-sliding-window-calculations"></a>
-</h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<code class="sourceCode R"><span class="fu"><a href="../reference/preview_gd.html">preview_gd</a></span><span class="op">(</span><span class="va">lotr_lyr</span>,
+           <span class="va">lotr_coords</span>,
+           wdim <span class="op">=</span> <span class="fl">5</span>, 
+           fact <span class="op">=</span> <span class="fl">3</span>, 
+           sample_count <span class="op">=</span> <span class="cn">TRUE</span>, 
+           min_n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-1.png" width="480"><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
+<p>Next, we run the moving window function with our vcf, coords, and raster layer. Here we set the parameters to calculate pi, use a window size of 5 x 5, an aggregation factor of 3, and rarefaction with a rarefaction size of 2 (minimum sample size of 2) and 5 iterations.</p>
+<p>The nloci argument is used in the calculation of pi. if nloci=NULL (default), the function returns the sum over SNPs of nucleotide diversity Otherwise, the function returns the average nucleotide diversity per nucleotide given the length nloci of the sequence.</p>
+<p>We then plot the genetic diversity layer (the first layer of the produced RasterStack) and the sample counts layer (the second stack)</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"pi"</span>,
-          fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
+          fact <span class="op">=</span> <span class="fl">3</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
-          nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Loading required namespace: adegenet</span></code></pre>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window pi"</span><span class="op">)</span></code></pre></div>
-<p><img src="../docs/articles/wingen-vignette_files/figure-html/sliding%20window-1.png" width="480"></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window sample counts"</span><span class="op">)</span></code></pre></div>
-<p><img src="../docs/articles/wingen-vignette_files/figure-html/sliding%20window-2.png" width="480"></p>
+          rarify_n <span class="op">=</span> <span class="fl">2</span>,
+          rarify_nit <span class="op">=</span> <span class="fl">5</span>,
+          nloci <span class="op">=</span> <span class="fl">100</span><span class="op">)</span>
+<span class="co">#&gt; Loading required namespace: adegenet</span>
+
+<span class="co"># the plot_gd function plots the genetic diversity layer</span>
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window pi"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/sliding%20window-1.png" width="480"></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="co"># the plot_count function plots the sample count layer</span>
+<span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window sample counts"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/sliding%20window-2.png" width="480"></p>
 </div>
-<div class="section level3">
-<h3 id="krige-results">Krige results<a class="anchor" aria-label="anchor" href="#krige-results"></a>
-</h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">kgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/krig_gd.html">krig_gd</a></span><span class="op">(</span><span class="va">wgd</span>, <span class="va">lyr</span>, resample <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## [using ordinary kriging]</span></code></pre>
-<pre><code><span class="co">## Warning in sqrt(krige_result$var1.var): NaNs produced</span></code></pre>
-<pre><code><span class="co">## [using ordinary kriging]</span></code></pre>
-<pre><code><span class="co">## Warning in sqrt(krige_result$var1.var): NaNs produced</span></code></pre>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged pi"</span><span class="op">)</span></code></pre></div>
-<p><img src="../docs/articles/wingen-vignette_files/figure-html/krige%20results-1.png" width="480"></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="section level4">
+<h4 id="krige-results">Krige results<a class="anchor" aria-label="anchor" href="#krige-results"></a>
+</h4>
+<p>To produce smoother maps of genetic diversity, we provide the function krig_gd() which creates a spatially interpolated raster from the moving window raster produced by window_gd(). This function uses the autoKrige() function from the R package “automap” to perform kriging on the moving window raster using an automatically generated variogram. Note that the RasterStack from window_gd() including both the genetic diversity layer and the sample count layer can be used and will generate kriged maps of both genetic diversity and sample count.</p>
+<p>Kriging is performed by first transforming the sliding window layer into a set of coordinates with corresponding genetic diversity (or sample count) values and then interpolating using these coordinates across the grid provided. Because of this, it is important to keep in mind how the coordinates from the sliding window raster and the grid align. If the resolution of the sliding window raster is much less than that of the grid, there are fewer points for interpolation which can result in grid-like artifacts during kriging.</p>
+<p>To deal with this issue, users can either (1) resample their sliding window raster layers and grid layers to the same resolution by using the “resample” argument or (2) manually disaggregate or aggregate either the sliding window or grid layers using the “r_agg”, “r_disagg”, “grd_agg”, or “grd_disagg” arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the “grd_disagg” argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a RasterLayer. Keep in mind that increasing the resolution of the sliding window layer (i.e. either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, however to a lesser extent.</p>
+<p>To run this function we provide the RasterStack output from <code>window_gd</code>, the indices of the layers we want to krige (in this case both the genetic diversity (1) and sample count (2) layers), and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a RasterStack of the kriged input layers.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># note: this step can take a little while</span>
+<span class="va">kgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/krig_gd.html">krig_gd</a></span><span class="op">(</span><span class="va">wgd</span>, indices <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="va">lotr_lyr</span>, disagg_grd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="co">#&gt; [using ordinary kriging]</span>
+<span class="co">#&gt; [using ordinary kriging]</span>
+
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged pi"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/krige%20results-1.png" width="480"></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged sample counts"</span><span class="op">)</span></code></pre></div>
-<p><img src="../docs/articles/wingen-vignette_files/figure-html/krige%20results-2.png" width="480"></p>
+<p><img src="wingen-vignette_files/figure-html/krige%20results-2.png" width="480"></p>
 </div>
-<div class="section level3">
-<h3 id="mask-results">Mask results<a class="anchor" aria-label="anchor" href="#mask-results"></a>
-</h3>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span>, min_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<div class="section level4">
+<h4 id="mask-results">Mask results<a class="anchor" aria-label="anchor" href="#mask-results"></a>
+</h4>
+<p>Next, we mask the resulting kriged layers. Masking can be performed using a variety of methods.</p>
+<p>For example, we can mask using the carrying capacity layer to exclude any areas where the carrying capacity is less than 0.01 (analagous to this might be using a species distribution model or habitat suitability model to exclude areas where the probability of presence is very low):</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span>, <span class="va">lotr_lyr</span>, minval <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span></code></pre></div>
-<p><img src="wingen-vignette_files/figure-html/mask%20results-1.png" width="480"></p>
+<p><img src="wingen-vignette_files/figure-html/mask%20results%201-1.png" width="480"></p>
+<p>You could also mask the layer using the sample counts layer produced by wingen to exclude undersampled areas (in this case areas where the kriged value is less than 1):</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span><span class="op">[[</span><span class="st">"pi"</span><span class="op">]</span><span class="op">]</span>, <span class="va">kgd</span><span class="op">[[</span><span class="st">"sample_count"</span><span class="op">]</span><span class="op">]</span>, minval <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
+
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/mask%20results%202-1.png" width="480"></p>
+<p>Another nice visualization addition is to add a “background” to your plots in the form of a RasterLayer or other spatial object (e.g. a country boundary) which can help provide geographic context:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># Create a "range map" for this species by masking areas of very low suitability</span>
+<span class="va">range_map</span> <span class="op">&lt;-</span> <span class="va">lotr_lyr</span>
+<span class="va">range_map</span><span class="op">[</span><span class="va">range_map</span> <span class="op">&lt;</span> <span class="fl">0.01</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span>
+
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, bkg <span class="op">=</span> <span class="va">range_map</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/range%20map%20background-1.png" width="480"></p>
 </div>
 </div>
-<div class="section level2">
-<h2 id="parallelization">Parallelization<a class="anchor" aria-label="anchor" href="#parallelization"></a>
-</h2>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
-          stat <span class="op">=</span> <span class="st">"pi"</span>,
-          fact <span class="op">=</span> <span class="fl">3</span>,
-          wdim <span class="op">=</span> <span class="fl">5</span>,
-          rarify <span class="op">=</span> <span class="cn">TRUE</span>,
-          nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code><span class="co">## Loading required namespace: adegenet</span></code></pre>
-<pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##   10.16    0.37   10.91</span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="parallelization">Parallelization<a class="anchor" aria-label="anchor" href="#parallelization"></a>
+</h3>
+<p>To increase computational speed users can perform the <code>window_gd</code> calculations with parallelization. If you are on a windows machine you first need to initate a cluster to do so, as shown below:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">cores</span> <span class="op">&lt;-</span> <span class="fl">5</span>
 <span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></span><span class="op">(</span><span class="va">cores</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/pkg/doParallel/man/registerDoParallel.html" class="external-link">registerDoParallel</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span>
 
 <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span>
-<span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"pi"</span>,
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
+          rarify_n <span class="op">=</span> <span class="fl">2</span>,
+          rarify_nit <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
           nloci <span class="op">=</span> <span class="fl">1000</span>, 
           parallel <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
-<pre><code><span class="co">##    user  system elapsed </span>
-<span class="co">##    0.96    0.09   12.36</span></code></pre>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
+<span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">stopCluster</a></span><span class="op">(</span><span class="va">cl</span><span class="op">)</span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="other-genetic-diversity-metrics">Other genetic diversity metrics<a class="anchor" aria-label="anchor" href="#other-genetic-diversity-metrics"></a>
-</h2>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pi_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<div class="section level3">
+<h3 id="other-genetic-diversity-metrics">Other genetic diversity metrics<a class="anchor" aria-label="anchor" href="#other-genetic-diversity-metrics"></a>
+</h3>
+<p>In addition to pi, users can calculate heterozygosity (“het”), allelic richness (either using “biallelic.richness” (faster but only works on biallelic data) or “allelic.richness”)</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pi_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"pi"</span>,
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
+          rarify_n <span class="op">=</span> <span class="fl">2</span>,
+          rarify_nit <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
           nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>
 
-<span class="va">het_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<span class="va">het_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"het"</span>,
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
+          rarify_n <span class="op">=</span> <span class="fl">2</span>,
+          rarify_nit <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 
-<span class="va">AR_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<span class="va">AR_wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"biallelic.richness"</span>,
+          rarify_n <span class="op">=</span> <span class="fl">2</span>,
+          rarify_nit <span class="op">=</span> <span class="fl">5</span>,
           fact <span class="op">=</span> <span class="fl">3</span>,
           wdim <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">pi_wgd</span>, main <span class="op">=</span> <span class="st">"Pi"</span><span class="op">)</span></code></pre></div>
-<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-1.png" width="480"></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">het_wgd</span>, main <span class="op">=</span> <span class="st">"Heterozygosity"</span><span class="op">)</span></code></pre></div>
-<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-2.png" width="480"></p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">AR_wgd</span>, main <span class="op">=</span> <span class="st">"Allelic Richness"</span><span class="op">)</span></code></pre></div>
-<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-3-3.png" width="480"></p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">pi_wgd</span>, bkg <span class="op">=</span> <span class="va">range_map</span>, main <span class="op">=</span> <span class="st">"Pi"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-5-1.png" width="480"></p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">het_wgd</span>, bkg <span class="op">=</span> <span class="va">range_map</span>, main <span class="op">=</span> <span class="st">"Heterozygosity"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-5-2.png" width="480"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
+<span class="fu"><a href="../reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">AR_wgd</span>, bkg <span class="op">=</span> <span class="va">range_map</span>, main <span class="op">=</span> <span class="st">"Allelic Richness"</span><span class="op">)</span></code></pre></div>
+<p><img src="wingen-vignette_files/figure-html/unnamed-chunk-5-3.png" width="480"></p>
+<div class="section level4">
+<h4 id="for-additional-information-check-out-our-paper-found-here-link">For additional information check out our paper found here: [LINK]<a class="anchor" aria-label="anchor" href="#for-additional-information-check-out-our-paper-found-here-link"></a>
+</h4>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

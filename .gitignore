@@ -46,10 +46,6 @@ token.R
 # RStudio files
 .Rproj.user/
 
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
 
@@ -77,3 +73,8 @@ vignettes/*.pdf
 #random spatial files
 *.grd
 *.gri
+
+# vignettes
+vignettes/*.html
+vignettes/wingen-vignette_files/
+Meta/

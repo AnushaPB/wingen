@@ -53,10 +53,10 @@
   <span class="va">coords</span>,
   <span class="va">lyr</span>,
   stat <span class="op">=</span> <span class="va">calc_mean_ar</span>,
+  wdim <span class="op">=</span> <span class="fl">3</span>,
   fact <span class="op">=</span> <span class="fl">0</span>,
-  wdim <span class="op">=</span> <span class="fl">10</span>,
   rarify <span class="op">=</span> <span class="cn">FALSE</span>,
-  rarify_n <span class="op">=</span> <span class="fl">4</span>,
+  rarify_n <span class="op">=</span> <span class="fl">2</span>,
   rarify_nit <span class="op">=</span> <span class="fl">10</span>,
   min_n <span class="op">=</span> <span class="fl">2</span>,
   fun <span class="op">=</span> <span class="va">mean</span>,
@@ -73,10 +73,12 @@
 <dd><p>coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),</p></dd>
 <dt>lyr</dt>
 <dd><p>RasterLayer to slide window across</p></dd>
-<dt>fact</dt>
-<dd><p>aggregation factor to apply to the RasterLayer (<em>note:</em> increasing this value reduces computational time)</p></dd>
+<dt>stat</dt>
+<dd><p>function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)</p></dd>
 <dt>wdim</dt>
 <dd><p>dimensions (height x width) of window, if only one value is provided a square window is created</p></dd>
+<dt>fact</dt>
+<dd><p>aggregation factor to apply to the RasterLayer (<em>note:</em> increasing this value reduces computational time)</p></dd>
 <dt>rarify</dt>
 <dd><p>if rarify = TRUE, rarefaction is performed</p></dd>
 <dt>rarify_n</dt>
@@ -84,7 +86,7 @@
 <dt>rarify_nit</dt>
 <dd><p>if rarify = TRUE, number of iterations to use for rarefaction</p></dd>
 <dt>min_n</dt>
-<dd><p>min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)</p></dd>
+<dd><p>min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)</p></dd>
 <dt>fun</dt>
 <dd><p>function to use to summarize data in window (defaults to base R mean)</p></dd>
 <dt>parallel</dt>

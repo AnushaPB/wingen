@@ -19,7 +19,7 @@ plot_count(
 \arguments{
 \item{x}{RasterLayer of counts or RasterStack where indexed layer is sample counts}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to 2)}
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to 2)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 

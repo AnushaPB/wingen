@@ -54,8 +54,11 @@
   coords <span class="op">=</span> <span class="cn">NULL</span>,
   xy <span class="op">=</span> <span class="cn">FALSE</span>,
   resample <span class="op">=</span> <span class="cn">FALSE</span>,
-  agg <span class="op">=</span> <span class="cn">NULL</span>,
-  disagg <span class="op">=</span> <span class="cn">NULL</span>,
+  agg_grd <span class="op">=</span> <span class="cn">NULL</span>,
+  disagg_grd <span class="op">=</span> <span class="cn">NULL</span>,
+  agg_r <span class="op">=</span> <span class="cn">NULL</span>,
+  disagg_r <span class="op">=</span> <span class="cn">NULL</span>,
+  resample_first <span class="op">=</span> <span class="cn">TRUE</span>,
   n_cell <span class="op">=</span> <span class="fl">1000</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -71,11 +74,17 @@
 <dt>xy</dt>
 <dd><p>whether to co-krige with x and y (~x+y)</p></dd>
 <dt>resample</dt>
-<dd><p>if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)</p></dd>
-<dt>agg</dt>
-<dd><p>factor used for aggregation of grd if provided</p></dd>
-<dt>disagg</dt>
-<dd><p>factor used for disaggregation of grd if provided</p></dd>
+<dd><p>whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)</p></dd>
+<dt>agg_grd</dt>
+<dd><p>factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)</p></dd>
+<dt>disagg_grd</dt>
+<dd><p>factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)</p></dd>
+<dt>agg_r</dt>
+<dd><p>factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)</p></dd>
+<dt>disagg_r</dt>
+<dd><p>factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)</p></dd>
+<dt>resample_first</dt>
+<dd><p>if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)</p></dd>
 <dt>n_cell</dt>
 <dd><p>number of cells to interpolate across if SpatialPointsDataFrame is provided for <code>grd</code></p></dd>
 </dl></div>

@@ -68,7 +68,12 @@
 <img src="logo.png" class="logo" alt=""><h1 id="wingen-">wingen <a class="anchor" aria-label="anchor" href="#wingen-"></a>
 </h1>
 </div>
-<!-- badges: start --><!-- badges: end --><p>Create maps of genetic diversity using a sliding window approach</p>
+<!-- badges: start --><!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) --><p>!</p>
+<div class="figure">
+<img src="https://latex.codecogs.com/png.image?%5Cdpi%7B110%7D&amp;space;%5Cbg_white&amp;space;alt%20text" title="alt text" alt=""><p class="caption">alt text</p>
+</div>
+<p>(<a href="https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y" class="external-link uri">https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y</a>)](<a href="https://codecov.io/gh/AnushaPB/wingen" class="external-link uri">https://codecov.io/gh/AnushaPB/wingen</a>) <img src="https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg" alt="build">](<a href="https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml" class="external-link uri">https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml</a>) <img src="https://img.shields.io/badge/license-MIT-blue" alt="license: MIT">](<a href="https://img.shields.io/badge/license-MIT-blue" class="external-link uri">https://img.shields.io/badge/license-MIT-blue</a>) <!-- badges: end --></p>
+<p>Create maps of genetic diversity using a moving window approach.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -83,41 +88,43 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">wingen</span><span class="op">)</span>
 
-<span class="co"># load example middle earth data </span>
+<span class="co"># load example data</span>
 <span class="fu"><a href="reference/load_middle_earth_ex.html">load_middle_earth_ex</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## ------------ middle earth loaded -------------</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="do">##  </span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="do">## Added to GlobalEnv: </span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="do">## vcf vcfR object with (1000 loci x 200 samples) </span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="do">## coords dataframe with x and y coordinates </span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="do">## lyr middle earth RasterLayer (100 x 100) </span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="do">## ----------------------------------------------</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="do">## </span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">-------------</span> middle earth example <span class="sc">-------------</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Objects loaded<span class="sc">:</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="er">*</span>lotr_vcf<span class="sc">*</span> vcfR <span class="fu">object</span> (<span class="dv">100</span> loci x <span class="dv">100</span> samples) </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span>lotr_coords<span class="sc">*</span> dataframe with x and y coordinates </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="sc">*</span>lotr_lyr<span class="sc">*</span> middle earth <span class="fu">RasterLayer</span> (<span class="dv">100</span> x <span class="dv">100</span>) </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="sc">------------------------------------------------</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># Run sliding window calculations of pi with rarefaction</span>
-<span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>,
-          <span class="va">coords</span>,
-          <span class="va">lyr</span>,
+<code class="sourceCode R"><span class="co"># Run moving window calculations of pi with rarefaction</span>
+<span class="va">wgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">lotr_vcf</span>,
+          <span class="va">lotr_coords</span>,
+          <span class="va">lotr_lyr</span>,
           stat <span class="op">=</span> <span class="st">"pi"</span>,
-          fact <span class="op">=</span> <span class="fl">3</span>,
-          wdim <span class="op">=</span> <span class="fl">5</span>,
+          wdim <span class="op">=</span> <span class="fl">3</span>,
+          fact <span class="op">=</span> <span class="fl">5</span>,
           rarify <span class="op">=</span> <span class="cn">TRUE</span>,
           nloci <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span>
 
 <span class="co"># Krige results</span>
-<span class="va">kgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/krig_gd.html">krig_gd</a></span><span class="op">(</span><span class="va">wgd</span>, <span class="va">lyr</span>, disagg <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+<span class="va">kgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/krig_gd.html">krig_gd</a></span><span class="op">(</span><span class="va">wgd</span>, <span class="va">lotr_lyr</span><span class="op">)</span>
 
 <span class="co"># Mask results</span>
-<span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span>, min_n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>
+<span class="va">mgd</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/mask_gd.html">mask_gd</a></span><span class="op">(</span><span class="va">kgd</span>, <span class="va">lotr_lyr</span>, minval <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>
 
 <span class="co"># Plot results</span>
-<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span>, oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window pi"</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span>, oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">wgd</span>, bkg <span class="op">=</span> <span class="va">mgd</span>,  main <span class="op">=</span> <span class="st">"Window pi"</span><span class="op">)</span>
 <span class="fu"><a href="reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kgd</span>, main <span class="op">=</span> <span class="st">"Kriged pi"</span><span class="op">)</span>
-<span class="fu"><a href="reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span></code></pre></div>
+<span class="fu"><a href="reference/plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">mgd</span>, main <span class="op">=</span> <span class="st">"Kriged &amp; masked pi"</span><span class="op">)</span>
+<span class="fu"><a href="reference/plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">wgd</span>, main <span class="op">=</span> <span class="st">"Window counts"</span><span class="op">)</span></code></pre></div>
 <p><img src="reference/figures/README-example-1.png" width="100%"></p>
+<p>For an extended example check out the package vignette:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/vignette.html" class="external-link">vignette</a></span><span class="op">(</span><span class="st">"wingen-vignette"</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">

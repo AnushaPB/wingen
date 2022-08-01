@@ -76,6 +76,8 @@
 <dd><p>cell indices for each coordinate</p></dd>
 <dt>nmat</dt>
 <dd><p>neighborhood matrix</p></dd>
+<dt>stat</dt>
+<dd><p>function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)</p></dd>
 <dt>rarify</dt>
 <dd><p>if rarify = TRUE, rarefaction is performed</p></dd>
 <dt>rarify_n</dt>
@@ -83,7 +85,7 @@
 <dt>rarify_nit</dt>
 <dd><p>if rarify = TRUE, number of iterations to use for rarefaction</p></dd>
 <dt>min_n</dt>
-<dd><p>min number of samples to calculate allelic richness for (equal to rarify_n if provided, otherwise defaults to 2)</p></dd>
+<dd><p>min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)</p></dd>
 <dt>fun</dt>
 <dd><p>function to use to summarize data in window (defaults to base R mean)</p></dd>
 <dt>nloci</dt>
