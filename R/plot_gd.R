@@ -15,35 +15,13 @@
 plot_gd <- function(x, bkg = NULL, index = 1, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
   if(raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer  (to change this behavior use the index argument)")
 
-  # suppress annoying and irrelevant plot warnings
+  # suppress irrelevant plot warnings
   suppressWarnings({
 
     if(!is.null(bkg)) {
+      purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, zlim = zlim,
+          main = main, legend = legend, legend.width = legend.width, axis.args = axis.args)
 
-      raster::plot(x[[index]],
-                   col = "white",
-                   legend = FALSE,
-                   main = main,
-                   axes = FALSE,
-                   box = FALSE)
-
-      raster::plot(bkg,
-                   col = "lightgray",
-                   border = "white",
-                   axes = FALSE,
-                   box = FALSE,
-                   add = TRUE,
-                   legend = FALSE)
-
-      raster::plot(x[[index]],
-                   col = col,
-                   zlim = zlim,
-                   add = TRUE,
-                   axes = FALSE,
-                   box = FALSE,
-                   legend = legend,
-                   legend.width =legend.width,
-                   axis.args = axis.args)
     } else {
       raster::plot(x[[index]],
                    col = col,
@@ -56,8 +34,69 @@ plot_gd <- function(x, bkg = NULL, index = 1, col = viridis::magma(breaks), brea
                    axis.args = axis.args)
     }
   }
+
   )
 
+  return()
+
+}
+
+#' Helper function for plot_gd
+#'
+#' @inheritParams plot_gd
+#'
+#' @keywords internal
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL,
+                        main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)){
+
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+
+  # calculate extent
+  xmin <- min(raster::extent(bkg)@xmin, raster::extent(x)@xmin)
+  xmax <- max(raster::extent(bkg)@xmax, raster::extent(x)@xmax)
+  ymin <- min(raster::extent(bkg)@ymin, raster::extent(x)@ymin)
+  ymax <- max(raster::extent(bkg)@ymax, raster::extent(x)@ymax)
+
+
+  raster::plot(1,
+               type = "n",
+               xlim = c(xmin, xmax),
+               ylim = c(ymin, ymax),
+               legend = FALSE,
+               main = main,
+               axes = FALSE,
+               box = FALSE)
+
+  raster::plot(bkg,
+               col = "lightgray",
+               border = "white",
+               axes = FALSE,
+               box = FALSE,
+               add = TRUE,
+               legend = FALSE)
+
+  raster::plot(x[[index]],
+               col = col,
+               zlim = zlim,
+               add = TRUE,
+               axes = FALSE,
+               box = FALSE,
+               legend = legend,
+               legend.width =legend.width,
+               axis.args = axis.args)
+
+  }
+
+  )
+
+
+  return()
 }
 
 #' Plot sample counts
@@ -101,4 +140,6 @@ plot_count <- function(x, index = 2, breaks = 10, col = viridis::mako(breaks), z
                                            axis.args = axis.args)
 
   })
+
+  return()
 }
