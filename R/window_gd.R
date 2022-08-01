@@ -12,11 +12,11 @@
 #' @examples
 #' library("raster")
 #' load_mini_ex()
-#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL){
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = NULL){
 
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
@@ -54,7 +54,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_pi, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, nloci)
+    results <- window_gd_general(gen, coords, lyr, stat = calc_pi, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L)
 
     names(results[[1]]) <- "pi"
    }
@@ -88,7 +88,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
-#' @param nloci for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
+#' @param L for calculating pi, if L=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length L of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
@@ -99,7 +99,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #'
 #' @examples
 #'
-window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = NULL) {
+window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = NULL) {
 
   # format coords
   coords <- data.frame(coords)
@@ -128,7 +128,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
 
     rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
 
-      result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci)
+      result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
 
       return(result)
 
@@ -136,7 +136,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
 
   } else {
 
-    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci)
+    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
 
   }
 
@@ -167,7 +167,7 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
 #' @export
 #'
 #' @examples
-window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, nloci = NULL){
+window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL){
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if(rarify) min_n <- rarify_n
@@ -184,9 +184,9 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
   if (length(sub) < min_n) {
     gd <- NA
   } else if (rarify){
-    gd <- rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun, nloci)
+    gd <- rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun, L)
   } else {
-    gd <- sample_gd(gen, sub, stat, nloci)
+    gd <- sample_gd(gen, sub, stat, L)
   }
 
   # count the number of samples in the window
@@ -207,7 +207,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #' @export
 #'
 #' @examples
-rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloci = NULL){
+rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL){
     # if number of samples is less than rarify_n, assign the value NA
     if (length(sub) < rarify_n) {
       gd <- NA
@@ -215,12 +215,12 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloc
 
     # if number of samples is greater than rarify_n, rarify
     if (length(sub) > rarify_n) {
-      gd <- rarify_gd(gen, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, nloci = nloci)
+      gd <- rarify_gd(gen, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L)
     }
 
     # if the number of samples is equal to rarify_n, calculate stat
     if (length(sub) == rarify_n) {
-      gd <- sample_gd(gen, sub, stat, nloci)
+      gd <- sample_gd(gen, sub, stat, L)
     }
 
   return(gd)
@@ -237,7 +237,7 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, nloc
 #' @keywords internal
 #'
 #' @examples
-rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci = NULL) {
+rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL) {
 
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
@@ -256,7 +256,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci 
   }
 
   # for each of the possible combos get gendiv stat
-  gdrar <- apply(cmb, 1, sample_gd, gen = gen, stat = stat, nloci = nloci)
+  gdrar <- apply(cmb, 1, sample_gd, gen = gen, stat = stat, L = L)
 
   # summarize rarefaction results
   gd <- stats::na.omit(fun(gdrar))
@@ -275,8 +275,8 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci 
 #' @keywords internal
 #'
 #' @examples
-sample_gd <- function(gen, sub, stat, nloci = NULL) {
-  if(is.null(nloci) | !identical(stat, calc_pi)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], nloci)}
+sample_gd <- function(gen, sub, stat, L = NULL) {
+  if(is.null(L) | !identical(stat, calc_pi)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], L)}
   return(gd)
 }
 
@@ -307,7 +307,7 @@ calc_mean_ar <- function(genind){
 #' @examples
 helper_calc_ar <- function(genind){
   genind$pop <- rep(factor(1), nrow(genind$tab))
-  #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == nloci)
+  #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
   ar <- hierfstat::allelic.richness(genind)$Ar[,1]
   return(ar)
 }
@@ -340,8 +340,8 @@ calc_mean_het <- function(hetmat){
 #' @keywords internal
 #'
 #' @examples
-calc_pi <- function(dos, nloci = NULL){
-  gd <- hierfstat::pi.dosage(dos, L = nloci)
+calc_pi <- function(dos, L = NULL){
+  gd <- hierfstat::pi.dosage(dos, L = L)
   return(gd)
 }
 
@@ -437,3 +437,52 @@ get_adj <- function(i, r, n, coord_cells){
   return(sub)
 }
 
+#' Generate preview of moving window and sample counts
+#'
+#' @param coords coordinates (two columns, the first should be x and the second should be y)
+#' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
+#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
+#' @inheritParams window_gd
+#'
+#' @return plots example window and sample counts (if sample_count = TRUE)
+#' @export
+#'
+#' @examples
+preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0){
+  if(fact != 0) lyr <- raster::aggregate(lyr, fact)
+
+  # convert wdim to matrix
+  nmat <- wdim_to_mat(wdim)
+
+  # get center of raster
+  e <- as.vector(extent(lyr))
+  c <- c(mean(e[c(1,2)]),mean(e[c(3,4)]))
+  center <- raster::cellFromXY(lyr, c)
+
+  # get adjacent cells to center cell
+  adjc <- raster::adjacent(lyr, center, directions = nmat)
+  # get list of indices of coords in that set of cells
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {seq(x[1], x[2])})
+  # fill in window
+  lyrw <- lyr*0
+  lyrw[adjci] <- 1
+  lyrw[center] <- 2
+
+  raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
+  legend("bottomleft", c("raster layer", "window", "focal cell"), col = mako(3, direction = -1), pch = 15)
+  if(!is.null(coords)) points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+
+  if(sample_count){
+
+    # get coord cells
+    coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
+
+    # count
+    lyrc <- lyr
+    nc <- purrr::map_dbl(1:ncell(lyr), function(x, lyr, nmat, coord_cells){sub <- get_adj(x, lyr, nmat, coord_cells); return(length(sub))}, lyr, nmat, coord_cells)
+    lyrc <- raster::setValues(lyr, nc)
+
+    lyrc[lyrc < min_n] <- NA
+    raster::plot(lyrc, col = mako(100), box = FALSE, axes = FALSE, main = "sample count")
+  }
+}

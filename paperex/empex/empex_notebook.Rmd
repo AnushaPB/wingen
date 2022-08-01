@@ -9,6 +9,9 @@ library(rgdal)
 library(raster)
 library(viridis)
 library(here)
+library(tigris)
+library(doParallel)
+library(foreach)
 
 wdir <- here("paperex", "empex")
 ```
@@ -17,11 +20,13 @@ wdir <- here("paperex", "empex")
 vcf <- read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_randomSNP.vcf"))
 coords <- read.table(here(wdir, "data", "Scelop.coord"))
 
-states <- rgdal::readOGR(here(wdir, "TIGRIS_USA", "cb_2018_us_state_5m.shp"))
+# download states from tigris
+states <- states(cb = TRUE)
 
-conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")),]
+conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
 
-PNW <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")),]
+PNW <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+
 plot(PNW)
 ```
 
@@ -30,12 +35,12 @@ plot(PNW)
 ```{r, fig.width = 8, fig.height = 5}
 par(mar = rep(0,4))
 plot(conus, col = "lightgray", border = "lightgray")
-plot(PNW, col = mako(1, begin = 0.7), border = "white", add = TRUE)
+plot(PNW, col = mako(1, begin = 0.7), border = "white", add = TRUE, main = "")
 ```
 
 ```{r, fig.width = 3, fig.height = 5}
 par(mar = rep(0,4))
-plot(PNW, col = mako(1, begin = 0.7), border = "white", lwd = 2)
+plot(PNW, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 ```
 
 # Run analysis
@@ -52,15 +57,10 @@ set.seed(22)
 hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
 
 set.seed(22)
-pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5, nloci = nrow(vcf))
+pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5, L = nrow(vcf))
 
 set.seed(22)
 ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
-
-par(mar = rep(0,4))
-plot_gd(pg, PNW)
-plot_gd(ag, PNW)
-plot_gd(hg, PNW)
 
 kpg <- krig_gd(pg[[1]], lyr, disagg_grd = 4)
 mpg <- mask(kpg, PNW)
@@ -94,7 +94,7 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = w, fact = f, rarify = FALSE, min_n = 2)
 
-pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = w, fact = f, rarify = FALSE, min_n = 2, nloci = nrow(vcf))
+pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = w, fact = f, rarify = FALSE, min_n = 2, L = nrow(vcf))
 
 agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = w, fact = f, rarify = FALSE, min_n = 2)
 
@@ -201,7 +201,7 @@ plot_gd(ag, PNW)
 ```
 
 # Test of different wdim
-```{r, fig.width = 6.5, fig.height = 7.5}
+```{r, fig.width = 7, fig.height = 8}
 
 
 cores <- 6
@@ -228,7 +228,8 @@ for(n in c(2, 3, 4)){
                       rarify = TRUE, 
                       rarify_n = n,
                       rarify_nit = 5,
-                      parallel = TRUE)
+                      parallel = TRUE,
+                      L = nrow(vcf@gt))
       stk[[i]] <- pg
       i <- i+1
       plot_gd(pg, PNW, zlim = c(100, 700))
@@ -255,12 +256,15 @@ for(n in c(2, 3, 4)){
   par(mfrow = c(2, 3), mar = rep(0,4), oma = rep(2,4))
   for(w in c(3, 5)){
     for(f in c(4, 3, 2)){
-      plot_gd(stk[[i]], PNW, zlim = c(100, 700), legend = FALSE)
+      plot_gd(stk[[i]], PNW, zlim = c(0.02, 0.11), legend = FALSE, breaks = 100)
       
       i <- i+1
     }
   }
 }
+
+
+plot_gd(stk[[1]], zlim = c(0.02, 0.11), legend = TRUE, breaks = 100)
 ```
 
 

@@ -17,7 +17,7 @@ window_gd_general(
   min_n = 2,
   fun = mean,
   parallel = FALSE,
-  nloci = NULL
+  L = NULL
 )
 }
 \arguments{
@@ -45,7 +45,7 @@ window_gd_general(
 
 \item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
 
-\item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
+\item{L}{for calculating pi, if L=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length L of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell

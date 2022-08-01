@@ -63,22 +63,13 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
   ymin <- min(raster::extent(bkg)@ymin, raster::extent(x)@ymin)
   ymax <- max(raster::extent(bkg)@ymax, raster::extent(x)@ymax)
 
-
-  raster::plot(1,
-               type = "n",
-               xlim = c(xmin, xmax),
-               ylim = c(ymin, ymax),
-               legend = FALSE,
-               main = main,
-               axes = FALSE,
-               box = FALSE)
-
   raster::plot(bkg,
                col = "lightgray",
                border = "white",
+               xlim = c(xmin, xmax),
+               ylim = c(ymin, ymax),
                axes = FALSE,
                box = FALSE,
-               add = TRUE,
                legend = FALSE)
 
   raster::plot(x[[index]],

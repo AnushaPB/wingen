@@ -34,5 +34,5 @@ Create RasterLayer from coordinates
 }
 \examples{
 load_mini_ex()
-coords_to_raster(mini_coords, buffer = 10, plot = TRUE)
+coords_to_raster(mini_coords, buffer = 1, plot = TRUE)
 }

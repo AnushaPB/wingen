@@ -84,7 +84,7 @@ legend(0,-80,
 ```
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
-tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, nloci = nrow(subvcf@gt))
+tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, L = nrow(subvcf@gt))
 
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
 plot_gd(tr$res, bkg, breaks = 10, zlim = c(0,0.30))
@@ -129,9 +129,6 @@ for(nsamp in c(100, 200)){
   }
 }
 
-plot_count(msk_lyr)
-preview_gd(lyr, subcoords, wdim = 5, fact = 3, min_n = 4)
-points(subcoords)
 ```
 
 ```{r, fig.width = 7.5, fig.height = 5}
@@ -160,8 +157,8 @@ for(nsamp in c(100, 200)){
 }
 
 #legendplots
-plot(r, zlim = c(0,0.30),  col = magma(100))
-plot(r, zlim = c(1,1.75),  col = magma(100))
+plot(r, zlim = c(0,0.30),  col = magma(100), legend.only = TRUE)
+plot(r, zlim = c(1,1.75),  col = magma(100), legend.only = TRUE)
 ```
 
 ```{r, fig.width = 7.5, fig.height = 5}
@@ -291,7 +288,7 @@ stk2 <- list()
 i = 1
 for(f in c(2, 3, 4)){
   for(w in c(3, 5, 7)){
-    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, nloci = nrow(subvcf@gt))
+    res <- window_gd(subvcf, subcoords, lyr, stat = "pi", wdim = w, fact = f, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, L = nrow(subvcf@gt))
     tr_k <- krig_gd(res[[1]], lyr, disagg_grd = 2)
     bkg <- resample(bkg, tr_k)
     tr_k_mask <- mask(tr_k, bkg)
@@ -577,8 +574,8 @@ subcoords <- subcoords[match(colnames(subvcf@gt[,-1]), subcoords$idx),]
 # check match
 all(colnames(subvcf@gt)[-1] == as.character(subcoords$idx))
 
-nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3, rarify = FALSE, min_n = 4, nloci = nrow(subvcf@gt))
-yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3,rarify = TRUE, rarify_n = 4, rarify_nit = 5, nloci = nrow(subvcf@gt))
+nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3, rarify = FALSE, min_n = 4, L = nrow(subvcf@gt))
+yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3,rarify = TRUE, rarify_n = 4, rarify_nit = 5, L = nrow(subvcf@gt))
 par(mfrow = c(1,3))
 plot(nr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
 plot(yr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
@@ -628,4 +625,20 @@ points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3
 ```
 
 
+
+# allelic richness maps
+```{r}
+load_mini_ex()
+set.seed(22)
+trab <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = TRUE, parallel = FALSE)
+set.seed(22)
+tra <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = TRUE, parallel = FALSE)
+plot_gd(trab)
+plot_gd(tra)
+
+r <- raster("outputs/WGS_rarifyTRUE_nsamp200_nloci100000_allelic_richness.tif")
+plot_gd(r)
+r <- raster("outputs/WGS_rarifyTRUE_nsamp200_nloci100000_biallelic_richness.tif")
+plot_gd(r)
+```
 

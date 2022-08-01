@@ -26,7 +26,7 @@ Mask genetic diversity map
 \examples{
 library("raster")
 load_mini_ex()
-wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
 mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 plot_gd(mpi, main = "Kriged and Masked Pi")

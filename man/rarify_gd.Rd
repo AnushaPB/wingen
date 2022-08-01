@@ -4,7 +4,7 @@
 \alias{rarify_gd}
 \title{Helper function to rarify subsample and calculate genetic diversity}
 \usage{
-rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci = NULL)
+rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL)
 }
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
@@ -17,7 +17,7 @@ rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, nloci = NULL)
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
-\item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
+\item{L}{for calculating pi, if L=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length L of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
 }
 \description{
 Helper function to rarify subsample and calculate genetic diversity

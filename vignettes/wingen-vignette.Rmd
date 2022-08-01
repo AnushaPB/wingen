@@ -135,7 +135,7 @@ preview_gd(lotr_lyr,
 
 Next, we run the moving window function with our vcf, coords, and raster layer. Here we set the parameters to calculate pi, use a window size of 5 x 5, an aggregation factor of 3, and rarefaction with a rarefaction size of 2 (minimum sample size of 2) and 5 iterations.
 
-The nloci argument is used in the calculation of pi. if nloci=NULL (default), the function returns the sum over SNPs of nucleotide diversity Otherwise, the function returns the average nucleotide diversity per nucleotide given the length nloci of the sequence.
+The L argument is used in the calculation of pi. if L=NULL (default), the function returns the sum over SNPs of nucleotide diversity Otherwise, the function returns the average nucleotide diversity per nucleotide given the length L of the sequence.
 
 We then plot the genetic diversity layer (the first layer of the produced RasterStack) and the sample counts layer (the second stack)
 
@@ -149,7 +149,7 @@ wgd <- window_gd(lotr_vcf,
           rarify = TRUE,
           rarify_n = 2,
           rarify_nit = 5,
-          nloci = 100)
+          L = 100)
 
 # the plot_gd function plots the genetic diversity layer
 plot_gd(wgd, main = "Window pi")
@@ -228,7 +228,7 @@ wgd <- window_gd(lotr_vcf,
           rarify_n = 2,
           rarify_nit = 5,
           rarify = TRUE,
-          nloci = 1000, 
+          L = 1000, 
           parallel = TRUE)
 )
 
@@ -249,7 +249,7 @@ pi_wgd <- window_gd(lotr_vcf,
           rarify_n = 2,
           rarify_nit = 5,
           rarify = TRUE,
-          nloci = 1000)
+          L = 1vc00)
 
 het_wgd <- window_gd(lotr_vcf,
           lotr_coords,

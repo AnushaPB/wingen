@@ -55,7 +55,7 @@ grid_samp <- function(pts, npts, ldim, full = FALSE){
 }
 
 
-sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = FALSE, rarify_n = 4, rarify_nit = 10, parallel = FALSE, nloci = 100000){
+sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = FALSE, rarify_n = 4, rarify_nit = 10, parallel = FALSE, L = 100000){
 
   if(parallel){
     cores <- 6
@@ -66,7 +66,7 @@ sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = 
   # Start the clock!
   ptm <- Sys.time()
 
-  res <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify = rarify, rarify_n, rarify_nit, min_n, fun = mean, parallel, nloci)
+  res <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify = rarify, rarify_n, rarify_nit, min_n, fun = mean, parallel, L)
 
   # Stop the clock
   pt <- as.numeric(Sys.time() - ptm, units = "secs")
@@ -86,7 +86,7 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   wdir <- get_exdir()
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, L = nrow(vcf@gt))
 
   df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
                    fact = 3,
@@ -214,12 +214,12 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
 
 
 #OLD?:
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
+time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = 100000){
   # reassign argument
   assign(var, val)
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, nloci)
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, L)
   #plot(gdmapr, col = magma(100))
 
   msk_count <- mask(gdmapr[[2]], gdmapr[[1]])
