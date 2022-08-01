@@ -31,11 +31,11 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
     ncol = (xmax - xmin)
   } else {
     if(length(res) == 1){
-      nrow <- (ymax - ymin)/res
       ncol <- (xmax - xmin)/res
+      nrow <- (ymax - ymin)/res
     } else if (length(res) == 2) {
-      nrow <- (ymax - ymin)/(res[1])
-      ncol <- (xmax - xmin)/(res[2])
+      ncol <- (xmax - xmin)/(res[1])
+      nrow <- (ymax - ymin)/(res[2])
     } else {
       stop("invalid res provided")
     }
@@ -60,7 +60,7 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
 
   # plot raster
   if(plot){
-    raster::plot(r, legend = FALSE, col = mako(ncell(r)))
+    raster::plot(r, legend = FALSE, col = viridis::mako(raster::ncell(r)))
     points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
   }
 
