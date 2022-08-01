@@ -49,7 +49,7 @@ wgd <- window_gd(lotr_vcf,
           wdim = 3,
           fact = 5,
           rarify = TRUE,
-          L = 1000)
+          L = 100)
 
 # Krige results
 kgd <- krig_gd(wgd, lotr_lyr)
