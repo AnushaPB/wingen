@@ -12,11 +12,11 @@
 #' @examples
 #' library("raster")
 #' load_mini_ex()
-#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = NULL){
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants"){
 
   # check that the input file is a vcf or a path to a vcf object
   if(class(vcf) != "vcfR" & is.character(vcf)){
@@ -88,7 +88,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
-#' @param L for calculating pi, if L=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length L of the sequence (L argument in \link[hierfstat]{pi.dosage} function)
+#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
@@ -99,17 +99,28 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #'
 #' @examples
 #'
-window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = NULL) {
+window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
 
   # format coords
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
 
-  # confirm that coords and gen align
+  # confirm that coords and gen align and set L
   if(class(gen)[1] == "genind"){
     if(nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
   } else {
     if(nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
+  }
+
+  # set L
+  if(!is.null(L) & !is.numeric(L)){
+    if(L == "nvariants"){
+      if(class(gen)[1] == "genind"){
+        L <- nrow(gen@tab)
+      } else {
+        L <- nrow(gen)
+      }
+    }
   }
 
   # make neighborhood matrix for window

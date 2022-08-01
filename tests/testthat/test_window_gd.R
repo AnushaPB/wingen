@@ -6,6 +6,13 @@ test_that("window_gd returns expected output", {
   expect_equal(raster::nlayers(wpi), 2)
 })
 
+test_that("L argument works", {
+  load_mini_ex()
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = "nvariants"), NA)
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = 100), NA)
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = NULL), NA)
+})
+
 test_that("wdim_check fixes wdim", {
   expect_error(wdim_check(1))
   expect_error(wdim_check(c(2, 3)))
