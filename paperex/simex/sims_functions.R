@@ -102,7 +102,7 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   # make ls of results
   results <- list(df, gdmapr)
 
-  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 
   message("calculation of ", stat, " complete...")
 
@@ -114,8 +114,8 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name,
   wdir <- get_exdir()
 
   results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
-  write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
-  purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
+  purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 }
 
 

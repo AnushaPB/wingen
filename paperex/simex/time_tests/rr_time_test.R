@@ -25,7 +25,7 @@ vcf <- vcf[l, c(1, si + 1)]
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test 200
 
@@ -50,7 +50,7 @@ vcf <- vcf[, c(1, 1:100 + 1)]
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 #cores <- 10
 #cl <- makeCluster(cores)

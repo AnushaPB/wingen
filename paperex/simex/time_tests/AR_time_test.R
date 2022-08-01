@@ -23,7 +23,7 @@ coords <- coords[si,]
 vcf <- vcf[l, c(1, si + 1)]
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
@@ -55,7 +55,7 @@ coords <- coords[si,]
 vcf <- vcf[l, c(1, si + 1)]
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
