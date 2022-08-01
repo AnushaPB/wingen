@@ -249,7 +249,7 @@ pi_wgd <- window_gd(lotr_vcf,
           rarify_n = 2,
           rarify_nit = 5,
           rarify = TRUE,
-          L = 1vc00)
+          L = 100)
 
 het_wgd <- window_gd(lotr_vcf,
           lotr_coords,
