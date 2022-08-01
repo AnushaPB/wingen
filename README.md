@@ -20,7 +20,7 @@ Install the development version from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("AnushaPB/wingen")
+devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 ```
 
 ## Example
