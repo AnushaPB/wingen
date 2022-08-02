@@ -36,6 +36,7 @@ mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL){
     if(!raster::compareRaster(x, mask, stopiffalse = FALSE)){
       if(resample == "mask") mask <- raster::resample(mask, x)
       if(resample == "x") x <- raster::resample(x, mask)
+      if(resample != "x" & resample != "mask") stop("invalid arugment provided for resample (must be \"x\" or \"mask\")")
     }
 
   }

@@ -87,9 +87,6 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   # create grid
   if(is.null(grd)){
     krig_grid <- raster_to_grid(r)
-  } else if(class(grd) == "SpatialPointsDataFrame") {
-    #TODO: FIX THIS NOT WORKING
-    krig_grid <- spdf_to_grid(grd, n_cell = n_cell)
   } else if(class(grd) == "RasterLayer"){
     krig_grid <- raster_to_grid(grd)
   } else if(sp::gridded(grd)){
@@ -144,37 +141,6 @@ raster_to_grid <- function(x){
   sp::gridded(grd) <- TRUE
   return(grd)
 }
-
-#' Make grid from Spatial Points Data Frame
-#'
-#' @param spdf Spatial Points Dataframe to create grid for kriging
-#' @param n_cell number of grid cells to use when kriging
-#'
-#' @note code from: https://stackoverflow.com/questions/43436466/create-grid-in-r-for-kriging-in-gstat
-#' @return gridded SpatialPixelsDataFrame
-#' @export
-#'
-#' @keywords internal
-#'
-#' @examples
-spdf_to_grid <- function(spdf, n_cell = 1000) {
-  # make grid from spdf
-  grd <- sp::makegrid(spdf, n = n_cell)
-  colnames(grd) <- c("x", "y")
-  sp::coordinates(grd) <- ~ x + y
-
-  # Next, convert the grid to `SpatialPoints` and subset these points by the polygon.
-  grd_pts <- sp::SpatialPoints(
-    coords      = grd,
-    proj4string = raster::crs(spdf)
-  )
-
-  # subset all points in `grd_pts` that fall within `spdf`
-  krig_grd <- grd_pts[spdf, ]
-
-  return(krig_grd)
-}
-
 
 #' Transform raster
 #'

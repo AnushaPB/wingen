@@ -1,30 +1,56 @@
 test_that("krig_gd returns expected output", {
   library("raster")
   load_mini_ex()
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
-  expect_warning(kpi <- krig_gd(wpi, mini_lyr))
-  expect_s4_class(wpi, "RasterStack")
-  expect_equal(raster::nlayers(wpi), 2)
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr))
+  expect_s4_class(mini_lyr, "RasterLayer")
+  expect_equal(raster::nlayers(kpi), 1)
+
+  expect_warning(expect_warning(kpi <- krig_gd(raster::stack(mini_lyr, mini_lyr), index = 1:2, mini_lyr)))
+  expect_s4_class(kpi, "RasterStack")
+  expect_equal(raster::nlayers(mini_lyr), 1)
 })
 
 test_that("krig_gd returns warning when not provided grd", {
   library("raster")
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
-
-  warnings <- capture_warnings(kpi <- krig_gd(wpi))
+  load_mini_ex()
+  expect_error(warnings <- capture_warnings(kpi <- krig_gd(mini_lyr, grd = NULL)), NA)
   # clean this up later:
   expect_equal(warnings[1], "no grd provided, defaults to using first raster layer to create grd")
+})
+
+test_that("coord kriging works", {
+  library("raster")
+  load_mini_ex()
+  expect_error(kpi <- krig_gd(mini_lyr, grd = lotr_lyr, coords = lotr_coords), NA)
+})
+
+test_that("grd kriging works", {
+  library("raster")
+  load_mini_ex()
+
+  grd <- raster_to_grid(mini_lyr)
+
+  expect_error(expect_warning(kpi <- krig_gd(mini_lyr, grd = grd)), NA)
+})
+
+
+test_that("krige_gd returns error when provided bad grd", {
+  library("raster")
+  load_mini_ex()
+
+  expect_error(kpi <- krig_gd(mini_lyr, grd = mini_coords))
+  expect_error(kpi <- krig_gd(mini_lyr, grd = sp::SpatialPoints(mini_coords)), "unable to find an inherited method for type of grd provided")
 })
 
 
 test_that("krig_gd returns warning when provided crs", {
   library("raster")
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
+  load_mini_ex()
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)
   raster::crs(grd) <- "+init=epsg:4121 +proj=longlat +ellps=GRS80 +datum=GGRS87 +no_defs +towgs84=-199.87,74.79,246.62"
 
-  warnings <- capture_warnings(kpi <- krig_gd(wpi, grd))
+  warnings <- capture_warnings(kpi <- krig_gd(mini_lyr, grd))
   expect_equal(warnings[1], "the provided raster and grid have different crs")
   expect_equal(warnings[2], "NaNs produced")
 
@@ -77,3 +103,25 @@ test_that("raster_transform transformations are correct", {
   expect_error(raster_transform(r, grd, agg_grd = 2, disagg_grd = 2))
 })
 
+test_that("xy argument works", {
+  library("raster")
+  load_mini_ex()
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = TRUE))
+
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = FALSE))
+})
+
+
+test_that("raster transform check", {
+  library("raster")
+  load_mini_ex()
+
+  bad_stack <- raster::stack(mini_lyr, mini_lyr)
+  expect_error(kpi <- raster_transform(bad_stack, grd = mini_lyr), ">1 layer provided for r")
+  expect_error(kpi <- raster_transform(mini_lyr, grd = bad_stack), ">1 layer provided for grd")
+
+  # check resample_first arg
+  expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = FALSE), NA)
+  expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = TRUE), NA)
+
+})
