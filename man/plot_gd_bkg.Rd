@@ -18,7 +18,7 @@ plot_gd_bkg(
 )
 }
 \arguments{
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to 1)}
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}
 

@@ -7,7 +7,7 @@
 plot_gd(
   x,
   bkg = NULL,
-  index = 1,
+  index = NULL,
   col = viridis::magma(breaks),
   breaks = 10,
   zlim = NULL,
@@ -22,7 +22,7 @@ plot_gd(
 
 \item{bkg}{RasterLayer or other spatial object that will be plotted as the "background" in gray}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to 1)}
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 
 \item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
 

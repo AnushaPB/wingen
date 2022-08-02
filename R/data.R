@@ -23,9 +23,19 @@
 #' RasterLayer of middle earth from CITE
 #'
 #'
-#' @format A RasterLayer of middle earth
+#' @format RasterLayer
 #' @source
 "lotr_lyr"
+
+#' Middle earth example range polygon
+#'
+#' SpatialPolygonsDataFrame of range map
+#'
+#'
+#' @format SpatialPolygonsDataFrame
+#' @source
+"lotr_range"
+
 
 #' Mini middle earth example coordinates
 #'

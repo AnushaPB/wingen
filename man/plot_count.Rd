@@ -6,7 +6,7 @@
 \usage{
 plot_count(
   x,
-  index = 2,
+  index = NULL,
   breaks = 10,
   col = viridis::mako(breaks),
   zlim = NULL,
@@ -19,7 +19,7 @@ plot_count(
 \arguments{
 \item{x}{RasterLayer of counts or RasterStack where indexed layer is sample counts}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to 2)}
+\item{index}{if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 

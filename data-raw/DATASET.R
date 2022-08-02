@@ -6,6 +6,12 @@ lotr_lyr <- raster::raster(as.matrix(lyr))
 raster::extent(lotr_lyr) <- raster::extent(0,100,-100,0)
 usethis::use_data(lotr_lyr, overwrite = TRUE)
 
+# make a fake range map
+lotr_lyr[lotr_lyr< 0.01]<- NA
+lotr_lyr <- lotr_lyr*0
+lotr_range <- raster::rasterToPolygons(lotr_lyr, dissolve = TRUE, n = 16)
+usethis::use_data(lotr_range, overwrite = TRUE)
+
 # load coords
 lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv") %>%
   dplyr::select(idx, x, y) %>%
