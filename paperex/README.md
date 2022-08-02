@@ -1,7 +1,5 @@
-README
+Examples from Bishop et al. 202X
 ================
-
-# Examples from Bishop et al. 202X
 
 ## Simulation Example
 

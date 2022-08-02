@@ -1,9 +1,7 @@
 ---
-title: "README"
+title: "Examples from Bishop et al. 202X"
 output: github_document
 ---
-
-# Examples from Bishop et al. 202X
 
 ## Simulation Example
 
