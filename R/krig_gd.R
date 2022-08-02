@@ -2,7 +2,7 @@
 #' Raster interpolation using 'autoKrige'
 #'
 #' @param r RasterLayer or RasterStack
-#' @param indices integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
+#' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
 #' @inheritParams krig_gd_lyr
 #' @return RasterLayer or RasterStack
 #' @export
@@ -15,11 +15,11 @@
 #' plot_gd(kpi, main = "Kriged Pi")
 #'
 
-krig_gd <- function(r, grd = NULL, indices = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
+krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
 
   # subset desired layers
   if(raster::nlayers(r) > 1){
-    r <- r[[indices]]
+    r <- r[[index]]
   }
 
   # convert from stack to list

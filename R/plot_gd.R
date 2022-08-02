@@ -71,7 +71,8 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
                ylim = c(ymin, ymax),
                axes = FALSE,
                box = FALSE,
-               legend = FALSE)
+               legend = FALSE,
+               main = main)
 
   raster::plot(x[[index]],
                col = col,
