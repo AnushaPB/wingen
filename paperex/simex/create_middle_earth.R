@@ -15,15 +15,15 @@ rescale <- function(x, x.min = NULL, x.max = NULL, new.min = 0, new.max = 1) {
 
 if(!file.exists(wdir, "data", "DEM_middle_earth.tif")){
   # load data
-  e1 <- raster(wdir, here("data", "DEM_50m_Quad1.tif"))
-  e2 <- raster(wdir, here("data", "DEM_50m_Quad2.tif"))
-  e3 <- raster(wdir, here("data", "DEM_50m_Quad3.tif"))
-  e4 <- raster(wdir, here("data", "DEM_50m_Quad4.tif"))
+  e1 <- raster(wdir, here("data", "middle_earth", "DEM_50m_Quad1.tif"))
+  e2 <- raster(wdir, here("data", "middle_earth", "DEM_50m_Quad2.tif"))
+  e3 <- raster(wdir, here("data", "middle_earth", "DEM_50m_Quad3.tif"))
+  e4 <- raster(wdir, here("data", "middle_earth", "DEM_50m_Quad4.tif"))
 
   # stich together
   stitched <- merge(e1, e2, e3, e4)
   plot(stitched)
-  writeRaster(stitched, here(wdir, "data", "DEM_middle_earth.tif"), overwrite = TRUE)
+  writeRaster(stitched, here(wdir, "data", "middle_earth", "DEM_middle_earth.tif"), overwrite = TRUE)
 }
 
 # Aggregate stitched layer

@@ -26,13 +26,13 @@ source(here(wdir, "sims_functions.R"))
 # load sims
 ```{r}
 
-vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
-
 lyr <- read.csv(here(wdir, "data", "middle_earth.csv"), header = FALSE)
 lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
 bkg <- lyr
 bkg[bkg < 0.01] <- NA
+
+vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
 
 geo <- read.csv(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
 coords <- geo[,c("idx","x","y")]
@@ -155,7 +155,6 @@ for(nsamp in c(100, 200)){
     }
   }
 }
-
 #legendplots
 plot(r, zlim = c(0,0.30),  col = magma(100), legend.only = TRUE)
 plot(r, zlim = c(1,1.75),  col = magma(100), legend.only = TRUE)
