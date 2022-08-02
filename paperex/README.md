@@ -19,7 +19,7 @@ The results and figures from the paper were created using the
 **Directory structure:**
 
     [simex]
-    |   *run_simex.sh* - main script to rerun simulations
+    |   *run_simex.sh* - main script to run simulations and generate results
     |   *simex_notebook.Rmd* - main notebook for paper analyses and generate figures
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
