@@ -18,28 +18,28 @@ The results and figures from the paper were created using the
 
 **Directory structure:**
 
-    simex
+    [simex]
     |   *run_simex.sh* - main script to rerun simulations
-    |   *simex_notebook.Rmd* - main notebook to redo paper analyses and generate figures
+    |   *simex_notebook.Rmd* - main notebook for paper analyses and generate figures
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
     │   sims_functions.R - functions used for simulation example analysis
     │
-    └───data
+    └───[data]
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
     │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
     |   |   mod-sim_params_it-0_t-1000_spp-spp_0.vcf - genomic data from simulations
     |   |   samples_seed42.csv - samples used in analysis
     │   │
-    │   └───middle_earth - directory with original DEM raster layers
+    │   └───[middle_earth] - directory with original DEM raster layers
     |
-    └───time_tests
+    └───[time_tests]
     │   │   AR_time_test.R - generates results for allelic.richness (WGS and rr dataset)
     │   │   FULL_time_test.R - generates results for FULL dataset
     │   │   rr_time_test.R - generates results for rr dataset
     │   │   WGS_time_test.R - generates results for WGS dataset
     │   
-    └───outputs - directory for results from time tests
+    └───[outputs] - directory for results from time tests
 
 ## Empirical Example
 
@@ -50,10 +50,10 @@ The results and figures from the paper were created using the
 
 **Directory structure:**
 
-    paperex
-    |   *empex_notebook.Rmd* - main notebook to redo paper analyses and generate figures
+    [paperex]
+    |   *empex_notebook.Rmd* - main notebook for paper analyses and generate figures
     │
-    └───data
+    └───[data]
         │   populations_r20.haplotypes.filtered_m70_randomSNP.ped - original ped file from Bouzid et al. 2022
         │   populations_r20.haplotypes.filtered_m70_randomSNP.map - original map file from Bouzid et al. 2022
         |   populations_r20.haplotypes.filtered_m70_randomSNP.vcf - vcf file generated from ped and map files
