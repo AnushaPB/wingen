@@ -1,6 +1,6 @@
 ---
 title: "README"
-output: html_document
+output: github_document
 ---
 
 # Examples from Bishop et al. 202X
