@@ -33,14 +33,15 @@ load_middle_earth_ex()
 ```
 
 
-    ------------- middle earth example -------------
+    -------------- middle earth example --------------
      
     Objects loaded: 
     *lotr_vcf* vcfR object (100 loci x 100 samples) 
     *lotr_coords* dataframe with x and y coordinates 
     *lotr_lyr* middle earth RasterLayer (100 x 100) 
+    *lotr_range* SpatialPolygonsDataFrame of spp range 
 
-    ------------------------------------------------
+    --------------------------------------------------
 
 ``` r
 # Run moving window calculations of pi with rarefaction
@@ -52,9 +53,8 @@ wgd <- window_gd(lotr_vcf,
           fact = 5,
           rarify = TRUE)
 
-
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(wgd, main = "window pi")
+plot_gd(wgd, bkg = lotr_range, main = "window pi")
 plot_count(wgd, main = "window counts")
 ```
 
@@ -74,13 +74,13 @@ plot_count(kgd_counts, main = "kriged counts")
 
 ``` r
 # Mask results
-mgd_lyr <- mask_gd(kgd, lotr_lyr, minval = 0.01)
+mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 
 # Plot results
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(mgd_lyr, main = "masked pi (study area)")
-plot_gd(mgd_counts, bkg = mgd_lyr, main = "masked pi (counts + study area)")
+plot_gd(mgd_lyr, main = "masked pi (spp range)")
+plot_gd(mgd_counts, bkg = lotr_range, main = "masked pi (counts + spp range)")
 ```
 
 <img src="man/figures/README-example-3.png" width="100%" />

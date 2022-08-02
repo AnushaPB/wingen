@@ -50,9 +50,8 @@ wgd <- window_gd(lotr_vcf,
           fact = 5,
           rarify = TRUE)
 
-
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(wgd, main = "window pi")
+plot_gd(wgd, bkg = lotr_range, main = "window pi")
 plot_count(wgd, main = "window counts")
 
 # Krige results
@@ -64,13 +63,13 @@ plot_gd(kgd, main = "kriged pi")
 plot_count(kgd_counts, main = "kriged counts")
 
 # Mask results
-mgd_lyr <- mask_gd(kgd, lotr_lyr, minval = 0.01)
+mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 
 # Plot results
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(mgd_lyr, main = "masked pi (study area)")
-plot_gd(mgd_counts, bkg = mgd_lyr, main = "masked pi (counts + study area)")
+plot_gd(mgd_lyr, main = "masked pi (spp range)")
+plot_gd(mgd_counts, bkg = lotr_range, main = "masked pi (counts + spp range)")
 ```
 
 For an extended example check out the package vignette:
