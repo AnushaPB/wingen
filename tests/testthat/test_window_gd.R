@@ -11,7 +11,13 @@ test_that("L argument works", {
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = "nvariants"), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = 100), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = NULL), NA)
+
+
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = "nvariants"), NA)
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = 100), NA)
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = NULL), NA)
 })
+
 
 test_that("wdim_check fixes wdim", {
   expect_error(wdim_check(1))
