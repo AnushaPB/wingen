@@ -20,7 +20,7 @@
 
 #' Middle earth example raster
 #'
-#' RasterLayer of middle earth from CITE
+#' RasterLayer of middle earth from Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 #'
 #'
 #' @format RasterLayer
