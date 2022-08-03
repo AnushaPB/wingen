@@ -16,7 +16,6 @@ test_that("mask_gd returns expected output", {
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
   expect_true(raster::cellStats(is.na(mpi) == (mini_lyr > 2), all))
-
 })
 
 test_that("resampling occurs correctly", {
@@ -34,6 +33,4 @@ test_that("resampling occurs correctly", {
 
   # check for error if invalid resample arg is supplied
   expect_error(mse <- mask_gd(x, mask, resample = "grid"))
-
-
 })

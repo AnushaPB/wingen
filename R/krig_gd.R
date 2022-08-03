@@ -14,18 +14,17 @@
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' plot_gd(kpi, main = "Kriged Pi")
 #'
-
-krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000){
+krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000) {
 
   # subset desired layers
-  if(raster::nlayers(r) > 1){
+  if (raster::nlayers(r) > 1) {
     r <- r[[index]]
   }
 
   # convert from stack to list
   rls <- raster::as.list(r)
 
-  if(is.null(grd)){
+  if (is.null(grd)) {
     grd <- r[[1]]
     warning("no grd provided, defaults to using first raster layer to create grd")
   }
@@ -63,12 +62,12 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #' @examples
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
 
-  #TODO: FIX COORDSS
+  # TODO: FIX COORDSS
   # if grd is NULL use r
-  if(is.null(grd)) grd <- r
+  if (is.null(grd)) grd <- r
 
   # Transform raster layer
-  if(class(grd) == "RasterLayer"){
+  if (class(grd) == "RasterLayer") {
     stk <- raster_transform(r, grd, resample, agg_grd, disagg_grd, agg_r, disagg_r, resample_first)
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
@@ -77,7 +76,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
 
-  if(!is.null(coords)){
+  if (!is.null(coords)) {
     coords <- data.frame(coords)
     colnames(coords) <- c("x", "y")
     rex <- raster::extract(r, coords)
@@ -85,13 +84,15 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   }
 
   # create grid
-  if(is.null(grd)){
+  if (is.null(grd)) {
     krig_grid <- raster_to_grid(r)
-  } else if(class(grd) == "RasterLayer"){
+  } else if (class(grd) == "RasterLayer") {
     krig_grid <- raster_to_grid(grd)
-  } else if(sp::gridded(grd)){
+  } else if (sp::gridded(grd)) {
     krig_grid <- grd
-  } else { stop(" unable to find an inherited method for type of grd provided")}
+  } else {
+    stop(" unable to find an inherited method for type of grd provided")
+  }
 
   # Assign values to df
   krig_df$layer <- krig_df[, 3]
@@ -103,7 +104,9 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   krig_df <- krig_df[!is.na(krig_df$layer), ]
 
   # remove crs values (automap doesn't like latlon CRS)
-  if(!raster::compareCRS(krig_df, krig_grid)){warning("the provided raster and grid have different crs")}
+  if (!raster::compareCRS(krig_df, krig_grid)) {
+    warning("the provided raster and grid have different crs")
+  }
   raster::crs(krig_df) <- NA
   raster::crs(krig_grid) <- NA
 
@@ -135,7 +138,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 #' @keywords internal
 #'
 #' @examples
-raster_to_grid <- function(x){
+raster_to_grid <- function(x) {
   grd <- data.frame(raster::rasterToPoints(x))
   sp::coordinates(grd) <- ~ x + y
   sp::gridded(grd) <- TRUE
@@ -150,26 +153,26 @@ raster_to_grid <- function(x){
 #' @export
 #'
 #' @examples
-raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE){
-  if(raster::nlayers(r) > 1) stop(">1 layer provided for r")
-  if(raster::nlayers(grd) > 1) stop(">1 layer provided for grd")
+raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE) {
+  if (raster::nlayers(r) > 1) stop(">1 layer provided for r")
+  if (raster::nlayers(grd) > 1) stop(">1 layer provided for grd")
 
-  if(resample_first){
-    if(resample == "r") r <- raster::resample(r, grd)
-    if(resample == "grd") grd <- raster::resample(grd, r)
+  if (resample_first) {
+    if (resample == "r") r <- raster::resample(r, grd)
+    if (resample == "grd") grd <- raster::resample(grd, r)
   }
 
-  if(!is.null(agg_grd) & !is.null(disagg_grd)) stop("Both agg_grd and disagg_grd provided, when only one should be provided")
-  if(!is.null(agg_grd)) grd <- raster::aggregate(grd, agg_grd)
-  if(!is.null(disagg_grd)) grd <- raster::disaggregate(grd, disagg_grd)
+  if (!is.null(agg_grd) & !is.null(disagg_grd)) stop("Both agg_grd and disagg_grd provided, when only one should be provided")
+  if (!is.null(agg_grd)) grd <- raster::aggregate(grd, agg_grd)
+  if (!is.null(disagg_grd)) grd <- raster::disaggregate(grd, disagg_grd)
 
-  if(!is.null(agg_r) & !is.null(disagg_r)) stop("Both agg_r and disagg_r provided, when only one should be provided")
-  if(!is.null(agg_r)) r <- raster::aggregate(r, agg_r)
-  if(!is.null(disagg_r)) r <- raster::disaggregate(r, disagg_r)
+  if (!is.null(agg_r) & !is.null(disagg_r)) stop("Both agg_r and disagg_r provided, when only one should be provided")
+  if (!is.null(agg_r)) r <- raster::aggregate(r, agg_r)
+  if (!is.null(disagg_r)) r <- raster::disaggregate(r, disagg_r)
 
-  if(!resample_first){
-    if(resample == "r") r <- raster::resample(r, grd)
-    if(resample == "grd") grd <- raster::resample(grd, r)
+  if (!resample_first) {
+    if (resample == "r") r <- raster::resample(r, grd)
+    if (resample == "grd") grd <- raster::resample(grd, r)
   }
 
   s <- list(r, grd)

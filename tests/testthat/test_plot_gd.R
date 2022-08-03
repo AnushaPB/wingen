@@ -45,4 +45,3 @@ test_that("check that plot count function works", {
   expect_error(plot_count(stk), NA)
   expect_error(plot_count(stk, index = 1), NA)
 })
-

@@ -13,7 +13,7 @@
 #' @examples
 #' load_mini_ex()
 #' coords_to_raster(mini_coords, buffer = 1, plot = TRUE)
-coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg = NULL, plot = FALSE){
+coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg = NULL, plot = FALSE) {
 
   # format coords
   coords <- as.data.frame(coords)
@@ -26,16 +26,16 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
   ymax <- max(coords$y, na.rm = TRUE) + buffer
 
   # make a matrix
-  if(is.null(res)){
-    nrow = (ymax - ymin)
-    ncol = (xmax - xmin)
+  if (is.null(res)) {
+    nrow <- (ymax - ymin)
+    ncol <- (xmax - xmin)
   } else {
-    if(length(res) == 1){
-      ncol <- (xmax - xmin)/res
-      nrow <- (ymax - ymin)/res
+    if (length(res) == 1) {
+      ncol <- (xmax - xmin) / res
+      nrow <- (ymax - ymin) / res
     } else if (length(res) == 2) {
-      ncol <- (xmax - xmin)/(res[1])
-      nrow <- (ymax - ymin)/(res[2])
+      ncol <- (xmax - xmin) / (res[1])
+      nrow <- (ymax - ymin) / (res[2])
     } else {
       stop("invalid res provided")
     }
@@ -50,16 +50,18 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
   raster::extent(r) <- c(xmin, xmax, ymin, ymax)
 
   # aggregate or disaggregate
-  if(!is.null(agg) & !is.null(disagg)){warning("both agg and disagg were provided. Did you mean to do this? (if so, note that aggregation will occur first and then disaggregation second")}
-  if(!is.null(agg)) r <- raster::aggregate(r, agg)
-  if(!is.null(disagg)) r <- raster::disaggregate(r, disagg)
+  if (!is.null(agg) & !is.null(disagg)) {
+    warning("both agg and disagg were provided. Did you mean to do this? (if so, note that aggregation will occur first and then disaggregation second")
+  }
+  if (!is.null(agg)) r <- raster::aggregate(r, agg)
+  if (!is.null(disagg)) r <- raster::disaggregate(r, disagg)
 
   # assign values to make it easier to visualize the resolution
   r <- raster::init(r)
   r[] <- 1:raster::ncell(r)
 
   # plot raster
-  if(plot){
+  if (plot) {
     raster::plot(r, legend = FALSE, col = viridis::mako(raster::ncell(r)))
     points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
   }

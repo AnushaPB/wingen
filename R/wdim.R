@@ -11,7 +11,7 @@
 #'
 #' @examples
 #' wdim_to_mat(3)
-#' wdim_to_mat(c(3,5))
+#' wdim_to_mat(c(3, 5))
 #'
 wdim_to_mat <- function(wdim) {
   if (any(wdim < 3)) {
@@ -44,7 +44,7 @@ wdim_to_mat <- function(wdim) {
 #' @keywords internal
 #'
 #' @examples
-#' wdim_check(c(4,4))
+#' wdim_check(c(4, 4))
 #' wdim_check(4)
 #'
 wdim_check <- function(wdim) {
@@ -72,4 +72,3 @@ wdim_check <- function(wdim) {
 
   return(wdim)
 }
-

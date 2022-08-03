@@ -1,19 +1,19 @@
 
-test_that("check vcf check throws correct errors and return correct object",{
+test_that("check vcf check throws correct errors and return correct object", {
   data("mini_vcf")
 
   expect_error(vcf_check("BAD/PATH"))
   expect_error(vcf_check(1))
   expect_s4_class(vcf_check(mini_vcf), "vcfR")
 
-  vcfR::write.vcf(mini_vcf,"temp_vcf.vcf")
+  vcfR::write.vcf(mini_vcf, "temp_vcf.vcf")
   expect_s4_class(vcf_check("temp_vcf.vcf"), "vcfR")
   expect_true(file.remove("temp_vcf.vcf"))
 
   expect_error(vcf_check(2), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
 })
 
-test_that("conversion functions return correct object types and errors",{
+test_that("conversion functions return correct object types and errors", {
   data("mini_vcf")
 
   expect_error(vcf_to_dosage("BAD/PATH"))
@@ -23,29 +23,27 @@ test_that("conversion functions return correct object types and errors",{
   expect_error(vcf_to_genind("BAD/PATH"))
   expect_error(vcf_to_genind(1))
   expect_warning(expect_warning(expect_s4_class(vcf_to_genind(mini_vcf), "genind")))
-
 })
 
-test_that("pop warnings for genind are correct",{
+test_that("pop warnings for genind are correct", {
   data("mini_vcf")
 
   # good cases
   expect_s4_class(vcf_to_genind(mini_vcf, pops = FALSE), "genind")
   expect_warning(expect_warning(expect_s4_class(vcf_to_genind(mini_vcf, pops = NULL), "genind")))
   expect_s4_class(vcf_to_genind(mini_vcf, pops = 1:10), "genind")
-  expect_s4_class(vcf_to_genind(mini_vcf, pops = rep(c("a","b"),5)), "genind")
+  expect_s4_class(vcf_to_genind(mini_vcf, pops = rep(c("a", "b"), 5)), "genind")
 
   # bad cases
   expect_error(vcf_to_genind(mini_vcf, pops = 1:2), "length of pops does not match number of individuals in genind")
-  expect_error(vcf_to_genind(mini_vcf, pops = c("a","b","c")), "length of pops does not match number of individuals in genind")
-
+  expect_error(vcf_to_genind(mini_vcf, pops = c("a", "b", "c")), "length of pops does not match number of individuals in genind")
 })
 
 test_that("check vcf to dosage matrix conversion is correct", {
   data("mini_vcf")
   dos <- vcf_to_dosage(mini_vcf)
   # get genotype matrix, remove FORMAT col (first col), and transpose so rows are individuals and cols are loci
-  gt <- t(mini_vcf@gt[,-1])
+  gt <- t(mini_vcf@gt[, -1])
 
   gt0 <- which(gt == "0|0", arr.ind = TRUE)
   gt1 <- rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))
@@ -56,8 +54,8 @@ test_that("check vcf to dosage matrix conversion is correct", {
   dos2 <- which(dos == 2, arr.ind = TRUE)
 
   # Reorder heterozygotes to match (since rowbind was used to create gt1)
-  dos1 <- dos1[order(rownames(dos1), dos1[,1], dos1[,2]),]
-  gt1 <- gt1[order(rownames(gt1), gt1[,1], gt1[,2]),]
+  dos1 <- dos1[order(rownames(dos1), dos1[, 1], dos1[, 2]), ]
+  gt1 <- gt1[order(rownames(gt1), gt1[, 1], gt1[, 2]), ]
 
   expect_equal(gt0, dos0)
   expect_equal(gt1, dos1)
@@ -71,14 +69,14 @@ test_that("check that vcf to genind conversion is correct", {
   # so by removing every other you get basically a dosage matrix)
   alleles <- colnames(genind@tab)
   allele0 <- stringr::str_split_fixed(alleles, "[.]", n = 2)
-  keep <- alleles[!duplicated(allele0[,1])]
+  keep <- alleles[!duplicated(allele0[, 1])]
 
   # check number of loci match
   expect_equal(length(keep), nrow(mini_vcf@gt))
 
   # get tables of genotypes
   tab <- genind@tab[, keep]
-  gt <- t(mini_vcf@gt[,-1])
+  gt <- t(mini_vcf@gt[, -1])
 
   # since for genind a homozygote can either be 2 or 0 depending on the ref allele selected make
   # two dosage matrices for each possible ref allele
@@ -104,4 +102,3 @@ test_that("check that vcf to genind conversion is correct", {
   # checks that all of the cases where true occurs twice are heterozygotes (e.g. 1)
   expect_true(all((sum_log == 2) == (tab == "1")))
 })
-

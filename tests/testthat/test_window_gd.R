@@ -16,12 +16,11 @@ test_that("all stats work", {
 
 test_that("error gets returned for mismatch vcf and coords", {
   load_mini_ex()
-  expect_error(wp <- window_gd(mini_vcf, mini_coords[1:2,], mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
-  expect_error(wa <- window_gd(mini_vcf, mini_coords[1:2,], mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
-  expect_error(wp <- window_gd(mini_vcf[,1:3], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
-  expect_error(wa <- window_gd(mini_vcf[,1:3], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
-
-  })
+  expect_error(wp <- window_gd(mini_vcf, mini_coords[1:2, ], mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
+  expect_error(wa <- window_gd(mini_vcf, mini_coords[1:2, ], mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
+  expect_error(wp <- window_gd(mini_vcf[, 1:3], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
+  expect_error(wa <- window_gd(mini_vcf[, 1:3], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
+})
 
 
 test_that("L argument works", {
@@ -51,30 +50,29 @@ test_that("wdim_check fixes wdim", {
 })
 
 test_that("returns matrix with only one zero", {
-  n <- wdim_to_mat(c(3,5))
+  n <- wdim_to_mat(c(3, 5))
 
   # only ones and zeroes
-  expect_equal(unique(as.vector(n)), c(1,0))
+  expect_equal(unique(as.vector(n)), c(1, 0))
 
   # only one zero
   expect_equal(sum(as.vector(n) == 0), 1)
 
   # zero is at center
-  center <- n[nrow(n)/2 + 0.5,ncol(n)/2 + 0.5]
+  center <- n[nrow(n) / 2 + 0.5, ncol(n) / 2 + 0.5]
   expect_equal(center, 0)
 
   n <- wdim_to_mat(3)
 
   # only ones and zeroes
-  expect_equal(unique(as.vector(n)), c(1,0))
+  expect_equal(unique(as.vector(n)), c(1, 0))
 
   # only one zero
   expect_equal(sum(as.vector(n) == 0), 1)
 
   # zero is at center
-  center <- n[nrow(n)/2 + 0.5,ncol(n)/2 + 0.5]
+  center <- n[nrow(n) / 2 + 0.5, ncol(n) / 2 + 0.5]
   expect_equal(center, 0)
-
 })
 
 test_that("biallelic richness is calculated correctly for all possible combos", {
@@ -115,26 +113,28 @@ test_that("allelic richness is calculated correctly", {
   # check rasters
   set.seed(22)
   trab <- window_gd(mini_vcf,
-                    mini_coords,
-                    mini_lyr,
-                    stat = "biallelic.richness",
-                    wdim = 3,
-                    fact = 3,
-                    rarify_n = 2,
-                    rarify_nit = 5,
-                    rarify = TRUE,
-                    parallel = FALSE)
+    mini_coords,
+    mini_lyr,
+    stat = "biallelic.richness",
+    wdim = 3,
+    fact = 3,
+    rarify_n = 2,
+    rarify_nit = 5,
+    rarify = TRUE,
+    parallel = FALSE
+  )
   set.seed(22)
   tra <- window_gd(mini_vcf,
-                   mini_coords,
-                   mini_lyr,
-                   stat = "allelic.richness",
-                   wdim = 3,
-                   fact = 3,
-                   rarify_n = 2,
-                   rarify_nit = 5,
-                   rarify = TRUE,
-                   parallel = FALSE)
+    mini_coords,
+    mini_lyr,
+    stat = "allelic.richness",
+    wdim = 3,
+    fact = 3,
+    rarify_n = 2,
+    rarify_nit = 5,
+    rarify = TRUE,
+    parallel = FALSE
+  )
 
   names(tra) <- names(trab) <- NULL
   expect_equal(trab, tra)

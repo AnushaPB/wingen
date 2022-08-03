@@ -16,12 +16,12 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants"){
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
 
   # check that the input file is a vcf or a path to a vcf object
-  if(class(vcf) != "vcfR" & is.character(vcf)){
+  if (class(vcf) != "vcfR" & is.character(vcf)) {
     vcf <- vcfR::read.vcfR(vcf)
-  } else if (class(vcf) != "vcfR" & !is.character(vcf)){
+  } else if (class(vcf) != "vcfR" & !is.character(vcf)) {
     stop("gen object must be of type vcfR or a path to a .vcf files")
   }
 
@@ -29,17 +29,16 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
   check_data(vcf, coords)
 
   # calc stats
-  if(stat == "allelic.richness"){
+  if (stat == "allelic.richness") {
     # convert from vcf to genind
     gen <- vcfR::vcfR2genind(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_ar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "allelic_richness"
-
   }
 
-  if(stat == "het" | stat == "heterozygosity"){
+  if (stat == "het" | stat == "heterozygosity") {
     # convert from vcf to heterozygosity matrix
     gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
     # IMPORTANT: transform matrix so that rows are individuals and cols are loci
@@ -50,29 +49,27 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     names(results[[1]]) <- "heterozygosity"
   }
 
-  if(stat == "pi"){
+  if (stat == "pi") {
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_pi, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L)
 
     names(results[[1]]) <- "pi"
-   }
+  }
 
-  if(stat == "biallelic.richness"){
-    #convert vcf to dosage matrix
+  if (stat == "biallelic.richness") {
+    # convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "biallelic_richness"
-
   }
 
   names(results[[2]]) <- "sample_count"
 
   return(results)
-
 }
 #' Helper function for window_gd
 #'
@@ -98,7 +95,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @keywords internal
 #'
 #' @examples
-#'
 window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
 
   # format coords
@@ -106,16 +102,16 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
   colnames(coords) <- c("x", "y")
 
   # confirm that coords and gen align and set L
-  if(class(gen)[1] == "genind"){
-    if(nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
+  if (class(gen)[1] == "genind") {
+    if (nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
   } else {
-    if(nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
+    if (nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
   }
 
   # set L
-  if(!is.null(L) & !is.numeric(L)){
-    if(L == "nvariants"){
-      if(class(gen)[1] == "genind"){
+  if (!is.null(L) & !is.numeric(L)) {
+    if (L == "nvariants") {
+      if (class(gen)[1] == "genind") {
         L <- nrow(gen@tab)
       } else {
         L <- nrow(gen)
@@ -127,28 +123,26 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
-  if(fact == 0){lyr <- lyr * 0} else {lyr <- raster::aggregate(lyr, fact, fun = mean) * 0}
+  if (fact == 0) {
+    lyr <- lyr * 0
+  } else {
+    lyr <- raster::aggregate(lyr, fact, fun = mean) * 0
+  }
 
   # get cell index for each coordinate
-  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[,"cells"]
+  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
 
   # ignore this: (need to assign i something so that R CMD Check recognizes it as a defined global variable - also this is useful for testing)
   i <- 1
 
-  if(parallel){
-
+  if (parallel) {
     rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
-
       result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
 
       return(result)
-
     }
-
   } else {
-
     rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
-
   }
 
 
@@ -156,8 +150,8 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
   alyr <- lyr
   nsagg <- lyr
   # assign values to rasters
-  alyr[] <- rast_vals[,"gd"]
-  nsagg[] <- rast_vals[,"ns"]
+  alyr[] <- rast_vals[, "gd"]
+  nsagg[] <- rast_vals[, "ns"]
 
   results <- raster::stack(alyr, nsagg)
 
@@ -178,10 +172,10 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
 #' @export
 #'
 #' @examples
-window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL){
+window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL) {
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
-  if(rarify) min_n <- rarify_n
+  if (rarify) min_n <- rarify_n
 
   # skip if raster value is NA
   if (is.na(lyr[i])) {
@@ -194,7 +188,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
   # if there are too few samples in that window assign the cell value NA
   if (length(sub) < min_n) {
     gd <- NA
-  } else if (rarify){
+  } else if (rarify) {
     gd <- rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun, L)
   } else {
     gd <- sample_gd(gen, sub, stat, L)
@@ -218,21 +212,21 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #' @export
 #'
 #' @examples
-rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL){
-    # if number of samples is less than rarify_n, assign the value NA
-    if (length(sub) < rarify_n) {
-      gd <- NA
-    }
+rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL) {
+  # if number of samples is less than rarify_n, assign the value NA
+  if (length(sub) < rarify_n) {
+    gd <- NA
+  }
 
-    # if number of samples is greater than rarify_n, rarify
-    if (length(sub) > rarify_n) {
-      gd <- rarify_gd(gen, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L)
-    }
+  # if number of samples is greater than rarify_n, rarify
+  if (length(sub) > rarify_n) {
+    gd <- rarify_gd(gen, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L)
+  }
 
-    # if the number of samples is equal to rarify_n, calculate stat
-    if (length(sub) == rarify_n) {
-      gd <- sample_gd(gen, sub, stat, L)
-    }
+  # if the number of samples is equal to rarify_n, calculate stat
+  if (length(sub) == rarify_n) {
+    gd <- sample_gd(gen, sub, stat, L)
+  }
 
   return(gd)
 }
@@ -260,7 +254,6 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
   if (choose(length(sub), rarify_n) < rarify_nit) {
     # get all possible combos (transpose so rows are unique combos)
     cmb <- t(utils::combn(sub, rarify_n))
-
   } else {
     # random sample subsets of size rarify_nit (transpose so rows are unique combos)
     cmb <- t(replicate(rarify_nit, sample(sub, rarify_n), simplify = TRUE))
@@ -287,7 +280,11 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
 #'
 #' @examples
 sample_gd <- function(gen, sub, stat, L = NULL) {
-  if(is.null(L) | !identical(stat, calc_pi)){gd <- stat(gen[sub,])} else {gd <- stat(gen[sub,], L)}
+  if (is.null(L) | !identical(stat, calc_pi)) {
+    gd <- stat(gen[sub, ])
+  } else {
+    gd <- stat(gen[sub, ], L)
+  }
   return(gd)
 }
 
@@ -302,7 +299,7 @@ sample_gd <- function(gen, sub, stat, L = NULL) {
 #' @keywords internal
 #'
 #' @examples
-calc_mean_ar <- function(genind){
+calc_mean_ar <- function(genind) {
   ar <- helper_calc_ar(genind)
   gd <- mean(ar, na.rm = TRUE)
   return(gd)
@@ -316,10 +313,10 @@ calc_mean_ar <- function(genind){
 #' @export
 #'
 #' @examples
-helper_calc_ar <- function(genind){
+helper_calc_ar <- function(genind) {
   genind$pop <- rep(factor(1), nrow(genind$tab))
-  #note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
-  ar <- hierfstat::allelic.richness(genind)$Ar[,1]
+  # note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
+  ar <- hierfstat::allelic.richness(genind)$Ar[, 1]
   return(ar)
 }
 
@@ -333,7 +330,7 @@ helper_calc_ar <- function(genind){
 #' @keywords internal
 #'
 #' @examples
-calc_mean_het <- function(hetmat){
+calc_mean_het <- function(hetmat) {
   gd <- mean(hetmat, na.rm = TRUE)
   return(gd)
 }
@@ -351,7 +348,7 @@ calc_mean_het <- function(hetmat){
 #' @keywords internal
 #'
 #' @examples
-calc_pi <- function(dos, L = NULL){
+calc_pi <- function(dos, L = NULL) {
   gd <- hierfstat::pi.dosage(dos, L = L)
   return(gd)
 }
@@ -366,8 +363,10 @@ calc_pi <- function(dos, L = NULL){
 #' @keywords internal
 #'
 #' @examples
-calc_mean_biar <- function(dos){
-  if(!all(dos %in% c(0, 1, 2, NA))){stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")}
+calc_mean_biar <- function(dos) {
+  if (!all(dos %in% c(0, 1, 2, NA))) {
+    stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
+  }
   ar_by_locus <- apply(dos, 2, helper_calc_biar)
   mean_ar <- mean(ar_by_locus, na.rm = TRUE)
   return(mean_ar)
@@ -383,11 +382,11 @@ calc_mean_biar <- function(dos){
 #' @keywords internal
 #'
 #' @examples
-helper_calc_biar <- function(loc){
+helper_calc_biar <- function(loc) {
   uq <- unique(loc, na.rm = TRUE)
-  if (1 %in% uq){
+  if (1 %in% uq) {
     return(2)
-  } else if (0 %in% uq & 2 %in% uq){
+  } else if (0 %in% uq & 2 %in% uq) {
     return(2)
   } else {
     return(1)
@@ -406,14 +405,14 @@ helper_calc_biar <- function(loc){
 #' @export
 #'
 #' @examples
-check_data <- function(gen, coords){
+check_data <- function(gen, coords) {
 
   # check number of samples
-  if(class(gen) == "genind"){
+  if (class(gen) == "genind") {
     nind <- nrow(gen$tab)
   }
 
-  if(class(gen) == "vcfR"){
+  if (class(gen) == "vcfR") {
     nind <- (ncol(gen@gt) - 1)
   }
 
@@ -421,7 +420,6 @@ check_data <- function(gen, coords){
   if (nind != nrow(coords)) {
     stop("number of samples in coords data and number of samples in gen data are not equal")
   }
-
 }
 
 #' Helper function to get adjacent cells to a given cell index
@@ -437,11 +435,13 @@ check_data <- function(gen, coords){
 #' @keywords internal
 #'
 #' @examples
-get_adj <- function(i, r, n, coord_cells){
+get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
   adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
   # get indices of adjacent cells
-  adjci <- purrr::map_dbl(adjc, 1, function(x) {seq(x[1], x[2])})
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {
+    seq(x[1], x[2])
+  })
   # get list of indices of coords in that set of cells
   sub <- which(coord_cells %in% adjci)
 

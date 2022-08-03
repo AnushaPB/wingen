@@ -20,7 +20,6 @@ test_that("check dimensions of raster produced", {
   ymax <- max(mini_coords$y, na.rm = TRUE) + buffer
 
   expect_true(all(dim(r) == c(round(ymax - ymin, 0), round(xmax - xmin, 0), 1)))
-
 })
 
 test_that("check resolution of raster produced", {
@@ -35,7 +34,6 @@ test_that("check resolution of raster produced", {
   expect_equal(round(raster::res(r), 0), c(5, 4))
 
   expect_error(r <- coords_to_raster(mini_coords, res = c(5, 4, 3)), "invalid res provided")
-
 })
 
 test_that("make sure it works if coords are in different formats", {
@@ -60,12 +58,10 @@ test_that("aggregation and disaggregation produce correct rasters", {
 
   expect_warning(rad <- coords_to_raster(mini_coords, agg = 2, disagg = 2))
   expect_true(raster::compareRaster(rad, r0))
-
 })
 
 test_that("plots without errors", {
   load_mini_ex()
 
   expect_error(r <- coords_to_raster(mini_coords, plot = TRUE), NA)
-
 })

@@ -48,7 +48,9 @@ vcf_to_genind <- function(x, pops = NULL) {
   genind <- vcfR::vcfR2genind(vcf)
 
   # TODO: Clean this up - Check if pops is false
-  if (is.logical(pops)) if (!pops) return(genind)
+  if (is.logical(pops)) if (!pops) {
+    return(genind)
+  }
 
   # assign pops if null or pop vector provided
   if (is.null(genind$pop) | is.vector(pops)) {
@@ -79,11 +81,11 @@ vcf_to_genind <- function(x, pops = NULL) {
 #' @keywords internal
 #'
 #' @examples
-vcf_check <- function(x){
+vcf_check <- function(x) {
   if (class(x)[1] == "vcfR") {
     vcf <- x
   } else if (is.character(x)) {
-    if(file.exists(x)){
+    if (file.exists(x)) {
       vcf <- vcfR::read.vcfR(x)
     } else {
       stop("Cannot open file: No such file or directory")

@@ -53,12 +53,10 @@ test_that("krig_gd returns warning when provided crs", {
   warnings <- capture_warnings(kpi <- krig_gd(mini_lyr, grd))
   expect_equal(warnings[1], "the provided raster and grid have different crs")
   expect_equal(warnings[2], "NaNs produced")
-
 })
 
 
 test_that("raster_transform transformations are correct", {
-
   data("mini_lyr")
   grd <- mini_lyr
   r <- raster::aggregate(mini_lyr, 2)
@@ -123,5 +121,4 @@ test_that("raster transform check", {
   # check resample_first arg
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = FALSE), NA)
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = TRUE), NA)
-
 })
