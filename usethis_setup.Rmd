@@ -10,52 +10,42 @@ library("usethis")
 library("devtools")
 ```
 
+# Create package
+
 ```{r}
 #create_package(here())
 #usethis::use_mit_license()
 ```
-```{r}
-check()
-install()
-library("wingen")
-```
 
 ```{r}
-#usethis::use_pkgdown()
-pkgdown::build_site()
-pkgdown::build_home_index()
-```
+# use dplyr pipe
+usethis::use_pipe(export = TRUE)
 
-```{r}
-use_pipe(export = TRUE)
-use_logo("logo.png", geometry = "250x250", retina = TRUE)
-```
+# use foreach pipe (remove if not using foreach)
+usethis::use_import_from('foreach', "%dopar%")
 
-```{r}
-styler::style_pkg() 
-```
+# use logo
+usethis::use_logo("logo.png", geometry = "250x250", retina = TRUE)
 
-```{r}
+# use vignette
 usethis::use_vignette("wingen-vignette")
-```
-```{r}
+
 # creates testing structure
 usethis::use_testthat()
-```
 
-```{r}
 # Creates and modifies external data for use in package
 usethis::use_data_raw()
 ```
+
 ```{r}
-usethis::use_build_ignore("sims")
+# Ignore stuff
+usethis::use_build_ignore("paperex/simex")
 
-usethis::use_build_ignore("sims_nlm")
-
-usethis::use_build_ignore("empex")
+usethis::use_build_ignore("paperex/empex")
 
 # THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
 usethis::use_build_ignore("inst/extdata/")
+usethis::use_build_ignore("data-raw")
 
 usethis::use_build_ignore("README_cache/")
 
@@ -63,22 +53,14 @@ usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
 
 usethis::use_build_ignore("vignettes/wingen-vignette_files/")
 
-usethis::use_build_ignore("data-raw")
-
-
 usethis::use_build_ignore("token")
 
-
 usethis::use_build_ignore(".gitignore")
+
 usethis::use_build_ignore(".github")
 
-#TEMP ADD THIS BACK LATER
-usethis::use_build_ignore("vignettes")
+```
 
-```
-```{r}
-usethis::use_import_from('foreach', "%dopar%")
-```
 #CI/GitHub actions
 https://github.com/r-lib/actions/tree/master/examples
 ## Quickstart CI workflow
@@ -100,23 +82,39 @@ When should you use it?
 You plan to submit your package to CRAN or Bioconductor
 Your package has OS-specific code
 
-# manual check
-qpdf: https://stackoverflow.com/questions/41570633/how-to-build-qpdf-on-windows
+## Code coverage
 ```{r}
+usethis::use_coverage(type = "codecov")
+
+use_github_action("test-coverage")
+
+covr::codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
+```
+
+# renv
+```{r}
+#renv::init()
+renv::snapshot()
+renv::clean()
+```
+
+# install and check package
+```{r}
+devtools::install()
 devtools::check()
 ```
 
 
-# Code coverage
+# Pkgdown site
+
 ```{r}
-usethis::use_coverage(type = "codecov")
-use_github_action("test-coverage")
-
-library(covr)
-
-codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
+#usethis::use_pkgdown()
+pkgdown::build_site()
+pkgdown::build_home_index()
 ```
 
-Link for badge from: https://app.codecov.io/gh/AnushaPB/wingen/settings/badge 
-[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
+# Fix package style (!use with caution!)
 
+```{r}
+styler::style_pkg() 
+```
