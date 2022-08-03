@@ -12,7 +12,7 @@
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 <!-- badges: end -->
 
-Create maps of genetic diversity using a moving window approach.
+Generate continuous maps of genetic diversity using moving windows
 
 ## Installation
 
