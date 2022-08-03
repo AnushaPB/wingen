@@ -1,13 +1,13 @@
 
 test_that("window_gd returns expected output", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
 })
 
 test_that("all stats work", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_error(wp <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
   expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
@@ -15,7 +15,7 @@ test_that("all stats work", {
 })
 
 test_that("error gets returned for mismatch vcf and coords", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_error(wp <- window_gd(mini_vcf, mini_coords[1:2, ], mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
   expect_error(wa <- window_gd(mini_vcf, mini_coords[1:2, ], mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
   expect_error(wp <- window_gd(mini_vcf[, 1:3], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
@@ -24,7 +24,7 @@ test_that("error gets returned for mismatch vcf and coords", {
 
 
 test_that("L argument works", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = "nvariants"), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = 100), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = NULL), NA)

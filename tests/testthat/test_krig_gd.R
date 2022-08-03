@@ -1,6 +1,6 @@
 test_that("krig_gd returns expected output", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr))
   expect_s4_class(mini_lyr, "RasterLayer")
   expect_equal(raster::nlayers(kpi), 1)
@@ -12,7 +12,7 @@ test_that("krig_gd returns expected output", {
 
 test_that("krig_gd returns warning when not provided grd", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_error(warnings <- capture_warnings(kpi <- krig_gd(mini_lyr, grd = NULL)), NA)
   # clean this up later:
   expect_equal(warnings[1], "no grd provided, defaults to using first raster layer to create grd")
@@ -20,13 +20,13 @@ test_that("krig_gd returns warning when not provided grd", {
 
 test_that("coord kriging works", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   expect_error(kpi <- krig_gd(mini_lyr, grd = lotr_lyr, coords = lotr_coords), NA)
 })
 
 test_that("grd kriging works", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   grd <- raster_to_grid(mini_lyr)
 
@@ -36,7 +36,7 @@ test_that("grd kriging works", {
 
 test_that("krige_gd returns error when provided bad grd", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   expect_error(kpi <- krig_gd(mini_lyr, grd = mini_coords))
   expect_error(kpi <- krig_gd(mini_lyr, grd = sp::SpatialPoints(mini_coords)), "unable to find an inherited method for type of grd provided")
@@ -45,7 +45,7 @@ test_that("krige_gd returns error when provided bad grd", {
 
 test_that("krig_gd returns warning when provided crs", {
   library("raster")
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)
   raster::crs(grd) <- "+init=epsg:4121 +proj=longlat +ellps=GRS80 +datum=GGRS87 +no_defs +towgs84=-199.87,74.79,246.62"
@@ -103,7 +103,7 @@ test_that("raster_transform transformations are correct", {
 
 test_that("xy argument works", {
   library("raster")
-  load_mini_ex()
+  data("mini_lyr")
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = TRUE))
 
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = FALSE))
@@ -112,7 +112,7 @@ test_that("xy argument works", {
 
 test_that("raster transform check", {
   library("raster")
-  load_mini_ex()
+  data("mini_lyr")
 
   bad_stack <- raster::stack(mini_lyr, mini_lyr)
   expect_error(kpi <- raster_transform(bad_stack, grd = mini_lyr), ">1 layer provided for r")

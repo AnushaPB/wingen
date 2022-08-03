@@ -1,5 +1,5 @@
 test_that("mask_gd returns expected output", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   expect_warning(kpi <- krig_gd(wpi, mini_lyr))
@@ -19,7 +19,7 @@ test_that("mask_gd returns expected output", {
 })
 
 test_that("resampling occurs correctly", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
   mask <- aggregate(mini_lyr, 2)

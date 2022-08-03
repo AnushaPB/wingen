@@ -1,5 +1,5 @@
 test_that("check dimensions of raster produced", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   r <- coords_to_raster(mini_coords)
 
@@ -23,7 +23,7 @@ test_that("check dimensions of raster produced", {
 })
 
 test_that("check resolution of raster produced", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   r <- coords_to_raster(mini_coords, res = 5)
   # check resolution is about 5
@@ -37,7 +37,7 @@ test_that("check resolution of raster produced", {
 })
 
 test_that("make sure it works if coords are in different formats", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   rdf <- coords_to_raster(mini_coords)
   rmat <- coords_to_raster(as.matrix(mini_coords))
@@ -45,7 +45,7 @@ test_that("make sure it works if coords are in different formats", {
 })
 
 test_that("aggregation and disaggregation produce correct rasters", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   r0 <- coords_to_raster(mini_coords)
 
@@ -61,7 +61,7 @@ test_that("aggregation and disaggregation produce correct rasters", {
 })
 
 test_that("plots without errors", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
 
   expect_error(r <- coords_to_raster(mini_coords, plot = TRUE), NA)
 })

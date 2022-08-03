@@ -1,5 +1,5 @@
 test_that("preview_gd returns expected output", {
-  load_mini_ex()
+  load_mini_ex(quiet = TRUE)
   pw <- preview_gd(mini_lyr,
     mini_coords,
     wdim = 3,
