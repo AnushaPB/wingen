@@ -173,7 +173,7 @@ To run this function we provide the RasterStack output from `window_gd`, the ind
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
 # note: this step can take a little while
-kgd <- krig_gd(wgd, indices = 1:2, lotr_lyr, disagg_grd = 2)
+kgd <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2)
 
 plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
