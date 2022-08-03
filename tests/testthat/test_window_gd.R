@@ -153,3 +153,10 @@ test_that("error if bad vcf is given", {
   expect_warning(expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), "cannot open the connection"), "No such file or directory")
   expect_error(wpi <- window_gd(mini_coords, mini_coords, mini_lyr, rarify = FALSE), "gen object must be of type vcfR or a path to a .vcf files")
 })
+
+test_that("return_stat returns correct functions", {
+  expect_equal(return_stat("pi"), calc_pi)
+  expect_equal(return_stat("het"), calc_mean_het)
+  expect_equal(return_stat("biallelic.richness"), calc_mean_biar)
+  expect_equal(return_stat("allelic.richness"), calc_mean_ar)
+})

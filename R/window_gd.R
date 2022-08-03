@@ -33,7 +33,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to genind
     gen <- vcfR::vcfR2genind(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_ar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "allelic_richness"
   }
@@ -44,7 +44,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # IMPORTANT: transform matrix so that rows are individuals and cols are loci
     gen <- t(gen)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_het, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "heterozygosity"
   }
@@ -53,7 +53,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_pi, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L)
 
     names(results[[1]]) <- "pi"
   }
@@ -62,7 +62,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = calc_mean_biar, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
 
     names(results[[1]]) <- "biallelic_richness"
   }
@@ -76,7 +76,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param gen genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @param coords coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),
 #' @param lyr RasterLayer to slide window across
-#' @param stat function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)
+#' @param stat function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
 #' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed
@@ -95,7 +95,17 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @keywords internal
 #'
 #' @examples
-window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
+window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
+
+  # set L if pi is being calculated
+  if (stat == "pi" & !is.null(L) & !is.numeric(L)) {
+    if (L == "nvariants") {
+      L <- ncol(gen)
+    }
+  }
+
+  # replace stat with function to calculate diversity statistic
+  stat <- return_stat(stat)
 
   # format coords
   coords <- data.frame(coords)
@@ -106,17 +116,6 @@ window_gd_general <- function(gen, coords, lyr, stat = calc_mean_ar, wdim = 3, f
     if (nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
   } else {
     if (nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
-  }
-
-  # set L
-  if (!is.null(L) & !is.numeric(L)) {
-    if (L == "nvariants") {
-      if (class(gen)[1] == "genind") {
-        L <- nrow(gen@tab)
-      } else {
-        L <- nrow(gen)
-      }
-    }
   }
 
   # make neighborhood matrix for window
@@ -446,4 +445,22 @@ get_adj <- function(i, r, n, coord_cells) {
   sub <- which(coord_cells %in% adjci)
 
   return(sub)
+}
+
+#' Helper function to get genetic diversity functions
+#'
+#' @param x genetic diversity statistic
+#'
+#' @return
+#' @export
+#'
+#' @keywords internal
+#'
+#' @examples
+return_stat <- function(x){
+  if(x == "pi") stat <- calc_pi
+  if(x == "biallelic.richness") stat <- calc_mean_biar
+  if(x == "allelic.richness") stat <- calc_mean_ar
+  if(x == "het") stat <- calc_mean_het
+  return(stat)
 }
