@@ -55,31 +55,6 @@ grid_samp <- function(pts, npts, ldim, full = FALSE){
 }
 
 
-sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = FALSE, rarify_n = 4, rarify_nit = 10, parallel = FALSE, L = 100000){
-
-  if(parallel){
-    cores <- 6
-    cl <- makeCluster(cores)
-    registerDoParallel(cl)
-  }
-
-  # Start the clock!
-  ptm <- Sys.time()
-
-  res <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify = rarify, rarify_n, rarify_nit, min_n, fun = mean, parallel, L)
-
-  # Stop the clock
-  pt <- as.numeric(Sys.time() - ptm, units = "secs")
-
-  plot(res,  col = magma(100))
-
-  if(parallel){
-    stopCluster(cl)
-  }
-
-  return(list(pt = pt, res = res))
-}
-
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
 
   # get wdir

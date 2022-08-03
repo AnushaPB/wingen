@@ -19,28 +19,31 @@ library(hierfstat)
 
 wdir <- here("paperex", "simex")
 source(here(wdir, "sims_functions.R"))
-
 ```
 
 
-# load sims
-```{r}
+# Load simulation results
 
+```{r}
+# Load middle earth layer and format as a raster
 lyr <- read.csv(here(wdir, "data", "middle_earth.csv"), header = FALSE)
 lyr <- raster(as.matrix(lyr))
 extent(lyr) <- extent(0,100,-100,0)
+# Create background layer for plotting
 bkg <- lyr
 bkg[bkg < 0.01] <- NA
 
+# Read in VCF
 vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
 
+# Read in geospatial data and convert coordinates to match lyr
 geo <- read.csv(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
+geo$y <- -geo$y
 coords <- geo[,c("idx","x","y")]
-coords$y <- -coords$y
 
+# Create file of individual coordinates if it doesn't exist already
 set.seed(42)
-
-if(TRUE){
+if(!file.exists(here(wdir, "data", "samples_seed42.csv"))){
   message("creating new file")
   si <- sample(nrow(coords), 200)
   write.csv( data.frame(inds = si), here(wdir, "data", "samples_seed42.csv"), row.names = FALSE)
@@ -50,25 +53,31 @@ if(TRUE){
   si <- df$inds
 }
 
-
+# Sample 10k loci
 l <- sample(nrow(vcf@gt), 10000)
 
+# Subset VCF (note: first column of VCF are sample IDs)
 subvcf <- vcf[l, c(1, si + 1)]
-
+# Subset coords
 subcoords <- coords[si,]
 subcoords <- subcoords[,c("x","y")]
 
-
-# check match
-all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si]))
+# check match between VCF and coords
+stopifnot(all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si])))
 
 ```
 
+# Figure 2: Simulation Example
+
+## Simulation setup plots
+
 ```{r,  fig.width = 6, fig.height = 6}
+# Make kernel density raster from FULL coordinates
 kde <- raster(MASS::kde2d(coords$x, coords$y, h = c(10,10), n = 100, lims = c(0,100,-100,0)))
 
+# Plot simulation setup (original lyr, population density, and sample distribution)
 par(mar = rep(2,4))
-plot(lyr, col = viridis::magma(100), main = "Carrying Capacity", axes = FALSE, box = FALSE)
+plot(lyr, col = viridis::magma(100), main = "Carrying Capacity/Conductance", axes = FALSE, box = FALSE)
 plot(kde, col = viridis::magma(10), main = "Population Density", axes = FALSE, box = FALSE)
 plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), main = "Distribution of Individuals", axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.4), xlab = "", ylab = "")
@@ -82,36 +91,51 @@ legend(0,-80,
        cex = 1.5)
 
 ```
+## Example simulation walkthrough
 
 ```{r, fig.width = 6, fig.height = 6, cache = TRUE}
-tr <- sim(subvcf, subcoords, lyr, stat = "het", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = FALSE, parallel = TRUE, L = nrow(subvcf@gt))
+# Run window function
+tr <- window_gd(subvcf, 
+                subcoords, 
+                lyr, 
+                stat = "pi", 
+                wdim = 3, 
+                fact = 3, 
+                rarify_n = 2, 
+                rarify_nit = 5, 
+                rarify = TRUE, 
+                parallel = FALSE,
+                L = nrow(subvcf@gt))
 
+# plot results
 par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot_gd(tr$res, bkg, breaks = 10, zlim = c(0,0.30))
-plot_count(tr$res, zlim = c(0,12))
+plot_gd(tr, bkg, breaks = 10)
+plot_count(tr, zlim = c(0,12))
 
-tr_k <- krig_gd(tr[["res"]][[1]], lyr, disagg_grd = 2)
+# Krige window raster (disaggregate to get smoother final layer)
+tr_k <- krig_gd(tr[[1]], lyr, disagg_grd = 2)
+# Assign any values less than 0 to 0 (since pi can't be less than 0)
 tr_k[tr_k < 0] <- 0
-tr_k_count <- krig_gd(tr[["res"]][[2]], lyr, agg_r = 2, disagg_grd = 2)
+# Krige count raster (aggregate original raster to reduce computational time)
+tr_k_count <- krig_gd(tr[[2]], lyr, agg_r = 2, disagg_grd = 2)
+# Assign any values less than 0 to 0 (since counts can't be less than 0)
 tr_k_count[tr_k_count < 0] <- 0
+
+# Mask kriged raster with count raster (all areas where counts are less than minval are masked)
 tr_k_mask <- mask_gd(tr_k, tr_k_count, minval = 1)
 
+# Plot results
 par(mar = rep(1,4), oma = rep(1,4), pty = "s")
-
 plot_gd(tr_k, bkg, breaks = 10, zlim = c(0,0.30))
 plot_gd(tr_k_mask, bkg, breaks = 10, zlim = c(0,0.30))
 plot_count(tr_k_count, zlim = c(0,12))
 ```
 
-```{r, fig.width = 6, fig.height = 6, cache = TRUE}
-preview_gd(lyr, subcoords, wdim = 3, fact = 3, sample_count = FALSE)
-```
-
-
-# Comparison of measures
+# Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
 
 ```{r, fig.width = 6, fig.height = 8}
-
+# Loop reads in outputs from time_tests functions
+# To recreate these outputs use the run_sims.sh script (or run the scripts within time_tests individually)
 measures <- c("pi", "biallelic_richness", "heterozygosity")
 datasets <- c("rr", "WGS", "FULL")
 for(nsamp in c(100, 200)){
@@ -132,8 +156,7 @@ for(nsamp in c(100, 200)){
 ```
 
 ```{r, fig.width = 7.5, fig.height = 5}
-# {PLOT CODE}
-
+# {Figure CODE} - same as above but *prettier*
 measures <- c("pi", "biallelic_richness", "heterozygosity")
 datasets <- c("rr", "WGS", "FULL")
 for(nsamp in c(100, 200)){
@@ -160,79 +183,11 @@ plot(r, zlim = c(0,0.30),  col = magma(100), legend.only = TRUE)
 plot(r, zlim = c(1,1.75),  col = magma(100), legend.only = TRUE)
 ```
 
-```{r, fig.width = 7.5, fig.height = 5}
+## Figure #X: Timing
 
-for(nsamp in c(100, 200)){
-  for(m in measures){
-    par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
-    
-    for(rarify in c("TRUE", "FALSE")){
-      for(d in datasets){
-        rfile <- here(wdir, "outputs", "krige", 
-                      paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
-        if(file.exists(rfile)){
-          r <- raster(rfile)
-        } else{
-          r <- get_divout(file.name = d, rarify  = rarify, measure = m, nsamp = nsamp)
-          if(is.null(r)) next
-          r <- krig_gd(r, lyr, disagg_grd = 2)
-          writeRaster(r, rfile, overwrite = TRUE)
-        }
-        
-        if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
-        if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
-        if(m == "heterozygosity") {zlim <- c(0,0.4); r[r < 0] <- 0}
-        r <- mask_gd(r, lyr, minval = 0.01)
-        plot(r,  col = magma(10), box = TRUE, axes = FALSE, main = "", zlim = zlim, legend = FALSE)    
-      }
-    }
-  }
-}
-
-n100 <- raster(here(wdir, "outputs", "n100_count.tif"))
-n100k <- krig_gd(n100, lyr, agg_r = 2, disagg_grd = 2)
-n200 <- raster(here(wdir, "outputs", "n200_count.tif"))
-n200k <- krig_gd(n200, lyr, agg_r = 2, disagg_grd = 2)
-
-for(nsamp in c(100, 200)){
-  if(nsamp == 100) msk <- n100k
-  if(nsamp == 200) msk <- n200k
-  for(m in measures){
-    par(mfrow = c(2, 3), mar = c(1,0,1,0), oma = rep(0,4))
-    for(rarify in c("TRUE", "FALSE")){
-      for(d in datasets){
-        rfile <- here(wdir, "outputs", "krige", 
-                      paste0(d, "_rarify", rarify, "_nsamp", nsamp, "_", m, "_krig.tif"))
-        r <- raster(rfile)
-        
-        if(nsamp == 100){
-          if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
-          if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
-          if(m == "heterozygosity") {zlim <- c(0,0.6); r[r < 0] <- 0}
-        }
-        if(nsamp == 200){
-          if(m == "pi") {zlim <- c(0, 0.3); r[r < 0] <- 0}
-          if(m == "biallelic_richness") {zlim <- c(1, 1.7); r[r < 1] <- 1}
-          if(m == "heterozygosity") {zlim <- c(0,0.3); r[r < 0] <- 0}
-        }
-        
-        r <- mask_gd(r, msk, minval = 1)
-        
-        plot(lyr, col = magma(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = TRUE, 
-             zlim = c(0.01,1), legend = FALSE)
-        plot(r,  col = magma(10), box = TRUE, axes = FALSE, 
-             main = "", zlim = zlim, legend = FALSE, add = TRUE)    
-      }
-    }
-  }
-}
-
-```
-
-
-## Timing
 ```{r}
-
+# Loop reads in outputs from time_tests functions
+# To recreate these outputs use the run_sims.sh script (or run the scripts within time_tests individually)
 
 tdf <- dplyr::bind_rows(
   map_dfr(c("rr", "WGS"), get_timeout, rarify = "TRUE", parallel = "FALSE", nsamp = 100),
@@ -274,7 +229,7 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
 
 ```
 
-## Window vs aggregation factor
+## Figure #X: Window vs Aggregation Factor
 
 ```{r, fig.width = 5, fig.height = 5}
 cores <- 6
@@ -324,308 +279,9 @@ plot(r, col = magma(100), zlim = c(0,0.3), legend.only = TRUE)
 
 ```
 
-# Time comparison
 
-Data generated with krig_plots.R
+# Confirmation that biallelic and allelic richness maps are the same
 
-```{r, fig.width = 8, fig.height = 9}
-bkg <- lyr
-bkg[bkg < 0.01] <- NA
-bkg <- disaggregate(bkg, 2)
-
-stk <- list()
-i = 1
-par(mfrow = c(3,3), mar = rep(1,4))
-
-for (m in c("pi", "biallelic.richness", "het")){
-  for (n in c(1000, 5000, 10000)){
-   tr_k <- raster(here(wdir, "outputs", paste0(m, "_", n, "krig.tif")))
-
-   tr_k <- resample(tr_k, bkg)
-
-   tr_k_mask <- mask(tr_k, bkg)
-
-   plot(tr_k_mask, col = viridis::magma(10, alpha = 1.0), axes = FALSE, box = TRUE, legend = TRUE)
-   
-   stk[[i]] <- tr_k_mask
-   i <- i+1
- }
-}
-
-```
-```{r, fig.width = 8, fig.height = 9.65}
-par(mfrow = c(4,3), mar = rep(0.5,4), oma = rep(2,4))
-
-for(n in c(1000,5000,10000)){
-  kde <- raster(here(wdir, "outputs", paste0(n,"_kde.tif")))
-  plot(kde, col = viridis::magma(10, alpha = 1.0), zlim = c(0, 0.0008390501), axes = FALSE, box = TRUE, legend = FALSE)
-}
-
-i=1
-for (m in c("pi", "biallelic.richness", "het")){
- for (n in c(1000, 5000, 10000)){
-   tr_k_mask <- stk[[i]]
-     
-   if(m == "pi") {zlim <- c(0, 0.3); tr_k_mask[tr_k_mask < 0] <- 0}
-   if(m == "biallelic.richness") {zlim <- c(1, 1.5); tr_k_mask[tr_k_mask < 1] <- 1}
-   if(m == "het") {zlim <- c(0,0.3); tr_k_mask[tr_k_mask < 0] <- 0}
-
-   plot(tr_k_mask, col = viridis::magma(10, alpha = 1.0), zlim = zlim, axes = FALSE, box = TRUE, legend = FALSE)
-   
-   i <- i+1
- }
-}
-```
-#
-```{r, fig.width = 4, fig.height = 4}
-set.seed(42)
-
-resf <- purrr::map(c(2, 4, 8, 16), time_test, "fact", subvcf, subcoords, lyr, stat = "pi", wdim = 3, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
-
-plot_time_test(resf, stat = "fact")
-plot_time_test(resf, stat = "ncell")
-plot_time_test(resf, stat = "total_count")
-```
-
-```{r, fig.width = 4, fig.height = 4}
-set.seed(42)
-
-resw2 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 2, stat = "pi", rarify = FALSE, min_n = 1)
-
-plot_time_test(resw2, stat = "wsize")
-
-resw3 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 3, stat = "pi", rarify = FALSE, min_n = 1)
-
-plot_time_test(resw3,  stat = "wsize")
-
-resw4 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", subvcf, subcoords, lyr, fact = 4, stat = "pi", rarify = FALSE, min_n = 1)
-
-plot_time_test(resw4,  stat = "wsize")
-
-```
-
-```{r, fig.width = 10, fig.height = 4}
-plot_rast_test(resw)
-```
-
-# IGNORE BELOW THIS LINE - RAREFACTION STUFF --------------------------------------------------------
-
-# REALIZATION: TIME CHANGING MIGHT HAVE TO DO WITH EDGE OF LANDSCAPE, NOT WINDOW SIZE EXACLTY - MAY NEED TO TRY FAKE LANDSCAPE WITH PERFECT EVEN SAMPLING TO GET CALCS RIGHT
-(replicate the vcf from one individual multiple times evenly across a landscape, also check if there is a diff based on the value but there shouldn't be)
-
-# UNIFORM GRID
-```{r, fig.width = 5, fig.height=5}
-m <- matrix(1, ncol = 10, nrow = 10)
-r <- raster(m)
-pts <- rasterToPoints(r)
-dcoords <- data.frame(pts[,c("x","y")])
-dvcf <- vcf[1:10000,c(1, sample(nrow(dcoords)) + 1)]
-
-dr <- raster(matrix(1,ncol = 10, nrow = 10))
-
-par(pty ="s")
-ncell(dr) == nrow(dcoords)
-plot(dr)
-points(dcoords)
-```
-note: rarify_n needs to be 2 so that landscape/sampling doesn't affect the results (e.g. you don't want any NA values)
-```{r, fig.width = 4, fig.height = 4}
-set.seed(42)
-
-resw2 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 2, stat = "pi", rarify = FALSE, min_n = 2)
-
-
-resw3 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 3, stat = "pi", rarify = FALSE, min_n = 2)
-
-
-resw4 <- purrr::map(c(3, 5, 7, 9, 11), time_test, "wdim", dvcf, dcoords, dr100, fact = 4, stat = "pi", rarify = FALSE, min_n = 2)
-
-plot_time_test(resw2, stat = "wsize")
-plot_time_test(resw3,  stat = "wsize")
-plot_time_test(resw4,  stat = "wsize")
-
-```
-
-```{r}
-dr100 <- raster(matrix(1, ncol = 100, nrow = 100))
-resf3 <- purrr::map(c(2, 3, 4, 5, 6, 7), time_test, "fact", dvcf, dcoords, dr100, stat = "pi", wdim = 3, rarify = FALSE, min_n = 2)
-
-plot_time_test(resf3, stat = "fact")
-```
-# FIGURE OUT THIS WEIRDNESS:
-```{r}
-plot(dr)
-plot(crop(dr, extent(0,21/100,0,21/100)), add = TRUE, col = "red")
-points(dcoords)
-
-resf <- purrr::map(c(3, 5, 7, 9), time_test, "wdim", dvcf, dcoords, dr, stat = "pi", rarify = FALSE, min_n = 1)
-plot_time_test(resf, stat = "wsize")
-plot_time_test(resf)
-
-plot_rast_test(resf)
-```
-
-note to self: I don't think I am counting total time right still...need to think on it (check the minutes versus seconds calculations)
-
-
-# Rarefaction test
-
-```{r}
-m <- matrix(1, ncol = 10, nrow = 20)
-r1 <- raster(m)
-extent(r1) <- c(0, 10, 0, 20)
-m <- matrix(2, ncol = 10, nrow = 20)
-r2 <- raster(m)
-r2 <- aggregate(r2, 2)
-extent(r2) <- c(10, 20, 0, 20)
-pts <- rbind(rasterToPoints(r1), rasterToPoints(r2))
-
-
-dcoords <- data.frame(pts[,c("x","y")])
-plot(dcoords)
-dvcf <- vcf[1:10000,c(1, sample(nrow(dcoords)) + 1)]
-
-dr <- raster(matrix(1, ncol = 20, nrow = 20))
-extent(dr) <- c(0,20,0,20)
-par(pty ="s")
-plot(dr)
-points(dcoords)
-
-wr <- sim(dvcf, dcoords, dr, stat = "het", wdim = 7, fact = 0, min_n = 6, rarify = FALSE, parallel = TRUE)
-
-wor <- sim(dvcf, dcoords, dr, stat = "het", wdim = 7, fact = 0, rarify = TRUE, rarify_n = 6, rarify_nit = 10, parallel = TRUE)
-
-plot(wr$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
-plot(wor$res[[1]], zlim = c(4029, 4829.786), col = magma(100))
-
-par(mfrow = c(1,2))
-plot(wr$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "No Rarefaction")
-plot(wor$res[[1]], zlim = c(0, 0.5), col = magma(100), main = "Rarefaction")
-```
-
-
-
-#Rarefaction take 2
-```{r}
-SiteSampleBuffer <- function(sample_sites, coords, npts, buffer_size = 5){
-  #sample_sites - coordinates of sampling sites
-  #coords - coordinates of all individuals in data set
-  #npts - number of points to sample from each site
-  #buffer - buffer around site from which to draw samples randomly
-  #edge_buffer - buffer from landscape edges to prevent sampling of sites
-  
-  site_samples <- data.frame()
-  
-  #sample sites can be provided as either sp or coords in vector format (nloop just counts how many sites)
-  if(class(sample_sites)[1] == "SpatialPoints"){nloop <- length(sample_sites)} else {nloop <- nrow(sample_sites)}
-  
-  for(s in 1:nloop){
-    #create buffer around sites from which to sample points
-    site_buffers <- rgeos::gBuffer(sample_sites[s,], width = buffer_size)
-    #subset out only coordinates falling within site buffers
-    buffer_samples <- coords[site_buffers,]
-    if(length(buffer_samples) < npts){stop(paste0("Less than npts found in buffer around site"))}
-    #convert from SPDF to df
-    buffer_samples_df <- data.frame(buffer_samples)
-    #randomly sample samples from coordinates
-    randsamp <- sample(nrow(buffer_samples_df), npts)
-    #subset df
-    buffer_samples_df <- buffer_samples_df[randsamp,]
-    
-    #save site IDs
-    buffer_samples_df$site <- s
-    
-    #bind samples
-    site_samples <- rbind(site_samples, buffer_samples_df)
-  }
-  return(site_samples[,c("idx", "x", "y")])
-}
-```
-
-```{r}
-
-plot(lyr)
-points(coords)
-
-pts <- coords
-coordinates(pts) <- ~x+y
-
-sample_sites <- rbind.data.frame(c(75, -20), c(25, -20), c(50, -20))
-colnames(sample_sites) <- c("x", "y")
-coordinates(sample_sites) <- ~x+y
-
-
-subcoords <- rbind.data.frame(SiteSampleBuffer(sample_sites[3], pts, npts = 5, buffer_size = 10),
-                              SiteSampleBuffer(sample_sites[2], pts, npts = 20, buffer_size = 10))
-
-
-plot(lyr)
-points(subcoords[,c("x","y")])
-
-
-si <- colnames(vcf@gt) %in% subcoords$idx
-si[1] <- TRUE
-subvcf <- vcf[l, si]
-
-# reorder coords to match
-subcoords <- subcoords[match(colnames(subvcf@gt[,-1]), subcoords$idx),]
- 
-# check match
-all(colnames(subvcf@gt)[-1] == as.character(subcoords$idx))
-
-nr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3, rarify = FALSE, min_n = 4, L = nrow(subvcf@gt))
-yr <- window_gd(subvcf, subcoords[,c("x","y")], lyr, "biallelic.richness", wdim = 5, fact = 3,rarify = TRUE, rarify_n = 4, rarify_nit = 5, L = nrow(subvcf@gt))
-par(mfrow = c(1,3))
-plot(nr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
-plot(yr[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
-plot(mask(full_ar, nr)[[1]], col = magma(100), zlim = c(1.170413, 1.999993))
-
-par(mfrow = c(1,3))
-plot(nr[[1]], col = magma(100))
-plot(yr[[1]], col = magma(100))
-plot(mask(full_ar, nr)[[1]], col = magma(100))
-```
-
-
-# check grid alignment
-
-```{r, fig.width = 10, fig.height = 20}
-data("lotr_lyr")
-
-lyr <- init(lotr_lyr, 'chess')
-lyr3 <- init(aggregate(lyr, 3),  'chess')
-lyrd3 <- init(disaggregate(lyr, 3),  'chess')
-pts <- raster::rasterToPoints(lyr)
-pts3 <- raster::rasterToPoints(lyr3)
-
-par(pty = "s", mfrow = c(4,2))
-plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
-plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
-
-plot(lyr3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts3, pch = 3, col = magma(1, begin = 0.6), cex = 0.5)
-plot(lyr3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts3[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
-
-plot(lyr, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
-plot(lyr, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 4, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
-
-plot(lyrd3, col = mako(2, begin = 0.3, end = 0.5), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts, pch = 3, col = magma(1, begin = 0.6), cex = 0.1)
-plot(lyrd3, col = mako(2, begin = 0.4, end = 0.6), xlim = c(0,10), ylim = c(-10,0), box = FALSE, axes = FALSE, legend = FALSE)
-points(pts[,c("x","y")], pch = 3, col = magma(1, begin = 0.75), cex = 1, lwd = 3, xlim = c(0,10), ylim = c(-10,0))
-
-
-
-```
-
-
-
-# allelic richness maps
 ```{r}
 load_mini_ex()
 set.seed(22)
