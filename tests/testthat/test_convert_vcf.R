@@ -5,6 +5,12 @@ test_that("check vcf check throws correct errors and return correct object",{
   expect_error(vcf_check("BAD/PATH"))
   expect_error(vcf_check(1))
   expect_s4_class(vcf_check(mini_vcf), "vcfR")
+
+  vcfR::write.vcf(mini_vcf,"temp_vcf.vcf")
+  expect_s4_class(vcf_check("temp_vcf.vcf"), "vcfR")
+  expect_true(file.remove("temp_vcf.vcf"))
+
+  expect_error(vcf_check(2), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
 })
 
 test_that("conversion functions return correct object types and errors",{

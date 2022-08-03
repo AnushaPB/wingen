@@ -10,8 +10,8 @@ which runs the Geonomics simulation and then the time tests to generate
 all of the rasters and time data for the different dataset types.
 
 *Note: some of these are parallelized tasks set up to operate on a 32
-processor system, this can be modified by going into the scripts
-described below*
+processor system, this can be modified by going into any of the files
+marked with an asterix described below*
 
 The results and figures from the paper were created using the
 `simex_notebook.Rmd`
@@ -19,11 +19,11 @@ The results and figures from the paper were created using the
 **Directory structure:**
 
     [simex]
-    |   *run_simex.sh* - main script to run simulations and generate results
-    |   *simex_notebook.Rmd* - main notebook for paper analyses and generate figures
+    |   run_simex.sh - main script to run simulations and generate results
+    |   simex_notebook.Rmd* - main notebook for paper analyses and generate figures
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
-    │   sims_functions.R - functions used for simulation example analysis
+    │   sims_functions.R* - functions used for simulation example analysis
     │
     └───[data]
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
@@ -34,10 +34,10 @@ The results and figures from the paper were created using the
     │   └───[middle_earth] - directory with original DEM raster layers
     |
     └───[time_tests]
-    │   │   AR_time_test.R - generates results for allelic.richness (WGS and rr dataset)
-    │   │   FULL_time_test.R - generates results for FULL dataset
-    │   │   rr_time_test.R - generates results for rr dataset
-    │   │   WGS_time_test.R - generates results for WGS dataset
+    │   │   AR_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
+    │   │   FULL_time_test.R* - generates results for FULL dataset
+    │   │   rr_time_test.R* - generates results for rr dataset
+    │   │   WGS_time_test.R* - generates results for WGS dataset
     │   
     └───[outputs] - directory for results from time tests
 
@@ -51,7 +51,7 @@ The results and figures from the paper were created using the
 **Directory structure:**
 
     [paperex]
-    |   *empex_notebook.Rmd* - main notebook for paper analyses and generate figures
+    |   empex_notebook.Rmd* - main notebook for paper analyses and generate figures
     │
     └───[data]
         │   populations_r20.haplotypes.filtered_m70_randomSNP.ped - original ped file from Bouzid et al. 2022
