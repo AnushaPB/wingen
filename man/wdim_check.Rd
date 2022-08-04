@@ -16,7 +16,7 @@ corrected wdim
 Helper function to check that wdim object is correctly assigned
 }
 \examples{
-wdim_check(c(4,4))
+wdim_check(c(4, 4))
 wdim_check(4)
 
 }

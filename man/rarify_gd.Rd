@@ -13,7 +13,7 @@ rarify_gd(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL)
 
 \item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction}
 
-\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 

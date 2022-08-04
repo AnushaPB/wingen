@@ -13,7 +13,7 @@ rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL)
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
 
-\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 

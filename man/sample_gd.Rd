@@ -9,7 +9,7 @@ sample_gd(gen, sub, stat, L = NULL)
 \arguments{
 \item{gen}{genetic data (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
 
-\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
 }

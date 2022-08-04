@@ -30,7 +30,7 @@ window_helper(
 
 \item{nmat}{neighborhood matrix}
 
-\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed}
 

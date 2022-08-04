@@ -8,7 +8,7 @@ window_gd_general(
   gen,
   coords,
   lyr,
-  stat = calc_mean_ar,
+  stat = "pi",
   wdim = 3,
   fact = 0,
   rarify = FALSE,
@@ -27,7 +27,7 @@ window_gd_general(
 
 \item{lyr}{RasterLayer to slide window across}
 
-\item{stat}{function to calculate genetic diversity (can either be calc_mean_arcalc_pi, calc_mean_biar, or calc_mean_het)}
+\item{stat}{function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)}
 
 \item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created}
 
