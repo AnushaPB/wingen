@@ -33,7 +33,7 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr", stats = "allelic.richness")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "AR", stats = "allelic.richness")
 
 stopCluster(cl)
 
@@ -65,6 +65,6 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "WGS", stats = "allelic.richness")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "AR", stats = "allelic.richness")
 
 stopCluster(cl)
