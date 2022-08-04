@@ -4,7 +4,7 @@
 \alias{calc_pi}
 \title{Calculate nucleotide diversity (pi) from dosage data}
 \usage{
-calc_pi(dos, nloci = NULL)
+calc_pi(dos, L = NULL)
 }
 \arguments{
 \item{dos}{a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP}

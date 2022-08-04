@@ -16,7 +16,7 @@ window_helper(
   rarify_nit,
   min_n,
   fun,
-  nloci = NULL
+  L = NULL
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ window_helper(
 
 \item{fun}{function to use to summarize data in window (defaults to base R mean)}
 
-\item{nloci}{for calculating pi, if nloci=NULL (default), returns the sum over SNPs of nucleotide diversity; otherwise return the average nucleotide diversity per nucleotide given the length nloci of the sequence (L argument in \link[hierfstat]{pi.dosage} function)}
+\item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
 }
 \description{
 Helper function for window calculations

@@ -4,12 +4,21 @@
 \alias{coords_to_raster}
 \title{Create RasterLayer from coordinates}
 \usage{
-coords_to_raster(coords, buffer = 0, agg = NULL, disagg = NULL, plot = FALSE)
+coords_to_raster(
+  coords,
+  buffer = 0,
+  res = NULL,
+  agg = NULL,
+  disagg = NULL,
+  plot = FALSE
+)
 }
 \arguments{
 \item{coords}{coordinates (two columns, the first should be x and the second should be y)}
 
 \item{buffer}{buffer to add to edge of raster (defaults to 0)}
+
+\item{res}{desired resolution of raster (defaults to NULL). Can be a single value for square cells or a vector with two values representing x and y resolutions.}
 
 \item{agg}{aggregation factor to apply to raster (defaults to NULL)}
 
@@ -25,5 +34,5 @@ Create RasterLayer from coordinates
 }
 \examples{
 load_mini_ex()
-coords_to_raster(mini_coords, buffer = 10, plot = TRUE)
+coords_to_raster(mini_coords, buffer = 1, plot = TRUE)
 }

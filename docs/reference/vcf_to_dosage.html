@@ -63,10 +63,30 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ex_vcf"</span><span class="op">)</span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>data set ‘ex_vcf’ not found</span>
-<span class="r-in"><span class="fu">vcf_to_dosage</span><span class="op">(</span><span class="va">ex_vcf</span><span class="op">)</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in vcf_to_dosage(ex_vcf):</span> object 'ex_vcf' not found</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"mini_vcf"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">vcf_to_dosage</span><span class="op">(</span><span class="va">mini_vcf</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        0_113689 0_61080 0_44227 0_71596 0_30648 0_14183 0_109874 0_56633</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 351766        0       0       0       0       0       2        0       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 350702        0       0       0       0       0       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353271        0       0       0       0       2       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353152        0       1       0       0       0       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353382        0       1       0       0       0       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353262        0       2       0       2       2       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 351987        0       2       0       0       0       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 347023        0       0       0       0       2       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353234        0       2       0       0       0       2        0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353497        0       1       0       1       2       2        1       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        0_10656 0_84757</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 351766       2       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 350702       0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353271       0       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353152       1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353382       0       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353262       2       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 351987       2       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 347023       1       2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353234       1       1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 353497       0       1</span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

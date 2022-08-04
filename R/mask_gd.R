@@ -13,31 +13,31 @@
 #' @examples
 #' library("raster")
 #' load_mini_ex()
-#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
 #' @examples
-mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL){
+mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
 
   # match raster layers
-  if(class(mask) == "RasterLayer" | class(mask) == "RasterStack" | class(mask) == "RasterBrick" ){
+  if (class(mask) == "RasterLayer" | class(mask) == "RasterStack" | class(mask) == "RasterBrick") {
 
     # mask areas below min/max val if provided
-    if(!is.null(minval)){
+    if (!is.null(minval)) {
       mask[mask < minval] <- NA
     }
 
-    if(!is.null(maxval)){
+    if (!is.null(maxval)) {
       mask[mask > maxval] <- NA
     }
 
-    if(!raster::compareRaster(x, mask, stopiffalse = FALSE)){
-      if(resample == "mask") mask <- raster::resample(mask, x)
-      if(resample == "x") x <- raster::resample(x, mask)
+    if (!raster::compareRaster(x, mask, stopiffalse = FALSE)) {
+      if (resample == "mask") mask <- raster::resample(mask, x)
+      if (resample == "x") x <- raster::resample(x, mask)
+      if (resample != "x" & resample != "mask") stop("invalid arugment provided for resample (must be \"x\" or \"mask\")")
     }
-
   }
 
   # mask

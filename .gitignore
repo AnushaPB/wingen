@@ -77,3 +77,10 @@ vignettes/*.pdf
 #random spatial files
 *.grd
 *.gri
+
+# private toke
+git_token.R
+
+# vignette files
+vignettes/wingen-vignette_files/*
+Meta

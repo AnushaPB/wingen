@@ -51,11 +51,15 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">krig_gd</span><span class="op">(</span>
   <span class="va">r</span>,
   grd <span class="op">=</span> <span class="cn">NULL</span>,
+  indices <span class="op">=</span> <span class="fl">1</span>,
   coords <span class="op">=</span> <span class="cn">NULL</span>,
   xy <span class="op">=</span> <span class="cn">FALSE</span>,
   resample <span class="op">=</span> <span class="cn">FALSE</span>,
-  agg <span class="op">=</span> <span class="cn">NULL</span>,
-  disagg <span class="op">=</span> <span class="cn">NULL</span>,
+  agg_grd <span class="op">=</span> <span class="cn">NULL</span>,
+  disagg_grd <span class="op">=</span> <span class="cn">NULL</span>,
+  agg_r <span class="op">=</span> <span class="cn">NULL</span>,
+  disagg_r <span class="op">=</span> <span class="cn">NULL</span>,
+  resample_first <span class="op">=</span> <span class="cn">TRUE</span>,
   n_cell <span class="op">=</span> <span class="fl">10000</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -66,16 +70,24 @@
 <dd><p>RasterLayer or RasterStack</p></dd>
 <dt>grd</dt>
 <dd><p>object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use <code>r</code> to create a grid.</p></dd>
+<dt>indices</dt>
+<dd><p>integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)</p></dd>
 <dt>coords</dt>
 <dd><p>if provided, kriging will occur based only on values at these coordinates</p></dd>
 <dt>xy</dt>
 <dd><p>whether to co-krige with x and y (~x+y)</p></dd>
 <dt>resample</dt>
-<dd><p>if grd is a raster, whether to resample r to the resolution of grd (defaults to FALSE)</p></dd>
-<dt>agg</dt>
-<dd><p>factor used for aggregation of grd if provided</p></dd>
-<dt>disagg</dt>
-<dd><p>factor used for disaggregation of grd if provided</p></dd>
+<dd><p>whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)</p></dd>
+<dt>agg_grd</dt>
+<dd><p>factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)</p></dd>
+<dt>disagg_grd</dt>
+<dd><p>factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)</p></dd>
+<dt>agg_r</dt>
+<dd><p>factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)</p></dd>
+<dt>disagg_r</dt>
+<dd><p>factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)</p></dd>
+<dt>resample_first</dt>
+<dd><p>if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)</p></dd>
 <dt>n_cell</dt>
 <dd><p>number of cells to interpolate across if SpatialPointsDataFrame is provided for <code>grd</code></p></dd>
 </dl></div>
@@ -86,27 +98,28 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="load_mini_ex.html">load_mini_ex</a></span><span class="op">(</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="st"><a href="https://rspatial.org/raster" class="external-link">"raster"</a></span><span class="op">)</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package 'raster' was built under R version 4.1.3</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: sp</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package 'sp' was built under R version 4.1.3</span>
+<span class="r-in"><span class="fu"><a href="load_mini_ex.html">load_mini_ex</a></span><span class="op">(</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB; font-weight: bold;">-------- mini middle earth loaded ---------</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB; font-weight: bold;">---------- mini middle earth example ----------</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">Added to GlobalEnv:</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00; font-weight: bold;">vcf</span> <span style="color: #BBBB00;">vcfR object with (10 loci x 10 samples)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">coords</span> <span style="color: #00BB00;">dataframe with x and y coordinates</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB; font-weight: bold;">lyr</span> <span style="color: #BB00BB;">middle earth RasterLayer (10 x 10)</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">Objects loaded:</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00; font-weight: bold;">*mini_vcf*</span> <span style="color: #BBBB00;">vcfR object (10 loci x 10 samples)</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">*mini_coords*</span> <span style="color: #00BB00;">dataframe with x and y coordinates</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB; font-weight: bold;">*mini_lyr*</span> <span style="color: #BB00BB;">middle earth RasterLayer (10 x 10)</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> -------------------------------------------</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> -----------------------------------------------</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span class="va">wpi</span> <span class="op">&lt;-</span> <span class="fu"><a href="window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">vcf</span>, <span class="va">coords</span>, <span class="va">lyr</span>, stat <span class="op">=</span> <span class="st">"pi"</span>, nloci <span class="op">=</span> <span class="fl">10</span>, rarify_n <span class="op">=</span> <span class="fl">4</span>, rarify_nit <span class="op">=</span> <span class="fl">5</span>, rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">kpi</span> <span class="op">&lt;-</span> <span class="fu">krig_gd</span><span class="op">(</span><span class="va">wpi</span>, <span class="va">lyr</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">wpi</span> <span class="op">&lt;-</span> <span class="fu"><a href="window_gd.html">window_gd</a></span><span class="op">(</span><span class="va">mini_vcf</span>, <span class="va">mini_coords</span>, <span class="va">mini_lyr</span>, nloci <span class="op">=</span> <span class="fl">10</span>, rarify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: adegenet</span>
+<span class="r-in"><span class="va">kpi</span> <span class="op">&lt;-</span> <span class="fu">krig_gd</span><span class="op">(</span><span class="va">wpi</span>, <span class="va">mini_lyr</span><span class="op">)</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [using ordinary kriging]</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NaNs produced</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [using ordinary kriging]</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NaNs produced</span>
-<span class="r-in"><span class="fu"><a href="plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kpi</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="plot_gd.html">plot_gd</a></span><span class="op">(</span><span class="va">kpi</span>, main <span class="op">=</span> <span class="st">"Kriged Pi"</span><span class="op">)</span></span>
 <span class="r-plt img"><img src="krig_gd-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="fu"><a href="plot_count.html">plot_count</a></span><span class="op">(</span><span class="va">kpi</span><span class="op">)</span></span>
-<span class="r-plt img"><img src="krig_gd-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"></span>
 </code></pre></div>
     </div>

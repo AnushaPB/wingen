@@ -48,7 +48,9 @@ vcf_to_genind <- function(x, pops = NULL) {
   genind <- vcfR::vcfR2genind(vcf)
 
   # TODO: Clean this up - Check if pops is false
-  if (is.logical(pops)) if (!pops) return(genind)
+  if (is.logical(pops)) if (!pops) {
+    return(genind)
+  }
 
   # assign pops if null or pop vector provided
   if (is.null(genind$pop) | is.vector(pops)) {
@@ -58,9 +60,6 @@ vcf_to_genind <- function(x, pops = NULL) {
     }
 
     if (is.vector(pops)) {
-      if (!is.null(genind$pop) & is.vector(pops)) {
-        warning("overwriting existing genind pops with vector of pops provided")
-      }
       if (length(pops) != nrow(genind@tab)) {
         stop("length of pops does not match number of individuals in genind")
       } else {
@@ -82,13 +81,15 @@ vcf_to_genind <- function(x, pops = NULL) {
 #' @keywords internal
 #'
 #' @examples
-vcf_check <- function(x){
+vcf_check <- function(x) {
   if (class(x)[1] == "vcfR") {
     vcf <- x
-  } else if (file.exists(x)) {
-    vcf <- vcfR::read.vcfR(x)
-  } else if (is.character(x)){
-    stop("Cannot open file: No such file or directory")
+  } else if (is.character(x)) {
+    if (file.exists(x)) {
+      vcf <- vcfR::read.vcfR(x)
+    } else {
+      stop("Cannot open file: No such file or directory")
+    }
   } else {
     stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
   }

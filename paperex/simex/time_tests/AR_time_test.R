@@ -23,7 +23,7 @@ coords <- coords[si,]
 vcf <- vcf[l, c(1, si + 1)]
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
@@ -33,7 +33,7 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "rr", stats = "allelic.richness")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "AR", stats = "allelic.richness")
 
 stopCluster(cl)
 
@@ -55,7 +55,7 @@ coords <- coords[si,]
 vcf <- vcf[l, c(1, si + 1)]
 
 # confirm that correct set is being used
-message(paste("nloci", nrow(vcf@gt), "/ nind", nrow(coords)))
+message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
@@ -65,6 +65,6 @@ cl <- makeCluster(cores)
 registerDoParallel(cl)
 
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "WGS", stats = "allelic.richness")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "AR", stats = "allelic.richness")
 
 stopCluster(cl)

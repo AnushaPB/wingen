@@ -7,7 +7,7 @@
 krig_gd(
   r,
   grd = NULL,
-  indices = 1,
+  index = 1,
   coords = NULL,
   xy = FALSE,
   resample = FALSE,
@@ -24,7 +24,7 @@ krig_gd(
 
 \item{grd}{object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
 
-\item{indices}{integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)}
+\item{index}{integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)}
 
 \item{coords}{if provided, kriging will occur based only on values at these coordinates}
 
@@ -53,7 +53,7 @@ Raster interpolation using 'autoKrige'
 \examples{
 library("raster")
 load_mini_ex()
-wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, nloci = 10, rarify = TRUE)
+wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
 plot_gd(kpi, main = "Kriged Pi")
 

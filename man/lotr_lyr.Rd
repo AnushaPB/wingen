@@ -5,12 +5,12 @@
 \alias{lotr_lyr}
 \title{Middle earth example raster}
 \format{
-A RasterLayer of middle earth
+RasterLayer
 }
 \usage{
 lotr_lyr
 }
 \description{
-RasterLayer of middle earth from CITE
+RasterLayer of middle earth from Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 }
 \keyword{datasets}

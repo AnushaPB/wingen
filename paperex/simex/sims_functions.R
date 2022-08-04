@@ -55,38 +55,13 @@ grid_samp <- function(pts, npts, ldim, full = FALSE){
 }
 
 
-sim <- function(vcf, coords, lyr, stat, wdim = 5, fact = 0, min_n = 2, rarify = FALSE, rarify_n = 4, rarify_nit = 10, parallel = FALSE, nloci = 100000){
-
-  if(parallel){
-    cores <- 6
-    cl <- makeCluster(cores)
-    registerDoParallel(cl)
-  }
-
-  # Start the clock!
-  ptm <- Sys.time()
-
-  res <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify = rarify, rarify_n, rarify_nit, min_n, fun = mean, parallel, nloci)
-
-  # Stop the clock
-  pt <- as.numeric(Sys.time() - ptm, units = "secs")
-
-  plot(res,  col = magma(100))
-
-  if(parallel){
-    stopCluster(cl)
-  }
-
-  return(list(pt = pt, res = res))
-}
-
 default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
 
   # get wdir
   wdir <- get_exdir()
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, nloci = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, L = nrow(vcf@gt))
 
   df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
                    fact = 3,
@@ -102,7 +77,7 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   # make ls of results
   results <- list(df, gdmapr)
 
-  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 
   message("calculation of ", stat, " complete...")
 
@@ -114,8 +89,8 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name,
   wdir <- get_exdir()
 
   results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
-  write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
-  purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nloci", nrow(vcf@gt))))
+  write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
+  purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 }
 
 
@@ -214,12 +189,12 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
 
 
 #OLD?:
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, nloci = 100000){
+time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = 100000){
   # reassign argument
   assign(var, val)
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, nloci)
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, L)
   #plot(gdmapr, col = magma(100))
 
   msk_count <- mask(gdmapr[[2]], gdmapr[[1]])
