@@ -7,7 +7,7 @@
 #'   \item{x}{x coordinate}
 #'   \item{y}{y coordinate}
 #' }
-#' @source
+#' @source created from simulations in Bishop et al., 202X
 "lotr_coords"
 
 #' Middle earth example vcf
@@ -15,16 +15,16 @@
 #' A Variant Call Format data set
 #'
 #' @format Object of class vcfR with 100 individuals and 1000 loci
-#' @source
+#' @source created from simulations in Bishop et al., 202X
 "lotr_vcf"
 
 #' Middle earth example raster
 #'
-#' RasterLayer of middle earth from Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
-#'
+#' RasterLayer of middle earth
 #'
 #' @format RasterLayer
-#' @source
+#' @source created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+#'
 "lotr_lyr"
 
 #' Middle earth example range polygon
@@ -33,7 +33,7 @@
 #'
 #'
 #' @format SpatialPolygonsDataFrame
-#' @source
+#' @source  created from simulations in Bishop et al., 202X
 "lotr_range"
 
 
@@ -44,7 +44,7 @@
 #'   \item{x}{x coordinate}
 #'   \item{y}{y coordinate}
 #' }
-#' @source
+#' @source created from simulations in Bishop et al., 202X
 "mini_coords"
 
 #' Mini middle earth example vcf
@@ -52,7 +52,7 @@
 #' A Variant Call Format data set
 #'
 #' @format Object of class vcfR with 10 individuals and 10 loci
-#' @source
+#' @source created from simulations in Bishop et al., 202X
 "mini_vcf"
 
 #' Mini middle earth example raster
@@ -61,5 +61,5 @@
 #'
 #'
 #' @format A RasterLayer of middle earth
-#' @source
+#' @source created from simulations in Bishop et al., 202X
 "mini_lyr"

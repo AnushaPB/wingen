@@ -21,8 +21,6 @@ library(wingen)
 library(raster)
 library(vcfR)
 library(viridis)
-library(foreach)
-library(doParallel)
 ```
 
 ## Background

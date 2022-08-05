@@ -59,7 +59,6 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #'
 #' @keywords internal
 #'
-#' @examples
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
 
   # TODO: FIX COORDSS
@@ -130,14 +129,12 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 #' Conver a raster to a grid
 #'
 #' @param x RasterLayer
-#' @inheritParams krig_gd
 #'
 #' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
 #' @keywords internal
 #'
-#' @examples
 raster_to_grid <- function(x) {
   grd <- data.frame(raster::rasterToPoints(x))
   sp::coordinates(grd) <- ~ x + y
@@ -152,7 +149,6 @@ raster_to_grid <- function(x) {
 #' @return stack of transformed rasters
 #' @export
 #'
-#' @examples
 raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE) {
   if (raster::nlayers(r) > 1) stop(">1 layer provided for r")
   if (raster::nlayers(grd) > 1) stop(">1 layer provided for grd")

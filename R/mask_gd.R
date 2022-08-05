@@ -18,7 +18,6 @@
 #' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
-#' @examples
 mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
 
   # match raster layers

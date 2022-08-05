@@ -20,3 +20,6 @@
 ^paperex$
 ^\.gitignore$
 ^token$
+^git_token\.R$
+^token\.R$
+^codecov\.yml$

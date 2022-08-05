@@ -25,3 +25,7 @@ plots example window and sample counts (if sample_count = TRUE)
 \description{
 Generate preview of moving window and sample counts
 }
+\examples{
+load_mini_ex()
+preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
+}

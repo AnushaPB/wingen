@@ -93,7 +93,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #'
 #' @keywords internal
 #'
-#' @examples
 window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
   # set L if pi is being calculated
@@ -134,11 +133,11 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
-    future::plan(multisession, workers = ncores)
+    future::plan(future::multisession, workers = ncores)
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr),
                           window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L,
-                          .options = furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")))
+                          .options = furrr::furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")))
 
 
   } else {
@@ -169,10 +168,8 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #'
 #' @keywords internal
 #'
-#' @return
 #' @export
 #'
-#' @examples
 window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL) {
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
@@ -209,10 +206,8 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #'
 #' @keywords internal
 #'
-#' @return
 #' @export
 #'
-#' @examples
 rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
@@ -237,12 +232,9 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = 
 #'
 #' @inheritParams window_gd_general
 #'
-#' @return
 #' @export
 #'
 #' @keywords internal
-#'
-#' @examples
 rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL) {
 
   # check to make sure sub is greater than rarify_n
@@ -279,7 +271,6 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
 #'
 #' @keywords internal
 #'
-#' @examples
 sample_gd <- function(gen, sub, stat, L = NULL) {
   if (is.null(L) | !identical(stat, calc_pi)) {
     gd <- stat(gen[sub, ])
@@ -299,7 +290,6 @@ sample_gd <- function(gen, sub, stat, L = NULL) {
 #'
 #' @keywords internal
 #'
-#' @examples
 calc_mean_ar <- function(genind) {
   ar <- helper_calc_ar(genind)
   gd <- mean(ar, na.rm = TRUE)
@@ -308,12 +298,10 @@ calc_mean_ar <- function(genind) {
 
 #' Helper function to calculate allelic richness
 #'
-#' @param genind
+#' @param genind genind object
 #'
-#' @return
 #' @export
 #'
-#' @examples
 helper_calc_ar <- function(genind) {
   genind$pop <- rep(factor(1), nrow(genind$tab))
   # note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
@@ -330,7 +318,6 @@ helper_calc_ar <- function(genind) {
 #'
 #' @keywords internal
 #'
-#' @examples
 calc_mean_het <- function(hetmat) {
   gd <- mean(hetmat, na.rm = TRUE)
   return(gd)
@@ -343,12 +330,10 @@ calc_mean_het <- function(hetmat) {
 #' @param dos a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP
 #' @param L length of the sequence (*note:* defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)
 #'
-#' @return
 #' @export
 #'
 #' @keywords internal
 #'
-#' @examples
 calc_pi <- function(dos, L = NULL) {
   gd <- hierfstat::pi.dosage(dos, L = L)
   return(gd)
@@ -363,7 +348,6 @@ calc_pi <- function(dos, L = NULL) {
 #'
 #' @keywords internal
 #'
-#' @examples
 calc_mean_biar <- function(dos) {
   if (!all(dos %in% c(0, 1, 2, NA))) {
     stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
@@ -377,12 +361,10 @@ calc_mean_biar <- function(dos) {
 #'
 #' @param loc genotypes at a biallelic locus (must have values of 0, 1, or 2)
 #'
-#' @return
 #' @export
 #'
 #' @keywords internal
 #'
-#' @examples
 helper_calc_biar <- function(loc) {
   uq <- unique(loc, na.rm = TRUE)
   if (1 %in% uq) {
@@ -405,7 +387,6 @@ helper_calc_biar <- function(loc) {
 #'
 #' @export
 #'
-#' @examples
 check_data <- function(gen, coords) {
 
   # check number of samples
@@ -434,8 +415,6 @@ check_data <- function(gen, coords) {
 #' @export
 #'
 #' @keywords internal
-#'
-#' @examples
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
   adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
@@ -453,12 +432,10 @@ get_adj <- function(i, r, n, coord_cells) {
 #'
 #' @param x genetic diversity statistic
 #'
-#' @return
 #' @export
 #'
 #' @keywords internal
 #'
-#' @examples
 return_stat <- function(x){
   if(x == "pi") stat <- calc_pi
   if(x == "biallelic.richness") stat <- calc_mean_biar

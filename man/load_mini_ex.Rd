@@ -15,3 +15,6 @@ three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
 \description{
 Loads mini middle earth example data and assigns to simple names
 }
+\examples{
+load_mini_ex()
+}

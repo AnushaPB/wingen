@@ -15,3 +15,6 @@ three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
 \description{
 Loads middle earth example data and assigns to simple names
 }
+\examples{
+load_middle_earth_ex()
+}

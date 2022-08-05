@@ -11,6 +11,9 @@ A data frame with 10 rows and 2 columns
 \item{y}{y coordinate}
 }
 }
+\source{
+created from simulations in Bishop et al., 202X
+}
 \usage{
 mini_coords
 }

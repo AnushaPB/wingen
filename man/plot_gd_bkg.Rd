@@ -31,6 +31,12 @@ plot_gd_bkg(
 \item{zlim}{limits of the color scale values}
 
 \item{main}{character. Main plot title}
+
+\item{legend}{if FALSE, no legend bar is displayed.}
+
+\item{legend.width}{Width in characters of the legend bar}
+
+\item{axis.args}{A list of additional arguments for the legend axis}
 }
 \description{
 Helper function for plot_gd

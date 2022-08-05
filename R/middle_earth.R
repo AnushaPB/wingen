@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples
+#' load_middle_earth_ex()
 load_middle_earth_ex <- function(quiet = FALSE) {
 
   # load all data
@@ -22,7 +23,7 @@ load_middle_earth_ex <- function(quiet = FALSE) {
       crayon::cyan(crayon::bold("\n-------------- middle earth example --------------\n")),
       crayon::silver("\nObjects loaded:"),
       crayon::yellow(crayon::bold("\n*lotr_vcf*")),
-      crayon::yellow(paste0("vcfR object (", nrow(lotr_vcf@gt), " loci x ", ncol(lotr_vcf@gt) - 1, " samples)")),
+      crayon::yellow(paste0("vcfR object (100 loci x 100 samples)")),
       crayon::green(crayon::bold("\n*lotr_coords*")), crayon::green("dataframe with x and y coordinates"),
       crayon::magenta(crayon::bold("\n*lotr_lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
       crayon::blue(crayon::bold("\n*lotr_range*")), crayon::blue("SpatialPolygonsDataFrame of spp range"),
@@ -41,6 +42,7 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 #' @export
 #'
 #' @examples
+#' load_mini_ex()
 load_mini_ex <- function(quiet = FALSE) {
 
   # load all data

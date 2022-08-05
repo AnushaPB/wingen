@@ -7,6 +7,9 @@
 \format{
 SpatialPolygonsDataFrame
 }
+\source{
+created from simulations in Bishop et al., 202X
+}
 \usage{
 lotr_range
 }

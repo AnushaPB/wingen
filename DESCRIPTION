@@ -21,6 +21,7 @@ Imports:
     crayon,
     furrr,
     future,
+    graphics,
     hierfstat,
     magrittr,
     purrr,
@@ -37,6 +38,7 @@ Suggests:
     knitr,
     rgeos,
     rmarkdown,
+    stringr,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
