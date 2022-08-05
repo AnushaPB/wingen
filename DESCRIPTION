@@ -24,7 +24,6 @@ Imports:
     graphics,
     hierfstat,
     magrittr,
-    progress,
     purrr,
     raster,
     Rcpp,
