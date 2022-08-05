@@ -28,16 +28,9 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test 200
-
-cores <- 10
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
-
-stopCluster(cl)
 
 # run test 100
 
@@ -52,12 +45,7 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 # confirm that correct set is being used
 message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-#cores <- 10
-#cl <- makeCluster(cores)
-#registerDoParallel(cl)
-
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = FALSE, file.name = "rr")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, parallel = FALSE, file.name = "rr")
 
-#stopCluster(cl)

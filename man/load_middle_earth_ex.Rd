@@ -4,11 +4,17 @@
 \alias{load_middle_earth_ex}
 \title{Load middle earth example}
 \usage{
-load_middle_earth_ex()
+load_middle_earth_ex(quiet = FALSE)
+}
+\arguments{
+\item{quiet}{whether to hide message (defaults to FALSE)}
 }
 \value{
 three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
 }
 \description{
 Loads middle earth example data and assigns to simple names
+}
+\examples{
+load_middle_earth_ex()
 }

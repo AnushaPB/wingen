@@ -21,8 +21,6 @@ library(wingen)
 library(raster)
 library(vcfR)
 library(viridis)
-library(foreach)
-library(doParallel)
 ```
 
 ## Background
@@ -118,7 +116,7 @@ The main arguments to `window_gd` are:
 7. *rarify* - Users have the option to perform rarefaction by setting the “rarify” argument to TRUE. If “rarify = TRUE”, users then define “rarify_n” as the number of samples to rarify to and “rarify_nit” as the number of iterations for rarefaction (e.g. if rarify_n = 4 and rarify_nit = 5, for each sample set, four random samples will be drawn five times). As the window moves across the landscape, three things can occur based on the number of samples in the window: (1) if the number of samples is less than “rarify_n”, genetic diversity is not calculated and a raster value of “NA” is assigned, (2) if the number of samples is equal to “rarify_n” the genetic diversity statistic is calculated for those samples, (3) if the number of samples is greater than “rarify_n,” rarefaction is implemented and that set of samples is subsampled “rarify_nit” times to a size of “rarify_n” and the mean (or another summary statistic set using “fun”) of those “rarify_nit” iterations is used. We suggest that users select “rarify_n” and “rarify_nit” such that the number of possible ways to choose “rarify_n” from a sample of size “rarify_n” plus one is greater than “rarify_nit” in order for there to always be “rarify_nit” number of unique combinations of size “rarify_n”. If “rarify = FALSE”, rarefaction is not performed and only steps (1) and (2) occur such that: (1) if the number of samples in the window is less than the “min_n” argument, genetic diversity is not calculated and a raster value of “NA” is assigned and (2) if the number of samples is equal to or greater than “min_n” the genetic diversity statistic is calculated for those samples. We highly encourage users to perform rarefaction as genetic diversity statistics are sensitive to sample size. The main benefit of not performing rarefaction is decreased computational time, however this is not worth the trade-off in inaccuracy unless you are confident that there is no effect of rarefaction after performing your analysis with and without rarefaction.
 
 
-8. *parallel* - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages. To perform parallelization on a Windows operating system a cluster must first be initialized using a few lines of code, a process which we describe later on.
+8. *parallel* - in order to increase computational efficiency, we provide the option for parallelization by setting the “parallel” argument to TRUE. Parallelization is performed using the “foreach” and “doParallel” R packages. 
 
 ----------------------------------------------------------------------------------------------------------
 
@@ -211,14 +209,9 @@ plot_gd(mgd, bkg = range_map, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed users can perform the `window_gd` calculations with parallelization. If you are on a windows machine you first need to initate a cluster to do so, as shown below:
+To increase computational speed users can perform the `window_gd` calculations with parallelization:
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
-cores <- 5
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-
-system.time(
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
@@ -228,11 +221,8 @@ wgd <- window_gd(lotr_vcf,
           rarify_n = 2,
           rarify_nit = 5,
           rarify = TRUE,
-          L = 1000, 
-          parallel = TRUE)
-)
-
-stopCluster(cl)
+          parallel = TRUE,
+          ncores = 2)
 ```
 
 ## Other genetic diversity metrics

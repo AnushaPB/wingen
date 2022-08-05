@@ -60,11 +60,6 @@ message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 # check match
 stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 
-cores <- 20
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-
 # run test
-run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, file.name = "AR", stats = "allelic.richness")
+run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, parallel = TRUE, ncores = 20, file.name = "AR", stats = "allelic.richness")
 
-stopCluster(cl)

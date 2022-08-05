@@ -7,6 +7,9 @@
 \format{
 Object of class vcfR with 100 individuals and 1000 loci
 }
+\source{
+created from simulations in Bishop et al., 202X
+}
 \usage{
 lotr_vcf
 }

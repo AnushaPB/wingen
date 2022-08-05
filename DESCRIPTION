@@ -19,18 +19,16 @@ Imports:
     adegenet,
     automap,
     crayon,
-    doParallel,
-    foreach,
+    furrr,
+    future,
     graphics,
     hierfstat,
     magrittr,
-    progress,
     purrr,
     raster,
     Rcpp,
     rgdal,
     sp,
-    stats,
     utils,
     vcfR,
     viridis
@@ -40,6 +38,7 @@ Suggests:
     knitr,
     rgeos,
     rmarkdown,
+    stringr,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

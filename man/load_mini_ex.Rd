@@ -4,11 +4,17 @@
 \alias{load_mini_ex}
 \title{Load mini middle earth example}
 \usage{
-load_mini_ex()
+load_mini_ex(quiet = FALSE)
+}
+\arguments{
+\item{quiet}{whether to hide message (defaults to FALSE)}
 }
 \value{
 three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
 }
 \description{
 Loads mini middle earth example data and assigns to simple names
+}
+\examples{
+load_mini_ex()
 }

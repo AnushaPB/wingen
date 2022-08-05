@@ -80,7 +80,6 @@ vcf_to_genind <- function(x, pops = NULL) {
 #'
 #' @keywords internal
 #'
-#' @examples
 vcf_check <- function(x) {
   if (class(x)[1] == "vcfR") {
     vcf <- x

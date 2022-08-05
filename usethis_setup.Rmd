@@ -22,7 +22,7 @@ library("devtools")
 usethis::use_pipe(export = TRUE)
 
 # use foreach pipe (remove if not using foreach)
-usethis::use_import_from('foreach', "%dopar%")
+# usethis::use_import_from('foreach', "%dopar%")
 
 # use logo
 usethis::use_logo("logo.png", geometry = "250x250", retina = TRUE)

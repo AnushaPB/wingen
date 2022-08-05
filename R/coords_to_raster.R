@@ -63,7 +63,7 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
   # plot raster
   if (plot) {
     raster::plot(r, legend = FALSE, col = viridis::mako(raster::ncell(r)))
-    points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
+    graphics::points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
   }
 
   return(r)

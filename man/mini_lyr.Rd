@@ -7,6 +7,9 @@
 \format{
 A RasterLayer of middle earth
 }
+\source{
+created from simulations in Bishop et al., 202X
+}
 \usage{
 mini_lyr
 }

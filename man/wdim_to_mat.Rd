@@ -17,7 +17,7 @@ Helper function to convert wdim object to neighbor matrix
 }
 \examples{
 wdim_to_mat(3)
-wdim_to_mat(c(3,5))
+wdim_to_mat(c(3, 5))
 
 }
 \keyword{internal}

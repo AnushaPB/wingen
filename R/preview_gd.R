@@ -10,6 +10,8 @@
 #' @export
 #'
 #' @examples
+#' load_mini_ex()
+#' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
 preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0) {
   if (fact != 0) lyr <- raster::aggregate(lyr, fact)
 
@@ -33,8 +35,8 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
   lyrw[center] <- 2
 
   raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
-  legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-  if (!is.null(coords)) points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+  if (!is.null(coords)) graphics::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
 
   if (sample_count) {
 
@@ -43,7 +45,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 
     # count
     lyrc <- lyr
-    nc <- purrr::map_dbl(1:ncell(lyr), function(x, lyr, nmat, coord_cells) {
+    nc <- purrr::map_dbl(1:raster::ncell(lyr), function(x, lyr, nmat, coord_cells) {
       sub <- get_adj(x, lyr, nmat, coord_cells)
       return(length(sub))
     }, lyr, nmat, coord_cells)

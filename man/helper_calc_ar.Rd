@@ -7,7 +7,7 @@
 helper_calc_ar(genind)
 }
 \arguments{
-\item{genind}{}
+\item{genind}{genind object}
 }
 \description{
 Helper function to calculate allelic richness

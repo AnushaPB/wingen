@@ -7,10 +7,13 @@
 \format{
 RasterLayer
 }
+\source{
+created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+}
 \usage{
 lotr_lyr
 }
 \description{
-RasterLayer of middle earth from Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+RasterLayer of middle earth
 }
 \keyword{datasets}
