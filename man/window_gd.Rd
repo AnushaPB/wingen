@@ -17,7 +17,8 @@ window_gd(
   min_n = 2,
   fun = mean,
   parallel = FALSE,
-  L = "nvariants"
+  L = "nvariants",
+  ncores = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ window_gd(
 \item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
+
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 }
 \value{
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell

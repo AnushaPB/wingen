@@ -16,7 +16,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
   if (class(vcf) != "vcfR" & is.character(vcf)) {
@@ -33,7 +33,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to genind
     gen <- vcfR::vcfR2genind(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, ncores)
 
     names(results[[1]]) <- "allelic_richness"
   }
@@ -44,7 +44,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # IMPORTANT: transform matrix so that rows are individuals and cols are loci
     gen <- t(gen)
 
-    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, ncores)
 
     names(results[[1]]) <- "heterozygosity"
   }
@@ -53,7 +53,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, L, ncores)
 
     names(results[[1]]) <- "pi"
   }
@@ -62,7 +62,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel)
+    results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, ncores)
 
     names(results[[1]]) <- "biallelic_richness"
   }
@@ -86,16 +86,15 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
+#' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
 #'
-#' @importFrom foreach %dopar%
-#'
 #' @keywords internal
 #'
 #' @examples
-window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants") {
+window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
   # set L if pi is being calculated
   if (stat == "pi" & !is.null(L) & !is.numeric(L)) {
@@ -131,17 +130,20 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
 
-  # ignore this: (need to assign i something so that R CMD Check recognizes it as a defined global variable - also this is useful for testing)
-  i <- 1
-
   if (parallel) {
-    rast_vals <- foreach::foreach(i = 1:raster::ncell(lyr), .combine = rbind, .packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")) %dopar% {
-      result <- window_helper(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
 
-      return(result)
-    }
+    if (is.null(ncores)) ncores <- future::availableCores() - 1
+
+    future::plan(multisession, workers = ncores)
+
+    rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr),
+                          window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L,
+                          .options = furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")))
+
+
   } else {
-    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
+    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr),
+                                window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
   }
 
 

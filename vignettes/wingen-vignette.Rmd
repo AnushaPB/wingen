@@ -214,11 +214,6 @@ plot_gd(mgd, bkg = range_map, main = "Kriged & masked pi")
 To increase computational speed users can perform the `window_gd` calculations with parallelization. If you are on a windows machine you first need to initate a cluster to do so, as shown below:
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
-cores <- 5
-cl <- makeCluster(cores)
-registerDoParallel(cl)
-
-system.time(
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
@@ -228,11 +223,8 @@ wgd <- window_gd(lotr_vcf,
           rarify_n = 2,
           rarify_nit = 5,
           rarify = TRUE,
-          L = 1000, 
-          parallel = TRUE)
-)
-
-stopCluster(cl)
+          parallel = TRUE,
+          ncores = 2)
 ```
 
 ## Other genetic diversity metrics
