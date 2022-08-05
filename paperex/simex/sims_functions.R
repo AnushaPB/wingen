@@ -25,53 +25,25 @@ load_middle_earth <- function(){
   return()
 }
 
-grid_samp <- function(pts, npts, ldim, full = FALSE){
-  inc <- ldim/sqrt(npts)
-  xgrid <- ygrid <- seq(0, ldim, inc)
-  subs <- c()
-  #first round of sampling: entire grid
-  for(i in 1:(length(xgrid)-1)){
-    for(j in 1:(length(ygrid)-1)){
-      gridsq = subset(pts, y > ygrid[j] & y < ygrid[j+1] & x > xgrid[i] & x < xgrid[i+1])
-      if(dim(gridsq)[1]>0){ subs = rbind(subs, gridsq[sample(1:dim(gridsq)[1],1 ), ]) }
-    }
-  }
-
-  #second round of sampling: cycle through gridcells again until number of desired samples is reached
-  if(full){
-    while(nrow(subs) != npts){
-      #reset grid indices
-      i=1
-      j=1
-      while(nrow(subs) != npts & i < (length(xgrid)-1) & j < (length(ygrid)-1)){
-        i = i+1
-        j = j+1
-        gridsq = subset(pts, y > ygrid[j] & y < ygrid[j+1] & x > xgrid[i] & x < xgrid[i+1])
-        if(dim(gridsq)[1]>0){subs = rbind(subs, gridsq[sample(1:dim(gridsq)[1],1 ), ])}
-      }
-    }
-  }
-  return(subs$idx)
-}
-
-
-default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.name){
+default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
+                              min_n = 2, fun = mean, parallel, ncores, file.name){
 
   # get wdir
   wdir <- get_exdir()
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5, min_n = 2, fun = mean, parallel, L = nrow(vcf@gt))
+  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = wdim, fact = fact, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                      min_n = min_n, fun = mean, parallel = parallel, ncores = ncores)
 
   df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
-                   fact = 3,
-                   wdim = 3)
+                   fact = fact,
+                   wdim = wdim)
 
   if(rarify){
-    df$rarify_n <- 2
-    df$rarify_nit <- 5
+    df$rarify_n <- rarify_n
+    df$rarify_nit <- rarify_nit
   } else {
-    df$min_n <- 2
+    df$min_n <- min_n
   }
 
   # make ls of results
@@ -84,11 +56,13 @@ default_time_test <- function(stat, vcf, coords, lyr, rarify, parallel, file.nam
   return(results)
 }
 
-run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, file.name, stats =  c("pi", "het", "biallelic.richness")){
+run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, ncores, file.name,
+                                  stats =  c("pi", "het", "biallelic.richness")){
   # get wdir
   wdir <- get_exdir()
 
-  results <- purrr::map(stats, default_time_test, vcf, coords, lyr, rarify, parallel, file.name)
+  results <- purrr::map(stats, default_time_test, vcf = vcf, coords = coords, lyr = lyr, rarify = rarify,
+                        parallel = parallel, ncores = ncores, file.name = file.name)
   write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
   purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 }
@@ -148,7 +122,7 @@ write_rast_helper <- function(resl, file.name){
 }
 
 get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
-  # Code to search for file in directory
+  # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
   presentFile <- grepl(file.name, listFiles) & grepl(file.type, listFiles)
   if(!is.null(rarify)){ presentFile <- presentFile & grepl(paste0("rarify", rarify), listFiles)}
@@ -166,7 +140,7 @@ get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, f
 }
 
 get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL, file.type = ".csv", rootPath = here(get_exdir(), "outputs")){
-  # Code to search for file in directory
+  # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
   presentFile <- grepl(paste0(file.name, "_rarify"), listFiles) & grepl(file.type, listFiles)
   if(!is.null(rarify)){ presentFile <- presentFile & grepl(paste0("rarify", rarify), listFiles)}
@@ -187,32 +161,3 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   return(r)
 }
 
-
-#OLD?:
-time_test <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 5, fact = 3, rarify = TRUE, rarify_n = 10, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = 100000){
-  # reassign argument
-  assign(var, val)
-
-  ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim, fact, rarify, rarify_n, rarify_nit,  min_n, fun, parallel, L)
-  #plot(gdmapr, col = magma(100))
-
-  msk_count <- mask(gdmapr[[2]], gdmapr[[1]])
-  if(rarify){
-    no_rarify <- cellStats(msk_count == rarify_n, "sum", na.rm = TRUE)*rarify_n
-    yes_rarify <- cellStats(msk_count > rarify_n, "sum", na.rm = TRUE)*rarify_n*rarify_nit
-    total_count = yes_rarify + no_rarify
-  } else {
-    total_count <- cellStats(msk_count, "sum", na.rm = TRUE)
-  }
-
-
-  df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
-                   total_count = total_count,
-                   ncell = ncell(aggregate(lyr, fact)),
-                   wsize = wdim*wdim,
-                   wprop = wdim*wdim/ncell(aggregate(lyr, fact)),
-                   fact = fact)
-
-  return(list(df, gdmapr))
-}
