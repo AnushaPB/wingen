@@ -21,7 +21,6 @@ Imports:
     crayon,
     furrr,
     future,
-    graphics,
     hierfstat,
     magrittr,
     purrr,
@@ -29,7 +28,6 @@ Imports:
     Rcpp,
     rgdal,
     sp,
-    stats,
     utils,
     vcfR,
     viridis
