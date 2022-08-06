@@ -38,6 +38,7 @@ Suggests:
     knitr,
     rgeos,
     rmarkdown,
+    sp,
     stringr,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
