@@ -1,13 +1,23 @@
+#' Get directory for files
+#'
+#' @export
+#'
 get_exdir <- function(){
   return(here::here("paperex", "simex"))
 }
 
-load_middle_earth <- function(){
+#' Load middle earth data
+#' @param subset if TRUE, subsets data
+#' @param quiet if TRUE, no message is printed
+#'
+#' @export
+#'
+load_middle_earth <- function(subset = FALSE, quiet = FALSE){
   # get wdir
   wdir <- get_exdir()
 
   # load genetic data
-  vcf <- vcfR::read.vcfR(here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
+  vcf <- vcfR::read.vcfR(here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"), verbose = FALSE)
   assign("vcf", vcf, envir = .GlobalEnv)
 
   # load coords
@@ -22,9 +32,82 @@ load_middle_earth <- function(){
   raster::extent(lyr) <- raster::extent(0,100,-100,0)
   assign("lyr", lyr, envir = .GlobalEnv)
 
+  # Create background layer for plotting
+  bkg <- lyr
+  bkg[bkg < 0.01] <- NA
+  assign("bkg", bkg, envir = .GlobalEnv)
+
+  # subset
+  if (subset){
+    # Create file of individual coordinates if it doesn't exist already
+    set.seed(42)
+    if(!file.exists(here(wdir, "data", "samples_seed42.csv"))){
+      message("creating new file")
+      si <- sample(nrow(coords), 200)
+      write.csv( data.frame(inds = si), here(wdir, "data", "samples_seed42.csv"), row.names = FALSE)
+    } else {
+      message("loading existing file")
+      df <- read.csv(here(wdir, "data", "samples_seed42.csv"))
+      si <- df$inds
+    }
+
+    # Subset coords
+    subcoords <- coords[si,]
+    subcoords <- subcoords[,c("x","y")]
+    assign("subcoords", subcoords, envir = .GlobalEnv)
+
+    # Sample 10k loci
+    l <- sample(nrow(vcf@gt), 10000)
+    # Subset VCF (note: first column of VCF are sample IDs)
+    subvcf <- vcf[l, c(1, si + 1)]
+    # Check match between VCF and coords
+    stopifnot(all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si])))
+    assign("subvcf", subvcf, envir = .GlobalEnv)
+
+
+    if (!quiet) {
+      # give message with information about objects
+      return(message(cat(
+        crayon::cyan(crayon::bold("\n--------------------- middle earth data ---------------------\n")),
+        crayon::silver("\nObjects loaded:"),
+        crayon::yellow(crayon::bold("\n*vcf*")),
+        crayon::yellow(paste0("vcfR object (142129 loci x 1697 samples)")),
+        crayon::green(crayon::bold("\n*coords*")), crayon::green("dataframe with x and y coordinates"),
+        crayon::yellow(crayon::bold("\n*subvcf*")),
+        crayon::yellow(paste0("vcfR object (10000 loci x 200 samples)")),
+        crayon::green(crayon::bold("\n*subcoords*")), crayon::green("dataframe with x and y coordinates for 200 samples"),
+        crayon::magenta(crayon::bold("\n*lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
+        crayon::blue(crayon::bold("\n*bkg*")), crayon::blue("background layer"),
+        crayon::cyan(crayon::bold("\n\n-------------------------------------------------------------\n"))
+      )))
+    }
+
+  } else {
+    if (!quiet) {
+      # give message with information about objects
+      return(message(cat(
+        crayon::cyan(crayon::bold("\n---------------- middle earth data ----------------\n")),
+        crayon::silver("\nObjects loaded:"),
+        crayon::yellow(crayon::bold("\n*lotr_vcf*")),
+        crayon::yellow(paste0("vcfR object (100 loci x 100 samples)")),
+        crayon::green(crayon::bold("\n*lotr_coords*")), crayon::green("dataframe with x and y coordinates"),
+        crayon::magenta(crayon::bold("\n*lotr_lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
+        crayon::blue(crayon::bold("\n*lotr_range*")), crayon::blue("SpatialPolygonsDataFrame of spp range"),
+        crayon::cyan(crayon::bold("\n\n---------------------------------------------------\n"))
+      )))
+    }
+  }
+
+
   return()
 }
 
+#' Run default time tests and produce raster outputs
+#'
+#' @inheritParams window_gd
+#' @param file.name file name to append to beginning of outputs
+#'
+#' @export
 default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
                               min_n = 2, fun = mean, parallel = FALSE, ncores = NULL, file.name){
 
@@ -56,6 +139,11 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify
   return(results)
 }
 
+#' Helper function for default_time_test
+#'
+#' @inheritParams default_time_test
+#'
+#' @export
 run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, ncores, file.name,
                                   stats =  c("pi", "het", "biallelic.richness")){
   # get wdir
@@ -68,44 +156,25 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, ncores, fi
 }
 
 
-unlist_test <- function(res){
-  df <- purrr::map_dfr(res, function(x){x[[1]]})
-
-  r <- purrr::map(res, function(x){x[[2]]})
-  return(list(df = df, raster = r))
-}
-
-
-plot_time_test <- function(res, stat = "all"){
-  res <- unlist_test(res)$df
-  if(stat == "all"){
-    par(pty = "s", mfrow = c(1,5))
-    plot(res$total_count, res$time, type = "b")
-    plot(res$ncell, res$time, type = "b")
-    plot(res$wsize, res$time, type = "b")
-    plot(res$wprop, res$time, type = "b")
-    plot(res$fact, res$time, type = "b")
-  } else {
-    par(pty = "s", mfrow = c(1,1))
-    plot(res[,stat], res$time, type = "b", xlab = stat, ylab = "System Time (seconds)")
-    return(glm(res[,stat] ~ res$time))
-  }
-
-}
-
-plot_rast_test <- function(res, zlim1 = NULL, zlim2 = NULL){
-  res <- unlist_test(res)$raster
-  par(pty = "s", mfrow = c(2, length(res)), mar = rep(2,4), oma = rep(2,4))
-  purrr::map(res, function(x){plot(x[[1]], axes = FALSE, box = FALSE, col = viridis::magma(100), zlim = zlim1)})
-  purrr::map(res, function(x){plot(x[[2]], axes = FALSE, box = FALSE, col = viridis::mako(100), zlim = zlim2)})
-}
-
-
+#' Write out default time test results
+#'
+#' @param res results
+#' @inheritParams default_time_test
+#'
+#' @export
+#'
 write_time_test <- function(res, file.name){
   df <- purrr::map_dfr(res, function(x){x[[1]]})
   write.csv(df, file.name)
 }
 
+#' Write out default time test raster results
+#'
+#' @param res results
+#' @inheritParams default_time_test
+#'
+#' @export
+#'
 write_rast_test <- function(res, file.name){
   if(class(res[[2]]) == "RasterStack"){
     resl <- res[[2]]
@@ -116,11 +185,24 @@ write_rast_test <- function(res, file.name){
   }
 }
 
+#' Helper function for write_rast_test
+#'
+#' @inheritParams write_rast_test
+#'
+#' @export
+#'
 write_rast_helper <- function(resl, file.name){
   lyrname <- names(resl)[1]
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
 
+#' Get raster outputs from default time test files
+#'
+#' @inheritParams default_time_test
+#' @param file.type type of file (defaults to tif)
+#' @param rootPath directory root
+#'
+#' @export
 get_divout <- function(file.name, rarify = NULL, stat = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
   # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
@@ -139,6 +221,13 @@ get_divout <- function(file.name, rarify = NULL, stat = NULL, nsamp = NULL, file
   return(r)
 }
 
+#' Get time test outputs from default time test files
+#'
+#' @inheritParams default_time_test
+#' @param file.type type of file (defaults to csv)
+#' @param rootPath directory root
+#'
+#' @export
 get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL, file.type = ".csv", rootPath = here(get_exdir(), "outputs")){
   # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
@@ -161,6 +250,15 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   return(r)
 }
 
+#' Helper function to test different parameter combinations
+#'
+#' @param params vector of wdim and fact values
+#' @inheritParams window_gd
+#'
+#' @return
+#' @export
+#'
+#' @examples
 test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
   wdim <- as.numeric(params["wdim"])
   fact <- as.numeric(params["fact"])
@@ -178,11 +276,27 @@ test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
   return(res)
 }
 
+#' Convert dataframe to list of vectors
+#'
+#' @param x dataframe
+#'
+#' @export
+#'
 df_to_ls <- function(x){
   x <- split(x, seq(nrow(x)))
   return(x)
 }
 
+#' Helper function to get rasters from default time tests and mask them
+#'
+#' @param params vector with dataset type, rarify value, and stat
+#' @param nsamp number of samples
+#' @param msk_lyr mask layer
+#'
+#' @return
+#' @export
+#'
+#' @examples
 test_datasets_simex <- function(params, nsamp, msk_lyr){
   file.name <- as.character(params[["datasets"]])
   rarify <- as.character(params[["rarify"]])
@@ -199,7 +313,17 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
   return(r)
 }
 
-test_simex_plot <- function(r, bkg, legend = FALSE, zlim = NULL){
+#' Create plots from default time test raster results
+#'
+#' @param r raster
+#' @param bkg background plot
+#' @param legend whether to plot legend
+#'
+#' @return
+#' @export
+#'
+#' @examples
+test_simex_plot <- function(r, bkg, legend = FALSE){
   stat <- names(r)[1]
 
   if(stat == "pi"){zlim <- c(0, 0.30)}
