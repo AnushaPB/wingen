@@ -9,6 +9,9 @@ helper_calc_biar(loc)
 \arguments{
 \item{loc}{genotypes at a biallelic locus (must have values of 0, 1, or 2)}
 }
+\value{
+biallelic richness value
+}
 \description{
 Helper function to calculate allelic richness for a biallelic locus
 }

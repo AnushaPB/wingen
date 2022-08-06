@@ -11,6 +11,9 @@ calc_pi(dos, L = NULL)
 
 \item{L}{length of the sequence (\emph{note:} defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)}
 }
+\value{
+nucleotide diversity (pi)
+}
 \description{
 Wrapper for \link[hierfstat]{pi.dosage} function
 }

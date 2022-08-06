@@ -9,6 +9,9 @@ return_stat(x)
 \arguments{
 \item{x}{genetic diversity statistic}
 }
+\value{
+function corresponding with desired statistic
+}
 \description{
 Helper function to get genetic diversity functions
 }
