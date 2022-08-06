@@ -66,7 +66,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   if (is.null(grd)) grd <- r
 
   # Transform raster layer
-  if (class(grd) == "RasterLayer") {
+  if (inherits(grd, "RasterLayer")) {
     stk <- raster_transform(r, grd, resample, agg_grd, disagg_grd, agg_r, disagg_r, resample_first)
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
@@ -85,7 +85,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   # create grid
   if (is.null(grd)) {
     krig_grid <- raster_to_grid(r)
-  } else if (class(grd) == "RasterLayer") {
+  } else if (inherits(grd, "RasterLayer")) {
     krig_grid <- raster_to_grid(grd)
   } else if (sp::gridded(grd)) {
     krig_grid <- grd

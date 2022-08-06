@@ -19,10 +19,10 @@
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
-  if (class(vcf) != "vcfR" & is.character(vcf)) {
+  if (!inherits(vcf, "vcfR") & is.character(vcf)) {
     vcf <- vcfR::read.vcfR(vcf)
-  } else if (class(vcf) != "vcfR" & !is.character(vcf)) {
-    stop("gen object must be of type vcfR or a path to a .vcf files")
+  } else if (!inherits(vcf, "vcfR") & !is.character(vcf)) {
+    stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
   }
 
   # check to make sure coords and gen align
@@ -109,14 +109,9 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
 
-  # confirm that coords and gen align and set L
-  if (class(gen)[1] == "genind") {
-    if (nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
-  } else {
-    if (nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
-  }
+  # confirm that coords and gen align
+  check_data(gen, coords)
 
-  # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
@@ -396,13 +391,18 @@ helper_calc_biar <- function(loc) {
 check_data <- function(gen, coords) {
 
   # check number of samples
-  if (class(gen) == "genind") {
+  if (inherits(gen, "genind")) {
     nind <- nrow(gen$tab)
   }
 
-  if (class(gen) == "vcfR") {
+  if (inherits(gen, "vcfR")) {
     nind <- (ncol(gen@gt) - 1)
   }
+
+  if (inherits(gen, "data.frame") | inherits(gen, "matrix")) {
+    nind <- nrow(gen)
+  }
+
 
   # check to make sure coords and gen align
   if (nind != nrow(coords)) {

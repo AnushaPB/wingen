@@ -16,7 +16,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
 Imports: 
-    adegenet,
     automap,
     crayon,
     furrr,
@@ -26,8 +25,6 @@ Imports:
     magrittr,
     purrr,
     raster,
-    Rcpp,
-    rgdal,
     sp,
     utils,
     vcfR,
@@ -36,6 +33,7 @@ Suggests:
     covr,
     devtools,
     knitr,
+    rgdal,
     rgeos,
     rmarkdown,
     sp,
