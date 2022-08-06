@@ -151,7 +151,7 @@ test_that("vcf path works", {
 test_that("error if bad vcf is given", {
   vcfpath <- "badpath"
   expect_warning(expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), "cannot open the connection"), "No such file or directory")
-  expect_error(wpi <- window_gd(mini_coords, mini_coords, mini_lyr, rarify = FALSE), "gen object must be of type vcfR or a path to a .vcf files")
+  expect_error(wpi <- window_gd(mini_coords, mini_coords, mini_lyr, rarify = FALSE), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
 })
 
 test_that("return_stat returns correct functions", {

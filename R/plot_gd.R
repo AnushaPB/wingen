@@ -25,12 +25,12 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
-      purrr::map(index, plot_gd_bkg,
+      plt <- purrr::map(index, plot_gd_bkg,
         x = x, bkg = bkg, col = col, breaks = breaks, zlim = zlim,
         main = main, legend = legend, legend.width = legend.width, axis.args = axis.args
       )
     } else {
-      raster::plot(x[[index]],
+      plt <- raster::plot(x[[index]],
         col = col,
         zlim = zlim,
         main = main,
@@ -43,7 +43,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
     }
   })
 
-  return()
+  return(invisible(plt))
 }
 
 #' Helper function for plot_gd
@@ -66,6 +66,16 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
     ymin <- min(raster::extent(bkg)@ymin, raster::extent(x)@ymin)
     ymax <- max(raster::extent(bkg)@ymax, raster::extent(x)@ymax)
 
+    raster::plot(x[[index]],
+                 col = "white",
+                 xlim = c(xmin, xmax),
+                 ylim = c(ymin, ymax),
+                 axes = FALSE,
+                 box = FALSE,
+                 legend = FALSE,
+                 main = main
+    )
+
     raster::plot(bkg,
       col = "lightgray",
       border = "white",
@@ -74,7 +84,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
       axes = FALSE,
       box = FALSE,
       legend = FALSE,
-      main = main
+      add = TRUE
     )
 
     raster::plot(x[[index]],
@@ -116,7 +126,7 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
     if (raster::nlayers(x) > 1) {
-      raster::plot(x[[index]],
+      plt <- raster::plot(x[[index]],
         col = col,
         zlim = zlim,
         main = main,
@@ -129,7 +139,7 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
     }
 
     if (raster::nlayers(x) == 1) {
-      raster::plot(x,
+      plt <- raster::plot(x,
         col = col,
         zlim = zlim,
         main = main,
@@ -142,5 +152,5 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
     }
   })
 
-  return()
+  return(invisible(plt))
 }

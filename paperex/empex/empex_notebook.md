@@ -1,8 +1,7 @@
----
-title: "Empirical Example"
-output: github_document
----
-```{r, message = FALSE, results = FALSE, warning = FALSE}
+Empirical Example
+================
+
+``` r
 library(wingen)
 library(vcfR)
 library(rgdal)
@@ -19,23 +18,46 @@ source(here(wdir, "empex_functions.R"))
 
 # Empirical Dataset
 
-Data used in this example is from Bouzid et al. (2022): https://doi.org/10.5061/dryad.n5tb2rbv2
+Data used in this example is from Bouzid et al. (2022):
+<https://doi.org/10.5061/dryad.n5tb2rbv2>
 
-**Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., & Leaché, A. D. (2022). Evidence for ephemeral ring species formation during the diversification history of western fence lizards ( Sceloporus occidentalis ). Molecular Ecology, 31(2), 620–631. https://doi.org/10.1111/mec.15836**
+**Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., &
+Leaché, A. D. (2022). Evidence for ephemeral ring species formation
+during the diversification history of western fence lizards ( Sceloporus
+occidentalis ). Molecular Ecology, 31(2), 620–631.
+<https://doi.org/10.1111/mec.15836>**
 
-```{r, fig.width = 5, fig.height = 5}
-
+``` r
 # Genetic data
 vcf <- read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_randomSNP.vcf"))
+```
 
+    ## Scanning file to determine attributes.
+    ## File attributes:
+    ##   meta lines: 6
+    ##   header_line: 7
+    ##   variant count: 6944
+    ##   column count: 110
+    ## Meta line 6 read in.
+    ## All meta lines processed.
+    ## gt matrix initialized.
+    ## Character matrix gt created.
+    ##   Character matrix gt rows: 6944
+    ##   Character matrix gt cols: 110
+    ##   skip: 0
+    ##   nrows: 6944
+    ##   row_num: 0
+    ## Processed variant 1000Processed variant 2000Processed variant 3000Processed variant 4000Processed variant 5000Processed variant 6000Processed variant: 6944
+    ## All variants processed
+
+``` r
 # Coordinates
 coords <- read.table(here(wdir, "data", "Scelop.coord"))
-
 ```
 
 Additionally, state data is used from TIGRIS:
 
-```{r, message = FALSE, results = FALSE}
+``` r
 # download states from tigris
 states <- states(cb = TRUE)
 
@@ -54,22 +76,28 @@ NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Ne
 
 ## Figure 4: Geographic context plots
 
-```{r, fig.width = 8, fig.height = 5}
+``` r
 par(mar = rep(0,4))
 plot(conus, col = "lightgray", border = "lightgray", main = "")
 plot(NUS, col = mako(1, begin = 0.7), border = "white", add = TRUE, main = "")
 ```
 
-```{r, fig.width = 3, fig.height = 5}
+![](empex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
 par(mar = rep(0,4))
 plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 ```
 
+![](empex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
 # Run wingen analysis
 
-First, different parameter combinations are evaluated. Here we vary the window size (wdim), the raster resolutions (disagg), and the rarefaction size (rarify_n) to get the plots from Figure S4
+First, different parameter combinations are evaluated. Here we vary the
+window size (wdim), the raster resolutions (disagg), and the rarefaction
+size (rarify\_n) to get the plots from Figure S4
 
-```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
+``` r
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
 stk <- purrr::map(params, test_empex, vcf, coords)
@@ -78,9 +106,11 @@ par(mfrow = c(2, 3), mar = rep(1, 4))
 purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
 ```
 
+![](empex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+
 Based on the results above we chose a final set of parameters:
 
-```{r}
+``` r
 # set parameters 
 wdim = 5
 fact = 0
@@ -90,9 +120,10 @@ disagg = 4
 lyr <- coords_to_raster(coords, disagg = disagg, buffer = 1)
 ```
 
-And ran the moving window function again, this time kriging and masking the resulting rasters:
+And ran the moving window function again, this time kriging and masking
+the resulting rasters:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, message = FALSE, results = FALSE, warning = FALSE}
+``` r
 # Run moving window
 set.seed(22)
 hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
@@ -114,9 +145,9 @@ khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
 mhg <- mask(khg, NUS)
 ```
 
-Plots for Figure 4: 
+Plots for Figure 4:
 
-```{r, fig.width = 12, fig.height = 6}
+``` r
 par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
 plot_gd(mpg, legend.width = 2,  axis.args = list(cex.axis = 1.5))
 
@@ -132,9 +163,12 @@ plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 ```
 
-Redo moving window calculations without rarefaction to get plots for Figure S5:
+![](empex_notebook_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+Redo moving window calculations without rarefaction to get plots for
+Figure S5:
+
+``` r
 hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
@@ -142,8 +176,7 @@ pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify
 agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 ```
 
-
-```{r, fig.width = 15, fig.height = 12}
+``` r
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
 plot_gd(pg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
@@ -153,7 +186,11 @@ plot_gd(hg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 plot_gd(pgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 plot_gd(agn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 plot_gd(hgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+```
 
+![](empex_notebook_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+``` r
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
 plot_gd(pg, NUS, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
@@ -165,8 +202,11 @@ plot_gd(agn, NUS, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, ax
 plot_gd(hgn, NUS, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
-```{r, fig.width = 4, fig.height = 5}
+![](empex_notebook_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+
+``` r
 par(mar = rep(0,4))
 plot_count(ag)
 ```
 
+![](empex_notebook_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->

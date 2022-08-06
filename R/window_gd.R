@@ -19,10 +19,10 @@
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
-  if (class(vcf) != "vcfR" & is.character(vcf)) {
+  if (!inherits(vcf, "vcfR") & is.character(vcf)) {
     vcf <- vcfR::read.vcfR(vcf)
-  } else if (class(vcf) != "vcfR" & !is.character(vcf)) {
-    stop("gen object must be of type vcfR or a path to a .vcf files")
+  } else if (!inherits(vcf, "vcfR") & !is.character(vcf)) {
+    stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
   }
 
   # check to make sure coords and gen align
@@ -109,14 +109,9 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
 
-  # confirm that coords and gen align and set L
-  if (class(gen)[1] == "genind") {
-    if (nrow(gen@tab) != nrow(coords)) stop("number of individuals in coordinates and genetic data do not match")
-  } else {
-    if (nrow(coords) != nrow(gen)) stop("number of individuals in coordinates and genetic data do not match")
-  }
+  # confirm that coords and gen align
+  check_data(gen, coords)
 
-  # make neighborhood matrix for window
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
@@ -130,19 +125,19 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
 
   if (parallel) {
-
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
     future::plan(future::multisession, workers = ncores)
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr),
-                          window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L,
-                          .options = furrr::furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet")))
-
-
+      window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L,
+      .options = furrr::furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet"))
+    )
   } else {
-    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr),
-                                window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L)
+    rast_vals <- purrr::map_dfr(
+      1:raster::ncell(lyr),
+      window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L
+    )
   }
 
 
@@ -168,6 +163,7 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #'
 #' @keywords internal
 #'
+#' @return genetic diversity and counts for a single cell
 #' @export
 #'
 window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL) {
@@ -206,6 +202,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #'
 #' @keywords internal
 #'
+#' @return genetic diversity statistic for a rarified subsample
 #' @export
 #'
 rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL) {
@@ -232,6 +229,7 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = 
 #'
 #' @inheritParams window_gd_general
 #'
+#' @return rarified genetic diversity statistic
 #' @export
 #'
 #' @keywords internal
@@ -300,6 +298,7 @@ calc_mean_ar <- function(genind) {
 #'
 #' @param genind genind object
 #'
+#' @return allelic richness
 #' @export
 #'
 helper_calc_ar <- function(genind) {
@@ -330,6 +329,7 @@ calc_mean_het <- function(hetmat) {
 #' @param dos a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP
 #' @param L length of the sequence (*note:* defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)
 #'
+#' @return nucleotide diversity (pi)
 #' @export
 #'
 #' @keywords internal
@@ -361,6 +361,7 @@ calc_mean_biar <- function(dos) {
 #'
 #' @param loc genotypes at a biallelic locus (must have values of 0, 1, or 2)
 #'
+#' @return biallelic richness value
 #' @export
 #'
 #' @keywords internal
@@ -390,18 +391,24 @@ helper_calc_biar <- function(loc) {
 check_data <- function(gen, coords) {
 
   # check number of samples
-  if (class(gen) == "genind") {
+  if (inherits(gen, "genind")) {
     nind <- nrow(gen$tab)
   }
 
-  if (class(gen) == "vcfR") {
+  if (inherits(gen, "vcfR")) {
     nind <- (ncol(gen@gt) - 1)
   }
+
+  if (inherits(gen, "data.frame") | inherits(gen, "matrix")) {
+    nind <- nrow(gen)
+  }
+
 
   # check to make sure coords and gen align
   if (nind != nrow(coords)) {
     stop("number of samples in coords data and number of samples in gen data are not equal")
   }
+
 }
 
 #' Helper function to get adjacent cells to a given cell index
@@ -432,14 +439,15 @@ get_adj <- function(i, r, n, coord_cells) {
 #'
 #' @param x genetic diversity statistic
 #'
+#' @return function corresponding with desired statistic
 #' @export
 #'
 #' @keywords internal
 #'
-return_stat <- function(x){
-  if(x == "pi") stat <- calc_pi
-  if(x == "biallelic.richness") stat <- calc_mean_biar
-  if(x == "allelic.richness") stat <- calc_mean_ar
-  if(x == "het") stat <- calc_mean_het
+return_stat <- function(x) {
+  if (x == "pi") stat <- calc_pi
+  if (x == "biallelic.richness") stat <- calc_mean_biar
+  if (x == "allelic.richness") stat <- calc_mean_ar
+  if (x == "het") stat <- calc_mean_het
   return(stat)
 }
