@@ -33,6 +33,7 @@ Suggests:
     covr,
     devtools,
     knitr,
+    MASS,
     rgdal,
     rgeos,
     rmarkdown,
