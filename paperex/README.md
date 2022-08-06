@@ -19,12 +19,12 @@ The results and figures from the paper were created using the
 **Directory structure:**
 
     [simex]
-    |   run_simex.sh - main script to run simulations and generate results
+    |   run_simex.sh* - main script to run simulations and generate results
     |   simex_notebook.Rmd* - main notebook for paper analyses and generate figures
-    |   simex_notebook.md* - knitted simex_notebook.Rmd
+    |   simex_notebook.md - knitted simex_notebook.Rmd
+    │   simex_functions.R* - functions used for simulation example analysis
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
-    │   simex_functions.R* - functions used for simulation example analysis
     │
     └───[data]
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
@@ -53,7 +53,7 @@ The results and figures from the paper were created using the
 
     [paperex]
     |   empex_notebook.Rmd* - main notebook for paper analyses and generate figures
-    |   empex_notebook.md* - knitted empex_notebook.Rmd
+    |   empex_notebook.md - knitted empex_notebook.Rmd
     |   empex_functions.R* - functions used for empirical example analysis
     │
     └───[data]
