@@ -6,59 +6,28 @@ library(wingen)
 library(raster)
 library(vcfR)
 library(viridis)
-library(foreach)
-library(doParallel)
 library(here)
 library(ggplot2)
 library(dplyr)
 library(purrr)
 library(adegenet)
-library(hierfstat)
 
 wdir <- here("paperex", "simex")
 source(here(wdir, "simex_functions.R"))
 ```
 
-# Load simulation results
+## Load simulation results
+
+The following function loads the results from the simulation and subsets
+the data for the example walkthrough.
 
 ``` r
-# Load middle earth layer and format as a raster
-lyr <- read.csv(here(wdir, "data", "middle_earth.csv"), header = FALSE)
-lyr <- raster(as.matrix(lyr))
-extent(lyr) <- extent(0,100,-100,0)
-# Create background layer for plotting
-bkg <- lyr
-bkg[bkg < 0.01] <- NA
-
-# Read in geospatial data and convert coordinates to match lyr
-geo <- read.csv(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.csv"))
-geo$y <- -geo$y
-coords <- geo[,c("idx","x","y")]
-
-# Create file of individual coordinates if it doesn't exist already
-set.seed(42)
-if(!file.exists(here(wdir, "data", "samples_seed42.csv"))){
-  message("creating new file")
-  si <- sample(nrow(coords), 200)
-  write.csv( data.frame(inds = si), here(wdir, "data", "samples_seed42.csv"), row.names = FALSE)
-} else {
-  message("loading existing file")
-  df <- read.csv(here(wdir, "data", "samples_seed42.csv"))
-  si <- df$inds
-}
+load_middle_earth(subset = TRUE)
 ```
 
-    ## loading existing file
+## Figure 2: Simulation Example
 
-``` r
-# Subset coords
-subcoords <- coords[si,]
-subcoords <- subcoords[,c("x","y")]
-```
-
-# Figure 2: Simulation Example
-
-## Simulation setup plots
+### Simulation setup plots
 
 ``` r
 # Make kernel density raster from FULL coordinates
@@ -92,87 +61,7 @@ legend(0,-80,
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
 
-## Example simulation walkthrough
-
-``` r
-# Read in VCF
-vcf <- read.vcfR(here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"))
-# Sample 10k loci
-l <- sample(nrow(vcf@gt), 10000)
-# Subset VCF (note: first column of VCF are sample IDs)
-subvcf <- vcf[l, c(1, si + 1)]
-# check match between VCF and coords
-stopifnot(all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si])))
-
-tr <- window_gd(subvcf, 
-                subcoords, 
-                lyr, 
-                stat = "pi", 
-                wdim = 3, 
-                fact = 3, 
-                rarify_n = 2, 
-                rarify_nit = 5, 
-                rarify = TRUE, 
-                parallel = FALSE)
-```
-
-``` r
-# Get window results
-tr <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = 200)
-
-# Get counts layer from preview gd 
-ct <- preview_gd(lyr, 
-                subcoords, 
-                wdim = 3, 
-                fact = 3)
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
-
-``` r
-# stack moving window and sample count layers
-tr <- stack(tr, ct[["sample_count"]])
-
-# plot results
-par(mar = rep(0,4), oma = rep(0,4), pty = "s")
-plot_gd(tr, bkg, breaks = 10)
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
-
-``` r
-# Krige window raster (disaggregate to get smoother final layer)
-tr_k <- krig_gd(tr[[1]], lyr, disagg_grd = 2)
-# Assign any values less than 0 to 0 (since pi can't be less than 0)
-tr_k[tr_k < 0] <- 0
-# Krige count raster (aggregate original raster to reduce computational time)
-tr_k_count <- krig_gd(tr[[2]], lyr, agg_r = 2, disagg_grd = 2)
-# Assign any values less than 0 to 0 (since counts can't be less than 0)
-tr_k_count[tr_k_count < 0] <- 0
-
-# Mask kriged raster with count raster (all areas where counts are less than minval are masked)
-tr_k_mask <- mask_gd(tr_k, tr_k_count, minval = 1)
-
-# Plot results
-par(mar = rep(1,4), oma = rep(1,4), pty = "s")
-plot_gd(tr_k, bkg, breaks = 10, zlim = c(0,0.30))
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->
-
-``` r
-plot_gd(tr_k_mask, bkg, breaks = 10, zlim = c(0,0.30))
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-5.png)<!-- -->
-
-``` r
-plot_count(tr_k_count, zlim = c(0,12))
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-6.png)<!-- -->
-
-# Figure \#X: Window vs Aggregation Factor
+### Figure \#X: Window vs Aggregation Factor
 
 ``` r
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -180,16 +69,16 @@ params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
 stk <- purrr::map(params, test_params_simex, subvcf, subcoords, lyr)
 
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-purrr::walk(stk, test_simex_plot, bkg = bkg, zlim = c(0, 0.30))
+purrr::walk(stk, test_simex_plot, bkg = bkg)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
-# Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
+## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
 
 ``` r
-params <- df_to_ls(expand.grid(rarify = c("TRUE", "FALSE"),
-                               datasets = c("rr", "WGS", "FULL"),
+params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
+                               rarify = c("TRUE", "FALSE"),
                                stat = c("pi", "biallelic_richness", "heterozygosity")))
 
 # Get example layers for masking (doesn't matter which parameters other than nsamp)
@@ -202,21 +91,21 @@ stk100 <- purrr::map(params, test_datasets_simex, nsamp = 100, msk_lyr = msk_lyr
 
 stk200 <- purrr::map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
-# Plot results (for figures, legend was set to FALSE)
+# Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-purrr::walk(stk100, test_simex_plot, bkg = bkg, legend = TRUE)
+purrr::walk(stk100, test_simex_plot, bkg = bkg, legend = FALSE)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4), pty = "s")
-purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = TRUE)
+purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-7-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-7-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-7-6.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-6.png)<!-- -->
 
-# Figure \#X: Timing
+## Figure \#X: Timing
 
 ``` r
 # Loop reads in outputs from time_tests functions
@@ -259,21 +148,4 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
         panel.grid.major.x = element_blank())
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
-
-# Confirmation that biallelic and allelic richness maps are the same
-
-``` r
-load_mini_ex()
-set.seed(22)
-trab <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = TRUE, parallel = FALSE)
-set.seed(22)
-tra <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify = TRUE, parallel = FALSE)
-plot_gd(trab)
-plot_gd(tra)
-
-r <- raster("outputs/WGS_rarifyTRUE_nsamp200_nloci100000_allelic_richness.tif")
-plot_gd(r)
-r <- raster("outputs/WGS_rarifyTRUE_nsamp200_nloci100000_biallelic_richness.tif")
-plot_gd(r)
-```
+![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->

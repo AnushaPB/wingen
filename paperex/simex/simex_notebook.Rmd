@@ -60,7 +60,7 @@ params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
 stk <- purrr::map(params, test_params_simex, subvcf, subcoords, lyr)
 
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-purrr::walk(stk, test_simex_plot, bkg = bkg, zlim = c(0, 0.30))
+purrr::walk(stk, test_simex_plot, bkg = bkg)
 ```
 
 ## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
