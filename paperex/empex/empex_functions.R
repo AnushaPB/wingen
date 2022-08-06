@@ -23,7 +23,7 @@ test_empex <- function(params, vcf, coords){
 test_empex_plot <- function(stk, bkg, zlim = c(0.02, 0.11)){
   r <- raster::stack(stk)
   plot_gd(r, bkg = bkg, zlim = zlim, legend = FALSE, breaks = 100)
-  return(invisible(NULL))
+  return(NULL)
 }
 
 df_to_ls <- function(x){
