@@ -135,27 +135,12 @@ ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
-```
-
-    ## [using ordinary kriging]
-
-``` r
 mpg <- mask(kpg, NUS)
 
 kag <- krig_gd(ag, index = 1, lyr, disagg_grd = 4)
-```
-
-    ## [using ordinary kriging]
-
-``` r
 mag <- mask(kag, NUS)
 
 khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
-```
-
-    ## [using ordinary kriging]
-
-``` r
 mhg <- mask(khg, NUS)
 ```
 
@@ -164,29 +149,15 @@ Plots for Figure 4:
 ``` r
 par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
 plot_gd(mpg, legend.width = 2,  axis.args = list(cex.axis = 1.5))
-```
 
-    ## NULL
-
-``` r
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 plot_gd(mag, legend.width = 2,  axis.args = list(cex.axis = 1.5))
-```
-
-    ## NULL
-
-``` r
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 plot_gd(mhg, legend.width = 2,  axis.args = list(cex.axis = 1.5))
-```
-
-    ## NULL
-
-``` r
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 ```
@@ -208,81 +179,29 @@ agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fac
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
 plot_gd(pg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(ag, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(hg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-```
 
-    ## NULL
-
-``` r
 plot_gd(pgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(agn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(hgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-    ## NULL
-
 ``` r
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
 plot_gd(pg, NUS, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(ag, NUS, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(hg, NUS, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
-```
 
-    ## NULL
-
-``` r
 plot_gd(pgn, NUS, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(agn, NUS, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
-```
-
-    ## NULL
-
-``` r
 plot_gd(hgn, NUS, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
-
-    ## NULL
 
 ``` r
 par(mar = rep(0,4))
@@ -290,5 +209,3 @@ plot_count(ag)
 ```
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-
-    ## NULL
