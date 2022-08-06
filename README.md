@@ -12,7 +12,8 @@
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 <!-- badges: end -->
 
-Generate continuous maps of genetic diversity using moving windows
+Generate continuous maps of genetic diversity using moving windows with
+options for rarefaction, kriging, and masking.
 
 ## Installation
 
