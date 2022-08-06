@@ -26,7 +26,7 @@ load_middle_earth <- function(){
 }
 
 default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
-                              min_n = 2, fun = mean, parallel, ncores, file.name){
+                              min_n = 2, fun = mean, parallel = FALSE, ncores = NULL, file.name){
 
   # get wdir
   wdir <- get_exdir()
@@ -121,16 +121,16 @@ write_rast_helper <- function(resl, file.name){
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
 
-get_divout <- function(file.name, rarify = NULL, measure = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
+get_divout <- function(file.name, rarify = NULL, stat = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
   # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
   presentFile <- grepl(file.name, listFiles) & grepl(file.type, listFiles)
   if(!is.null(rarify)){ presentFile <- presentFile & grepl(paste0("rarify", rarify), listFiles)}
-  if(!is.null(measure)){ presentFile <- presentFile & grepl(measure, listFiles)}
+  if(!is.null(stat)){ presentFile <- presentFile & grepl(stat, listFiles)}
   if(file.name != "FULL" & !is.null(nsamp)){ presentFile <- presentFile & grepl(paste0("nsamp", nsamp), listFiles)}
   locFile <- listFiles[presentFile]
 
-  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, measure, "- returning NULL")); return(NULL)}
+  if(!any(presentFile)){warning(paste("File does not exist for", file.name, rarify, stat, "- returning NULL")); return(NULL)}
   file <- here(rootPath, locFile)
   if(length(file) > 1) {print(file); stop("more than one file provided")}
   r <- raster::stack(file)
@@ -159,5 +159,54 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   r$dataset <- file.name
 
   return(r)
+}
+
+test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
+  wdim <- as.numeric(params["wdim"])
+  fact <- as.numeric(params["fact"])
+  res <- window_gd(vcf,
+                   coords,
+                   lyr,
+                   stat = stat,
+                   wdim = wdim,
+                   fact = fact,
+                   rarify = TRUE,
+                   rarify_n = 2,
+                   rarify_nit = 5,
+                   parallel = TRUE,
+                   ncores = 4)
+  return(res)
+}
+
+df_to_ls <- function(x){
+  x <- split(x, seq(nrow(x)))
+  return(x)
+}
+
+test_datasets_simex <- function(params, nsamp, msk_lyr){
+  file.name <- as.character(params[["datasets"]])
+  rarify <- as.character(params[["rarify"]])
+  stat <- as.character(params[["stat"]])
+
+  r <- get_divout(file.name = file.name,
+                  rarify = rarify,
+                  stat = stat,
+                  nsamp = nsamp)
+
+  if(is.null(r)) return(NULL)
+  r <- mask(r, msk_lyr)
+  names(r) <- stat
+  return(r)
+}
+
+test_simex_plot <- function(r, bkg, legend = FALSE, zlim = NULL){
+  stat <- names(r)[1]
+
+  if(stat == "pi"){zlim <- c(0, 0.30)}
+  if(stat == "biallelic_richness"){zlim <- c(1, 1.75)}
+  if(stat == "heterozygosity"){zlim <- c(0, 0.30)}
+
+  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100)
+  return(NULL)
 }
 

@@ -6,7 +6,7 @@
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @inheritParams window_gd
 #'
-#' @return plots example window and sample counts (if sample_count = TRUE)
+#' @return RasterStack with example window layer and sample counts (if sample_count = TRUE)
 #' @export
 #'
 #' @examples
@@ -36,6 +36,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 
   raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+
   if (!is.null(coords)) graphics::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
 
   if (sample_count) {
@@ -56,6 +57,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 
     # make stack
     lyrw <- raster::stack(lyrw, lyrc)
+    names(lyrw) <- c("window", "sample_count")
   }
 
   return(lyrw)

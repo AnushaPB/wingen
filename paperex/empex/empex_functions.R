@@ -1,5 +1,5 @@
 
-test_empex <- function(params, vcf, coords){
+test_params_empex <- function(params, vcf, coords){
   rarify_n <- as.numeric(params["rarify_n"])
   wdim <- as.numeric(params["wdim"])
   disagg <- as.numeric(params["disagg"])

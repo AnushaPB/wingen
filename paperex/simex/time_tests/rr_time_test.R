@@ -2,7 +2,7 @@ library(wingen)
 library(foreach)
 library(doParallel)
 library(here)
-source(here("paperex/simex/sims_functions.R"))
+source(here("paperex", "simex", "simex_functions.R"))
 
 
 # load vcf, coords, and lyr

@@ -72,7 +72,7 @@ First, different parameter combinations are evaluated. Here we vary the window s
 ```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
-stk <- purrr::map(params, test_empex, vcf, coords)
+stk <- purrr::map(params, test_params_empex, vcf, coords)
 
 par(mfrow = c(2, 3), mar = rep(1, 4))
 purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
