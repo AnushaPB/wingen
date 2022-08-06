@@ -18,13 +18,14 @@ source(here(wdir, "empex_functions.R"))
 
 # Empirical Dataset
 
-Data used in this example is from Bouzid et al. 2022 and can be found on
-dryad: <https://datadryad.org/stash/dataset/doi:10.5061/dryad.n5tb2rbv2>
-
-Bouzid, Nassima et al. (2021), Data from: Evidence for ephemeral ring
-species formation during the diversification history of Western Fence
-Lizards (Sceloporus occidentalis), Dryad, Dataset,
+Data used in this example is from Bouzid et al. (2022):
 <https://doi.org/10.5061/dryad.n5tb2rbv2>
+
+**Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., &
+Leaché, A. D. (2022). Evidence for ephemeral ring species formation
+during the diversification history of western fence lizards ( Sceloporus
+occidentalis ). Molecular Ecology, 31(2), 620–631.
+<https://doi.org/10.1111/mec.15836>**
 
 ``` r
 # Genetic data
