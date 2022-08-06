@@ -20,7 +20,7 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
 }
 \value{
-plots example window and sample counts (if sample_count = TRUE)
+RasterStack with example window layer and sample counts (if sample_count = TRUE)
 }
 \description{
 Generate preview of moving window and sample counts
