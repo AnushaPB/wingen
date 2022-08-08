@@ -5,10 +5,6 @@
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)
-#' @param zlim limits of the color scale values
-#' @param legend if FALSE, no legend bar is displayed.
-#' @param legend.width Width in characters of the legend bar
-#' @param axis.args A list of additional arguments for the legend axis
 #' @inheritParams raster::plot
 #'
 #' @return plot of genetic diversity
@@ -18,27 +14,21 @@
 #' data("mini_lyr")
 #' plot_gd(mini_lyr)
 #'
-plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)) {
+plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 10, main = NULL, ...) {
   if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
 
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
-      plt <- purrr::map(index, plot_gd_bkg,
-        x = x, bkg = bkg, col = col, breaks = breaks, zlim = zlim,
-        main = main, legend = legend, legend.width = legend.width, axis.args = axis.args
-      )
+      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, ...)
     } else {
       plt <- raster::plot(x[[index]],
         col = col,
-        zlim = zlim,
-        main = main,
         axes = FALSE,
         box = FALSE,
-        legend = legend,
-        legend.width = legend.width,
-        axis.args = axis.args
+        main = main,
+        ...
       )
     }
   })
@@ -54,8 +44,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @export
 #'
-plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, zlim = NULL,
-                        main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)) {
+plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, main = NULL, ...) {
 
   # suppress irrelevant plot warnings
   suppressWarnings({
@@ -89,13 +78,10 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 
     raster::plot(x[[index]],
       col = col,
-      zlim = zlim,
       add = TRUE,
       axes = FALSE,
       box = FALSE,
-      legend = legend,
-      legend.width = legend.width,
-      axis.args = axis.args
+      ...
     )
   })
 
@@ -109,7 +95,6 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #' @param index if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
-#' @param zlim limits of the color scale values
 #' @inheritParams plot_gd
 #' @inheritParams raster::plot
 #'
@@ -119,7 +104,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks), zlim = NULL, main = NULL, legend = TRUE, legend.width = 1, axis.args = list(cex.axis = 1)) {
+plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks), main = NULL, ...) {
   if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
 
@@ -128,29 +113,24 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
     if (raster::nlayers(x) > 1) {
       plt <- raster::plot(x[[index]],
         col = col,
-        zlim = zlim,
-        main = main,
         axes = FALSE,
         box = FALSE,
-        legend = legend,
-        legend.width = legend.width,
-        axis.args = axis.args
+        main = main,
+        ...
       )
     }
 
     if (raster::nlayers(x) == 1) {
       plt <- raster::plot(x,
         col = col,
-        zlim = zlim,
-        main = main,
         axes = FALSE,
         box = FALSE,
-        legend = legend,
-        legend.width = legend.width,
-        axis.args = axis.args
+        main = main,
+        ...
       )
     }
   })
 
   return(invisible(plt))
 }
+

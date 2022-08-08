@@ -9,11 +9,8 @@ plot_count(
   index = NULL,
   breaks = 10,
   col = viridis::mako(breaks),
-  zlim = NULL,
   main = NULL,
-  legend = TRUE,
-  legend.width = 1,
-  axis.args = list(cex.axis = 1)
+  ...
 )
 }
 \arguments{
@@ -25,15 +22,10 @@ plot_count(
 
 \item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
 
-\item{zlim}{limits of the color scale values}
-
 \item{main}{character. Main plot title}
 
-\item{legend}{if FALSE, no legend bar is displayed.}
-
-\item{legend.width}{Width in characters of the legend bar}
-
-\item{axis.args}{A list of additional arguments for the legend axis}
+\item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
+        such as axes=FALSE, main='title', ylab='latitude'}
 }
 \value{
 plot of sample counts

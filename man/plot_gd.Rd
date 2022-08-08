@@ -10,11 +10,8 @@ plot_gd(
   index = NULL,
   col = viridis::magma(breaks),
   breaks = 10,
-  zlim = NULL,
   main = NULL,
-  legend = TRUE,
-  legend.width = 1,
-  axis.args = list(cex.axis = 1)
+  ...
 )
 }
 \arguments{
@@ -28,15 +25,10 @@ plot_gd(
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
-\item{zlim}{limits of the color scale values}
-
 \item{main}{character. Main plot title}
 
-\item{legend}{if FALSE, no legend bar is displayed.}
-
-\item{legend.width}{Width in characters of the legend bar}
-
-\item{axis.args}{A list of additional arguments for the legend axis}
+\item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
+        such as axes=FALSE, main='title', ylab='latitude'}
 }
 \value{
 plot of genetic diversity
