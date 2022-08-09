@@ -29,6 +29,7 @@ vcf_to_dosage <- function(x) {
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #' @param pops if NULL (default), and there are no pops detected from the vcf, each individual is assigned its own pop. If FALSE then genind$pop is left NULL. Alternatively, a vector of population assignments for each individual can be provided
+#' @param warning whether to retunr warning if new pops are assigned
 #'
 #' @return returns genind object
 #' @export
@@ -39,7 +40,7 @@ vcf_to_dosage <- function(x) {
 #' data("mini_vcf")
 #' vcf_to_genind(mini_vcf)
 #'
-vcf_to_genind <- function(x, pops = NULL) {
+vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
   # check vcf
   vcf <- vcf_check(x)
@@ -56,8 +57,7 @@ vcf_to_genind <- function(x, pops = NULL) {
   if (is.null(genind$pop) | is.vector(pops)) {
     if (is.null(pops)) {
       genind$pop <- as.factor(1:nrow(genind@tab))
-      warning("no pops were provided, assigning a pop to each individual (to stop this, set pops = FALSE)")
-    }
+      }
 
     if (is.vector(pops)) {
       if (length(pops) != nrow(genind@tab)) {
@@ -69,6 +69,29 @@ vcf_to_genind <- function(x, pops = NULL) {
   }
 
   return(genind)
+}
+
+#' Convert vcf to heterozygosity matrix
+#'
+#' @param x can either be an object of class 'vcfR' or a path to a .vcf file
+#'#'
+#' @return heterozygosity matrix
+#' @export
+#'
+#' @keywords internal
+
+#'
+#' @examples
+vcf_to_het <- function(x){
+  # check vcf
+  vcf <- vcf_check(x)
+
+  het <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
+  # IMPORTANT: transform matrix so that rows are individuals and cols are loci
+  het <- t(het)
+  # if gen is a vector of only one locus, turn into matrix with one column
+  if(nrow(vcf@gt) == 1){ het <- matrix(het, ncol = 1)}
+  return(het)
 }
 
 #' Check if an object is a vcf or a path to a vcf

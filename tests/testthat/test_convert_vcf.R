@@ -22,7 +22,7 @@ test_that("conversion functions return correct object types and errors", {
 
   expect_error(vcf_to_genind("BAD/PATH"))
   expect_error(vcf_to_genind(1))
-  expect_warning(expect_warning(expect_s4_class(vcf_to_genind(mini_vcf), "genind")))
+  expect_s4_class(vcf_to_genind(mini_vcf), "genind")
 })
 
 test_that("pop warnings for genind are correct", {
@@ -30,7 +30,7 @@ test_that("pop warnings for genind are correct", {
 
   # good cases
   expect_s4_class(vcf_to_genind(mini_vcf, pops = FALSE), "genind")
-  expect_warning(expect_warning(expect_s4_class(vcf_to_genind(mini_vcf, pops = NULL), "genind")))
+  expect_s4_class(vcf_to_genind(mini_vcf, pops = NULL), "genind")
   expect_s4_class(vcf_to_genind(mini_vcf, pops = 1:10), "genind")
   expect_s4_class(vcf_to_genind(mini_vcf, pops = rep(c("a", "b"), 5)), "genind")
 
@@ -64,7 +64,7 @@ test_that("check vcf to dosage matrix conversion is correct", {
 
 test_that("check that vcf to genind conversion is correct", {
   data("mini_vcf")
-  expect_warning(genind <- vcf_to_genind(mini_vcf))
+  genind <- vcf_to_genind(mini_vcf)
   # get table and retain only unique columns (for genind objects each allele is a column,
   # so by removing every other you get basically a dosage matrix)
   alleles <- colnames(genind@tab)
@@ -102,3 +102,22 @@ test_that("check that vcf to genind conversion is correct", {
   # checks that all of the cases where true occurs twice are heterozygotes (e.g. 1)
   expect_true(all((sum_log == 2) == (tab == "1")))
 })
+
+
+test_that("check that vcf to het conversion is correct", {
+  data("mini_vcf")
+  expect_error(genind <- vcf_to_het(mini_vcf), NA)
+
+  # check for one locus
+  obs <- vcf_to_het(mini_vcf[2,])
+  # manually calculated:
+  expected <- c(FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE)
+  expect_true(all(obs == expected))
+
+  # check for one individual (note: first col of vcf is format col)
+  obs <- vcf_to_het(mini_vcf[, 1:2])
+  # manually calculated:
+  expected <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)
+  expect_true(all(obs == expected))
+})
+

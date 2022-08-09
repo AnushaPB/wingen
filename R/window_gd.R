@@ -31,7 +31,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
   # calc stats
   if (stat == "allelic.richness") {
     # convert from vcf to genind
-    gen <- vcfR::vcfR2genind(vcf)
+    gen <- vcf_to_genind(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, ncores)
 
@@ -40,9 +40,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 
   if (stat == "het" | stat == "heterozygosity") {
     # convert from vcf to heterozygosity matrix
-    gen <- vcfR::is.het(vcfR::extract.gt(vcf), na_is_false = FALSE)
-    # IMPORTANT: transform matrix so that rows are individuals and cols are loci
-    gen <- t(gen)
+    gen <- vcf_to_het(vcf)
 
     results <- window_gd_general(gen, coords, lyr, stat = stat, wdim, fact, rarify, rarify_n, rarify_nit, min_n, fun, parallel, ncores)
 
@@ -352,7 +350,15 @@ calc_mean_biar <- function(dos) {
   if (!all(dos %in% c(0, 1, 2, NA))) {
     stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
   }
-  ar_by_locus <- apply(dos, 2, helper_calc_biar)
+
+  # if null dimensions (e.g., only one value provided), use helper_calc_biar directly
+  # otherwise apply across columns (i.e., loci)
+  if (is.null(dim(dos))){
+    ar_by_locus <- helper_calc_biar(dos)
+  } else {
+    ar_by_locus <- apply(dos, 2, helper_calc_biar)
+  }
+
   mean_ar <- mean(ar_by_locus, na.rm = TRUE)
   return(mean_ar)
 }
