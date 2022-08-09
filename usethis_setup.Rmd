@@ -21,6 +21,9 @@ library("devtools")
 # use dplyr pipe
 usethis::use_pipe(export = TRUE)
 
+# use foreach pipe (remove if not using foreach)
+# usethis::use_import_from('foreach', "%dopar%")
+
 # use logo
 usethis::use_logo("logo.png", geometry = "250x250", retina = TRUE)
 
@@ -50,15 +53,11 @@ usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
 
 usethis::use_build_ignore("vignettes/wingen-vignette_files/")
 
-usethis::use_build_ignore("token.R")
+usethis::use_build_ignore("token")
 
 usethis::use_build_ignore(".gitignore")
 
 usethis::use_build_ignore(".github")
-
-usethis::use_build_ignore("git_token.R")
-
-usethis::use_build_ignore("codecov.yml")
 
 ```
 
@@ -92,7 +91,7 @@ use_github_action("test-coverage")
 
 ```
 ```{r}
-# run codecov and make badge
+# run cidecov and make badge
 covr::codecov(token = "86761b9c-f2dc-4550-84e2-2740fdf54384")
 ```
 
@@ -110,6 +109,14 @@ devtools::check()
 ```
 
 
+# Pkgdown site
+
+```{r}
+#usethis::use_pkgdown()
+pkgdown::build_site()
+pkgdown::build_home_index()
+```
+
 # Fix package style (!use with caution!)
 
 ```{r}
@@ -119,23 +126,5 @@ styler::style_pkg()
 # check package name
 ```{r}
 available::available("wingen")
-```
-## Figshare token
-```{r}
-Sys.setenv ("FIGSHARE_TOKEN" = "f7919f53ed5227c55356335accb321e9c955be8ffe6049ace76b02973e13aeae0d79a630ed148ded4ca2d850dd9a66f874ccf8a3f2c9933b60d42e3d7412f300")
-
-cli <- depositsClient$new(service = "figshare")
-cli$deposit_download_file(20459376, filename = "simulation_example_csv.csv")
-cli$deposits
-
-metadata <- list (
-    title = "Test Deposit")
-
-cli <- depositsClient$new (
-    service = "figshare",
-    metadata = metadata
-)
-
-cli$deposit_new()
 ```
 
