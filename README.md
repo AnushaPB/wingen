@@ -26,23 +26,23 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 ## Example
 
-The following example demonstrates the basic functionality of `wingen`
+The following example demonstrates the basic functionality of wingen
 using a subset of the simulated data from Bishop et al. (202X). For more
-details about this data set check out the [original paper](LINK) and the
+details about this dataset, see the [original paper](LINK) and the
 package vignette.
 
 ``` r
 library(wingen)
 
-# load example data
+# Load example data
 load_middle_earth_ex()
 ```
 
-The core function of this package is `window_gd` which takes as inputs a
-vcfR object (or a path to a .vcf file), sample coordinates, and a raster
-layer which the moving window will slide across. Users can control the
-genetic diversity statistic that is calculated (`stat`), the window
-dimensions (`wdim`), the aggregation factor to use on the raster
+The core function of this package is `window_gd()`, which takes as
+inputs a vcfR object (or a path to a .vcf file), sample coordinates, and
+a raster layer which the moving window will slide across. Users can
+control the genetic diversity statistic that is calculated (`stat`), the
+window dimensions (`wdim`), the aggregation factor to use on the raster
 (`fact`), whether to perform rarefaction (`rarify`), and other aspects
 of the moving window calculations. Additional arguments for this
 function are described in the vignette and function documentation.
@@ -65,8 +65,8 @@ plot_count(wgd, main = "window counts")
 
 <img src="man/figures/README-window_gd-1.png" width="100%" />
 
-Next, the output from `window_gd` can be interpolated using kriging with
-the `krig_gd` function.
+Next, the output from `window_gd()` can be interpolated using kriging
+with the `krig_gd()` function.
 
 ``` r
 # Krige results
@@ -80,7 +80,7 @@ plot_count(kgd_counts, main = "kriged counts")
 
 <img src="man/figures/README-krig_gd-1.png" width="100%" />
 
-Finally, the output from `krige_gd` (or `window_gd`) can be masked to
+Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to
 exclude areas that fall outside of the study area or that were
 undersampled.
 
@@ -101,7 +101,7 @@ plot_gd(mgd_counts, bkg = lotr_range, main = "masked pi (counts + spp range)")
 
 <img src="man/figures/README-result-1.png" width="100%" />
 
-For an extended example check out the package vignette:
+For an extended example, see the package vignette:
 
 ``` r
 vignette("wingen-vignette")
