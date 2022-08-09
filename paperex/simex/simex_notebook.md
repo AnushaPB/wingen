@@ -25,6 +25,23 @@ the data for the example walkthrough.
 load_middle_earth(subset = TRUE)
 ```
 
+    ## loading existing file
+
+    ## 
+    ## --------------------- middle earth data ---------------------
+    ##  
+    ## Objects loaded: 
+    ## *vcf* vcfR object (142129 loci x 1697 samples) 
+    ## *coords* dataframe with x and y coordinates 
+    ## *subvcf* vcfR object (10000 loci x 200 samples) 
+    ## *subcoords* dataframe with x and y coordinates for 200 samples 
+    ## *lyr* middle earth RasterLayer (100 x 100) 
+    ## *bkg* background layer 
+    ## 
+    ## -------------------------------------------------------------
+
+    ## 
+
 ## Figure 2: Simulation Example
 
 ### Simulation setup plots
