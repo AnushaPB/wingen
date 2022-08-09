@@ -84,3 +84,4 @@ git_token.R
 # vignette files
 vignettes/wingen-vignette_files/*
 Meta
+*.zip
