@@ -199,12 +199,8 @@ plot_gd(mgd, main = "Kriged & masked pi")
 
 Another nice visualization addition is to add a "background" to your plots in the form of a RasterLayer or other spatial object (e.g. a country boundary) which can help provide geographic context:
 
-```{r range map background, fig.width = 5, fig.height = 5}
-# Create a "range map" for this species by masking areas of very low suitability
-range_map <- lotr_lyr
-range_map[range_map < 0.01] <- NA
-
-plot_gd(mgd, bkg = range_map, main = "Kriged & masked pi")
+```{r range map background, fig.width = 6, fig.height = 5}
+plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 ```
 
 ## Parallelization
