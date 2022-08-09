@@ -23,7 +23,7 @@ source(here(wdir, "simex_functions.R"))
 
 The following function loads the results from the simulation and subsets the data for the example walkthrough. 
 
-```{r, eval = TRUE, include = TRUE, message = FALSE, results = FALSE}
+```{r}
 load_middle_earth(subset = TRUE)
 ```
 
