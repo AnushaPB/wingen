@@ -19,7 +19,6 @@ knitr::opts_chunk$set(
 ```{r setup, warning = FALSE, message = FALSE}
 library(wingen)
 library(raster)
-library(vcfR)
 library(viridis)
 ```
 
@@ -41,7 +40,7 @@ To demonstrate how wingen works, we will use a subset the data from the simulati
 
 ### Load Middle Earth example
 
-The smaller Middle Earth example dataset used in our example contains three objects which are loaded by `load_middle_earth_ex()`:
+The smaller Middle Earth example dataset used in our example contains four objects which are loaded by `load_middle_earth_ex()`:
 
 1. `lotr_vcf` - a vcfR object containing the genetic data
 
@@ -49,6 +48,7 @@ The smaller Middle Earth example dataset used in our example contains three obje
 
 3. `lotr_lyr` - a raster object of the landscape (higher values indicate greater connectivity/carrying capacity)
 
+4. `lotr_range` - a SpatialPolygonsDataFrame object outlining the "range" of the simulated species
 
 ```{r load example data, fig.width = 5, fig.height = 5}
 load_middle_earth_ex()
@@ -259,9 +259,9 @@ AR_wgd <- window_gd(lotr_vcf,
 
 
 ```{r, fig.width = 5, fig.height = 5}
-plot_gd(pi_wgd, bkg = range_map, main = "Pi")
-plot_gd(het_wgd, bkg = range_map, main = "Heterozygosity")
-plot_gd(AR_wgd, bkg = range_map, main = "Allelic Richness")
+plot_gd(pi_wgd, bkg = lotr_range, main = "Pi")
+plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
+plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
 ```
 
 ### For additional information, see our paper found here: [LINK]
