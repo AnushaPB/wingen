@@ -24,8 +24,6 @@ window_gd(
 \arguments{
 \item{vcf}{object of type vcf ( (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))}
 
-\item{coords}{coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),}
-
 \item{lyr}{RasterLayer to slide window across}
 
 \item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}

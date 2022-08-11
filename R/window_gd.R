@@ -4,8 +4,18 @@
 #'
 #' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
 #' @param stat genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
+#' @param lyr RasterLayer to slide window across
+#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
+#' @param rarify if rarify = TRUE, rarefaction is performed
+#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
+#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
+#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
+#' @param fun function to use to summarize data in window (defaults to base R mean)
+#' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
+#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
+#' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
-#' @inheritParams window_gd_general
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
 #'
@@ -72,24 +82,13 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' Helper function for window_gd
 #'
 #' @param gen genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
-#' @param coords coordinates (two columns, the first should be x and the second should be y and the order should be the same as the genetic data),
-#' @param lyr RasterLayer to slide window across
-#' @param stat function to calculate genetic diversity (can either be calc_mean_ar, calc_pi, calc_mean_biar, or calc_mean_het)
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
-#' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
-#' @param rarify if rarify = TRUE, rarefaction is performed
-#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
-#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
-#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
-#' @param fun function to use to summarize data in window (defaults to base R mean)
-#' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
-#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
-#' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
+#' @inheritParams window_gd
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, parallel = FALSE, L = "nvariants", ncores = NULL) {
 
@@ -160,6 +159,7 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @inheritParams window_gd_general
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return genetic diversity and counts for a single cell
 #' @export
@@ -199,6 +199,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #' @inheritParams window_gd_general
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @return genetic diversity statistic for a rarified subsample
 #' @export
@@ -231,6 +232,8 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = 
 #' @export
 #'
 #' @keywords internal
+#' @noRd
+#'
 rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL) {
 
   # check to make sure sub is greater than rarify_n
@@ -266,6 +269,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 sample_gd <- function(gen, sub, stat, L = NULL) {
   if (is.null(L) | !identical(stat, calc_pi)) {
@@ -285,6 +289,7 @@ sample_gd <- function(gen, sub, stat, L = NULL) {
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 calc_mean_ar <- function(genind) {
   ar <- helper_calc_ar(genind)
@@ -299,6 +304,8 @@ calc_mean_ar <- function(genind) {
 #' @return allelic richness
 #' @export
 #'
+#' @keywords internal
+#' @noRd
 helper_calc_ar <- function(genind) {
   genind$pop <- rep(factor(1), nrow(genind$tab))
   # note [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
@@ -314,7 +321,7 @@ helper_calc_ar <- function(genind) {
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 calc_mean_het <- function(hetmat) {
   gd <- mean(hetmat, na.rm = TRUE)
   return(gd)
@@ -331,7 +338,7 @@ calc_mean_het <- function(hetmat) {
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 calc_pi <- function(dos, L = NULL) {
   gd <- hierfstat::pi.dosage(dos, L = L)
   return(gd)
@@ -345,7 +352,7 @@ calc_pi <- function(dos, L = NULL) {
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 calc_mean_biar <- function(dos) {
   if (!all(dos %in% c(0, 1, 2, NA))) {
     stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
@@ -371,7 +378,7 @@ calc_mean_biar <- function(dos) {
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 helper_calc_biar <- function(loc) {
   uq <- unique(loc, na.rm = TRUE)
   if (1 %in% uq) {
@@ -391,6 +398,7 @@ helper_calc_biar <- function(loc) {
 #' @param coords coordinates
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @export
 #'
@@ -428,6 +436,7 @@ check_data <- function(gen, coords) {
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
   adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
@@ -449,7 +458,7 @@ get_adj <- function(i, r, n, coord_cells) {
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 return_stat <- function(x) {
   if (x == "pi") stat <- calc_pi
   if (x == "biallelic.richness") stat <- calc_mean_biar

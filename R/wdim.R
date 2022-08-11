@@ -6,6 +6,7 @@
 #' @return neighborhood matrix
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @export
 #'
@@ -42,6 +43,7 @@ wdim_to_mat <- function(wdim) {
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @examples
 #' wdim_check(c(4, 4))

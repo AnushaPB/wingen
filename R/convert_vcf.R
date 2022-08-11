@@ -7,10 +7,7 @@
 #' @export
 #'
 #' @keywords internal
-#'
-#' @examples
-#' data("mini_vcf")
-#' vcf_to_dosage(mini_vcf)
+#' @noRd
 #'
 vcf_to_dosage <- function(x) {
   # check vcf
@@ -35,11 +32,7 @@ vcf_to_dosage <- function(x) {
 #' @export
 #'
 #' @keywords internal
-#'
-#' @examples
-#' data("mini_vcf")
-#' vcf_to_genind(mini_vcf)
-#'
+#' @noRd
 vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
   # check vcf
@@ -79,9 +72,7 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' @export
 #'
 #' @keywords internal
-
-#'
-#' @examples
+#' @noRd
 vcf_to_het <- function(x){
   # check vcf
   vcf <- vcf_check(x)
@@ -102,7 +93,7 @@ vcf_to_het <- function(x){
 #' @export
 #'
 #' @keywords internal
-#'
+#' @noRd
 vcf_check <- function(x) {
   if (class(x)[1] == "vcfR") {
     vcf <- x

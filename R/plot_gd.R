@@ -41,6 +41,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @inheritParams plot_gd
 #'
 #' @keywords internal
+#' @noRd
 #'
 #' @export
 #'

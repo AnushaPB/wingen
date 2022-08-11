@@ -3,7 +3,17 @@
 #'
 #' @param r RasterLayer or RasterStack
 #' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
-#' @inheritParams krig_gd_lyr
+#' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param coords if provided, kriging will occur based only on values at these coordinates
+#' @param xy whether to co-krige with x and y (~x+y)
+#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
+#' @param agg_grd factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
+#' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
+#' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
+#' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
+#' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
+#' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
+#'
 #' @return RasterLayer or RasterStack
 #' @export
 #'
@@ -42,22 +52,13 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #'
 #' Helper function for \code{\link{krig_gd}}
 #'
-#' @param r raster for kriging
-#' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
-#' @param coords if provided, kriging will occur based only on values at these coordinates
-#' @param xy whether to co-krige with x and y (~x+y)
-#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
-#' @param agg_grd factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
-#' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
-#' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
-#' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
-#' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
-#' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
+#' @inheritParams krig_gd
 #'
 #' @return RasterLayer
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
 
@@ -134,6 +135,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 #' @export
 #'
 #' @keywords internal
+#' @noRd
 #'
 raster_to_grid <- function(x) {
   grd <- data.frame(raster::rasterToPoints(x))
@@ -148,6 +150,8 @@ raster_to_grid <- function(x) {
 #'
 #' @return stack of transformed rasters
 #' @export
+#'
+#' @noRd
 #'
 raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE) {
   if (raster::nlayers(r) > 1) stop(">1 layer provided for r")
