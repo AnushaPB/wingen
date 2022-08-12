@@ -11,19 +11,22 @@ The simulation example was executed using the `run_simex.sh` script which runs t
 
 *Note: some of these are parallelized tasks set up to operate on a 32 processor system, this can be modified by going into any of the files marked with an asterix described below*
 
-The results and figures from the paper were created using the `simex_notebook.Rmd`
+The results and figures from the paper were created using the `simex_notebook.Rmd` and `runtime_notebook.Rmd`
 
 **Directory structure:**
 
 ```
 [simex]
 |   run_simex.sh* - main script to run simulations and generate results
-|   simex_notebook.Rmd* - main notebook for paper analyses and generate figures
+|   simex_notebook.Rmd* - main notebook for simulation analyses and figures
 |   simex_notebook.md - knitted simex_notebook.Rmd
 │   simex_functions.R* - functions used for simulation example analysis
 |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
 |   gnxsim.py - script to run geonomics simulations
-│
+|   runtime_notebook.Rmd - main notebook for runtime analyses and figures
+|   runtime_notebook.md - knitted runtime_notebook.Rmd 
+|   runtime_functions.R - functions used for runtime analysis
+|
 └───[data]
 │   │   middle_earth.csv - matrix used to create raster layer for simulations
 │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
@@ -51,7 +54,7 @@ The results and figures from the paper were created using the `empex_notebook.Rm
 
 ```
 [paperex]
-|   empex_notebook.Rmd* - main notebook for paper analyses and generate figures
+|   empex_notebook.Rmd* - main notebook for empirical analyses and figures
 |   empex_notebook.md - knitted empex_notebook.Rmd
 |   empex_functions.R* - functions used for empirical example analysis
 │
