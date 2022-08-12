@@ -1,9 +1,8 @@
 ---
-title: "runtime_analysis"
+title: "Runtime Analysis"
 output: github_document
-date: "2022-08-11"
 ---
-```{r}
+```{r, warning = FALSE, message = FALSE}
 library(wingen)
 library(raster)
 library(ggplot2)
@@ -20,7 +19,7 @@ source(here(wdir, "runtime_functions.R"))
 
 ```{r, fig.width = 8, fig.height = 8}
 # load middle earth example just to get a vcc to modify
-load_middle_earth_ex()
+load_middle_earth_ex(quiet = TRUE)
 
 # set dimensions of raster
 dim <- 50

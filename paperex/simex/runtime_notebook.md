@@ -1,77 +1,14 @@
-runtime_analysis
+Runtime Analysis
 ================
-2022-08-11
 
 ``` r
 library(wingen)
 library(raster)
-```
-
-    ## Warning: package 'raster' was built under R version 4.1.3
-
-    ## Loading required package: sp
-
-    ## Warning: package 'sp' was built under R version 4.1.3
-
-``` r
 library(ggplot2)
-```
-
-    ## Warning: package 'ggplot2' was built under R version 4.1.3
-
-``` r
 library(viridis)
-```
-
-    ## Warning: package 'viridis' was built under R version 4.1.3
-
-    ## Loading required package: viridisLite
-
-    ## Warning: package 'viridisLite' was built under R version 4.1.3
-
-``` r
 library(dplyr)
-```
-
-    ## Warning: package 'dplyr' was built under R version 4.1.3
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:raster':
-    ## 
-    ##     intersect, select, union
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 library(vcfR)
-```
-
-    ## Warning: package 'vcfR' was built under R version 4.1.3
-
-    ## 
-    ##    *****       ***   vcfR   ***       *****
-    ##    This is vcfR 1.13.0 
-    ##      browseVignettes('vcfR') # Documentation
-    ##      citation('vcfR') # Citation
-    ##    *****       *****      *****       *****
-
-``` r
 library(here)
-```
-
-    ## Warning: package 'here' was built under R version 4.1.3
-
-    ## here() starts at C:/Users/Anusha/Documents/GitHub/wingen
-
-``` r
 wdir <- here("paperex", "simex")
 source(here(wdir, "runtime_functions.R"))
 ```
@@ -80,23 +17,8 @@ source(here(wdir, "runtime_functions.R"))
 
 ``` r
 # load middle earth example just to get a vcc to modify
-load_middle_earth_ex()
-```
+load_middle_earth_ex(quiet = TRUE)
 
-    ## 
-    ## -------------- middle earth example --------------
-    ##  
-    ## Objects loaded: 
-    ## *lotr_vcf* vcfR object (100 loci x 100 samples) 
-    ## *lotr_coords* dataframe with x and y coordinates 
-    ## *lotr_lyr* middle earth RasterLayer (100 x 100) 
-    ## *lotr_range* SpatialPolygonsDataFrame of spp range 
-    ## 
-    ## --------------------------------------------------
-
-    ## 
-
-``` r
 # set dimensions of raster
 dim <- 50
 # create square raster
