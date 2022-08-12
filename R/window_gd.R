@@ -380,7 +380,12 @@ calc_mean_biar <- function(dos) {
 #' @keywords internal
 #' @noRd
 helper_calc_biar <- function(loc) {
-  uq <- unique(loc, na.rm = TRUE)
+  # check if all NA and if so return NA
+  if(all(is.na(loc))) return(NA)
+
+  # calculate number of unique alleles
+  # note: has to be na.omit (na.rm is not an argument for unique)
+  uq <- unique(na.omit(loc))
   if (1 %in% uq) {
     return(2)
   } else if (0 %in% uq & 2 %in% uq) {

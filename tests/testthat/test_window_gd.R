@@ -102,12 +102,14 @@ test_that("returns matrix with only one zero", {
 
   })
 
-test_that("biallelic richness is calculated correctly for all possible combos", {
-  expected <- c(1, 2, 2, 2, 2, 2, 2, 2, 1)
-  all_possible_combos <- t(expand.grid(0:2, 0:2))
+test_that("biallelic richness is calculated correctly for all possible combos (including NAs)", {
+
+  all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
+  expected <- c(1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, NA)
+
   ar_vals <- apply(all_possible_combos, 2, helper_calc_biar)
   expect_equal(ar_vals, expected)
-  expect_equal(calc_mean_biar(all_possible_combos), mean(expected))
+  expect_equal(calc_mean_biar(all_possible_combos), mean(expected, na.rm = TRUE))
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 
@@ -168,6 +170,22 @@ test_that("allelic richness is calculated correctly", {
   expect_equal(trab, tra)
 
   })
+
+
+test_that("NAs are treated correctly when calculating biallelic richness", {
+
+  geno <- c(0, 1, 2, NA)
+  expect_equal(helper_calc_biar(geno), 2)
+
+  geno <- c(0, 1, NA)
+  expect_equal(helper_calc_biar(geno), 2)
+
+  geno <- c(0, NA)
+  expect_equal(helper_calc_biar(geno), 1)
+
+
+
+})
 
 test_that("vcf path works", {
   load_mini_ex()
