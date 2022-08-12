@@ -95,12 +95,12 @@ plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 
 First, different parameter combinations are evaluated. Here we vary the
 window size (wdim), the raster resolutions (disagg), and the rarefaction
-size (rarify\_n) to get the plots from Figure S4
+size (rarify_n) to get the plots from Figure S4
 
 ``` r
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
-stk <- purrr::map(params, test_empex, vcf, coords)
+stk <- purrr::map(params, test_params_empex, vcf, coords)
 
 par(mfrow = c(2, 3), mar = rep(1, 4))
 purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
@@ -126,13 +126,13 @@ the resulting rasters:
 ``` r
 # Run moving window
 set.seed(22)
-hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
-pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
-ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)

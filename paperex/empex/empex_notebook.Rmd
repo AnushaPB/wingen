@@ -95,13 +95,13 @@ And ran the moving window function again, this time kriging and masking the resu
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, message = FALSE, results = FALSE, warning = FALSE}
 # Run moving window
 set.seed(22)
-hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
-pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
-ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
