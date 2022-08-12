@@ -204,9 +204,10 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed, users can perform the `window_gd()` calculations with parallelization:
+To increase computational speed, users can perform the `window_gd()` calculations with parallelization by setting `parallel = TRUE` and `ncores` to the number of cores to use:
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
+# Note: this code is not evaluated when building the vignette as it spawns multiple processes
 wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
