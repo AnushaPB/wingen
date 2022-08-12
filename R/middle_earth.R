@@ -12,10 +12,7 @@
 load_middle_earth_ex <- function(quiet = FALSE) {
 
   # load all data
-  utils::data("lotr_vcf")
-  utils::data("lotr_lyr")
-  utils::data("lotr_coords")
-  utils::data("lotr_range")
+  utils::data(list = c("lotr_vcf", "lotr_lyr", "lotr_coords", "lotr_range"))
 
   if (!quiet) {
     # give message with information about objects
@@ -46,9 +43,7 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 load_mini_ex <- function(quiet = FALSE) {
 
   # load all data
-  utils::data("mini_vcf", envir = environment())
-  utils::data("mini_coords", envir = environment())
-  utils::data("mini_lyr", envir = environment())
+  utils::data(list = c("mini_vcf", "mini_coords", "mini_lyr"))
 
   # give message with information about objects
   if (!quiet) {
