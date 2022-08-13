@@ -42,15 +42,17 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
   genind <- vcfR::vcfR2genind(vcf)
 
   # TODO: Clean this up - Check if pops is false
-  if (is.logical(pops)) if (!pops) {
-    return(genind)
+  if (is.logical(pops)) {
+    if (!pops) {
+      return(genind)
+    }
   }
 
   # assign pops if null or pop vector provided
   if (is.null(genind$pop) | is.vector(pops)) {
     if (is.null(pops)) {
       genind$pop <- as.factor(1:nrow(genind@tab))
-      }
+    }
 
     if (is.vector(pops)) {
       if (length(pops) != nrow(genind@tab)) {
@@ -67,13 +69,13 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' Convert vcf to heterozygosity matrix
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
-#'#'
+#' #'
 #' @return heterozygosity matrix
 #' @export
 #'
 #' @keywords internal
 #' @noRd
-vcf_to_het <- function(x){
+vcf_to_het <- function(x) {
   # check vcf
   vcf <- vcf_check(x)
 
@@ -81,7 +83,9 @@ vcf_to_het <- function(x){
   # IMPORTANT: transform matrix so that rows are individuals and cols are loci
   het <- t(het)
   # if gen is a vector of only one locus, turn into matrix with one column
-  if(nrow(vcf@gt) == 1){ het <- matrix(het, ncol = 1)}
+  if (nrow(vcf@gt) == 1) {
+    het <- matrix(het, ncol = 1)
+  }
   return(het)
 }
 

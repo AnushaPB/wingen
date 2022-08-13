@@ -17,7 +17,7 @@ window_gd(
   min_n = 2,
   fun = mean,
   L = "nvariants",
-  rarify_alleles = FALSE,
+  rarify_alleles = TRUE,
   parallel = FALSE,
   ncores = NULL
 )
@@ -45,7 +45,7 @@ window_gd(
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
 
-\item{rarify_alleles}{for calculationg biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to FALSE)}
+\item{rarify_alleles}{for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
 \item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
 

@@ -13,7 +13,7 @@
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to base R mean)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
-#' @param rarify_alleles for calculationg biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to FALSE)
+#' @param rarify_alleles for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
@@ -44,19 +44,21 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to genind
     gen <- vcf_to_genind(vcf)
 
-    results <- window_gd_general(gen = gen,
-                                 coords = coords,
-                                 lyr = lyr,
-                                 stat = stat,
-                                 wdim = wdim,
-                                 fact = fact,
-                                 rarify = rarify,
-                                 rarify_n = rarify_n,
-                                 rarify_nit = rarify_nit,
-                                 min_n = min_n,
-                                 fun = fun,
-                                 parallel = parallel,
-                                 ncores = ncores)
+    results <- window_gd_general(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      stat = stat,
+      wdim = wdim,
+      fact = fact,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      parallel = parallel,
+      ncores = ncores
+    )
 
     names(results[[1]]) <- "allelic_richness"
   }
@@ -65,19 +67,21 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to heterozygosity matrix
     gen <- vcf_to_het(vcf)
 
-    results <- window_gd_general(gen = gen,
-                                 coords = coords,
-                                 lyr = lyr,
-                                 stat = stat,
-                                 wdim = wdim,
-                                 fact = fact,
-                                 rarify = rarify,
-                                 rarify_n = rarify_n,
-                                 rarify_nit = rarify_nit,
-                                 min_n = min_n,
-                                 fun = fun,
-                                 parallel = parallel,
-                                 ncores = ncores)
+    results <- window_gd_general(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      stat = stat,
+      wdim = wdim,
+      fact = fact,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      parallel = parallel,
+      ncores = ncores
+    )
 
     names(results[[1]]) <- "heterozygosity"
   }
@@ -86,20 +90,22 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert from vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- window_gd_general(gen = gen,
-                                 coords = coords,
-                                 lyr = lyr,
-                                 stat = stat,
-                                 wdim = wdim,
-                                 fact = fact,
-                                 rarify = rarify,
-                                 rarify_n = rarify_n,
-                                 rarify_nit = rarify_nit,
-                                 min_n = min_n,
-                                 fun = fun,
-                                 L = L,
-                                 parallel = parallel,
-                                 ncores = ncores)
+    results <- window_gd_general(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      stat = stat,
+      wdim = wdim,
+      fact = fact,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      L = L,
+      parallel = parallel,
+      ncores = ncores
+    )
 
     names(results[[1]]) <- "pi"
   }
@@ -108,20 +114,22 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     # convert vcf to dosage matrix
     gen <- vcf_to_dosage(vcf)
 
-    results <- results <- window_gd_general(gen = gen,
-                                            coords = coords,
-                                            lyr = lyr,
-                                            stat = stat,
-                                            wdim = wdim,
-                                            fact = fact,
-                                            rarify = rarify,
-                                            rarify_n = rarify_n,
-                                            rarify_nit = rarify_nit,
-                                            min_n = min_n,
-                                            fun = fun,
-                                            rarify_alleles = rarify_alleles,
-                                            parallel = parallel,
-                                            ncores = ncores)
+    results <- results <- window_gd_general(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      stat = stat,
+      wdim = wdim,
+      fact = fact,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      rarify_alleles = rarify_alleles,
+      parallel = parallel,
+      ncores = ncores
+    )
 
     names(results[[1]]) <- "biallelic_richness"
   }
@@ -323,7 +331,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
 #' @noRd
 #'
 sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = TRUE) {
-  if(identical(stat, calc_mean_biar)){
+  if (identical(stat, calc_mean_biar)) {
     gd <- stat(gen[sub, ], rarify_alleles)
   } else if (is.null(L) | !identical(stat, calc_pi)) {
     gd <- stat(gen[sub, ])
@@ -373,7 +381,7 @@ helper_calc_ar <- function(gen) {
   # (including those with NAs) times two (assuming diploids)
 
   # note: [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
-  #ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
+  # ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
   ar <- hierfstat::allelic.richness(gen)$Ar[, 1]
   return(ar)
 }
@@ -426,7 +434,7 @@ calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
 
   # if rarify_alleles = TRUE, get min.n for rarefaction
   # min.n is set to the number of non-NA genotypes * 2 (for diploid)
-  if(rarify_alleles){
+  if (rarify_alleles) {
     min.n <- get_minn(dos)
   } else {
     min.n <- NULL
@@ -434,7 +442,7 @@ calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
 
   # if null dimensions (e.g., only one value provided), use helper_calc_biar directly
   # otherwise apply across columns (i.e., loci)
-  if (is.null(dim(dos))){
+  if (is.null(dim(dos))) {
     ar_by_locus <- sapply(dos, helper_calc_biar, rarify_alleles, min.n)
   } else {
     ar_by_locus <- apply(dos, 2, helper_calc_biar, rarify_alleles, min.n)
@@ -455,9 +463,11 @@ calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
 #' @noRd
 helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
   # check if all NA and if so return NA
-  if(all(is.na(loc))) return(NA)
+  if (all(is.na(loc))) {
+    return(NA)
+  }
 
-  if(rarify_alleles){
+  if (rarify_alleles) {
 
     # make df of counts of reference and alternate
     # omit NAs before counting alleles
@@ -466,7 +476,6 @@ helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
 
     # rarefied counts calculation taken from hierfstat::allelic.richness function
     AR <- raref(counts, min.n = min.n)
-
   } else {
 
     # calculate number of unique alleles
@@ -479,7 +488,6 @@ helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
     } else {
       AR <- 1
     }
-
   }
 
   return(AR)
@@ -505,8 +513,8 @@ raref <- function(x, min.n) {
 #'
 #' @export
 #'
-get_minn <- function(dos){
-  if(is.null(nrow(dos))){
+get_minn <- function(dos) {
+  if (is.null(nrow(dos))) {
     # if nrow is NULL then only one sample is included so min.n must be 2
     min.n <- 2
   } else {
@@ -521,9 +529,11 @@ get_minn <- function(dos){
 #'
 #' @export
 #' @noRd
-countgen <- function(x){
+countgen <- function(x) {
   notNA <- length(na.omit(x))
-  if(notNA == 0){notNA <- NA}
+  if (notNA == 0) {
+    notNA <- NA
+  }
   return(notNA)
 }
 
@@ -559,7 +569,6 @@ check_data <- function(gen, coords) {
   if (nind != nrow(coords)) {
     stop("number of samples in coords data and number of samples in gen data are not equal")
   }
-
 }
 
 #' Helper function to get adjacent cells to a given cell index

@@ -109,7 +109,7 @@ test_that("check that vcf to het conversion is correct", {
   expect_error(genind <- vcf_to_het(mini_vcf), NA)
 
   # check for one locus
-  obs <- vcf_to_het(mini_vcf[2,])
+  obs <- vcf_to_het(mini_vcf[2, ])
   # manually calculated:
   expected <- c(FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE)
   expect_true(all(obs == expected))
@@ -120,4 +120,3 @@ test_that("check that vcf to het conversion is correct", {
   expected <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)
   expect_true(all(obs == expected))
 })
-

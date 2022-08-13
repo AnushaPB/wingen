@@ -13,30 +13,27 @@ test_that("all stats work", {
   expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
   expect_error(wbr <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
-
-  })
+})
 
 test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
-  expect_error(wp <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
-  expect_error(wh <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
-  expect_error(wa <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
-
-  })
+  expect_error(wp <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
+  expect_error(wh <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
+  expect_error(wa <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
+})
 
 test_that("all stats work with just one individual", {
   load_mini_ex(quiet = TRUE)
 
   # note: the first col of a vcf is the format col
-  expect_error(wp <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "pi", rarify = FALSE), NA)
-  expect_error(wh <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
-  expect_error(wa <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
-
-  })
+  expect_error(wp <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "pi", rarify = FALSE), NA)
+  expect_error(wh <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "het", rarify = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
+  expect_error(wa <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
+})
 
 
 
@@ -46,8 +43,7 @@ test_that("error gets returned for mismatch vcf and coords", {
   expect_error(wa <- window_gd(mini_vcf, mini_coords[1:2, ], mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
   expect_error(wp <- window_gd(mini_vcf[, 1:3], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
   expect_error(wa <- window_gd(mini_vcf[, 1:3], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), "number of samples in coords data and number of samples in gen data are not equal")
-
-  })
+})
 
 
 test_that("L argument works", {
@@ -60,8 +56,7 @@ test_that("L argument works", {
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = "nvariants"), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = 100), NA)
   expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE, L = NULL), NA)
-
-  })
+})
 
 
 test_that("wdim_check fixes wdim", {
@@ -75,8 +70,7 @@ test_that("wdim_check fixes wdim", {
 
   expect_warning(wdim_check(c(3, 4)))
   expect_warning(wdim_check(4))
-
-  })
+})
 
 test_that("returns matrix with only one zero", {
   n <- wdim_to_mat(c(3, 5))
@@ -102,11 +96,9 @@ test_that("returns matrix with only one zero", {
   # zero is at center
   center <- n[nrow(n) / 2 + 0.5, ncol(n) / 2 + 0.5]
   expect_equal(center, 0)
-
-  })
+})
 
 test_that("biallelic richness is calculated correctly for all possible combos (including NAs)", {
-
   all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
   expected <- c(1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, NA)
 
@@ -120,11 +112,10 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
   min.n <- get_minn(all_possible_combos)
   expect_equal(min.n, 2)
 
-  expected_rar <- c(1, 3/2, 5/3, 1, 3/2, 5/3, 1.5, 2, 5/3, 3/2, 1, 1, 1, 2, 1, NA)
+  expected_rar <- c(1, 3 / 2, 5 / 3, 1, 3 / 2, 5 / 3, 1.5, 2, 5 / 3, 3 / 2, 1, 1, 1, 2, 1, NA)
   ar_vals_rar <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = TRUE, min.n = min.n)
   expect_equal(ar_vals_rar, expected_rar)
-
-  })
+})
 
 
 test_that("allelic richness is calculated correctly", {
@@ -180,8 +171,7 @@ test_that("allelic richness is calculated correctly", {
 
   names(tra) <- names(trab) <- NULL
   expect_equal(trab, tra)
-
-  })
+})
 
 test_that("vcf path works", {
   load_mini_ex()
@@ -189,23 +179,20 @@ test_that("vcf path works", {
   vcfpath <- "test_temp.vcf"
   expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), NA)
   expect_true(file.remove("test_temp.vcf"))
-
-  })
+})
 
 test_that("error if bad vcf is given", {
   vcfpath <- "badpath"
   expect_warning(expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), "cannot open the connection"), "No such file or directory")
   expect_error(wpi <- window_gd(mini_coords, mini_coords, mini_lyr, rarify = FALSE), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
-
-  })
+})
 
 test_that("return_stat returns correct functions", {
   expect_equal(return_stat("pi"), calc_pi)
   expect_equal(return_stat("het"), calc_mean_het)
   expect_equal(return_stat("biallelic.richness"), calc_mean_biar)
   expect_equal(return_stat("allelic.richness"), calc_mean_ar)
-
-  })
+})
 
 test_that("raref works", {
   allele.counts <- c(1, 3)
@@ -213,14 +200,13 @@ test_that("raref works", {
 })
 
 test_that("countgen works", {
-
   all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
   actual <- apply(all_possible_combos, 2, countgen)
-  expected <- c(2,2,2,1,2,2,2,1,2,2,2,1,1,1,1,NA)
+  expected <- c(2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 1, 1, 1, NA)
 
   expect_equal(expected, actual)
 
-  actual <- sapply(all_possible_combos[1,], countgen)
+  actual <- sapply(all_possible_combos[1, ], countgen)
   expected <- c(1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA)
 
   expect_equal(expected, actual)
