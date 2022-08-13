@@ -11,6 +11,7 @@ test_that("all stats work", {
   expect_error(wp <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
   expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
+  expect_error(wbr <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
 
   })
@@ -20,6 +21,7 @@ test_that("all stats work with just one locus", {
   expect_error(wp <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
   expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
+  expect_error(wbr <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
 
   })
@@ -113,6 +115,12 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 
+  # check rarefaction
+  min.n <- 2 * min(ind.count(data.frame(all_possible_combos)), na.rm = TRUE)
+  expected_rar <- c(1, 3/2, 5/3, 1, 3/2, 5/3, 1.5, 2, 5/3, 3/2, 1, 1, 1, 2, 1, NA)
+  ar_vals_rar <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = TRUE, min.n = 2)
+  expect_equal(ar_vals_rar, expected_rar)
+
   })
 
 
@@ -153,6 +161,7 @@ test_that("allelic richness is calculated correctly", {
     rarify = TRUE,
     parallel = FALSE
   )
+
   set.seed(22)
   tra <- window_gd(mini_vcf,
     mini_coords,
@@ -170,22 +179,6 @@ test_that("allelic richness is calculated correctly", {
   expect_equal(trab, tra)
 
   })
-
-
-test_that("NAs are treated correctly when calculating biallelic richness", {
-
-  geno <- c(0, 1, 2, NA)
-  expect_equal(helper_calc_biar(geno), 2)
-
-  geno <- c(0, 1, NA)
-  expect_equal(helper_calc_biar(geno), 2)
-
-  geno <- c(0, NA)
-  expect_equal(helper_calc_biar(geno), 1)
-
-
-
-})
 
 test_that("vcf path works", {
   load_mini_ex()

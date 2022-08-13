@@ -103,6 +103,12 @@ system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = f
 set.seed(22)
 system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
+set.seed(22)
+system.time(ag1 <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, ncores = 5, rarify_alleles = TRUE))
+
+set.seed(22)
+system.time(ag2 <- window_gd(vcf, coords, lyr, stat = "allelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, ncores = 5))
+
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
 mpg <- mask(kpg, NUS)
@@ -112,6 +118,16 @@ mag <- mask(kag, NUS)
 
 khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
 mhg <- mask(khg, NUS)
+```
+```{r, fig.width = 8, fig.height = 5}
+par(mfrow = c(1,2), mar = rep(1,4), oma = rep(2,4))
+plot_gd(ag, NUS, breaks = 100, zlim = get_minmax(ag, bag), main = "allelic.richness")
+plot_gd(bag, NUS, breaks = 100, zlim = get_minmax(ag, bag), main = "biallelic.richness")
+
+
+par(mfrow = c(1,2), mar = rep(1,4), oma = rep(2,4))
+plot_gd(ag, NUS, breaks = 100, main = "allelic.richness")
+plot_gd(bag, NUS, breaks = 100, main = "biallelic.richness")
 ```
 
 Plots for Figure 4: 
@@ -135,10 +151,13 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 Redo moving window calculations without rarefaction to get plots for Figure S5:
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+set.seed(22)
 hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 
+set.seed(22)
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
 
+set.seed(22)
 agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 ```
 
