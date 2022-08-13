@@ -20,6 +20,8 @@ paperex/simex/*.csv
 
 #EMPIRICAL
 paperex/empex/data
+paperex/empex/EEMS
+paperex/empex/EEMS_notebook.Rmd
 
 # private token
 token.R
