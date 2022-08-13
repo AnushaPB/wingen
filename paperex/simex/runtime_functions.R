@@ -9,7 +9,8 @@
 #' @export
 #'
 #' @examples
-time_eval <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0, fun = mean, parallel = FALSE, ncores = 10){
+time_eval <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
+                      fun = mean, parallel = FALSE, ncores = 10){
   # reassign argument
   assign(var, val)
 
