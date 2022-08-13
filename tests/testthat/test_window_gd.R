@@ -116,7 +116,7 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 
   # check rarefaction
-  min.n <- 2 * min(ind.count(data.frame(all_possible_combos)), na.rm = TRUE)
+  min.n <- 2 * min(sapply(expected, countgen), na.rm = TRUE)
   expected_rar <- c(1, 3/2, 5/3, 1, 3/2, 5/3, 1.5, 2, 5/3, 3/2, 1, 1, 1, 2, 1, NA)
   ar_vals_rar <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = TRUE, min.n = 2)
   expect_equal(ar_vals_rar, expected_rar)
