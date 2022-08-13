@@ -203,3 +203,22 @@ test_that("return_stat returns correct functions", {
   expect_equal(return_stat("allelic.richness"), calc_mean_ar)
 
   })
+
+test_that("raref works", {
+  allele.counts <- c(1, 3)
+  expect_equal(raref(allele.counts, min.n = 2), 1.5)
+})
+
+test_that("countgen works", {
+
+  all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
+  actual <- apply(all_possible_combos, 2, countgen)
+  expected <- c(2,2,2,1,2,2,2,1,2,2,2,1,1,1,1,NA)
+
+  expect_equal(expected, actual)
+
+  actual <- sapply(all_possible_combos[1,], countgen)
+  expected <- c(1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA)
+
+  expect_equal(expected, actual)
+})

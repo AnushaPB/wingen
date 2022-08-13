@@ -426,14 +426,13 @@ calc_mean_biar <- function(dos, rarify_alleles = FALSE) {
 
   # if rarify_alleles = TRUE, get min.n for rarefaction
   # min.n is set to the number of non-NA genotypes * 2 (for diploid)
-  # CLEAN THIS UP
   if(rarify_alleles){
-    if(is.null(dim(dos))){
-      min.n <- 2 * min(sapply(dos, countgen), na.rm = TRUE)
+    if(is.null(nrow(dos))){
+      # if nrow is NULL then only one sample is included so min.n must be 2
+      min.n <- 2
     } else {
       min.n <- 2 * min(apply(dos, 2, countgen), na.rm = TRUE)
     }
-
   } else {
     min.n <- NULL
   }
@@ -441,7 +440,7 @@ calc_mean_biar <- function(dos, rarify_alleles = FALSE) {
   # if null dimensions (e.g., only one value provided), use helper_calc_biar directly
   # otherwise apply across columns (i.e., loci)
   if (is.null(dim(dos))){
-    ar_by_locus <- helper_calc_biar(dos, rarify_alleles, min.n)
+    ar_by_locus <- sapply(dos, helper_calc_biar, rarify_alleles, min.n)
   } else {
     ar_by_locus <- apply(dos, 2, helper_calc_biar, rarify_alleles, min.n)
   }
@@ -507,7 +506,7 @@ raref <- function(x, min.n) {
 
 #' Count number of not NA genotypes
 #'
-#' @param x
+#' @param x dosage matrix
 #'
 #' @export
 #' @noRd
