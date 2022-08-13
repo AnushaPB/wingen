@@ -115,8 +115,18 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify
   wdir <- get_exdir()
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf, coords, lyr, stat, wdim = wdim, fact = fact, rarify = rarify, rarify_n = rarify_n,
-                      rarify_nit = rarify_nit, min_n = min_n, fun = mean, rarify_alleles = rarify_alleles,
+  gdmapr <- window_gd(vcf = vcf,
+                      coords = coords,
+                      lyr = lyr,
+                      stat = stat,
+                      wdim = wdim,
+                      fact = fact,
+                      rarify = rarify,
+                      rarify_n = rarify_n,
+                      rarify_nit = rarify_nit,
+                      min_n = min_n,
+                      fun = mean,
+                      rarify_alleles = rarify_alleles,
                       parallel = parallel, ncores = ncores)
 
   df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
@@ -145,13 +155,22 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify
 #' @inheritParams default_time_test
 #'
 #' @export
-run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRUE, parallel, ncores = 10, file.name,
+run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRUE, parallel = TRUE, ncores = 10, file.name,
                                   stats =  c("pi", "het", "biallelic.richness")){
   # get wdir
   wdir <- get_exdir()
 
-  results <- purrr::map(stats, default_time_test, vcf = vcf, coords = coords, lyr = lyr, rarify = rarify,
-                        rarify_alleles = rarify_alleles, parallel = parallel, ncores = ncores, file.name = file.name)
+  results <- purrr::map(stats,
+                        default_time_test,
+                        vcf = vcf,
+                        coords = coords,
+                        lyr = lyr,
+                        rarify = rarify,
+                        rarify_alleles = rarify_alleles,
+                        parallel = parallel,
+                        ncores = ncores,
+                        file.name = file.name)
+
   write_time_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt), "_parallel", parallel, "_time_results.csv")))
   purrr::map(results, write_rast_test, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
 }
