@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-time_eval <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0, fun = mean, parallel = FALSE){
+time_eval <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0, fun = mean, parallel = FALSE, ncores = 10){
   # reassign argument
   assign(var, val)
 
@@ -27,7 +27,8 @@ time_eval <- function(val, var, vcf, coords, lyr, stat = "pi", wdim = 3, fact = 
             rarify = FALSE,
             min_n = 1,
             fun,
-            parallel)
+            parallel,
+            ncores)
 
   # create aggregated layer for calculating ncell
   if(fact != 0) lyr <- aggregate(lyr, fact)

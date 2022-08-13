@@ -109,7 +109,7 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
 #'
 #' @export
 default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
-                              min_n = 2, fun = mean, parallel = FALSE, ncores = NULL, file.name){
+                              min_n = 2, fun = mean, parallel = FALSE, ncores = 10, file.name){
 
   # get wdir
   wdir <- get_exdir()
@@ -144,7 +144,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify
 #' @inheritParams default_time_test
 #'
 #' @export
-run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, ncores, file.name,
+run_default_time_test <- function(vcf, coords, lyr, rarify, parallel, ncores = 10, file.name,
                                   stats =  c("pi", "het", "biallelic.richness")){
   # get wdir
   wdir <- get_exdir()
