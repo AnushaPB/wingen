@@ -30,10 +30,10 @@ message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test 200
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_rr", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "rr_RarifyAlleles", stats = "biallelic.richness")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_rr", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "rr_RarifyAlleles", stats = "biallelic.richness")
 
 # run test 100
 
@@ -49,10 +49,10 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_rr", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "rr_RarifyAlleles", stats = "biallelic.richness")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_rr", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "rr_RarifyAlleles", stats = "biallelic.richness")
 
 
 # WGS ---------------------------------------------------------------------------------------------------
@@ -81,10 +81,10 @@ message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 # run test 200
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_WGS", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "WGS_RarifyAlleles", stats = "biallelic.richness")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_WGS", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "WGS_RarifyAlleles", stats = "biallelic.richness")
 
 # run test 100
 
@@ -100,7 +100,7 @@ stopifnot(colnames(vcf@gt)[-1] == as.character(coords$idx))
 message(paste("nsnps", nrow(vcf@gt), "/ nind", nrow(coords)))
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = TRUE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_WGS", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "WGS_RarifyAlleles", stats = "biallelic.richness")
 
 run_default_time_test(vcf, coords[,c("x","y")], lyr, rarify = FALSE, rarify_alleles = TRUE,
-                      parallel = FALSE, file.name = "rr", file.name = "RA_WGS", stats = "biallelic.richness")
+                      parallel = FALSE, file.name = "WGS_RarifyAlleles", stats = "biallelic.richness")
