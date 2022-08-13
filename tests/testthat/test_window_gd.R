@@ -10,7 +10,7 @@ test_that("all stats work", {
   load_mini_ex(quiet = TRUE)
   expect_error(wp <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
   expect_error(wbr <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
 
@@ -20,8 +20,8 @@ test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
   expect_error(wp <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
-  expect_error(wbr <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
+  expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf[1,], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
 
   })
@@ -32,7 +32,8 @@ test_that("all stats work with just one individual", {
   # note: the first col of a vcf is the format col
   expect_error(wp <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "pi", rarify = FALSE), NA)
   expect_error(wh <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "biallelic.richness", rarify = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
+  expect_error(wb <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
   expect_error(wa <- window_gd(mini_vcf[,1:2], mini_coords[1,], mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
 
   })
@@ -109,16 +110,18 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
   all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
   expected <- c(1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, NA)
 
-  ar_vals <- apply(all_possible_combos, 2, helper_calc_biar)
+  ar_vals <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = FALSE)
   expect_equal(ar_vals, expected)
-  expect_equal(calc_mean_biar(all_possible_combos), mean(expected, na.rm = TRUE))
+  expect_equal(calc_mean_biar(all_possible_combos, rarify_alleles = FALSE), mean(expected, na.rm = TRUE))
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 
   # check rarefaction
-  min.n <- 2 * min(sapply(expected, countgen), na.rm = TRUE)
+  min.n <- get_minn(all_possible_combos)
+  expect_equal(min.n, 2)
+
   expected_rar <- c(1, 3/2, 5/3, 1, 3/2, 5/3, 1.5, 2, 5/3, 3/2, 1, 1, 1, 2, 1, NA)
-  ar_vals_rar <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = TRUE, min.n = 2)
+  ar_vals_rar <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = TRUE, min.n = min.n)
   expect_equal(ar_vals_rar, expected_rar)
 
   })
@@ -134,7 +137,7 @@ test_that("allelic richness is calculated correctly", {
   observed_ar <- helper_calc_ar(gen)
 
   dos <- vcf_to_dosage(mini_vcf)
-  observed_bar <- apply(dos, 2, helper_calc_biar)
+  observed_bar <- apply(dos, 2, helper_calc_biar, min.n = get_minn(dos))
 
   expect_true(all(observed_bar == expected))
   expect_true(all(observed_ar == expected))

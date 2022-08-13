@@ -27,7 +27,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = FALSE, parallel = FALSE, ncores = NULL) {
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, parallel = FALSE, ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
   if (!inherits(vcf, "vcfR") & is.character(vcf)) {
@@ -141,7 +141,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @keywords internal
 #' @noRd
 #'
-window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = FALSE, ncores = NULL, parallel = FALSE) {
+window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, ncores = NULL, parallel = FALSE) {
 
   # set L if pi is being calculated
   if (stat == "pi" & !is.null(L) & !is.numeric(L)) {
@@ -215,7 +215,7 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @return genetic diversity and counts for a single cell
 #' @export
 #'
-window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL, rarify_alleles = FALSE) {
+window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL, rarify_alleles = TRUE) {
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if (rarify) min_n <- rarify_n
@@ -255,7 +255,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #' @return genetic diversity statistic for a rarified subsample
 #' @export
 #'
-rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL, rarify_alleles = FALSE) {
+rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL, rarify_alleles = TRUE) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
     gd <- NA
@@ -285,7 +285,7 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = 
 #' @keywords internal
 #' @noRd
 #'
-rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL, rarify_alleles = FALSE) {
+rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL, rarify_alleles = TRUE) {
 
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
@@ -322,7 +322,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NU
 #' @keywords internal
 #' @noRd
 #'
-sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = FALSE) {
+sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = TRUE) {
   if(identical(stat, calc_mean_biar)){
     gd <- stat(gen[sub, ], rarify_alleles)
   } else if (is.null(L) | !identical(stat, calc_pi)) {
@@ -419,7 +419,7 @@ calc_pi <- function(dos, L = NULL) {
 #'
 #' @keywords internal
 #' @noRd
-calc_mean_biar <- function(dos, rarify_alleles = FALSE) {
+calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
   if (!all(dos %in% c(0, 1, 2, NA))) {
     stop("to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
   }
@@ -427,12 +427,7 @@ calc_mean_biar <- function(dos, rarify_alleles = FALSE) {
   # if rarify_alleles = TRUE, get min.n for rarefaction
   # min.n is set to the number of non-NA genotypes * 2 (for diploid)
   if(rarify_alleles){
-    if(is.null(nrow(dos))){
-      # if nrow is NULL then only one sample is included so min.n must be 2
-      min.n <- 2
-    } else {
-      min.n <- 2 * min(apply(dos, 2, countgen), na.rm = TRUE)
-    }
+    min.n <- get_minn(dos)
   } else {
     min.n <- NULL
   }
@@ -458,7 +453,7 @@ calc_mean_biar <- function(dos, rarify_alleles = FALSE) {
 #'
 #' @keywords internal
 #' @noRd
-helper_calc_biar <- function(loc, rarify_alleles = FALSE, min.n = NULL) {
+helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
   # check if all NA and if so return NA
   if(all(is.na(loc))) return(NA)
 
@@ -502,6 +497,22 @@ raref <- function(x, min.n) {
   dum <- exp(lchoose(nn - x, min.n) - lchoose(nn, min.n))
   dum[is.na(dum)] <- 0
   return(sum(1 - dum))
+}
+
+#' Calculate min.n
+#'
+#' @param dos dosage matrix
+#'
+#' @export
+#'
+get_minn <- function(dos){
+  if(is.null(nrow(dos))){
+    # if nrow is NULL then only one sample is included so min.n must be 2
+    min.n <- 2
+  } else {
+    min.n <- 2 * min(apply(dos, 2, countgen), na.rm = TRUE)
+  }
+  return(min.n)
 }
 
 #' Count number of not NA genotypes
