@@ -62,7 +62,6 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #'
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
 
-  # TODO: FIX COORDSS
   # if grd is NULL use r
   if (is.null(grd)) grd <- r
 
@@ -76,6 +75,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
 
+  # use coords if provided
   if (!is.null(coords)) {
     coords <- data.frame(coords)
     colnames(coords) <- c("x", "y")
