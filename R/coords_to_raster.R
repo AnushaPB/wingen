@@ -67,7 +67,7 @@ make_raster <- function(coords, buffer = 0, res = NULL){
 
   # set resolution
   if(length(res) > 2) stop("invalid res provided")
-  if(!is.null(res)) res(r) <- res
+  if(!is.null(res)) raster::res(r) <- res
 
 
   return(r)
