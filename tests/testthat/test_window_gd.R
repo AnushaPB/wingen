@@ -23,11 +23,11 @@ test_that("all stats and parallel works", {
 
 test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
-  expect_warning(wp <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
-  expect_warning(wh <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE))
-  expect_warning(wb <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE))
-  expect_warning(wb <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE))
-  expect_warning(wa <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE))
+  expect_warning(wp <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
+  expect_warning(wh <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE))
+  expect_warning(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE))
+  expect_warning(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE))
+  expect_warning(wa <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE))
 })
 
 test_that("get error with just one individual", {
@@ -246,7 +246,7 @@ test_that("vcf path works", {
 
 test_that("error if bad vcf is given", {
   vcfpath <- "badpath"
-  expect_warning(expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), "cannot open the connection"), "No such file or directory")
+  expect_error(wpi <- window_gd(vcfpath, mini_coords, mini_lyr, rarify = FALSE), "Cannot open file: No such file or directory")
   expect_error(wpi <- window_gd(mini_coords, mini_coords, mini_lyr, rarify = FALSE), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
 })
 
@@ -274,4 +274,3 @@ test_that("countgen works", {
 
   expect_equal(expected, actual)
 })
-

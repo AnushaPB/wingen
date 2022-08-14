@@ -26,8 +26,8 @@ test_that("check resolution of raster produced", {
   load_mini_ex(quiet = TRUE)
 
   r <- coords_to_raster(mini_coords, res = 5)
-  # check resolution is about 5
-  expect_equal(round(raster::res(r), 0), c(5, 5))
+  # check resolution is 5
+  expect_equal(raster::res(r), c(5, 5))
 
   r <- coords_to_raster(mini_coords, res = c(5, 4))
   # check resolution is about 4 , 5 (also confirm order of x, y)
@@ -65,3 +65,4 @@ test_that("plots without errors", {
 
   expect_error(r <- coords_to_raster(mini_coords, plot = TRUE), NA)
 })
+
