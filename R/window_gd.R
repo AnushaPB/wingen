@@ -30,116 +30,41 @@
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, parallel = FALSE, ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
-  if (!inherits(vcf, "vcfR") & is.character(vcf)) {
-    vcf <- vcfR::read.vcfR(vcf)
-  } else if (!inherits(vcf, "vcfR") & !is.character(vcf)) {
-    stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
-  }
+  vcf <- vcf_check(vcf)
 
   # check to make sure coords and gen align and remove individuals or markers with no scores
   data <- check_data(vcf, coords)
   vcf <- data[["vcf"]]
   coords <- data[["coords"]]
 
-  # calc stats
-  if (stat == "allelic.richness") {
-    # convert from vcf to genind
-    gen <- vcf_to_genind(vcf)
+  # convert vcf based on statistic being calculated
+  gen <- convert_vcf(vcf, stat)
 
-    results <- window_gd_general(
-      gen = gen,
-      coords = coords,
-      lyr = lyr,
-      stat = stat,
-      wdim = wdim,
-      fact = fact,
-      rarify = rarify,
-      rarify_n = rarify_n,
-      rarify_nit = rarify_nit,
-      min_n = min_n,
-      fun = fun,
-      parallel = parallel,
-      ncores = ncores
-    )
+  # run moving window
+  results <- window_gd_general(
+    gen = gen,
+    coords = coords,
+    lyr = lyr,
+    stat = stat,
+    wdim = wdim,
+    fact = fact,
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    parallel = parallel,
+    ncores = ncores
+  )
 
-    names(results[[1]]) <- "allelic_richness"
-  }
-
-  if (stat == "het" | stat == "heterozygosity") {
-    # convert from vcf to heterozygosity matrix
-    gen <- vcf_to_het(vcf)
-
-    results <- window_gd_general(
-      gen = gen,
-      coords = coords,
-      lyr = lyr,
-      stat = stat,
-      wdim = wdim,
-      fact = fact,
-      rarify = rarify,
-      rarify_n = rarify_n,
-      rarify_nit = rarify_nit,
-      min_n = min_n,
-      fun = fun,
-      parallel = parallel,
-      ncores = ncores
-    )
-
-    names(results[[1]]) <- "heterozygosity"
-  }
-
-  if (stat == "pi") {
-    # convert from vcf to dosage matrix
-    gen <- vcf_to_dosage(vcf)
-
-    results <- window_gd_general(
-      gen = gen,
-      coords = coords,
-      lyr = lyr,
-      stat = stat,
-      wdim = wdim,
-      fact = fact,
-      rarify = rarify,
-      rarify_n = rarify_n,
-      rarify_nit = rarify_nit,
-      min_n = min_n,
-      fun = fun,
-      L = L,
-      parallel = parallel,
-      ncores = ncores
-    )
-
-    names(results[[1]]) <- "pi"
-  }
-
-  if (stat == "biallelic.richness") {
-    # convert vcf to dosage matrix
-    gen <- vcf_to_dosage(vcf)
-
-    results <- results <- window_gd_general(
-      gen = gen,
-      coords = coords,
-      lyr = lyr,
-      stat = stat,
-      wdim = wdim,
-      fact = fact,
-      rarify = rarify,
-      rarify_n = rarify_n,
-      rarify_nit = rarify_nit,
-      min_n = min_n,
-      fun = fun,
-      rarify_alleles = rarify_alleles,
-      parallel = parallel,
-      ncores = ncores
-    )
-
-    names(results[[1]]) <- "biallelic_richness"
-  }
-
-  names(results[[2]]) <- "sample_count"
+  # set raster layer names based on stat
+  results <- name_results(results, stat)
 
   return(results)
 }
+
 #' Helper function for window_gd
 #'
 #' @param gen genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
@@ -154,11 +79,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, ncores = NULL, parallel = FALSE) {
 
   # set L if pi is being calculated
-  if (stat == "pi" & !is.null(L) & !is.numeric(L)) {
-    if (L == "nvariants") {
-      L <- ncol(gen)
-    }
-  }
+  if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(gen)
 
   # replace stat with function to calculate diversity statistic
   stat <- return_stat(stat)
@@ -170,14 +91,11 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   # confirm that coords and gen align
   check_data(gen, coords)
 
+  # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
-  if (fact == 0) {
-    lyr <- lyr * 0
-  } else {
-    lyr <- raster::aggregate(lyr, fact, fun = mean) * 0
-  }
+  if (fact == 0) lyr <- lyr * 0 else lyr <- raster::aggregate(lyr, fact, fun = mean) * 0
 
   # get cell index for each coordinate
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
@@ -470,16 +388,15 @@ helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
   }
 
   if (rarify_alleles) {
-
-    # make df of counts of reference and alternate
     # omit NAs before counting alleles
     loc_NArm <- na.omit(loc)
+
+    # make df of counts of reference and alternate
     counts <- c(R = sum(loc_NArm), A = 2 * length(loc_NArm) - sum(loc_NArm, na.rm = TRUE))
 
     # rarefied counts calculation taken from hierfstat::allelic.richness function
     AR <- raref(counts, min.n = min.n)
   } else {
-
     # calculate number of unique alleles
     # note: has to be na.omit (na.rm is not an argument for unique)
     uq <- unique(na.omit(loc))
@@ -508,6 +425,32 @@ raref <- function(x, min.n) {
   dum[is.na(dum)] <- 0
   return(sum(1 - dum))
 }
+
+#' Helper function to get adjacent cells to a given cell index
+#'
+#' @param i cell index
+#' @param r RasterLayer
+#' @param n neighborhood matrix
+#' @param coord_cells cell numbers of coordinates
+#'
+#' @return indices of coordinates that are adjacent to the given cell
+#' @export
+#'
+#' @keywords internal
+#' @noRd
+get_adj <- function(i, r, n, coord_cells) {
+  # get adjacent cells to cell i
+  adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
+  # get indices of adjacent cells
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {
+    seq(x[1], x[2])
+  })
+  # get list of indices of coords in that set of cells
+  sub <- which(coord_cells %in% adjci)
+
+  return(sub)
+}
+
 
 #' Calculate min.n
 #'
@@ -569,13 +512,17 @@ check_data <- function(gen, coords = NULL) {
     nind <- nrow(gen)
   }
 
+  # check coords
+  if (!is.null(coords)) {
+    if (nind != nrow(coords)) {
+      stop("number of samples in coords data and number of samples in gen data are not equal")
+    }
+  }
+
   # check for rows or columns with missing data in a vcf
   if (inherits(gen, "vcfR")) {
     return(check_vcf_NA(gen, coords))
   }
-
-  # check coords
-  if (!is.null(coords)) if (nind != nrow(coords)) stop("number of samples in coords data and number of samples in gen data are not equal")
 
   return()
 }
@@ -589,68 +536,93 @@ check_data <- function(gen, coords = NULL) {
 #' @noRd
 #'
 check_vcf_NA <- function(vcf, coords = NULL) {
+
+  # check for mismatch before indexing
+  if (!is.null(coords)) {
+    if ((ncol(vcf@gt) - 1) != nrow(coords)) {
+      stop("number of samples in coords data and number of samples in vcf are not equal")
+    }
+  }
+
   if (nrow(vcf@fix) == 1) {
-    NA_col <- sapply(vcf@gt[-1], function(x) {
-      all(is.na(x))
-    })
-
-    if (any(NA_col)) {
-      warning("Individuals with no scored loci have been removed")
-      vcf <- vcf[, c(TRUE, !NA_col)]
-      coords <- coords[!NA_col, ]
-    }
+    NA_col <- get_allNA(vcf@gt[-1])
+    NA_row <- FALSE
   } else {
-    NA_col <- apply(vcf@gt[, -1], 2, function(x) {
-      all(is.na(x))
-    })
-    NA_row <- apply(vcf@gt[, -1], 1, function(x) {
-      all(is.na(x))
-    })
+    NA_col <- get_allNA(vcf@gt[, -1], MARGIN = 2)
+    NA_row <- get_allNA(vcf@gt[, -1], MARGIN = 1)
+  }
 
-    if (any(NA_col)) {
-      warning("Individuals with no scored loci have been removed")
-      vcf <- vcf[, c(TRUE, !NA_col)]
-      if (!is.null(coords)) coords <- coords[!NA_col, ]
-    }
+  if (any(NA_col)) {
+    warning("Individuals with no scored loci have been removed")
+    vcf <- vcf[, c(TRUE, !NA_col)]
+  }
 
-    if (any(NA_row)) {
-      warning("Markers with no scored alleles have been removed")
-      vcf <- vcf[!NA_row, ]
-    }
+  if (any(NA_row)) {
+    warning("Markers with no scored alleles have been removed")
+    vcf <- vcf[!NA_row, ]
   }
 
   if (is.null(coords)) {
     result <- vcf
   } else {
+    coords <- coords[!NA_col, ]
     result <- list(vcf = vcf, coords = coords)
   }
 
   return(result)
 }
 
-#' Helper function to get adjacent cells to a given cell index
+#' Helper function to get NA values
 #'
-#' @param i cell index
-#' @param r RasterLayer
-#' @param n neighborhood matrix
-#' @param coord_cells cell numbers of coordinates
-#'
-#' @return indices of coordinates that are adjacent to the given cell
+#' @inheritParams base::array
 #' @export
 #'
-#' @keywords internal
-#' @noRd
-get_adj <- function(i, r, n, coord_cells) {
-  # get adjacent cells to cell i
-  adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
-  # get indices of adjacent cells
-  adjci <- purrr::map_dbl(adjc, 1, function(x) {
-    seq(x[1], x[2])
-  })
-  # get list of indices of coords in that set of cells
-  sub <- which(coord_cells %in% adjci)
+get_allNA <- function(x, MARGIN = NULL) {
+  if (is.null(dim(x))) allNA <- is.na(x)
+  if (!is.null(dim(x))) {
+    allNA <- apply(x, MARGIN, function(x) {
+      all(is.na(x))
+    })
+  }
+  return(allNA)
+}
 
-  return(sub)
+#' Convert vcf to correct format based on stat
+#'
+#' @param vcf vcfR
+#' @param stat genetic diversity statistic
+#'
+#' @export
+#' @noRd
+convert_vcf <- function(vcf, stat) {
+  if (stat == "allelic.richness") gen <- vcf_to_genind(vcf)
+
+  if (stat == "het" | stat == "heterozygosity") gen <- vcf_to_het(vcf)
+
+  if (stat == "pi" | stat == "biallelic.richness") gen <- vcf_to_dosage(vcf)
+
+  return(gen)
+}
+
+#' Rename results from window_gd
+#'
+#' @param x RasterStack produced by window_gd
+#' @param stat genetic diversity statistic
+#'
+#' @export
+#' @noRd
+name_results <- function(x, stat) {
+  names(x[[2]]) <- "sample_counts"
+
+  if (stat == "pi") names(x[[1]]) <- "pi"
+
+  if (stat == "het") names(x[[1]]) <- "heterozygosity"
+
+  if (stat == "allelic.richness") names(x[[1]]) <- "allelic_richness"
+
+  if (stat == "biallelic.richness") names(x[[1]]) <- "biallelic_richness"
+
+  return(x)
 }
 
 #' Helper function to get genetic diversity functions
@@ -664,8 +636,12 @@ get_adj <- function(i, r, n, coord_cells) {
 #' @noRd
 return_stat <- function(x) {
   if (x == "pi") stat <- calc_pi
+
   if (x == "biallelic.richness") stat <- calc_mean_biar
+
   if (x == "allelic.richness") stat <- calc_mean_ar
+
   if (x == "het") stat <- calc_mean_het
+
   return(stat)
 }
