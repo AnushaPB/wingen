@@ -51,6 +51,50 @@ legend(0,-80,
        cex = 1.5)
 
 ```
+```{r}
+br <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness", rarify = TRUE, wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, parallel = FALSE, rarify_alleles = TRUE)
+
+bra <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness",  rarify = TRUE, wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify_alleles = FALSE)
+
+plot_gd(br)
+
+ml <- get_divout(file.name = "rr", rarify = TRUE, stat = "biallelic.richness", nsamp = 200)
+plot_gd(ml)
+
+plot_gd(br)
+
+```
+
+```{r, fig.height = 5, fig.width = 5}
+set.seed(42)
+
+wg <- window_gd(subvcf, 
+                subcoords, 
+                lyr, 
+                stat = "pi", 
+                rarify = TRUE, 
+                wdim = 3, 
+                fact = 3, 
+                rarify_n = 2, 
+                rarify_nit = 5, 
+                parallel = FALSE)
+
+kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
+
+kc <- krig_gd(wg, lyr, index = 2, agg_r = 2, disagg_grd = 2)
+
+mg <- mask_gd(kg, kc, minval = 1)
+
+# replace values less than 0 in kriged plots
+kc[kc < 0] <- 0
+kg[kg < 0] <- 0
+
+plot_gd(wg, bkg, zlim = c(0, 0.30))
+plot_count(wg, zlim = c(0,12))
+plot_gd(kg, zlim = c(0, 0.30))
+plot_count(kc, zlim = c(0,12))
+plot_gd(mg, bkg,zlim = c(0, 0.30))
+```
 
 ### Figure #X: Window vs Aggregation Factor
 
@@ -65,7 +109,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 
 ## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
 
-```{r, fig.width = 7.5, fig.height = 5, cache = TRUE}
+```{r, fig.width = 6.75, fig.height = 4.5, cache = TRUE}
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
                                rarify = c("TRUE", "FALSE"),
                                stat = c("pi", "biallelic_richness", "heterozygosity")))
@@ -81,10 +125,11 @@ stk100 <- purrr::map(params, test_datasets_simex, nsamp = 100, msk_lyr = msk_lyr
 stk200 <- purrr::map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
-par(mfrow = c(2, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
+par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
 purrr::walk(stk100, test_simex_plot, bkg = bkg, legend = FALSE)
 
-par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4), pty = "s")
+
+par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
 purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
 
 ```
@@ -107,10 +152,10 @@ tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
   geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
-  geom_hline(yintercept = 120, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 120, label = "2 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
-  geom_hline(yintercept = 180, linetype = "dashed", col = "lightgray", lwd = 1) + 
-  geom_text(aes(factor(200), 180, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 60*3, linetype = "dashed", col = "gray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*3, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 60*6, linetype = "dashed", col = "lightgray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*6, label = "6 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
             vjust = -0.5, position=position_dodge(width = .9)) + 
@@ -124,7 +169,7 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("number of samples") +
   ylab("time (seconds)") +
-  ylim(0,200) +
+  ylim(0,400) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
