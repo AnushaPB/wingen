@@ -14,18 +14,21 @@ processor system, this can be modified by going into any of the files
 marked with an asterix described below*
 
 The results and figures from the paper were created using the
-`simex_notebook.Rmd`
+`simex_notebook.Rmd` and `runtime_notebook.Rmd`
 
 **Directory structure:**
 
     [simex]
     |   run_simex.sh* - main script to run simulations and generate results
-    |   simex_notebook.Rmd* - main notebook for paper analyses and generate figures
+    |   simex_notebook.Rmd* - main notebook for simulation analyses and figures
     |   simex_notebook.md - knitted simex_notebook.Rmd
     │   simex_functions.R* - functions used for simulation example analysis
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
-    │
+    |   runtime_notebook.Rmd - main notebook for runtime analyses and figures
+    |   runtime_notebook.md - knitted runtime_notebook.Rmd 
+    |   runtime_functions.R - functions used for runtime analysis
+    |
     └───[data]
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
     │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
@@ -35,10 +38,13 @@ The results and figures from the paper were created using the
     │   └───[middle_earth] - directory with original DEM raster layers
     |
     └───[time_tests]
-    │   │   AR_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
+    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
     │   │   FULL_time_test.R* - generates results for FULL dataset
     │   │   rr_time_test.R* - generates results for rr dataset
     │   │   WGS_time_test.R* - generates results for WGS dataset
+    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
+    │   │   RarifyAlleles_time_test.R* - generates results for biallelic.richness with allele rarefaction 
+    │   │   (WGS and rr dataset)
     │   
     └───[outputs] - directory for results from time tests
 
@@ -52,7 +58,7 @@ The results and figures from the paper were created using the
 **Directory structure:**
 
     [paperex]
-    |   empex_notebook.Rmd* - main notebook for paper analyses and generate figures
+    |   empex_notebook.Rmd* - main notebook for empirical analyses and figures
     |   empex_notebook.md - knitted empex_notebook.Rmd
     |   empex_functions.R* - functions used for empirical example analysis
     │
