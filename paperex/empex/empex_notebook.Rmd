@@ -52,7 +52,7 @@ conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "Am
 NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
 ```
 
-## Figure 4: Geographic context plots
+### **Figure 4:** Geographic context plots
 
 ```{r, fig.width = 8, fig.height = 5}
 par(mar = rep(0,4))
@@ -65,7 +65,7 @@ par(mar = rep(0,4))
 plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 ```
 
-# Run wingen analysis
+## Run wingen analysis
 
 First, different parameter combinations are evaluated. Here we vary the window size (wdim), the raster resolutions (disagg), and the rarefaction size (rarify_n) to get the plots from Figure S4
 
@@ -103,12 +103,6 @@ system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = f
 set.seed(22)
 system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
-set.seed(22)
-system.time(ag1 <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, ncores = 5, rarify_alleles = TRUE))
-
-set.seed(22)
-system.time(ag2 <- window_gd(vcf, coords, lyr, stat = "allelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5, parallel = TRUE, ncores = 5))
-
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
 mpg <- mask(kpg, NUS)
@@ -119,18 +113,8 @@ mag <- mask(kag, NUS)
 khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
 mhg <- mask(khg, NUS)
 ```
-```{r, fig.width = 8, fig.height = 5}
-par(mfrow = c(1,2), mar = rep(1,4), oma = rep(2,4))
-plot_gd(ag, NUS, breaks = 100, zlim = get_minmax(ag, bag), main = "allelic.richness")
-plot_gd(bag, NUS, breaks = 100, zlim = get_minmax(ag, bag), main = "biallelic.richness")
 
-
-par(mfrow = c(1,2), mar = rep(1,4), oma = rep(2,4))
-plot_gd(ag, NUS, breaks = 100, main = "allelic.richness")
-plot_gd(bag, NUS, breaks = 100, main = "biallelic.richness")
-```
-
-Plots for Figure 4: 
+### **Figure 4:** Comparison of different measures: 
 
 ```{r, fig.width = 12, fig.height = 6}
 par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
@@ -148,7 +132,7 @@ plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 ```
 
-Redo moving window calculations without rarefaction to get plots for Figure S5:
+### **Figure S5:**  moving window calculations with and without rarefaction 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 set.seed(22)
@@ -158,11 +142,12 @@ set.seed(22)
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
 
 set.seed(22)
-agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
 ```
 
 
 ```{r, fig.width = 15, fig.height = 12}
+
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
 plot_gd(pg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))

@@ -74,7 +74,7 @@ conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "Am
 NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
 ```
 
-## Figure 4: Geographic context plots
+### **Figure 4:** Geographic context plots
 
 ``` r
 par(mar = rep(0,4))
@@ -91,7 +91,7 @@ plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-# Run wingen analysis
+## Run wingen analysis
 
 First, different parameter combinations are evaluated. Here we vary the
 window size (wdim), the raster resolutions (disagg), and the rarefaction
@@ -145,7 +145,7 @@ khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
 mhg <- mask(khg, NUS)
 ```
 
-Plots for Figure 4:
+### **Figure 4:** Comparison of different measures:
 
 ``` r
 par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
@@ -165,15 +165,17 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-Redo moving window calculations without rarefaction to get plots for
-Figure S5:
+### **Figure S5:** moving window calculations with and without rarefaction
 
 ``` r
+set.seed(22)
 hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 
+set.seed(22)
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
 
-agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+set.seed(22)
+agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
 ```
 
 ``` r
