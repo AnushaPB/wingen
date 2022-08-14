@@ -51,23 +51,11 @@ legend(0,-80,
        cex = 1.5)
 
 ```
-```{r}
-br <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness", rarify = TRUE, wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, parallel = FALSE, rarify_alleles = TRUE)
-
-bra <- window_gd(subvcf, subcoords, lyr, stat = "biallelic.richness",  rarify = TRUE, wdim = 3, fact = 3, rarify_n = 2, rarify_nit = 5, rarify_alleles = FALSE)
-
-plot_gd(br)
-
-ml <- get_divout(file.name = "rr", rarify = TRUE, stat = "biallelic.richness", nsamp = 200)
-plot_gd(ml)
-
-plot_gd(br)
-
-```
 
 ```{r, fig.height = 5, fig.width = 5}
 set.seed(42)
 
+# run moving window
 wg <- window_gd(subvcf, 
                 subcoords, 
                 lyr, 
@@ -79,15 +67,16 @@ wg <- window_gd(subvcf,
                 rarify_nit = 5, 
                 parallel = FALSE)
 
+# krig results
 kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
-
 kc <- krig_gd(wg, lyr, index = 2, agg_r = 2, disagg_grd = 2)
-
-mg <- mask_gd(kg, kc, minval = 1)
 
 # replace values less than 0 in kriged plots
 kc[kc < 0] <- 0
 kg[kg < 0] <- 0
+
+# mask areas with less than one count
+mg <- mask_gd(kg, kc, minval = 1)
 
 plot_gd(wg, bkg, zlim = c(0, 0.30))
 plot_count(wg, zlim = c(0,12))
