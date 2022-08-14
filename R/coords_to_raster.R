@@ -15,39 +15,8 @@
 #' coords_to_raster(mini_coords, buffer = 1, plot = TRUE)
 coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg = NULL, plot = FALSE) {
 
-  # format coords
-  coords <- as.data.frame(coords)
-  colnames(coords) <- c("x", "y")
-
-  # coords
-  xmin <- min(coords$x, na.rm = TRUE) - buffer
-  xmax <- max(coords$x, na.rm = TRUE) + buffer
-  ymin <- min(coords$y, na.rm = TRUE) - buffer
-  ymax <- max(coords$y, na.rm = TRUE) + buffer
-
   # make a matrix
-  if (is.null(res)) {
-    nrow <- (ymax - ymin)
-    ncol <- (xmax - xmin)
-  } else {
-    if (length(res) == 1) {
-      ncol <- (xmax - xmin) / res
-      nrow <- (ymax - ymin) / res
-    } else if (length(res) == 2) {
-      ncol <- (xmax - xmin) / (res[1])
-      nrow <- (ymax - ymin) / (res[2])
-    } else {
-      stop("invalid res provided")
-    }
-  }
-
-  m <- matrix(nrow = nrow, ncol = ncol)
-
-  # turn into raster
-  r <- raster::raster(m)
-
-  # set extent
-  raster::extent(r) <- c(xmin, xmax, ymin, ymax)
+  r <- make_raster(coords, buffer = buffer, res = res)
 
   # aggregate or disaggregate
   if (!is.null(agg) & !is.null(disagg)) {
@@ -67,4 +36,40 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
   }
 
   return(r)
+}
+
+#' coords to raster converter
+#'
+#' @inheritParams coords_to_raster
+#'
+#' @export
+#' @noRd
+make_raster <- function(coords, buffer = 0, res = NULL){
+  # format coords
+  coords <- data.frame(coords)
+  colnames(coords) <- c("x", "y")
+
+  # get x and y min and max and round up to nearest integer
+  # (note: must be an integer for assigning nrow and ncol of a matrix)
+  xmin <- ceiling(min(coords$x, na.rm = TRUE) - buffer)
+  xmax <- ceiling(max(coords$x, na.rm = TRUE) + buffer)
+  ymin <- ceiling(min(coords$y, na.rm = TRUE) - buffer)
+  ymax <- ceiling(max(coords$y, na.rm = TRUE) + buffer)
+
+  # make matrix
+  m <- matrix(nrow = (ymax - ymin), ncol = (xmax - xmin))
+
+  # turn into raster
+  r <- raster::raster(m)
+
+  # set extent
+  raster::extent(r) <- c(xmin, xmax, ymin, ymax)
+
+  # set resolution
+  if(length(res) > 2) stop("invalid res provided")
+  if(!is.null(res)) res(r) <- res
+
+
+  return(r)
+
 }
