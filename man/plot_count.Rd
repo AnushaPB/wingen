@@ -10,6 +10,7 @@ plot_count(
   breaks = 10,
   col = viridis::mako(breaks),
   main = NULL,
+  box = FALSE,
   ...
 )
 }

@@ -11,6 +11,7 @@ plot_gd(
   col = viridis::magma(breaks),
   breaks = 10,
   main = NULL,
+  box = FALSE,
   ...
 )
 }
