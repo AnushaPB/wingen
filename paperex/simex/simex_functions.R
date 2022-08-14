@@ -347,10 +347,10 @@ test_simex_plot <- function(r, bkg, legend = FALSE){
   stat <- names(r)[1]
 
   if(stat == "pi"){zlim <- c(0, 0.30)}
-  if(stat == "biallelic_richness"){zlim <- c(1, 1.75)}
+  if(stat == "biallelic_richness"){zlim <- c(1, 1.86)}
   if(stat == "heterozygosity"){zlim <- c(0, 0.30)}
 
-  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100)
+  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE)
   return(NULL)
 }
 
