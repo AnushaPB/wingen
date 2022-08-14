@@ -1,40 +1,40 @@
 
+
 test_that("window_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
+  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE), NA)
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
 })
 
-test_that("all stats work", {
+test_that("all stats and parallel works", {
   load_mini_ex(quiet = TRUE)
-  expect_error(wp <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
-  expect_error(wh <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
-  expect_error(wbr <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
-  expect_error(wa <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
+  expect_warning(expect_warning(wp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE)))
+  expect_warning(expect_warning(wh <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "het", rarify = FALSE)))
+  expect_warning(expect_warning(wb <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE)))
+  expect_warning(expect_warning(wbr <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE)))
+  expect_warning(expect_warning(wa <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE)))
+
+  # check parallel
+  expect_warning(expect_warning(wpp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE, parallel = TRUE, ncores = 2)))
+  names(wpp) <- names(wp) <- NULL
+  expect_equal(wpp, wp)
 })
 
 test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
-  expect_error(wp <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE), NA)
-  expect_error(wh <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
-  expect_error(wa <- window_gd(mini_vcf[1, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
+  expect_warning(wp <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
+  expect_warning(wh <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE))
+  expect_warning(wb <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE))
+  expect_warning(wb <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE))
+  expect_warning(wa <- window_gd(mini_vcf_NA[1, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE))
 })
 
-test_that("all stats work with just one individual", {
+test_that("get error with just one individual", {
   load_mini_ex(quiet = TRUE)
-
   # note: the first col of a vcf is the format col
-  expect_error(wp <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "pi", rarify = FALSE), NA)
-  expect_error(wh <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "het", rarify = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE), NA)
-  expect_error(wb <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE), NA)
-  expect_error(wa <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "allelic.richness", rarify = FALSE), NA)
+  expect_error(wp <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "pi", rarify = FALSE), "cannot run window_gd with only one individual")
 })
-
 
 
 test_that("error gets returned for mismatch vcf and coords", {
@@ -118,33 +118,78 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
 })
 
 
-test_that("allelic richness is calculated correctly", {
+test_that("allelic richness is calculated correctly for dataset with NAs (and rarefaction)", {
   load_mini_ex()
 
-  # note: this was calculated manually
-  expected <- c(1, 2, 1, 2, 2, 1, 2, 2, 2, 2)
+  expect_warning(expect_warning(gen <- vcf_to_genind(mini_vcf_NA)))
+  observed_ar <- helper_calc_ar(gen)
+
+  expect_warning(expect_warning(data <- check_data(mini_vcf_NA, mini_coords)))
+  dos <- vcf_to_dosage(data$vcf)
+  observed_bar <- apply(dos, 2, helper_calc_biar, min.n = get_minn(dos))
+
+  expect_true(all(observed_bar == observed_ar))
+
+  # check rasters
+  set.seed(22)
+  expect_warning(
+    expect_warning(
+      trab <- window_gd(mini_vcf_NA,
+        mini_coords,
+        mini_lyr,
+        stat = "biallelic.richness",
+        wdim = 3,
+        fact = 3,
+        rarify_n = 2,
+        rarify_nit = 5,
+        rarify = TRUE,
+        parallel = FALSE,
+        rarify_alleles = TRUE
+      )
+    )
+  )
+
+
+  set.seed(22)
+  expect_warning(
+    expect_warning(
+      tra <- window_gd(mini_vcf_NA,
+        mini_coords,
+        mini_lyr,
+        stat = "allelic.richness",
+        wdim = 3,
+        fact = 3,
+        rarify_n = 2,
+        rarify_nit = 5,
+        rarify = TRUE,
+        parallel = FALSE
+      )
+    )
+  )
+
+
+  names(tra) <- names(trab) <- NULL
+  expect_equal(trab, tra)
+})
+
+test_that("allelic richness is calculated correctly for dataset with no NAs", {
+  load_mini_ex()
 
   gen <- vcf_to_genind(mini_vcf)
   observed_ar <- helper_calc_ar(gen)
 
-  dos <- vcf_to_dosage(mini_vcf)
-  observed_bar <- apply(dos, 2, helper_calc_biar, min.n = get_minn(dos))
+  data <- check_data(mini_vcf, mini_coords)
+  dos <- vcf_to_dosage(data$vcf)
+  observed_bar_rar <- apply(dos, 2, helper_calc_biar, min.n = get_minn(dos), rarify_alleles = TRUE)
+  observed_bar_norar <- apply(dos, 2, helper_calc_biar, min.n = get_minn(dos), rarify_alleles = FALSE)
 
-  expect_true(all(observed_bar == expected))
-  expect_true(all(observed_ar == expected))
-  expect_true(all(observed_bar == observed_ar))
-
-  expected_mean <- mean(expected)
-  observed_bar_mean <- calc_mean_biar(dos)
-  observed_ar_mean <- calc_mean_ar(gen)
-
-  expect_true(all(observed_bar_mean == expected_mean))
-  expect_true(all(observed_ar_mean == expected_mean))
-  expect_true(all(observed_bar_mean == observed_ar_mean))
+  expect_true(all(observed_bar_rar == observed_ar))
+  expect_true(all(observed_bar_norar == observed_ar))
+  expect_true(all(observed_bar_norar == observed_bar_rar))
 
   # check rasters
   set.seed(22)
-  trab <- window_gd(mini_vcf,
+  trab_rar <- window_gd(mini_vcf,
     mini_coords,
     mini_lyr,
     stat = "biallelic.richness",
@@ -153,7 +198,23 @@ test_that("allelic richness is calculated correctly", {
     rarify_n = 2,
     rarify_nit = 5,
     rarify = TRUE,
-    parallel = FALSE
+    parallel = FALSE,
+    rarify_alleles = TRUE
+  )
+
+  # check rasters
+  set.seed(22)
+  trab_norar <- window_gd(mini_vcf,
+    mini_coords,
+    mini_lyr,
+    stat = "biallelic.richness",
+    wdim = 3,
+    fact = 3,
+    rarify_n = 2,
+    rarify_nit = 5,
+    rarify = TRUE,
+    parallel = FALSE,
+    rarify_alleles = FALSE
   )
 
   set.seed(22)
@@ -169,8 +230,10 @@ test_that("allelic richness is calculated correctly", {
     parallel = FALSE
   )
 
-  names(tra) <- names(trab) <- NULL
-  expect_equal(trab, tra)
+  names(tra) <- names(trab_rar) <- names(trab_norar) <- NULL
+  expect_equal(tra, trab_rar)
+  expect_equal(tra, trab_norar)
+  expect_equal(trab_norar, trab_rar)
 })
 
 test_that("vcf path works", {
@@ -211,3 +274,4 @@ test_that("countgen works", {
 
   expect_equal(expected, actual)
 })
+

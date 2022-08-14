@@ -1,10 +1,10 @@
 
 test_that("check vcf check throws correct errors and return correct object", {
-  data("mini_vcf")
+  data("mini_vcf_NA")
 
   expect_error(vcf_check("BAD/PATH"))
   expect_error(vcf_check(1))
-  expect_s4_class(vcf_check(mini_vcf), "vcfR")
+  expect_s4_class(vcf_check(mini_vcf_NA), "vcfR")
 
   vcfR::write.vcf(mini_vcf, "temp_vcf.vcf")
   expect_s4_class(vcf_check("temp_vcf.vcf"), "vcfR")
@@ -40,10 +40,10 @@ test_that("pop warnings for genind are correct", {
 })
 
 test_that("check vcf to dosage matrix conversion is correct", {
-  data("mini_vcf")
-  dos <- vcf_to_dosage(mini_vcf)
+  data("mini_vcf_NA")
+  dos <- vcf_to_dosage(mini_vcf_NA)
   # get genotype matrix, remove FORMAT col (first col), and transpose so rows are individuals and cols are loci
-  gt <- t(mini_vcf@gt[, -1])
+  gt <- t(mini_vcf_NA@gt[, -1])
 
   gt0 <- which(gt == "0|0", arr.ind = TRUE)
   gt1 <- rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))
@@ -63,20 +63,23 @@ test_that("check vcf to dosage matrix conversion is correct", {
 })
 
 test_that("check that vcf to genind conversion is correct", {
-  data("mini_vcf")
-  genind <- vcf_to_genind(mini_vcf)
+  data("mini_vcf_NA")
+
+  expect_warning(expect_warning(mini_vcf_NA <- check_vcf_NA(mini_vcf_NA)))
+
+  genind <- vcf_to_genind(mini_vcf_NA)
   # get table and retain only unique columns (for genind objects each allele is a column,
   # so by removing every other you get basically a dosage matrix)
   alleles <- colnames(genind@tab)
   allele0 <- stringr::str_split_fixed(alleles, "[.]", n = 2)
   keep <- alleles[!duplicated(allele0[, 1])]
 
-  # check number of loci match
-  expect_equal(length(keep), nrow(mini_vcf@gt))
+  # check number of loci match (minus 1 because one row of all NAs gets dropped)
+  expect_equal(length(keep), nrow(mini_vcf_NA@gt))
 
   # get tables of genotypes
   tab <- genind@tab[, keep]
-  gt <- t(mini_vcf@gt[, -1])
+  gt <- t(mini_vcf_NA@gt[, -1])
 
   # since for genind a homozygote can either be 2 or 0 depending on the ref allele selected make
   # two dosage matrices for each possible ref allele
@@ -84,11 +87,13 @@ test_that("check that vcf to genind conversion is correct", {
   gt_dos1[which(gt == "0|0", arr.ind = TRUE)] <- 2
   gt_dos1[rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))] <- 1
   gt_dos1[which(gt == "1|1", arr.ind = TRUE)] <- 0
+  gt_dos1[which(gt == "NA", arr.ind = TRUE)] <- NA
 
   gt_dos2 <- gt
   gt_dos2[which(gt == "0|0", arr.ind = TRUE)] <- 0
   gt_dos2[rbind(which(gt == "0|1", arr.ind = TRUE), which(gt == "1|0", arr.ind = TRUE))] <- 1
   gt_dos2[which(gt == "1|1", arr.ind = TRUE)] <- 2
+  gt_dos2[which(gt == "NA", arr.ind = TRUE)] <- NA
 
   # turn into character for comparison
   tab <- apply(tab, 2, as.character)
@@ -97,26 +102,26 @@ test_that("check that vcf to genind conversion is correct", {
   sum_log <- (gt_dos1 == tab) + (gt_dos2 == tab)
 
   # checks that in at least one comparison the result is true
-  expect_true(all(sum_log > 0))
+  expect_true(all(sum_log > 0, na.rm = TRUE))
 
   # checks that all of the cases where true occurs twice are heterozygotes (e.g. 1)
-  expect_true(all((sum_log == 2) == (tab == "1")))
+  expect_true(all((sum_log == 2) == (tab == "1"), na.rm = TRUE))
 })
 
 
 test_that("check that vcf to het conversion is correct", {
-  data("mini_vcf")
-  expect_error(genind <- vcf_to_het(mini_vcf), NA)
+  data("mini_vcf_NA")
+  expect_error(genind <- vcf_to_het(mini_vcf_NA), NA)
 
   # check for one locus
-  obs <- vcf_to_het(mini_vcf[2, ])
+  obs <- as.vector(vcf_to_het(mini_vcf_NA[7, ]))
   # manually calculated:
-  expected <- c(FALSE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, TRUE)
-  expect_true(all(obs == expected))
+  expected <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, NA, FALSE)
+  expect_equal(obs, expected)
 
   # check for one individual (note: first col of vcf is format col)
-  obs <- vcf_to_het(mini_vcf[, 1:2])
+  obs <- as.vector(vcf_to_het(mini_vcf_NA[, 1:2]))
   # manually calculated:
-  expected <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)
-  expect_true(all(obs == expected))
+  expected <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, NA, NA, TRUE)
+  expect_equal(obs, expected)
 })

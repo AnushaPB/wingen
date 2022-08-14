@@ -36,8 +36,10 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
     stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
   }
 
-  # check to make sure coords and gen align
-  check_data(vcf, coords)
+  # check to make sure coords and gen align and remove individuals or markers with no scores
+  data <- check_data(vcf, coords)
+  vcf <- data[["vcf"]]
+  coords <- data[["coords"]]
 
   # calc stats
   if (stat == "allelic.richness") {
@@ -549,7 +551,10 @@ countgen <- function(x) {
 #'
 #' @export
 #'
-check_data <- function(gen, coords) {
+check_data <- function(gen, coords = NULL) {
+
+  # check for one individual
+  if (!is.null(coords)) if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
 
   # check number of samples
   if (inherits(gen, "genind")) {
@@ -564,11 +569,63 @@ check_data <- function(gen, coords) {
     nind <- nrow(gen)
   }
 
-
-  # check to make sure coords and gen align
-  if (nind != nrow(coords)) {
-    stop("number of samples in coords data and number of samples in gen data are not equal")
+  # check for rows or columns with missing data in a vcf
+  if (inherits(gen, "vcfR")) {
+    return(check_vcf_NA(gen, coords))
   }
+
+  # check coords
+  if (!is.null(coords)) if (nind != nrow(coords)) stop("number of samples in coords data and number of samples in gen data are not equal")
+
+  return()
+}
+
+#' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
+#'
+#' @param vcf vcfR
+#' @param coords coordinates
+#'
+#' @export
+#' @noRd
+#'
+check_vcf_NA <- function(vcf, coords = NULL) {
+  if (nrow(vcf@fix) == 1) {
+    NA_col <- sapply(vcf@gt[-1], function(x) {
+      all(is.na(x))
+    })
+
+    if (any(NA_col)) {
+      warning("Individuals with no scored loci have been removed")
+      vcf <- vcf[, c(TRUE, !NA_col)]
+      coords <- coords[!NA_col, ]
+    }
+  } else {
+    NA_col <- apply(vcf@gt[, -1], 2, function(x) {
+      all(is.na(x))
+    })
+    NA_row <- apply(vcf@gt[, -1], 1, function(x) {
+      all(is.na(x))
+    })
+
+    if (any(NA_col)) {
+      warning("Individuals with no scored loci have been removed")
+      vcf <- vcf[, c(TRUE, !NA_col)]
+      if (!is.null(coords)) coords <- coords[!NA_col, ]
+    }
+
+    if (any(NA_row)) {
+      warning("Markers with no scored alleles have been removed")
+      vcf <- vcf[!NA_row, ]
+    }
+  }
+
+  if (is.null(coords)) {
+    result <- vcf
+  } else {
+    result <- list(vcf = vcf, coords = coords)
+  }
+
+  return(result)
 }
 
 #' Helper function to get adjacent cells to a given cell index

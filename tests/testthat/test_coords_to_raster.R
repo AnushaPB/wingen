@@ -9,7 +9,7 @@ test_that("check dimensions of raster produced", {
   ymin <- min(mini_coords$y, na.rm = TRUE) - buffer
   ymax <- max(mini_coords$y, na.rm = TRUE) + buffer
 
-  expect_true(all(dim(r) == c(round(ymax - ymin, 0), round(xmax - xmin, 0), 1)))
+  expect_equal(dim(r), c(ymax - ymin, xmax - xmin, 1), tolerance = 1)
 
   r <- coords_to_raster(mini_coords, buffer = 1)
 
@@ -19,7 +19,7 @@ test_that("check dimensions of raster produced", {
   ymin <- min(mini_coords$y, na.rm = TRUE) - buffer
   ymax <- max(mini_coords$y, na.rm = TRUE) + buffer
 
-  expect_true(all(dim(r) == c(round(ymax - ymin, 0), round(xmax - xmin, 0), 1)))
+  expect_equal(dim(r), c(ymax - ymin, xmax - xmin, 1), tolerance = 1)
 })
 
 test_that("check resolution of raster produced", {
@@ -52,12 +52,12 @@ test_that("aggregation and disaggregation produce correct rasters", {
   ra <- coords_to_raster(mini_coords, agg = 2)
   expect_true(raster::compareRaster(ra, raster::aggregate(r0, 2)))
 
-
   rd <- coords_to_raster(mini_coords, disagg = 2)
   expect_true(raster::compareRaster(rd, raster::disaggregate(r0, 2)))
 
   expect_warning(rad <- coords_to_raster(mini_coords, agg = 2, disagg = 2))
-  expect_true(raster::compareRaster(rad, r0))
+  r0_rad <- raster::disaggregate(raster::aggregate(r0, 2), 2)
+  expect_true(raster::compareRaster(rad, r0_rad))
 })
 
 test_that("plots without errors", {

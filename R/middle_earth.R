@@ -43,14 +43,15 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 load_mini_ex <- function(quiet = FALSE) {
 
   # load all data
-  utils::data(list = c("mini_vcf", "mini_coords", "mini_lyr"))
+  utils::data(list = c("mini_vcf", "mini_vcf_NA", "mini_coords", "mini_lyr"))
 
   # give message with information about objects
   if (!quiet) {
     message(cat(
       crayon::cyan(crayon::bold("\n---------- mini middle earth example ----------\n")),
       crayon::blue("\nObjects loaded:"),
-      crayon::yellow(crayon::bold("\n*mini_vcf*")), crayon::yellow("vcfR object (10 loci x 10 samples)"),
+      crayon::yellow(crayon::bold("\n*mini_vcf*")), crayon::yellow("vcfR object (10 loci x 10 samples) and no missing data"),
+      crayon::yellow(crayon::bold("\n*mini_vcf_NA*")), crayon::yellow("vcfR object (10 loci x 10 samples) and missing data"),
       crayon::green(crayon::bold("\n*mini_coords*")), crayon::green("dataframe with x and y coordinates"),
       crayon::magenta(crayon::bold("\n*mini_lyr*")), crayon::magenta("middle earth RasterLayer (10 x 10)"),
       crayon::cyan(crayon::bold("\n\n-----------------------------------------------"))
