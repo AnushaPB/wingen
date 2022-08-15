@@ -29,7 +29,10 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, parallel = FALSE, ncores = NULL) {
+window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
+                      rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2,
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                      parallel = FALSE, ncores = NULL) {
 
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(vcf)
@@ -78,7 +81,10 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0, rarify 
 #' @keywords internal
 #' @noRd
 #'
-window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0, rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2, fun = mean, L = "nvariants", rarify_alleles = TRUE, ncores = NULL, parallel = FALSE) {
+window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
+                              rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
+                              fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                              parallel = FALSE, ncores = NULL) {
 
   # set L if pi is being calculated
   if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(gen)
@@ -145,7 +151,9 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @return genetic diversity and counts for a single cell
 #' @export
 #'
-window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L = NULL, rarify_alleles = TRUE) {
+window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
+                          rarify, rarify_n, rarify_nit, min_n,
+                          fun, L = NULL, rarify_alleles = TRUE) {
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if (rarify) min_n <- rarify_n
@@ -185,7 +193,8 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n
 #' @return genetic diversity statistic for a rarified subsample
 #' @export
 #'
-rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = NULL, rarify_alleles = TRUE) {
+rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
+                          fun = mean, L = NULL, rarify_alleles = TRUE) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
     gd <- NA
@@ -215,7 +224,8 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat, fun = mean, L = 
 #' @keywords internal
 #' @noRd
 #'
-rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat, fun, L = NULL, rarify_alleles = TRUE) {
+rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
+                      fun, L = NULL, rarify_alleles = TRUE) {
 
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
