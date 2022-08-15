@@ -35,7 +35,12 @@ vcf <- vcfR::read.vcfR(file)
 
 # subsample loci and individuals
 # note: first column is FORMAT, hence c(1, samples + 1)
-lotr_vcf <- vcf[sample(1:nrow(vcf@gt), 100), c(1, samples + 1)]
+lotr_vcf <- vcf[, c(1, samples + 1)]
+# retain only variant sites
+lotr_vcf <- lotr_vcf[is.polymorphic(lotr_vcf), ]
+# subsample loci
+set.seed(42)
+lotr_vcf <- lotr_vcf[sample(1:nrow(lotr_vcf@gt), 100), ]
 # check to make sure order and IDs are the same
 stopifnot(colnames(lotr_vcf@gt)[-1] == lotr_coords$idx)
 
@@ -47,7 +52,11 @@ usethis::use_data(lotr_vcf, overwrite = TRUE)
 
 # Code to create tiny example dataset ------------------------------------------------------------------
 mini_lyr <- raster::aggregate(lotr_lyr, 10)
-mini_vcf <- lotr_vcf[1:10, 1:11]
+
+mini_vcf <- lotr_vcf[, 1:11]
+mini_vcf <- mini_vcf[is.polymorphic(mini_vcf),]
+mini_vcf <- mini_vcf[1:10, ]
+
 mini_coords <- lotr_coords[1:10, ]
 
 # add NAs to vcf for testing

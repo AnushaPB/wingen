@@ -554,25 +554,26 @@ check_vcf_NA <- function(vcf, coords = NULL) {
     NA_row <- get_allNA(vcf@gt[, -1], MARGIN = 1)
   }
 
-  if (any(NA_col)) {
-    warning("Individuals with no scored loci have been removed")
-    vcf <- vcf[, c(TRUE, !NA_col)]
-  }
-
   if (any(NA_row)) {
     warning("Markers with no scored alleles have been removed")
     vcf <- vcf[!NA_row, ]
   }
 
+  if (any(NA_col)) {
+    warning("Individuals with no scored loci have been removed")
+    vcf <- vcf[, c(TRUE, !NA_col)]
+  }
+
+  # check for invariant sites
+  if(any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
+
+  # make results
   if (is.null(coords)) {
     result <- vcf
   } else {
     coords <- coords[!NA_col, ]
     result <- list(vcf = vcf, coords = coords)
   }
-
-  # check for invariant sites
-  if(any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
 
   return(result)
 }

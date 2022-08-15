@@ -38,7 +38,7 @@ test_that("get error with just one individual", {
 
 test_that("window_gd returns expected value", {
   load_mini_ex()
-  vcf <- mini_vcf[c(3, 6, 7, 10), 1:3]
+  vcf <- mini_vcf[c(1, 4, 8), 1:3]
   coords <- mini_coords[1:2,]
 
   wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", min_n = 2)
@@ -300,18 +300,14 @@ test_that("countgen works", {
 
 test_that("invariant warning is given", {
   data("mini_vcf_NA")
-
-  invariant_vcf <- mini_vcf_NA[7:9, c(1, 3:7)]
-  expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
-
   # check for one locus
   ## no NA
-  invariant_vcf <- mini_vcf_NA[7, c(1, 3:7)]
+  invariant_vcf <- mini_vcf_NA[3, c(1:5)]
   expect_warning(check_data(invariant_vcf), "invariant sites found in vcf")
   # some NA
-  invariant_vcf <- mini_vcf_NA[8, c(1, 3:7)]
+  invariant_vcf <- mini_vcf_NA[3, c(1:8)]
   expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
   # all NA
-  invariant_vcf <- mini_vcf_NA[9, c(1, 3:7)]
+  invariant_vcf <- mini_vcf_NA[9, ]
   expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
 })

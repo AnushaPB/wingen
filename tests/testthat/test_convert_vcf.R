@@ -116,12 +116,12 @@ test_that("check that vcf to het conversion is correct", {
   # check for one locus
   obs <- as.vector(vcf_to_het(mini_vcf_NA[7, ]))
   # manually calculated:
-  expected <- c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, NA, FALSE)
+  expected <- c(FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, NA, FALSE)
   expect_equal(obs, expected)
 
   # check for one individual (note: first col of vcf is format col)
   obs <- as.vector(vcf_to_het(mini_vcf_NA[, 1:2]))
   # manually calculated:
-  expected <- c(FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, NA, NA, TRUE)
+  expected <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, NA, NA, FALSE)
   expect_equal(obs, expected)
 })
