@@ -86,7 +86,7 @@ plot_count(kc, zlim = c(0,12))
 plot_gd(mg, bkg,zlim = c(0, 0.30))
 ```
 
-### Figure #X: Window vs Aggregation Factor
+### Figure S1: Window vs Aggregation Factor
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -97,7 +97,7 @@ par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
 purrr::walk(stk, test_simex_plot, bkg = bkg)
 ```
 
-## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
+## Figure 3 & Figure S2: Comparison of datasets, statistics, and sample sizes
 
 ```{r, fig.width = 6.75, fig.height = 4.5, cache = TRUE}
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -124,7 +124,7 @@ purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
 
 ```
 
-## Figure #X: Timing
+## Figure S3: Computational time for simulation example
 
 ```{r, warning = FALSE}
 # Loop reads in outputs from time_tests functions
