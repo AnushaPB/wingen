@@ -13,6 +13,7 @@
 #' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
 #' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
 #' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
+#' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
 #'
@@ -26,7 +27,9 @@
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' plot_gd(kpi, main = "Kriged Pi")
 #'
-krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 10000) {
+krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
+                    resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
+                    zero_correction = TRUE, resample_first = TRUE, n_cell = 10000) {
 
   # subset desired layers
   if (raster::nlayers(r) > 1) {
@@ -42,7 +45,10 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
   }
 
   # krige
-  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy, resample, agg_grd, disagg_grd, agg_r, disagg_r, n_cell)
+  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy,
+                     resample, agg_grd, disagg_grd, agg_r, disagg_r,
+                     zero_correction, resample_first, n_cell)
+
   # convert from list to stack
   rstk <- raster::stack(rstk)
   names(rstk) <- names(r)
@@ -61,7 +67,9 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #'
 #' @noRd
 #'
-krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
+krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
+                        resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
+                        zero_correction = TRUE, resample_first = TRUE, n_cell = 1000) {
 
   # if grd is NULL use r
   if (is.null(grd)) grd <- r
@@ -122,8 +130,12 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
   # Get kriged spdf
   krig_spdf <- krig_res$krige_output
 
-  # turn SPDF into raster and stack
+  # turn SPDF into raster
   krig_gder <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
+
+  # replace negative values with zero
+  if(zero_correction) krig_gder[krig_gder < 0] <- 0
+
   return(krig_gder)
 }
 
