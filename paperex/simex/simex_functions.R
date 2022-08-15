@@ -17,7 +17,13 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
   wdir <- get_exdir()
 
   # load genetic data
-  vcf <- vcfR::read.vcfR(here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf"), verbose = FALSE)
+  # check if file exists locally and if not download it from figshare
+  file <- here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
+  if(!file.exists(file)){
+    message("downloading vcf from figshare and storing locally...this will take a little time, but only has to be done once")
+    download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
+  }
+  vcf <- vcfR::read.vcfR(file, verbose = FALSE)
   assign("vcf", vcf, envir = .GlobalEnv)
 
   # load coords

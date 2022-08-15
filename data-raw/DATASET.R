@@ -26,7 +26,12 @@ samples <- sample(nrow(lotr_coords), 100, prob = 1 / p)
 lotr_coords <- lotr_coords[samples, ]
 
 # load genetic data
-vcf <- vcfR::read.vcfR("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
+# check if file exists locally and if not download it from figshare
+file <- "inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"
+if(!file.exists(file)){
+  download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
+}
+vcf <- vcfR::read.vcfR(file)
 
 # subsample loci and individuals
 # note: first column is FORMAT, hence c(1, samples + 1)
