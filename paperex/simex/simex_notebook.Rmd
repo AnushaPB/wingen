@@ -38,7 +38,7 @@ kde <- raster(MASS::kde2d(coords$x, coords$y, h = c(10,10), n = 100, lims = c(0,
 # Plot simulation setup (original lyr, population density, and sample distribution)
 par(mar = rep(2,4))
 plot(lyr, col = viridis::magma(100), main = "Carrying Capacity/Conductance", axes = FALSE, box = FALSE)
-plot(kde, col = viridis::magma(10), main = "Population Density", axes = FALSE, box = FALSE)
+plot(kde, col = viridis::magma(100), main = "Population Density", axes = FALSE, box = FALSE)
 plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), main = "Distribution of Individuals", axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.4), xlab = "", ylab = "")
 points(subcoords$x, subcoords$y, pch = 16, cex = 1, col = mako(1, begin = 0.2, alpha = 0.9), xlab = "", ylab = "")
@@ -78,6 +78,7 @@ kg[kg < 0] <- 0
 # mask areas with less than one count
 mg <- mask_gd(kg, kc, minval = 1)
 
+par(mar = rep(0,4))
 plot_gd(wg, bkg, zlim = c(0, 0.30))
 plot_count(wg, zlim = c(0,12))
 plot_gd(kg, zlim = c(0, 0.30))

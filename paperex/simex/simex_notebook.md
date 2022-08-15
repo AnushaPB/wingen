@@ -58,7 +58,7 @@ plot(lyr, col = viridis::magma(100), main = "Carrying Capacity/Conductance", axe
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 ``` r
-plot(kde, col = viridis::magma(10), main = "Population Density", axes = FALSE, box = FALSE)
+plot(kde, col = viridis::magma(100), main = "Population Density", axes = FALSE, box = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-3-2.png)<!-- -->
@@ -78,6 +78,71 @@ legend(0,-80,
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
 
+``` r
+set.seed(42)
+
+# run moving window
+wg <- window_gd(subvcf, 
+                subcoords, 
+                lyr, 
+                stat = "pi", 
+                rarify = TRUE, 
+                wdim = 3, 
+                fact = 3, 
+                rarify_n = 2, 
+                rarify_nit = 5, 
+                parallel = FALSE)
+
+# krig results
+kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
+```
+
+    ## [using ordinary kriging]
+
+``` r
+kc <- krig_gd(wg, lyr, index = 2, agg_r = 2, disagg_grd = 2)
+```
+
+    ## [using ordinary kriging]
+
+``` r
+# replace values less than 0 in kriged plots
+kc[kc < 0] <- 0
+kg[kg < 0] <- 0
+
+# mask areas with less than one count
+mg <- mask_gd(kg, kc, minval = 1)
+
+par(mar = rep(0,4))
+plot_gd(wg, bkg, zlim = c(0, 0.30))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+plot_count(wg, zlim = c(0,12))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+
+``` r
+plot_gd(kg, zlim = c(0, 0.30))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
+
+``` r
+plot_count(kc, zlim = c(0,12))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
+
+``` r
+plot_gd(mg, bkg,zlim = c(0, 0.30))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-5.png)<!-- -->
+
 ### Figure \#X: Window vs Aggregation Factor
 
 ``` r
@@ -89,7 +154,7 @@ par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
 purrr::walk(stk, test_simex_plot, bkg = bkg)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
 
@@ -109,18 +174,18 @@ stk100 <- purrr::map(params, test_datasets_simex, nsamp = 100, msk_lyr = msk_lyr
 stk200 <- purrr::map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
-par(mfrow = c(2, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
+par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
 purrr::walk(stk100, test_simex_plot, bkg = bkg, legend = FALSE)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-3.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
-par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4), pty = "s")
+par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
 purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-5-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-5-6.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
 
 ## Figure \#X: Timing
 
@@ -140,10 +205,10 @@ tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
   geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
-  geom_hline(yintercept = 120, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 120, label = "2 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
-  geom_hline(yintercept = 180, linetype = "dashed", col = "lightgray", lwd = 1) + 
-  geom_text(aes(factor(200), 180, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 60*3, linetype = "dashed", col = "gray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*3, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 60*6, linetype = "dashed", col = "lightgray", lwd = 1) + 
+  geom_text(aes(factor(200), 60*6, label = "6 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
             vjust = -0.5, position=position_dodge(width = .9)) + 
@@ -157,7 +222,7 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("number of samples") +
   ylab("time (seconds)") +
-  ylim(0,200) +
+  ylim(0,400) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
@@ -165,4 +230,4 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
         panel.grid.major.x = element_blank())
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
