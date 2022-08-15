@@ -55,7 +55,9 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
     lyrc <- raster::setValues(lyr, nc)
 
     lyrc[lyrc < min_n] <- NA
-    raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE, main = "sample count")
+
+    raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE)
+    title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
 
     # make stack
     lyrw <- raster::stack(lyrw, lyrc)

@@ -29,9 +29,9 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
         col = col,
         axes = FALSE,
         box = box,
-        main = main,
         ...
       )
+      title(main = list(main, font = 1), adj = 0, line = -0.5)
     }
   })
 
@@ -63,8 +63,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
       ylim = c(ymin, ymax),
       axes = FALSE,
       box = box,
-      legend = FALSE,
-      main = main
+      legend = FALSE
     )
 
     raster::plot(bkg,
@@ -87,6 +86,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
     )
   })
 
+  title(main = list(main, font = 1), adj = 0, line = -0.5)
 
   return()
 }
@@ -119,9 +119,9 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
         col = col,
         axes = FALSE,
         box = box,
-        main = main,
         ...
       )
+      title(main = list(main, font = 1), adj = 0, line = -0.5)
     }
 
     if (raster::nlayers(x) == 1) {
@@ -129,11 +129,12 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
         col = col,
         axes = FALSE,
         box = box,
-        main = main,
         ...
       )
+      title(main = list(main, font = 1), adj = 0, line = -0.5)
     }
   })
 
   return(invisible(plt))
 }
+
