@@ -65,6 +65,7 @@ lotr_lyr
 # Map of data
 plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
 points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
+
 ```
 
 If users don't have a raster layer of their landscape, they can generate one from their coordinates using the `coords_to_raster()` function. The resolution of this raster can be either tuned with the `agg` (to aggregate) and `disagg` (to disaggregate) arguments or defined using the `res` argument. The `res` argument can either be a single value (e.g., 0.00833) or a vector of two values with the x and y resolutions.
@@ -146,9 +147,9 @@ wgd <- window_gd(lotr_vcf,
           L = 100)
 
 # The plot_gd function plots the genetic diversity layer
-plot_gd(wgd, main = "Window pi")
+plot_gd(wgd, main = "Moving window pi")
 # The plot_count function plots the sample count layer
-plot_count(wgd, main = "Window sample counts")
+plot_count(wgd, main = "Moving window sample counts")
 ```
 
 ### Krige results
