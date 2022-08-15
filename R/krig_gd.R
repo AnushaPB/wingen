@@ -1,5 +1,7 @@
 
-#' Raster interpolation using 'autoKrige'
+#' Krige moving window maps
+#'
+#' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
 #'
 #' @param r RasterLayer or RasterStack
 #' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
@@ -57,7 +59,6 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE, resampl
 #' @return RasterLayer
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 #'
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE, n_cell = 1000) {
@@ -134,7 +135,6 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE, resample = FAL
 #' @return gridded SpatialPixelsDataFrame
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 #'
 raster_to_grid <- function(x) {

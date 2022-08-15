@@ -2,7 +2,7 @@
 % Please edit documentation in R/middle_earth.R
 \name{load_middle_earth_ex}
 \alias{load_middle_earth_ex}
-\title{Load middle earth example}
+\title{Middle earth example}
 \usage{
 load_middle_earth_ex(quiet = FALSE)
 }
@@ -13,7 +13,7 @@ load_middle_earth_ex(quiet = FALSE)
 three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
 }
 \description{
-Loads middle earth example data and assigns to simple names
+Loads middle earth example data
 }
 \examples{
 load_middle_earth_ex()

@@ -2,7 +2,7 @@
 % Please edit documentation in R/mask_gd.R
 \name{mask_gd}
 \alias{mask_gd}
-\title{Mask genetic diversity map}
+\title{Mask moving window maps}
 \usage{
 mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
 }
@@ -11,7 +11,7 @@ mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
 
 \item{mask}{Raster object or Spatial object to use as mask}
 
-\item{resample}{if x and mask are non matching rasters, which layer to resample to match them (defaults to "y")}
+\item{resample}{if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")}
 
 \item{minval}{if mask is a Raster object, value of mask below which to mask}
 
@@ -21,7 +21,7 @@ mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
 RasterLayer
 }
 \description{
-Mask genetic diversity map
+Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
 library("raster")

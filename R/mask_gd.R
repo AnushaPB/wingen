@@ -1,9 +1,11 @@
 
-#' Mask genetic diversity map
+#' Mask moving window maps
+#'
+#' Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x Raster object to mask
 #' @param mask Raster object or Spatial object to use as mask
-#' @param resample if x and mask are non matching rasters, which layer to resample to match them (defaults to "y")
+#' @param resample if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")
 #' @param minval if mask is a Raster object, value of mask below which to mask
 #' @param maxval if mask is a Raster object, value of mask above which to mask
 #'

@@ -1,5 +1,7 @@
 
-#' Generate preview of moving window and sample counts
+#' Preview moving window and sample counts
+#'
+#' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
 #'
 #' @param coords coordinates (two columns, the first should be x and the second should be y)
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)

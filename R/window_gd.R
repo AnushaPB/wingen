@@ -1,10 +1,12 @@
 
 
-#' Sliding window map of genetic diversity
+#' Create a moving window map of genetic diversity
+#'
+#' Generate a continuous raster map of genetic diversity using moving windows
 #'
 #' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
 #' @param stat genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
-#' @param lyr RasterLayer to slide window across
+#' @param lyr RasterLayer to move the window across
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
 #' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed
@@ -519,7 +521,7 @@ check_data <- function(gen, coords = NULL) {
     }
   }
 
-  # check for rows or columns with missing data in a vcf
+  # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
   if (inherits(gen, "vcfR")) {
     return(check_vcf_NA(gen, coords))
   }
@@ -568,6 +570,9 @@ check_vcf_NA <- function(vcf, coords = NULL) {
     coords <- coords[!NA_col, ]
     result <- list(vcf = vcf, coords = coords)
   }
+
+  # check for invariant sites
+  if(any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
 
   return(result)
 }

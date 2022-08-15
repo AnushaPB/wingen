@@ -6,7 +6,6 @@
 #' @return returns dosage matrix
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 #'
 vcf_to_dosage <- function(x) {
@@ -31,7 +30,6 @@ vcf_to_dosage <- function(x) {
 #' @return returns genind object
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
@@ -61,7 +59,6 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' @return heterozygosity matrix
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 vcf_to_het <- function(x) {
   # check vcf
@@ -87,7 +84,6 @@ vcf_to_het <- function(x) {
 #' @return vcf object
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 vcf_check <- function(x) {
   if (class(x)[1] == "vcfR")

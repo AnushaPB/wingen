@@ -1,4 +1,6 @@
-#' Plot genetic diversity results
+#' Plot moving window map of genetic diversity
+#'
+#' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
 #' @param bkg RasterLayer or other spatial object that will be plotted as the "background" in gray
@@ -40,7 +42,6 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @inheritParams plot_gd
 #'
-#' @keywords internal
 #' @noRd
 #'
 #' @export
@@ -90,7 +91,9 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
   return()
 }
 
-#' Plot sample counts
+#' Plot moving window map of sample counts
+#'
+#' Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x RasterLayer of counts or RasterStack where indexed layer is sample counts
 #' @param index if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_gd.R
 \name{plot_count}
 \alias{plot_count}
-\title{Plot sample counts}
+\title{Plot moving window map of sample counts}
 \usage{
 plot_count(
   x,
@@ -32,7 +32,7 @@ plot_count(
 plot of sample counts
 }
 \description{
-Plot sample counts
+Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
 data("mini_lyr")

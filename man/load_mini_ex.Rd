@@ -2,7 +2,7 @@
 % Please edit documentation in R/middle_earth.R
 \name{load_mini_ex}
 \alias{load_mini_ex}
-\title{Load mini middle earth example}
+\title{Mini middle earth example}
 \usage{
 load_mini_ex(quiet = FALSE)
 }
@@ -13,7 +13,7 @@ load_mini_ex(quiet = FALSE)
 three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
 }
 \description{
-Loads mini middle earth example data and assigns to simple names
+Loads mini middle earth example data
 }
 \examples{
 load_mini_ex()

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_gd.R
 \name{plot_gd}
 \alias{plot_gd}
-\title{Plot genetic diversity results}
+\title{Plot moving window map of genetic diversity}
 \usage{
 plot_gd(
   x,
@@ -35,7 +35,7 @@ plot_gd(
 plot of genetic diversity
 }
 \description{
-Plot genetic diversity results
+Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
 data("mini_lyr")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/coords_to_raster.R
 \name{coords_to_raster}
 \alias{coords_to_raster}
-\title{Create RasterLayer from coordinates}
+\title{Create a raster from coordinates}
 \usage{
 coords_to_raster(
   coords,
@@ -30,7 +30,7 @@ coords_to_raster(
 RasterLayer
 }
 \description{
-Create RasterLayer from coordinates
+Generate a raster layer from coordinates which can be used in \link[wingen]{window_gd} as the RasterLayer to move the window across
 }
 \examples{
 load_mini_ex()

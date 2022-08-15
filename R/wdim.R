@@ -5,7 +5,6 @@
 #'
 #' @return neighborhood matrix
 #'
-#' @keywords internal
 #' @noRd
 #'
 #' @export
@@ -42,7 +41,6 @@ wdim_to_mat <- function(wdim) {
 #' @return corrected wdim
 #' @export
 #'
-#' @keywords internal
 #' @noRd
 #'
 #' @examples

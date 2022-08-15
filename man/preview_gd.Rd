@@ -2,12 +2,12 @@
 % Please edit documentation in R/preview_gd.R
 \name{preview_gd}
 \alias{preview_gd}
-\title{Generate preview of moving window and sample counts}
+\title{Preview moving window and sample counts}
 \usage{
 preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 }
 \arguments{
-\item{lyr}{RasterLayer to slide window across}
+\item{lyr}{RasterLayer to move the window across}
 
 \item{coords}{coordinates (two columns, the first should be x and the second should be y)}
 
@@ -23,7 +23,7 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 RasterStack with example window layer and sample counts (if sample_count = TRUE)
 }
 \description{
-Generate preview of moving window and sample counts
+Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
 }
 \examples{
 load_mini_ex()

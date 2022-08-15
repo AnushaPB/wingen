@@ -2,7 +2,7 @@
 % Please edit documentation in R/krig_gd.R
 \name{krig_gd}
 \alias{krig_gd}
-\title{Raster interpolation using 'autoKrige'}
+\title{Krige moving window maps}
 \usage{
 krig_gd(
   r,
@@ -48,7 +48,7 @@ krig_gd(
 RasterLayer or RasterStack
 }
 \description{
-Raster interpolation using 'autoKrige'
+Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
 }
 \examples{
 library("raster")

@@ -1,6 +1,6 @@
-#' Load middle earth example
+#' Middle earth example
 #'
-#' Loads middle earth example data and assigns to simple names
+#' Loads middle earth example data
 #'
 #' @param quiet whether to hide message (defaults to FALSE)
 #'
@@ -29,9 +29,9 @@ load_middle_earth_ex <- function(quiet = FALSE) {
   }
 }
 
-#' Load mini middle earth example
+#' Mini middle earth example
 #'
-#' Loads mini middle earth example data and assigns to simple names
+#' Loads mini middle earth example data
 #'
 #' @param quiet whether to hide message (defaults to FALSE)
 #'

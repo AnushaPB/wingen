@@ -2,7 +2,7 @@
 % Please edit documentation in R/window_gd.R
 \name{window_gd}
 \alias{window_gd}
-\title{Sliding window map of genetic diversity}
+\title{Create a moving window map of genetic diversity}
 \usage{
 window_gd(
   vcf,
@@ -25,7 +25,7 @@ window_gd(
 \arguments{
 \item{vcf}{object of type vcf ( (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))}
 
-\item{lyr}{RasterLayer to slide window across}
+\item{lyr}{RasterLayer to move the window across}
 
 \item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
 
@@ -55,7 +55,7 @@ window_gd(
 RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 }
 \description{
-Sliding window map of genetic diversity
+Generate a continuous raster map of genetic diversity using moving windows
 }
 \examples{
 library("raster")
