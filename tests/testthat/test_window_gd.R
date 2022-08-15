@@ -36,6 +36,29 @@ test_that("get error with just one individual", {
   expect_error(wp <- window_gd(mini_vcf[, 1:2], mini_coords[1, ], mini_lyr, stat = "pi", rarify = FALSE), "cannot run window_gd with only one individual")
 })
 
+test_that("window_gd returns expected value", {
+  load_mini_ex()
+  vcf <- mini_vcf[c(3, 6, 7, 10), 1:3]
+  coords <- mini_coords[1:2,]
+
+  wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", min_n = 2)
+  dos <- vcf_to_dosage(vcf)
+  expect_equal(calc_pi(dos, L = ncol(dos)), unique(na.omit(values(wg[[1]]))))
+
+  wg <- window_gd(vcf, coords, stat = "het", mini_lyr, min_n = 2)
+  het <- vcf_to_het(vcf)
+  expect_equal(calc_mean_het(het), unique(na.omit(values(wg[[1]]))))
+
+  wg <- window_gd(vcf, coords, stat = "biallelic.richness", mini_lyr, min_n = 2, rarify_alleles = TRUE)
+  expect_equal(calc_mean_biar(dos, rarify_alleles = TRUE), unique(na.omit(values(wg[[1]]))))
+
+  wg <- window_gd(vcf, coords, stat = "biallelic.richness", mini_lyr, min_n = 2, rarify_alleles = FALSE)
+  expect_equal(calc_mean_biar(dos, rarify_alleles = FALSE), unique(na.omit(values(wg[[1]]))))
+
+  wg <- window_gd(vcf, coords, stat = "allelic.richness", mini_lyr, min_n = 2)
+  genind <- vcf_to_genind(vcf)
+  expect_equal(calc_mean_ar(genind), unique(na.omit(values(wg[[1]]))))
+})
 
 test_that("error gets returned for mismatch vcf and coords", {
   load_mini_ex(quiet = TRUE)
@@ -273,4 +296,22 @@ test_that("countgen works", {
   expected <- c(1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA, 1, 1, 1, NA)
 
   expect_equal(expected, actual)
+})
+
+test_that("invariant warning is given", {
+  data("mini_vcf_NA")
+
+  invariant_vcf <- mini_vcf_NA[7:9, c(1, 3:7)]
+  expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
+
+  # check for one locus
+  ## no NA
+  invariant_vcf <- mini_vcf_NA[7, c(1, 3:7)]
+  expect_warning(check_data(invariant_vcf), "invariant sites found in vcf")
+  # some NA
+  invariant_vcf <- mini_vcf_NA[8, c(1, 3:7)]
+  expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
+  # all NA
+  invariant_vcf <- mini_vcf_NA[9, c(1, 3:7)]
+  expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
 })
