@@ -628,7 +628,7 @@ convert_vcf <- function(vcf, stat) {
 #' @export
 #' @noRd
 name_results <- function(x, stat) {
-  names(x[[2]]) <- "sample_counts"
+  names(x[[2]]) <- "sample_count"
 
   if (stat == "pi") names(x[[1]]) <- "pi"
 

@@ -33,7 +33,6 @@ package vignette.
 
 ``` r
 library(wingen)
-
 # Load example data
 load_middle_earth_ex()
 ```
@@ -59,8 +58,8 @@ wgd <- window_gd(lotr_vcf,
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(wgd, bkg = lotr_range, main = "window pi")
-plot_count(wgd, main = "window counts")
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
+plot_count(wgd, main = "Moving window sample counts")
 ```
 
 <img src="man/figures/README-window_gd-1.png" width="100%" />
@@ -74,8 +73,8 @@ kgd <- krig_gd(wgd[["pi"]], lotr_lyr)
 kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr)
 
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(kgd, main = "kriged pi")
-plot_count(kgd_counts, main = "kriged counts")
+plot_gd(kgd, main = "Kriged pi")
+plot_count(kgd_counts, main = "Kriged sample counts")
 ```
 
 <img src="man/figures/README-krig_gd-1.png" width="100%" />
@@ -95,8 +94,8 @@ mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 ``` r
 # Plot results
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(mgd_lyr, main = "masked pi (spp range)")
-plot_gd(mgd_counts, bkg = lotr_range, main = "masked pi (counts + spp range)")
+plot_gd(mgd_lyr, main = "Masked pi (range)")
+plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)")
 ```
 
 <img src="man/figures/README-result-1.png" width="100%" />
