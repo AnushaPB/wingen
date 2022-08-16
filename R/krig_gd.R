@@ -71,15 +71,65 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
                         resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
                         zero_correction = TRUE, resample_first = TRUE, n_cell = 1000) {
 
-  # if grd is NULL use r
-  if (is.null(grd)) grd <- r
-
   # Transform raster layer
   if (inherits(grd, "RasterLayer")) {
     stk <- raster_transform(r, grd, resample, agg_grd, disagg_grd, agg_r, disagg_r, resample_first)
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
   }
+
+  # create df
+  krig_df <- make_krig_df(r, coords)
+
+  # create grid
+  krig_grid <- make_krige_grid(r, grd)
+
+  # remove crs values (automap doesn't like latlon CRS)
+  if (!raster::compareCRS(krig_df, krig_grid)) warning("the provided raster and grid have different crs")
+  raster::crs(krig_df) <- NA
+  raster::crs(krig_grid) <- NA
+
+  # krige using autoKrige
+  krig_r <- krig(krig_df, krig_grid, xy = xy, zero_correction = zero_correction)
+
+  return(krig_r)
+}
+
+
+#' Perform kriging with autoKrige
+#'
+#' @param krig_df dataframe for kriging
+#' @param krig_grid grid for kriging
+#' @inheritParams krig_gd
+#'
+#' @export
+#' @noRd
+krig <- function(krig_df, krig_grid, xy = FALSE, zero_correction = TRUE){
+  # autokrige
+  if (xy)
+    krig_res <- automap::autoKrige(layer ~ x + y, krig_df, krig_grid)
+  else
+    krig_res <- automap::autoKrige(layer ~ 1, krig_df, krig_grid)
+
+  # Get kriged spdf
+  krig_spdf <- krig_res$krige_output
+
+  # turn spdf into raster
+  krig_r <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
+
+  # replace negative values with zero
+  if(zero_correction) krig_r[krig_r < 0] <- 0
+
+  return(krig_r)
+}
+
+#' Create df for kriging
+#'
+#' @inheritParams krig_gd
+#'
+#' @export
+#' @noRd
+make_krig_df <- function(r, coords = NULL){
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
@@ -92,17 +142,6 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
     krig_df <- data.frame(coords, layer = rex)
   }
 
-  # create grid
-  if (is.null(grd)) {
-    krig_grid <- raster_to_grid(r)
-  } else if (inherits(grd, "RasterLayer")) {
-    krig_grid <- raster_to_grid(grd)
-  } else if (sp::gridded(grd)) {
-    krig_grid <- grd
-  } else {
-    stop(" unable to find an inherited method for type of grd provided")
-  }
-
   # Assign values to df
   krig_df$layer <- krig_df[, 3]
 
@@ -112,35 +151,29 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
   # remove na values
   krig_df <- krig_df[!is.na(krig_df$layer), ]
 
-  # remove crs values (automap doesn't like latlon CRS)
-  if (!raster::compareCRS(krig_df, krig_grid)) {
-    warning("the provided raster and grid have different crs")
-  }
-  raster::crs(krig_df) <- NA
-  raster::crs(krig_grid) <- NA
-
-  # Krige
-  if (xy) {
-    krig_res <- automap::autoKrige(layer ~ x + y, krig_df, krig_grid)
-  }
-  if (!xy) {
-    krig_res <- automap::autoKrige(layer ~ 1, krig_df, krig_grid)
-  }
-
-  # Get kriged spdf
-  krig_spdf <- krig_res$krige_output
-
-  # turn SPDF into raster
-  krig_gder <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
-
-  # replace negative values with zero
-  if(zero_correction) krig_gder[krig_gder < 0] <- 0
-
-  return(krig_gder)
+  return(krig_df)
 }
 
+#' Create grid for kriging
+#'
+#' @inheritParams krig_gd
+#'
+#' @export
+#' @noRd
+make_krige_grid <- function(r = NULL, grd = NULL){
+  if (is.null(grd)) {
+    krig_grid <- raster_to_grid(r)
+  } else if (inherits(grd, "RasterLayer")) {
+    krig_grid <- raster_to_grid(grd)
+  } else if (sp::gridded(grd)) {
+    krig_grid <- grd
+  } else {
+    stop(" unable to find an inherited method for type of grd provided")
+  }
+  return(krig_grid)
+}
 
-#' Conver a raster to a grid
+#' Convert a raster to a grid
 #'
 #' @param x RasterLayer
 #'
