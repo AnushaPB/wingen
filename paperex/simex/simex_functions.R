@@ -105,8 +105,8 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
 subset_data <- function(vcf, coords, nsamples, nvariants){
 
   # make file names
-  variant.file <- paste0("variants_seed42_", nvariants, ".csv")
-  sample.file <- paste0("samples_seed42_", nsamples, ".csv")
+  variant.file <- paste0("variants_seed42_", as.character(nvariants), ".csv")
+  sample.file <- paste0("samples_seed42_", as.character(nsamples), ".csv")
 
   # get variants
   variants <- read.csv(here("paperex", "simex", "data", variant.file))[,1]
