@@ -20,6 +20,7 @@ The results and figures from the paper were created using the
 
     [simex]
     |   run_simex.sh* - main script to run simulations and generate results
+    |   creat_datasets.R - script to create example datasets
     |   simex_notebook.Rmd* - main notebook for simulation analyses and figures
     |   simex_notebook.md - knitted simex_notebook.Rmd
     │   simex_functions.R* - functions used for simulation example analysis
@@ -33,18 +34,16 @@ The results and figures from the paper were created using the
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
     │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
     |   |   mod-sim_params_it-0_t-1000_spp-spp_0.vcf - genomic data from simulations
-    |   |   samples_seed42.csv - samples used in analysis
     │   │
     │   └───[middle_earth] - directory with original DEM raster layers
+    │   │
+    │   └───[samples] - directory with sample files used to create example datasets
     |
     └───[time_tests]
     │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
     │   │   FULL_time_test.R* - generates results for FULL dataset
     │   │   rr_time_test.R* - generates results for rr dataset
     │   │   WGS_time_test.R* - generates results for WGS dataset
-    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
-    │   │   RarifyAlleles_time_test.R* - generates results for biallelic.richness with allele rarefaction 
-    │   │   (WGS and rr dataset)
     │   
     └───[outputs] - directory for results from time tests
 
