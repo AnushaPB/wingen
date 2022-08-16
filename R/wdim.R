@@ -27,7 +27,7 @@ wdim_to_mat <- function(wdim) {
     # focal cell (center of matrix) has to be zero
     n[wdim / 2 + 0.5, wdim / 2 + 0.5] <- 0
   } else {
-    stop("wdim must be a number or a vector of length 2")
+    stop("wdim must be a single integer or a vector two integers")
   }
 
 
