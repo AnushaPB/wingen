@@ -68,9 +68,10 @@ Next, the output from `window_gd()` can be interpolated using kriging
 with the `krig_gd()` function.
 
 ``` r
-# Krige results
-kgd <- krig_gd(wgd[["pi"]], lotr_lyr)
-kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr)
+# Krige genetic diversity (disaggregate grid to project across a smoother final surface)
+kgd <- krig_gd(wgd[["pi"]], lotr_lyr, disagg_grd = 2)
+# Krige counts (aggregate input raster to decrease computational time)
+kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr, agg_r = 2, disagg_grd = 2)
 
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
 plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
