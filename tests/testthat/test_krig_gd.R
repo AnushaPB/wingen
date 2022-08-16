@@ -122,3 +122,4 @@ test_that("raster transform check", {
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = FALSE), NA)
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = TRUE), NA)
 })
+
