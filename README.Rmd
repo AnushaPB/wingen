@@ -55,8 +55,8 @@ wgd <- window_gd(lotr_vcf,
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
-plot_count(wgd, main = "Moving window sample counts")
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi", legend.width = 1.5)
+plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
 ```
 
 Next, the output from `window_gd()` can be interpolated using kriging with the `krig_gd()` function.
@@ -67,8 +67,8 @@ kgd <- krig_gd(wgd[["pi"]], lotr_lyr)
 kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr)
 
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(kgd, main = "Kriged pi")
-plot_count(kgd_counts, main = "Kriged sample counts")
+plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
+plot_count(kgd_counts, main = "Kriged sample counts", legend.width = 1.5)
 ```
 
 Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to exclude areas that fall outside of the study area or that were undersampled. 
@@ -84,8 +84,8 @@ mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 ```{r result, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
 # Plot results
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(mgd_lyr, main = "Masked pi (range)")
-plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)")
+plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
+plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
 ```
 
 
