@@ -109,9 +109,9 @@ subset_data <- function(vcf, coords, nsamples, nvariants){
   sample.file <- paste0("samples_seed42_", as.integer(nsamples), ".csv")
 
   # get variants
-  variants <- read.csv(here("paperex", "simex", "data", variant.file))[,1]
+  variants <- read.csv(here("paperex", "simex", "data", "samples", variant.file))[,1]
   # get ids of inds to sample
-  samples <- read.csv(here("paperex", "simex", "data", sample.file))[,1]
+  samples <- read.csv(here("paperex", "simex", "data", "samples", sample.file))[,1]
 
   # subset coodinates
   subcoords <- coords[samples,]
