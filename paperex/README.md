@@ -7,7 +7,7 @@ Examples from Bishop et al. 202X
 
 The simulation example was executed using the `run_simex.sh` script
 which runs the Geonomics simulation and then the time tests to generate
-all of the rasters and time data for the different dataset types.
+all of the rasters and computational time results for the different dataset types.
 
 *Note: some of these are parallelized tasks set up to operate on a 32
 processor system, this can be modified by going into any of the files

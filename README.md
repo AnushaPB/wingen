@@ -52,8 +52,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          wdim = 3,
-          fact = 5,
+          wdim = 5,
+          fact = 4,
           rarify = TRUE)
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
@@ -88,7 +88,7 @@ undersampled.
 mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 # Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
+mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 3)
 ```
 
 ``` r
