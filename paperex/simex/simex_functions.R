@@ -6,6 +6,7 @@ get_exdir <- function(){
   return(here::here("paperex", "simex"))
 }
 
+
 #' Load middle earth data
 #' @param subset if TRUE, subsets data
 #' @param quiet if TRUE, no message is printed
@@ -45,29 +46,11 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
 
   # subset
   if (subset){
-    # Create file of individual coordinates if it doesn't exist already
-    set.seed(42)
-    if(!file.exists(here(wdir, "data", "samples_seed42.csv"))){
-      message("creating new file")
-      si <- sample(nrow(coords), 200)
-      write.csv( data.frame(inds = si), here(wdir, "data", "samples_seed42.csv"), row.names = FALSE)
-    } else {
-      message("loading existing file")
-      df <- read.csv(here(wdir, "data", "samples_seed42.csv"))
-      si <- df$inds
-    }
-
-    # Subset coords
-    subcoords <- coords[si,]
-    subcoords <- subcoords[,c("x","y")]
+    # get subsampled dataset
+    subdata <- subset_data(vcf, coords, nsamples = 200, nvariants = 10000)
+    subvcf <- subdata[["vcf"]]
+    subcoords <- subdata[["coords"]]
     assign("subcoords", subcoords, envir = .GlobalEnv)
-
-    # Sample 10k loci
-    l <- sample(nrow(vcf@gt), 10000)
-    # Subset VCF (note: first column of VCF are sample IDs)
-    subvcf <- vcf[l, c(1, si + 1)]
-    # Check match between VCF and coords
-    stopifnot(all(colnames(subvcf@gt)[-1] == as.character(geo$idx[si])))
     assign("subvcf", subvcf, envir = .GlobalEnv)
 
 
@@ -106,6 +89,40 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
 
 
   return()
+}
+
+#' Subset data using defined sample sets
+#'
+#' @param vcf full vcf
+#' @param coords full coordinates
+#' @param nsamples number of subsamples (either 100 or 200)
+#' @param nvariants number of variants (either 10000 or 100000)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+subset_data <- function(vcf, coords, nsamples, nvariants){
+
+  # make file names
+  variant.file <- paste0("variants_seed42_", nvariants, ".csv")
+  sample.file <- paste0("samples_seed42_", nsamples, ".csv")
+
+  # get variants
+  variants <- read.csv(here("paperex", "simex", "data", variant.file))[,1]
+  # get ids of inds to sample
+  samples <- read.csv(here("paperex", "simex", "data", sample.file))[,1]
+
+  # subset coodinates
+  subcoords <- coords[samples,]
+  # subset vcf
+  subvcf <- vcf[variants, c(1, samples + 1)]
+  # check match
+  stopifnot(colnames(subvcf@gt)[-1] == as.character(subcoords$idx))
+  # confirm that correct set is being used
+  message(paste("nvariants", nrow(subvcf@gt), "/ nind", nrow(subcoords)))
+
+  return(list(vcf = subvcf, coords = subcoords[,c("x","y")]))
 }
 
 #' Run default time tests and produce raster outputs
