@@ -18,14 +18,14 @@ source(here(wdir, "simex_functions.R"))
 
 ## Load simulation results
 
-The following function loads the results from the simulation and subsets
-the data for the example walkthrough.
+The following function loads the simulated data and subsets it for the
+example walkthrough.
 
 ``` r
 load_middle_earth(subset = TRUE)
 ```
 
-    ## loading existing file
+    ## nvariants 10000 / nind 200
 
     ## 
     ## --------------------- middle earth data ---------------------
@@ -143,7 +143,7 @@ plot_gd(mg, bkg,zlim = c(0, 0.30))
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-5.png)<!-- -->
 
-### Figure \#X: Window vs Aggregation Factor
+### Figure S1: Window vs Aggregation Factor
 
 ``` r
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -156,7 +156,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
+## Figure 3 & Figure S2: Comparison of datasets, statistics, and sample sizes
 
 ``` r
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -187,7 +187,7 @@ purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
 
-## Figure \#X: Timing
+## Figure S3: Computational time for simulation example
 
 ``` r
 # Loop reads in outputs from time_tests functions

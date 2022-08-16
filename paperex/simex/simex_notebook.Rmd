@@ -21,11 +21,12 @@ source(here(wdir, "simex_functions.R"))
 
 ## Load simulation results
 
-The following function loads the results from the simulation and subsets the data for the example walkthrough. 
+The following function loads the simulated data and subsets it for the example walkthrough. 
 
 ```{r}
 load_middle_earth(subset = TRUE)
 ```
+
 
 ## Figure 2: Simulation Example
 
