@@ -1,6 +1,4 @@
 library(wingen)
-library(foreach)
-library(doParallel)
 library(here)
 source(here("paperex", "simex", "simex_functions.R"))
 
@@ -13,6 +11,6 @@ coords <- coords[,c("x","y")]
 # confirm that correct set is being used
 message(paste("nvariants", nrow(vcf@gt), "/ nind", nrow(coords)))
 
-run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, ncores = 10, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = TRUE, parallel = TRUE, ncores = 25, file.name = "FULL")
 
-run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, ncores = 10, file.name = "FULL")
+run_default_time_test(vcf, coords, lyr, rarify = FALSE, parallel = TRUE, ncores = 25, file.name = "FULL")
