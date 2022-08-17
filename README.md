@@ -27,9 +27,9 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 ## Example
 
 The following example demonstrates the basic functionality of wingen
-using a small *subset* (100 variant loci x 100 samples) of the simulated
-data from Bishop et al. (202X). For more details about this dataset, see
-the [original paper](LINK) and the package vignette.
+using a **small subset (100 variant loci x 100 samples) of the simulated
+data from Bishop et al. (202X)**. For more details about this dataset,
+see the [original paper](LINK) and the package vignette.
 
 ``` r
 library(wingen)
