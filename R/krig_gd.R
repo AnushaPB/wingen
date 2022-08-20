@@ -15,7 +15,6 @@
 #' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
 #' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
-#' @param n_cell number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}
 #'
 #' @return RasterLayer or RasterStack
 #' @export
@@ -29,7 +28,7 @@
 #'
 krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
                     resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
-                    zero_correction = TRUE, resample_first = TRUE, n_cell = 10000) {
+                    zero_correction = TRUE, resample_first = TRUE) {
 
   # subset desired layers
   if (raster::nlayers(r) > 1) {
@@ -47,7 +46,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
   # krige
   rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy,
                      resample, agg_grd, disagg_grd, agg_r, disagg_r,
-                     zero_correction, resample_first, n_cell)
+                     zero_correction, resample_first)
 
   # convert from list to stack
   rstk <- raster::stack(rstk)
@@ -69,7 +68,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
 #'
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
                         resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
-                        zero_correction = TRUE, resample_first = TRUE, n_cell = 1000) {
+                        zero_correction = TRUE, resample_first = TRUE) {
 
   # Transform raster layer
   if (inherits(grd, "RasterLayer")) {
