@@ -41,7 +41,7 @@ points(coords, cex = 0.5, pch = 3)
 
 ``` r
 # evaluate different wdim settings (note: window size = wdim ^ 2)
-set.seed(22)
+set.seed(44)
 file.name <- here(wdir, "outputs", "runtime_wdim.csv")
 if(file.exists(file.name)){
   resw <- read.csv(file.name)
@@ -49,8 +49,11 @@ if(file.exists(file.name)){
   resw <- purrr::map_dfr(1:10, time_eval_its, c(3, 5, 7, 9, 11), "wdim", vcf, coords, lyr)
   write.csv(resw, file.name, row.names = FALSE)
 }
+```
 
+    ## Loading required namespace: adegenet
 
+``` r
 # evaluate different fact settings (note: number of raster cells = ncell(aggregate(lyr, fact)))
 set.seed(22)
 file.name <- here(wdir, "outputs", "runtime_fact.csv")
