@@ -3,11 +3,10 @@
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #'
-#' @return returns dosage matrix
+#' @return returns dosage matrix#'
+#'
 #' @export
-#'
 #' @noRd
-#'
 vcf_to_dosage <- function(x) {
   # check vcf
   vcf <- vcf_check(x)
@@ -28,8 +27,8 @@ vcf_to_dosage <- function(x) {
 #' @param warning whether to retunr warning if new pops are assigned
 #'
 #' @return returns genind object
-#' @export
 #'
+#' @export
 #' @noRd
 vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
@@ -57,8 +56,8 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #' #'
 #' @return heterozygosity matrix
-#' @export
 #'
+#' @export
 #' @noRd
 vcf_to_het <- function(x) {
   # check vcf
@@ -82,8 +81,8 @@ vcf_to_het <- function(x) {
 #' @param x vcfR object or path to vcf
 #'
 #' @return vcf object
-#' @export
 #'
+#' @export
 #' @noRd
 vcf_check <- function(x) {
   if (class(x)[1] == "vcfR")

@@ -5,14 +5,8 @@
 #'
 #' @return neighborhood matrix
 #'
-#' @noRd
-#'
 #' @export
-#'
-#' @examples
-#' wdim_to_mat(3)
-#' wdim_to_mat(c(3, 5))
-#'
+#' @noRd
 wdim_to_mat <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")
@@ -39,14 +33,9 @@ wdim_to_mat <- function(wdim) {
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
 #'
 #' @return corrected wdim
+#'
 #' @export
-#'
 #' @noRd
-#'
-#' @examples
-#' wdim_check(c(4, 4))
-#' wdim_check(4)
-#'
 wdim_check <- function(wdim) {
   if (any(wdim < 3)) {
     stop("wdim cannot be less than 3")

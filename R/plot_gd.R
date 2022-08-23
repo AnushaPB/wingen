@@ -42,10 +42,8 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @inheritParams plot_gd
 #'
-#' @noRd
-#'
 #' @export
-#'
+#' @noRd
 plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, main = NULL, box = FALSE, ...) {
 
   # suppress irrelevant plot warnings

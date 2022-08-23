@@ -76,11 +76,9 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 #' @inheritParams window_gd
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+#'
 #' @export
-#'
-#' @keywords internal
 #' @noRd
-#'
 window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                               rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
                               fun = mean, L = "nvariants", rarify_alleles = TRUE,
@@ -145,12 +143,10 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #'
 #' @inheritParams window_gd_general
 #'
-#' @keywords internal
-#' @noRd
-#'
 #' @return genetic diversity and counts for a single cell
-#' @export
 #'
+#' @export
+#' @noRd
 window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
@@ -187,12 +183,12 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
 #'
 #' @inheritParams window_gd_general
 #'
-#' @keywords internal
 #' @noRd
 #'
 #' @return genetic diversity statistic for a rarified subsample
-#' @export
 #'
+#' @export
+#' @noRd
 rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
                           fun = mean, L = NULL, rarify_alleles = TRUE) {
   # if number of samples is less than rarify_n, assign the value NA
@@ -219,11 +215,9 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
 #' @inheritParams window_gd_general
 #'
 #' @return rarified genetic diversity statistic
+
 #' @export
-#'
-#' @keywords internal
 #' @noRd
-#'
 rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
                       fun, L = NULL, rarify_alleles = TRUE) {
 
@@ -257,11 +251,9 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
 #' @inheritParams window_gd_general
 #'
 #' @return mean allelic richness of a subsample
+#'
 #' @export
-#'
-#' @keywords internal
 #' @noRd
-#'
 sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = TRUE) {
   if (identical(stat, calc_mean_biar)) {
     gd <- stat(gen[sub, ], rarify_alleles)
@@ -279,11 +271,9 @@ sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = TRUE) {
 #' @param genind genind
 #'
 #' @return allelic richness averaged across all loci
+#'
 #' @export
-#'
-#' @keywords internal
 #' @noRd
-#'
 calc_mean_ar <- function(genind) {
   ar <- helper_calc_ar(genind)
   gd <- mean(ar, na.rm = TRUE)
@@ -295,9 +285,8 @@ calc_mean_ar <- function(genind) {
 #' @param genind genind object
 #'
 #' @return allelic richness
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 helper_calc_ar <- function(gen) {
   # get number of individuals
@@ -324,9 +313,8 @@ helper_calc_ar <- function(gen) {
 #' @param hetmat matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)
 #'
 #' @return heterozygosity averaged across all individuals and then all loci
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 calc_mean_het <- function(hetmat) {
   gd <- mean(hetmat, na.rm = TRUE)
@@ -341,9 +329,8 @@ calc_mean_het <- function(hetmat) {
 #' @param L length of the sequence (*note:* defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)
 #'
 #' @return nucleotide diversity (pi)
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 calc_pi <- function(dos, L = NULL) {
   gd <- hierfstat::pi.dosage(dos, L = L)
@@ -355,9 +342,8 @@ calc_pi <- function(dos, L = NULL) {
 #' @param dos dosage matrix
 #'
 #' @return allelic richness averaged across all loci
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
   if (!all(dos %in% c(0, 1, 2, NA))) {
@@ -389,9 +375,8 @@ calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
 #' @param loc genotypes at a biallelic locus (must have values of 0, 1, or 2)
 #'
 #' @return biallelic richness value
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
   # check if all NA and if so return NA
@@ -446,9 +431,8 @@ raref <- function(x, min.n) {
 #' @param coord_cells cell numbers of coordinates
 #'
 #' @return indices of coordinates that are adjacent to the given cell
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
@@ -469,7 +453,7 @@ get_adj <- function(i, r, n, coord_cells) {
 #' @param dos dosage matrix
 #'
 #' @export
-#'
+#' @noRd
 get_minn <- function(dos) {
   if (is.null(nrow(dos))) {
     # if nrow is NULL then only one sample is included so min.n must be 2
@@ -501,11 +485,8 @@ countgen <- function(x) {
 #' @param gen genetic data
 #' @param coords coordinates
 #'
-#' @keywords internal
-#' @noRd
-#'
 #' @export
-#'
+#' @noRd
 check_data <- function(gen, coords = NULL) {
 
   # check for one individual
@@ -535,8 +516,6 @@ check_data <- function(gen, coords = NULL) {
   if (inherits(gen, "vcfR")) {
     return(check_vcf_NA(gen, coords))
   }
-
-  return()
 }
 
 #' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
@@ -546,7 +525,6 @@ check_data <- function(gen, coords = NULL) {
 #'
 #' @export
 #' @noRd
-#'
 check_vcf_NA <- function(vcf, coords = NULL) {
 
   # check for mismatch before indexing
@@ -591,8 +569,9 @@ check_vcf_NA <- function(vcf, coords = NULL) {
 #' Helper function to get NA values
 #'
 #' @inheritParams base::array
-#' @export
 #'
+#' @export
+#' @noRd
 get_allNA <- function(x, MARGIN = NULL) {
   if (is.null(dim(x))) allNA <- is.na(x)
   if (!is.null(dim(x))) {
@@ -646,9 +625,8 @@ name_results <- function(x, stat) {
 #' @param x genetic diversity statistic
 #'
 #' @return function corresponding with desired statistic
-#' @export
 #'
-#' @keywords internal
+#' @export
 #' @noRd
 return_stat <- function(x) {
   if (x == "pi") stat <- calc_pi

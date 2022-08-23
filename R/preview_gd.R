@@ -111,9 +111,9 @@ preview_count <- function(lyr, coords, nmat, min_n){
 #' @param coord_cells cell indexes of coordinates
 #'
 #' @return
-#' @export
 #'
-#' @examples
+#' @export
+#' @noRd
 sample_count <- function(x, lyr, nmat, coord_cells) {
   sub <- get_adj(x, lyr, nmat, coord_cells)
   return(length(sub))

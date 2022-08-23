@@ -61,11 +61,8 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
 #'
 #' @inheritParams krig_gd
 #'
-#' @return RasterLayer
 #' @export
-#'
 #' @noRd
-#'
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
                         resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
                         zero_correction = TRUE, resample_first = TRUE) {
@@ -177,10 +174,9 @@ make_krige_grid <- function(r = NULL, grd = NULL){
 #' @param x RasterLayer
 #'
 #' @return gridded SpatialPixelsDataFrame
+#'
 #' @export
-#'
 #' @noRd
-#'
 raster_to_grid <- function(x) {
   grd <- data.frame(raster::rasterToPoints(x))
   sp::coordinates(grd) <- ~ x + y
@@ -192,11 +188,8 @@ raster_to_grid <- function(x) {
 #'
 #' @inheritParams krig_gd
 #'
-#' @return stack of transformed rasters
 #' @export
-#'
 #' @noRd
-#'
 raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE) {
   if (raster::nlayers(r) > 1) stop(">1 layer provided for r")
   if (raster::nlayers(grd) > 1) stop(">1 layer provided for grd")
