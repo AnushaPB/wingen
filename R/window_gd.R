@@ -113,7 +113,7 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr),
       window_helper, lyr, gen, coord_cells, nmat, stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet"))
+      .options = furrr::furrr_options(seed = TRUE, packages = c("raster", "purrr", "hierfstat", "stats", "adegenet", "wingen"))
     )
   } else {
     rast_vals <- purrr::map_dfr(
