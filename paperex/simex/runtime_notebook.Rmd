@@ -77,8 +77,8 @@ plotw <- ggplot() +
   geom_line(data = resw_mean, aes(x = wsize, y = time), 
             col = mako(1, begin = 0.8), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 
-  ylab("time (seconds)") +
-  xlab("window size (number of cells)") +
+  ylab("Time (seconds)") +
+  xlab("Window Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
@@ -99,8 +99,8 @@ plotf <- ggplot() +
   geom_line(data = resf_mean, aes(x = ncell, y = time),
             col = mako(1, begin = 0.6), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 
-  ylab("time (seconds)") +
-  xlab("number of raster cells") +
+  ylab("Time (seconds)") +
+  xlab("Raster Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
@@ -113,6 +113,7 @@ plotf <- ggplot() +
 ggarrange(plotw, NULL, plotf, 
           nrow = 1, widths = c(1, 0.05, 1),
           labels = c("(a)", "", "(b)"), 
-          font.label = list(size = 20, color = "black", face = "plain", family = NULL))
+          hjust = -2,
+          font.label = list(size = 14, color = "black", face = "plain", family = NULL))
 ```
 
