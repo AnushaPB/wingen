@@ -8,6 +8,7 @@ library(ggplot2)
 library(viridis)
 library(dplyr)
 library(vcfR)
+library(ggpubr)
 library(here)
 wdir <- here("paperex", "simex")
 source(here(wdir, "runtime_functions.R"))
@@ -49,11 +50,8 @@ if(file.exists(file.name)){
   resw <- purrr::map_dfr(1:10, time_eval_its, c(3, 5, 7, 9, 11), "wdim", vcf, coords, lyr)
   write.csv(resw, file.name, row.names = FALSE)
 }
-```
 
-    ## Loading required namespace: adegenet
 
-``` r
 # evaluate different fact settings (note: number of raster cells = ncell(aggregate(lyr, fact)))
 set.seed(22)
 file.name <- here(wdir, "outputs", "runtime_fact.csv")
@@ -70,41 +68,49 @@ resw_mean <- resw %>%
         group_by(wsize) %>% 
         summarise(time = mean(time))
 
-ggplot() +
+plotw <- ggplot() +
   geom_line(data = resw, aes(x = wsize, y = time, group = it), 
             col = mako(1, begin = 0.8), alpha = 0.15, lwd = 1) +
   geom_line(data = resw_mean, aes(x = wsize, y = time), 
             col = mako(1, begin = 0.8), alpha = 1, lwd = 1.1) +
-  theme_bw() + 
-  ylab("time (seconds)") +
-  xlab("window size (number of cells)") +
+  theme_bw(base_size = 16) + 
+  ylab("Time (seconds)") +
+  xlab("Window Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
         panel.grid.major.x = element_blank(),
         aspect.ratio = 1)
 ```
-
-![](runtime_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 resf_mean <- resf %>% 
         group_by(ncell) %>% 
         summarise(time = mean(time))
 
-ggplot() +
+(plotf <- ggplot() +
   geom_line(data = resf, aes(x = ncell, y = time, group = it), 
             col = mako(1, begin = 0.6), alpha = 0.1, lwd = 1) +
   geom_line(data = resf_mean, aes(x = ncell, y = time),
             col = mako(1, begin = 0.6), alpha = 1, lwd = 1.1) +
-  theme_bw() + 
-  ylab("time (seconds)") +
-  xlab("number of raster cells") +
+  theme_bw(base_size = 16) + 
+  ylab("Time (seconds)") +
+  xlab("Raster Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
         panel.grid.major.x = element_blank(),
-        aspect.ratio = 1)
+        aspect.ratio = 1))
 ```
 
 ![](runtime_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+ggarrange(plotw, NULL, plotf, 
+          nrow = 1, widths = c(1, 0.05, 1),
+          labels = c("(a)", "", "(b)"), 
+          hjust = -2,
+          font.label = list(size = 14, color = "black", face = "plain", family = NULL))
+```
+
+![](runtime_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
