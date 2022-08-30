@@ -110,8 +110,6 @@ preview_count <- function(lyr, coords, nmat, min_n){
 #' @param nmat neighborhood matrix
 #' @param coord_cells cell indexes of coordinates
 #'
-#' @return
-#'
 #' @export
 #' @noRd
 sample_count <- function(x, lyr, nmat, coord_cells) {
