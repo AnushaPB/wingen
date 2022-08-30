@@ -9,14 +9,15 @@ krig_gd(
   grd = NULL,
   index = 1,
   coords = NULL,
-  xy = FALSE,
-  resample = FALSE,
   agg_grd = NULL,
   disagg_grd = NULL,
   agg_r = NULL,
   disagg_r = NULL,
-  resample_first = TRUE,
-  n_cell = 10000
+  autoKrige_output = FALSE,
+  zero_correction = TRUE,
+  xy = FALSE,
+  resample = FALSE,
+  resample_first = TRUE
 )
 }
 \arguments{
@@ -28,10 +29,6 @@ krig_gd(
 
 \item{coords}{if provided, kriging will occur based only on values at these coordinates}
 
-\item{xy}{whether to co-krige with x and y (~x+y)}
-
-\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)}
-
 \item{agg_grd}{factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
 
 \item{disagg_grd}{factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
@@ -40,12 +37,18 @@ krig_gd(
 
 \item{disagg_r}{factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
 
-\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
+\item{autoKrige_output}{whether to return full output from \code{autoKrige()} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
 
-\item{n_cell}{number of cells to interpolate across if SpatialPointsDataFrame is provided for \code{grd}}
+\item{zero_correction}{if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)}
+
+\item{xy}{whether to co-krige with x and y (~x+y)}
+
+\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)}
+
+\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 }
 \value{
-RasterLayer or RasterStack
+a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
 }
 \description{
 Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'

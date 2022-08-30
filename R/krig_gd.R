@@ -7,16 +7,17 @@
 #' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates
-#' @param xy whether to co-krige with x and y (~x+y)
-#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
 #' @param agg_grd factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
 #' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
 #' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
 #' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
+#' @param autoKrige_output whether to return full output from `autoKrige()` including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
 #' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
+#' @param xy whether to co-krige with x and y (~x+y)
+#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #'
-#' @return RasterLayer or RasterStack
+#' @return a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
 #' @export
 #'
 #' @examples
@@ -26,9 +27,12 @@
 #' kpi <- krig_gd(wpi, mini_lyr)
 #' plot_gd(kpi, main = "Kriged Pi")
 #'
-krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
-                    resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
-                    zero_correction = TRUE, resample_first = TRUE) {
+krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
+                    agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
+                    autoKrige_output = FALSE,
+                    zero_correction = TRUE,
+                    xy = FALSE,
+                    resample = FALSE, resample_first = TRUE) {
 
   # subset desired layers
   if (raster::nlayers(r) > 1) {
@@ -44,13 +48,31 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
   }
 
   # krige
-  rstk <- purrr::map(rls, krig_gd_lyr, grd, coords, xy,
-                     resample, agg_grd, disagg_grd, agg_r, disagg_r,
-                     zero_correction, resample_first)
+  rstk <- purrr::map(rls,
+                     krig_gd_lyr,
+                     grd = grd,
+                     coords = coords,
+                     agg_grd = agg_grd,
+                     disagg_grd = disagg_grd,
+                     agg_r = agg_r,
+                     disagg_r = disagg_r,
+                     autoKrige_output = autoKrige_output,
+                     zero_correction = zero_correction,
+                     xy = xy,
+                     resample = resample,
+                     resample_first = resample_first)
 
-  # convert from list to stack
-  rstk <- raster::stack(rstk)
+  # give names from stack to list
   names(rstk) <- names(r)
+
+  if(length(rls) == 1){
+    rstk <- rstk[[1]]
+  }
+
+  if(!autoKrige_output){
+    # convert from list to stack
+    rstk <- raster::stack(rstk)
+  }
 
   return(rstk)
 }
@@ -63,13 +85,18 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL, xy = FALSE,
 #'
 #' @export
 #' @noRd
-krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
-                        resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
-                        zero_correction = TRUE, resample_first = TRUE) {
+krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
+                        agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
+                        autoKrige_output = FALSE,
+                        zero_correction = TRUE,
+                        xy = FALSE,
+                        resample = FALSE, resample_first = TRUE) {
 
   # Transform raster layer
   if (inherits(grd, "RasterLayer")) {
-    stk <- raster_transform(r, grd, resample, agg_grd, disagg_grd, agg_r, disagg_r, resample_first)
+    stk <- raster_transform(r = r, grd = grd,
+                            agg_grd = agg_grd, disagg_grd = disagg_grd, agg_r = agg_r, disagg_r = disagg_r,
+                            resample = resample, resample_first = resample_first)
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
   }
@@ -86,7 +113,9 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
   raster::crs(krig_grid) <- NA
 
   # krige using autoKrige
-  krig_r <- krig(krig_df, krig_grid, xy = xy, zero_correction = zero_correction)
+  krig_r <- krig(krig_df, krig_grid,
+                 autoKrige_output = autoKrige_output,
+                 xy = xy, zero_correction = zero_correction)
 
   return(krig_r)
 }
@@ -100,7 +129,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL, xy = FALSE,
 #'
 #' @export
 #' @noRd
-krig <- function(krig_df, krig_grid, xy = FALSE, zero_correction = TRUE){
+krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_correction = TRUE){
   # autokrige
   if (xy)
     krig_res <- automap::autoKrige(layer ~ x + y, krig_df, krig_grid)
@@ -110,13 +139,22 @@ krig <- function(krig_df, krig_grid, xy = FALSE, zero_correction = TRUE){
   # Get kriged spdf
   krig_spdf <- krig_res$krige_output
 
-  # turn spdf into raster
+  # turn spdf into raster (automatically just uses the first variable)
   krig_r <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
 
   # replace negative values with zero
   if(zero_correction) krig_r[krig_r < 0] <- 0
 
-  return(krig_r)
+  # create results
+  if(autoKrige_output){
+    krig_var <- raster::rasterFromXYZ(krig_spdf[,"var1.var"], crs = raster::crs(krig_grid))
+    krig_stdev <- raster::rasterFromXYZ(krig_spdf[,"var1.stdev"], crs = raster::crs(krig_grid))
+    result <- list(raster = krig_r, var = krig_var, stdev = krig_stdev, autoKrige_output = krig_res)
+  } else {
+    result <- krig_r
+  }
+
+  return(result)
 }
 
 #' Create df for kriging
