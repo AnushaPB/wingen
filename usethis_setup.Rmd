@@ -19,7 +19,7 @@ library("devtools")
 
 ```{r}
 # use dplyr pipe
-usethis::use_pipe(export = TRUE)
+usethis::use_pipe(export = FALSE)
 
 # use foreach pipe (remove if not using foreach)
 # usethis::use_import_from('foreach', "%dopar%")
