@@ -1,12 +1,12 @@
 
 # file types
-*.tif
 *.cpg
 *.dbg
 *.dbf
 *.prj
 *.shp*
 *.shx
+*.tif
 
 # private token
 token.R
@@ -55,9 +55,6 @@ vignettes/*.pdf
 # docs
 # inst/doc
 
-# tif files
-*.tif
-
 #vcfs
 *.vcf
 
@@ -74,20 +71,20 @@ Meta
 *.zip
 default_params.R
 
-
 # SIMS
 paperex/simex/RData/
 paperex/simex/bdrive/
 paperex/simex/GNX_mod-sims_params
-paperex/simex/outputs
+!paperex/simex/outputs/*.tif
 !paperex/simex/data/samples_seed42.csv
 !paperex/simex/data/middle_earth.csv
 !paperex/simex/data/mod-sim_params_it-0_t-1000_spp-spp_0.csv
 
-#EMPIRICAL
+# EMPIRICAL
 paperex/empex/EEMS
 paperex/empex/EEMS_notebook.Rmd
 !paperex/empex/data/Scelop.coords
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf
 paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
 paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
+cov_token.R

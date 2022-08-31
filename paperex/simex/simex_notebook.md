@@ -18,14 +18,14 @@ source(here(wdir, "simex_functions.R"))
 
 ## Load simulation results
 
-The following function loads the results from the simulation and subsets
-the data for the example walkthrough.
+The following function loads the simulated data and subsets it for the
+example walkthrough.
 
 ``` r
 load_middle_earth(subset = TRUE)
 ```
 
-    ## loading existing file
+    ## nvariants 10000 / nind 200
 
     ## 
     ## --------------------- middle earth data ---------------------
@@ -87,7 +87,7 @@ wg <- window_gd(subvcf,
                 lyr, 
                 stat = "pi", 
                 rarify = TRUE, 
-                wdim = 3, 
+                wdim = 7, 
                 fact = 3, 
                 rarify_n = 2, 
                 rarify_nit = 5, 
@@ -106,44 +106,41 @@ kc <- krig_gd(wg, lyr, index = 2, agg_r = 2, disagg_grd = 2)
     ## [using ordinary kriging]
 
 ``` r
-# replace values less than 0 in kriged plots
-kc[kc < 0] <- 0
-kg[kg < 0] <- 0
-
 # mask areas with less than one count
-mg <- mask_gd(kg, kc, minval = 1)
+mg <- mask_gd(kg, kc, minval = 2)
+mg <- mask_gd(mg, bkg)
 
 par(mar = rep(0,4))
-plot_gd(wg, bkg, zlim = c(0, 0.30))
+plot_gd(wg, bkg, zlim = c(0, 0.31))
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
-plot_count(wg, zlim = c(0,12))
+plot_count(wg, zlim = c(0,30), horizontal = TRUE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
 
 ``` r
-plot_gd(kg, zlim = c(0, 0.30))
+plot_gd(kg, zlim = c(0, 0.31))
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
 
 ``` r
-plot_count(kc, zlim = c(0,12))
+plot_count(kc, zlim = c(0,30))
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
 
 ``` r
-plot_gd(mg, bkg,zlim = c(0, 0.30))
+plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-5.png)<!-- -->
 
-### Figure \#X: Window vs Aggregation Factor
+### Figure S1: Window vs Aggregation Factor
 
 ``` r
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -156,7 +153,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## Figure 3 & Figure 1S: Comparison of datasets, statistics, and sample sizes
+## Figure 3 & Figure S2: Comparison of datasets, statistics, and sample sizes
 
 ``` r
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -175,19 +172,19 @@ stk200 <- purrr::map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr
 
 # Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-purrr::walk(stk100, test_simex_plot, bkg = bkg, legend = FALSE)
+purrr::walk(stk100, test_simex_plot, legend = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-purrr::walk(stk200, test_simex_plot, bkg = bkg, legend = FALSE)
+purrr::walk(stk200, test_simex_plot, legend = TRUE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
 
-## Figure \#X: Timing
+## Figure S3: Computational time for simulation example
 
 ``` r
 # Loop reads in outputs from time_tests functions
@@ -203,12 +200,14 @@ tdf[tdf$dataset == "rr", "dataset"] <- "10,000 loci (w/o Parallelization)"
 tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
 
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
-  geom_hline(yintercept = 60, linetype = "dashed", col = "darkgray", lwd = 1) + 
-  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "gray", fontface = "italic") +
-  geom_hline(yintercept = 60*3, linetype = "dashed", col = "gray", lwd = 1) + 
-  geom_text(aes(factor(200), 60*3, label = "3 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
-  geom_hline(yintercept = 60*6, linetype = "dashed", col = "lightgray", lwd = 1) + 
-  geom_text(aes(factor(200), 60*6, label = "6 min", vjust = -1, hjust = -0.7), col = "lightgray", fontface = "italic") +
+  geom_hline(yintercept = 60, linetype = "dashed", col = "grey80", lwd = 1) + 
+  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "grey80", fontface = "italic") +
+  geom_hline(yintercept = 60*5, linetype = "dashed", col = "grey70", lwd = 1) + 
+  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "grey70", fontface = "italic") +
+  geom_hline(yintercept = 60*10, linetype = "dashed", col = "grey60", lwd = 1) + 
+  geom_text(aes(factor(200), 60*10, label = "10 min", vjust = -1, hjust = -0.4), col = "grey60", fontface = "italic") +
+  geom_hline(yintercept = 60*15, linetype = "dashed", col = "grey50", lwd = 1) + 
+  geom_text(aes(factor(200), 60*15, label = "15 min", vjust = -1, hjust = -0.4), col = "grey50", fontface = "italic") +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
             vjust = -0.5, position=position_dodge(width = .9)) + 
@@ -222,7 +221,7 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("number of samples") +
   ylab("time (seconds)") +
-  ylim(0,400) +
+  ylim(0,1000) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),

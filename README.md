@@ -27,13 +27,12 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 ## Example
 
 The following example demonstrates the basic functionality of wingen
-using a subset of the simulated data from Bishop et al. (202X). For more
-details about this dataset, see the [original paper](LINK) and the
-package vignette.
+using a **small subset (100 variant loci x 100 samples) of the simulated
+data from Bishop et al. (202X)**. For more details about this dataset,
+see the [original paper](LINK) and the package vignette.
 
 ``` r
 library(wingen)
-
 # Load example data
 load_middle_earth_ex()
 ```
@@ -53,14 +52,14 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          wdim = 3,
-          fact = 5,
+          wdim = 5,
+          fact = 4,
           rarify = TRUE)
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(wgd, bkg = lotr_range, main = "window pi")
-plot_count(wgd, main = "window counts")
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi", legend.width = 1.5)
+plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-window_gd-1.png" width="100%" />
@@ -69,13 +68,14 @@ Next, the output from `window_gd()` can be interpolated using kriging
 with the `krig_gd()` function.
 
 ``` r
-# Krige results
-kgd <- krig_gd(wgd[["pi"]], lotr_lyr)
-kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr)
+# Krige genetic diversity (disaggregate grid to project across a smoother final surface)
+kgd <- krig_gd(wgd[["pi"]], lotr_lyr, disagg_grd = 2)
+# Krige counts (aggregate input raster to decrease computational time)
+kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr, agg_r = 2, disagg_grd = 2)
 
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(kgd, main = "kriged pi")
-plot_count(kgd_counts, main = "kriged counts")
+plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
+plot_count(kgd_counts, main = "Kriged sample counts", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-krig_gd-1.png" width="100%" />
@@ -89,14 +89,14 @@ undersampled.
 mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 # Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
+mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 3)
 ```
 
 ``` r
 # Plot results
 par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
-plot_gd(mgd_lyr, main = "masked pi (spp range)")
-plot_gd(mgd_counts, bkg = lotr_range, main = "masked pi (counts + spp range)")
+plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
+plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-result-1.png" width="100%" />

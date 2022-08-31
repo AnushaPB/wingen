@@ -20,10 +20,24 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
   # convert wdim to matrix
   nmat <- wdim_to_mat(wdim)
 
+  # plot window preview
+  preview_window(lyr, nmat, coords)
+
+  # plot count preview and return count raster
+  if (sample_count) {lyrc <- preview_count(lyr, coords, nmat, min_n); return(lyrc)}
+}
+
+#' Plot preview of moving window
+#'
+#' @param lyr RasterLayer
+#' @param nmat neighbor matrix
+#' @param coords coordinates
+#'
+#' @export
+#' @noRd
+preview_window <- function(lyr, nmat, coords){
   # get center of raster
-  e <- as.vector(raster::extent(lyr))
-  c <- c(mean(e[c(1, 2)]), mean(e[c(3, 4)]))
-  center <- raster::cellFromXY(lyr, c)
+  center <- get_center(lyr)
 
   # get adjacent cells to center cell
   adjc <- raster::adjacent(lyr, center, directions = nmat)
@@ -31,6 +45,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
   adjci <- purrr::map_dbl(adjc, 1, function(x) {
     seq(x[1], x[2])
   })
+
   # fill in window
   lyrw <- lyr * 0
   lyrw[adjci] <- 1
@@ -38,31 +53,66 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 
   raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-
   if (!is.null(coords)) graphics::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
-
-  if (sample_count) {
-
-    # get coord cells
-    coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
-
-    # count
-    lyrc <- lyr
-    nc <- purrr::map_dbl(1:raster::ncell(lyr), function(x, lyr, nmat, coord_cells) {
-      sub <- get_adj(x, lyr, nmat, coord_cells)
-      return(length(sub))
-    }, lyr, nmat, coord_cells)
-    lyrc <- raster::setValues(lyr, nc)
-
-    lyrc[lyrc < min_n] <- NA
-
-    raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE)
-    title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
-
-    # make stack
-    lyrw <- raster::stack(lyrw, lyrc)
-    names(lyrw) <- c("window", "sample_count")
   }
 
-  return(lyrw)
+#' Get center cell of a raster
+#'
+#' @param x raster
+#'
+#' @export
+#' @noRd
+get_center <- function(x){
+  e <- as.vector(raster::extent(x))
+  c <- c(mean(e[c(1, 2)]), mean(e[c(3, 4)]))
+  center <- raster::cellFromXY(x, c)
+  return(center)
+}
+
+#' Plot preview of sample count layer
+#'
+#' @param lyr RasterLayer
+#' @param coords coordinates
+#' @param nmat neighborhood matrix
+#'
+#' @export
+#' @noRd
+preview_count <- function(lyr, coords, nmat, min_n){
+  # get coord cells
+  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
+
+  # make copy of raster for counting
+  lyrc <- lyr
+
+  # get counts for each raster cell
+  nc <- purrr::map_dbl(1:raster::ncell(lyr), sample_count, lyr, nmat, coord_cells)
+
+  # assign values to raster
+  lyrc <- raster::setValues(lyr, nc)
+
+  # mask areas where counts are less than min value
+  lyrc[lyrc < min_n] <- NA
+
+  # set name
+  names(lyrc) <- "sample_count"
+
+  # plot results
+  raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE)
+  title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
+
+  return(lyrc)
+}
+
+#' Count samples in window around focal cell
+#'
+#' @param x focal cell index
+#' @param lyr raster layer
+#' @param nmat neighborhood matrix
+#' @param coord_cells cell indexes of coordinates
+#'
+#' @export
+#' @noRd
+sample_count <- function(x, lyr, nmat, coord_cells) {
+  sub <- get_adj(x, lyr, nmat, coord_cells)
+  return(length(sub))
 }

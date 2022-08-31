@@ -154,7 +154,7 @@ plot_count(wgd, main = "Moving window sample counts")
 
 ### Krige results
 
-To produce smoother maps of genetic diversity, we provide the function `krig_gd()` which creates a spatially interpolated raster from the moving window raster produced by `window_gd()`. This function uses the `autoKrige()` function from the R package automap to perform kriging on the moving window raster using an automatically generated variogram. Note that the RasterStack from `window_gd()`, including both the genetic diversity layer and the sample count layer, can be used and will generate kriged maps of both genetic diversity and sample count.
+To produce smoother maps of genetic diversity, we provide the function `krig_gd()` which creates a spatially interpolated raster from the moving window raster produced by `window_gd()`. This function uses the `autoKrige()` function from the R package automap to perform kriging on the moving window raster using an automatically generated variogram. Note that the RasterStack from `window_gd()`, including both the genetic diversity layer and the sample count layer, can be used to generate kriged maps of both genetic diversity and sample count.
 
 
 Kriging is performed by first transforming the moving window layer into a set of coordinates with corresponding genetic diversity (or sample count) values and then interpolating using these coordinates across the grid provided. Because of this, it is important to keep in mind how the coordinates from the moving window raster and the grid align. If the resolution of the moving window raster is much lower than that of the grid, there are fewer points for interpolation which can result in grid-like artifacts during kriging.
@@ -173,11 +173,23 @@ plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
+Users can optionally get the full output from `autoKrige()`, including raster layers of standard deviation and variance, by setting `autoKrige_output = TRUE` 
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_output = TRUE)
+
+summary(kgd_autoKrige)
+
+plot_gd(kgd_autoKrige$raster, main = "Kriged pi")
+plot_gd(kgd_autoKrige$var, main = "Kriged variance")
+plot_gd(kgd_autoKrige$stdev, main = "Kriged standard deviation")
+```
+
 ### Mask results
 
 Next, we mask the resulting kriged layers. Masking can be performed using a variety of methods.
 
-For example, we can mask using the carrying capacity layer to exclude any areas where the carrying capacity is lower than 0.01 (alternatively, one could use a species distribution model or habitat suitability model to exclude areas where the probability of presence is very low): 
+**Method 1:** mask using the carrying capacity layer to exclude any areas where the carrying capacity is lower than 0.01 (alternatively, one could use a species distribution model or habitat suitability model to exclude areas where the probability of presence is very low): 
 
 ```{r mask results 1, fig.width = 5, fig.height = 5}
 mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
@@ -185,13 +197,22 @@ mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 plot_gd(mgd, main = "Kriged & masked pi")
 ```
 
-You could also mask the layer using the sample counts layer produced by wingen to exclude undersampled areas (in this case, areas where the kriged value is lower than 1): 
+**Method 2:** mask the layer using the standard deviation or variance layer produced by `krig_gd` when `autoKrige_output = TRUE` to exclude areas where uncertainty is higher (in this case, areas where the standard deviation is greater than 0.05): 
 
 ```{r mask results 2, fig.width = 5, fig.height = 5}
+mgd <- mask_gd(kgd[["pi"]], kgd_autoKrige[["stdev"]], maxval = 0.05)
+
+plot_gd(mgd, main = "Kriged & masked pi")
+```
+
+**Method 3:** mask the layer using the sample counts layer produced by wingen to exclude undersampled areas (in this case, areas where the kriged value is lower than 1): 
+
+```{r mask results 3, fig.width = 5, fig.height = 5}
 mgd <- mask_gd(kgd[["pi"]], kgd[["sample_count"]], minval = 1)
 
 plot_gd(mgd, main = "Kriged & masked pi")
 ```
+
 
 Another nice visualization option is to add a "background" to your plots in the form of a RasterLayer or other spatial object (e.g., a country boundary) which can help provide geographic context:
 

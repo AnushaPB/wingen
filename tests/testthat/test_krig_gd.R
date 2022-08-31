@@ -110,6 +110,21 @@ test_that("xy argument works", {
 })
 
 
+test_that("autoKrige_output argument works", {
+  library("raster")
+  data("mini_lyr")
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, autoKrige_output = TRUE))
+
+  expect_true(is.list(kpi))
+  expect_true(inherits(kpi[["raster"]], "RasterLayer"))
+  expect_true(inherits(kpi[["var"]], "RasterLayer"))
+  expect_true(inherits(kpi[["stdev"]], "RasterLayer"))
+  expect_true(inherits(kpi[["autoKrige_output"]], "autoKrige"))
+
+  expect_warning(expect_warning(kpi <- krig_gd(raster::stack(mini_lyr, mini_lyr), index = 1:2, mini_lyr, autoKrige_output = TRUE)))
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, autoKrige_output = FALSE))
+})
+
 test_that("raster transform check", {
   library("raster")
   data("mini_lyr")
@@ -122,3 +137,4 @@ test_that("raster transform check", {
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = FALSE), NA)
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = TRUE), NA)
 })
+

@@ -31,7 +31,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0, line = -0.5)
+      title(main = list(main, font = 1), adj = 0)
     }
   })
 
@@ -42,10 +42,8 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @inheritParams plot_gd
 #'
-#' @noRd
-#'
 #' @export
-#'
+#' @noRd
 plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 10, main = NULL, box = FALSE, ...) {
 
   # suppress irrelevant plot warnings
@@ -86,7 +84,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
     )
   })
 
-  title(main = list(main, font = 1), adj = 0, line = -0.5)
+  title(main = list(main, font = 1), adj = 0)
 
   return()
 }
@@ -121,7 +119,7 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0, line = -0.5)
+      title(main = list(main, font = 1), adj = 0)
     }
 
     if (raster::nlayers(x) == 1) {
@@ -131,7 +129,7 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0, line = -0.5)
+      title(main = list(main, font = 1), adj = 0)
     }
   })
 

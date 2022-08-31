@@ -8,7 +8,7 @@ test_that("preview_gd returns expected output", {
     min_n = 2
   )
 
-  expect_equal(raster::nlayers(pw), 2)
+  expect_equal(raster::nlayers(pw), 1)
 
   pw <- preview_gd(mini_lyr,
     mini_coords,
@@ -18,6 +18,5 @@ test_that("preview_gd returns expected output", {
     min_n = 2
   )
 
-  expect_equal(raster::nlayers(pw), 1)
-  expect_equal(raster::unique(pw), c(0, 1, 2))
+  expect_equal(pw, NULL)
 })

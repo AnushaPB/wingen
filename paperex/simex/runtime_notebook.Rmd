@@ -9,6 +9,7 @@ library(ggplot2)
 library(viridis)
 library(dplyr)
 library(vcfR)
+library(ggpubr)
 library(here)
 wdir <- here("paperex", "simex")
 source(here(wdir, "runtime_functions.R"))
@@ -40,10 +41,10 @@ points(coords, cex = 0.5, pch = 3)
 ```
 
 
-```{r, fig.width = 4, fig.height = 4}
+```{r, fig.width = 4, fig.height = 4, warning = FALSE}
 
 # evaluate different wdim settings (note: window size = wdim ^ 2)
-set.seed(22)
+set.seed(44)
 file.name <- here(wdir, "outputs", "runtime_wdim.csv")
 if(file.exists(file.name)){
   resw <- read.csv(file.name)
@@ -70,14 +71,14 @@ resw_mean <- resw %>%
         group_by(wsize) %>% 
         summarise(time = mean(time))
 
-ggplot() +
+plotw <- ggplot() +
   geom_line(data = resw, aes(x = wsize, y = time, group = it), 
-            col = mako(1, begin = 0.8), alpha = 0.15, lwd = 1) +
+            col = mako(1, begin = 0.8), alpha = 0.25, lwd = 1) +
   geom_line(data = resw_mean, aes(x = wsize, y = time), 
             col = mako(1, begin = 0.8), alpha = 1, lwd = 1.1) +
-  theme_bw() + 
-  ylab("time (seconds)") +
-  xlab("window size (number of cells)") +
+  theme_bw(base_size = 16) + 
+  ylab("Time (seconds)") +
+  xlab("Window Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
@@ -87,23 +88,32 @@ ggplot() +
 
 
 
-```{r, fig.width = 3, fig.height = 3}
+```{r, fig.width = 5, fig.height = 5}
 resf_mean <- resf %>% 
         group_by(ncell) %>% 
         summarise(time = mean(time))
 
-ggplot() +
+(plotf <- ggplot() +
   geom_line(data = resf, aes(x = ncell, y = time, group = it), 
-            col = mako(1, begin = 0.6), alpha = 0.1, lwd = 1) +
+            col = mako(1, begin = 0.6), alpha = 0.25, lwd = 1) +
   geom_line(data = resf_mean, aes(x = ncell, y = time),
             col = mako(1, begin = 0.6), alpha = 1, lwd = 1.1) +
-  theme_bw() + 
-  ylab("time (seconds)") +
-  xlab("number of raster cells") +
+  theme_bw(base_size = 16) + 
+  ylab("Time (seconds)") +
+  xlab("Raster Size (number of cells)") +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
         panel.grid.major.x = element_blank(),
-        aspect.ratio = 1)
+        aspect.ratio = 1))
 
 ```
+
+```{r, fig.width = 10, fig.height = 5.5}
+ggarrange(plotw, NULL, plotf, 
+          nrow = 1, widths = c(1, 0.05, 1),
+          labels = c("(a)", "", "(b)"), 
+          hjust = -2,
+          font.label = list(size = 14, color = "black", face = "plain", family = NULL))
+```
+

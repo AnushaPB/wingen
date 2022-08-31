@@ -109,9 +109,9 @@ subset_data <- function(vcf, coords, nsamples, nvariants){
   sample.file <- paste0("samples_seed42_", as.integer(nsamples), ".csv")
 
   # get variants
-  variants <- read.csv(here("paperex", "simex", "data", variant.file))[,1]
+  variants <- read.csv(here("paperex", "simex", "data", "samples", variant.file))[,1]
   # get ids of inds to sample
-  samples <- read.csv(here("paperex", "simex", "data", sample.file))[,1]
+  samples <- read.csv(here("paperex", "simex", "data", "samples", sample.file))[,1]
 
   # subset coodinates
   subcoords <- coords[samples,]
@@ -366,12 +366,12 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @export
 #'
 #' @examples
-test_simex_plot <- function(r, bkg, legend = FALSE){
+test_simex_plot <- function(r, bkg = NULL, legend = FALSE){
   stat <- names(r)[1]
 
-  if(stat == "pi"){zlim <- c(0, 0.30)}
-  if(stat == "biallelic_richness"){zlim <- c(1, 1.86)}
-  if(stat == "heterozygosity"){zlim <- c(0, 0.30)}
+  if(stat == "pi"){zlim <- c(0, 0.31)}
+  if(stat == "biallelic_richness"){zlim <- c(1, 1.95)}
+  if(stat == "heterozygosity"){zlim <- c(0, 0.29)}
 
   plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE)
   return(NULL)
