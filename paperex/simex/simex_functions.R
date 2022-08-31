@@ -131,7 +131,7 @@ subset_data <- function(vcf, coords, nsamples, nvariants){
 #' @param file.name file name to append to beginning of outputs
 #'
 #' @export
-default_time_test <- function(stat, vcf, coords, lyr, wdim = 3, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
+default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
                               min_n = 2, fun = mean, rarify_alleles = TRUE, parallel = FALSE, ncores = 10, file.name){
 
   # get wdir
