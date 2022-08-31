@@ -1,7 +1,7 @@
 
 # load genetic data ---------------------------------------------------------------------------------------------------
 
-# check if file exists locally and if not download it from figshare
+# check if the vcf file from the simulations exists locally and if not download it from figshare
 file <- here::here("paperex", "simex", "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
 if(!file.exists(file)){
   message("downloading vcf from figshare and storing locally...this will take some time, but only has to be done once")
