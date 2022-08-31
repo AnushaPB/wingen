@@ -7,6 +7,9 @@ python3 gnxsim.py
 ## note this simulation runs for 10000 time steps but we only ended up using time step 1000
 cp GNX_mod-sim/it-0/spp-spp_0/*1000* data
 
+# create datasets for running time tests
+Rscript create_dataset.R
+
 # Run time tests
 Rscript time_tests/rr_time_test.R
 Rscript time_tests/WGS_time_test.R
