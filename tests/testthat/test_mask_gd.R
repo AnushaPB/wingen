@@ -22,7 +22,7 @@ test_that("resampling occurs correctly", {
   load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
-  mask <- aggregate(mini_lyr, 2)
+  mask <- raster::aggregate(mini_lyr, 2)
 
   # resample to mask to match x
   expect_error(msm <- mask_gd(x, mask, resample = "mask"), NA)

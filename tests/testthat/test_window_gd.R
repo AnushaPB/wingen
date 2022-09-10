@@ -43,21 +43,21 @@ test_that("window_gd returns expected value", {
 
   wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", min_n = 2)
   dos <- vcf_to_dosage(vcf)
-  expect_equal(calc_pi(dos, L = ncol(dos)), unique(na.omit(values(wg[[1]]))))
+  expect_equal(calc_pi(dos, L = ncol(dos)), unique(na.omit(raster::values(wg[[1]]))))
 
   wg <- window_gd(vcf, coords, stat = "het", mini_lyr, min_n = 2)
   het <- vcf_to_het(vcf)
-  expect_equal(calc_mean_het(het), unique(na.omit(values(wg[[1]]))))
+  expect_equal(calc_mean_het(het), unique(na.omit(raster::values(wg[[1]]))))
 
   wg <- window_gd(vcf, coords, stat = "biallelic.richness", mini_lyr, min_n = 2, rarify_alleles = TRUE)
-  expect_equal(calc_mean_biar(dos, rarify_alleles = TRUE), unique(na.omit(values(wg[[1]]))))
+  expect_equal(calc_mean_biar(dos, rarify_alleles = TRUE), unique(na.omit(raster::values(wg[[1]]))))
 
   wg <- window_gd(vcf, coords, stat = "biallelic.richness", mini_lyr, min_n = 2, rarify_alleles = FALSE)
-  expect_equal(calc_mean_biar(dos, rarify_alleles = FALSE), unique(na.omit(values(wg[[1]]))))
+  expect_equal(calc_mean_biar(dos, rarify_alleles = FALSE), unique(na.omit(raster::values(wg[[1]]))))
 
   wg <- window_gd(vcf, coords, stat = "allelic.richness", mini_lyr, min_n = 2)
   genind <- vcf_to_genind(vcf)
-  expect_equal(calc_mean_ar(genind), unique(na.omit(values(wg[[1]]))))
+  expect_equal(calc_mean_ar(genind), unique(na.omit(raster::values(wg[[1]]))))
 })
 
 test_that("error gets returned for mismatch vcf and coords", {

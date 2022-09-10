@@ -1,5 +1,5 @@
 test_that("krig_gd returns expected output", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr))
   expect_s4_class(mini_lyr, "RasterLayer")
@@ -11,7 +11,7 @@ test_that("krig_gd returns expected output", {
 })
 
 test_that("krig_gd returns warning when not provided grd", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
   expect_error(warnings <- capture_warnings(kpi <- krig_gd(mini_lyr, grd = NULL)), NA)
   # clean this up later:
@@ -19,13 +19,13 @@ test_that("krig_gd returns warning when not provided grd", {
 })
 
 test_that("coord kriging works", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
   expect_error(kpi <- krig_gd(mini_lyr, grd = lotr_lyr, coords = lotr_coords), NA)
 })
 
 test_that("grd kriging works", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
 
   grd <- raster_to_grid(mini_lyr)
@@ -35,7 +35,7 @@ test_that("grd kriging works", {
 
 
 test_that("krige_gd returns error when provided bad grd", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
 
   expect_error(kpi <- krig_gd(mini_lyr, grd = mini_coords))
@@ -44,7 +44,7 @@ test_that("krige_gd returns error when provided bad grd", {
 
 
 test_that("krig_gd returns warning when provided crs", {
-  library("raster")
+
   load_mini_ex(quiet = TRUE)
   # clean this up later:
   grd <- raster_to_grid(mini_lyr)
@@ -102,7 +102,7 @@ test_that("raster_transform transformations are correct", {
 })
 
 test_that("xy argument works", {
-  library("raster")
+
   data("mini_lyr")
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = TRUE))
 
@@ -111,7 +111,6 @@ test_that("xy argument works", {
 
 
 test_that("autoKrige_output argument works", {
-  library("raster")
   data("mini_lyr")
   expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, autoKrige_output = TRUE))
 
@@ -126,7 +125,7 @@ test_that("autoKrige_output argument works", {
 })
 
 test_that("raster transform check", {
-  library("raster")
+
   data("mini_lyr")
 
   bad_stack <- raster::stack(mini_lyr, mini_lyr)
