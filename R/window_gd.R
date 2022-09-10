@@ -23,7 +23,7 @@
 #' @export
 #'
 #' @examples
-#' library("raster")
+#'
 #' load_mini_ex()
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
 #' plot_gd(wpi, main = "Window pi")
@@ -662,3 +662,4 @@ return_stat <- function(x) {
 
   return(stat)
 }
+

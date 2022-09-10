@@ -13,7 +13,6 @@
 #' @export
 #'
 #' @examples
-#' library("raster")
 #' load_mini_ex()
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 #' kpi <- krig_gd(wpi, mini_lyr)

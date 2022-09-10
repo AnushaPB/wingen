@@ -58,7 +58,7 @@ RasterStack that includes a raster of genetic diversity and a raster of the numb
 Generate a continuous raster map of genetic diversity using moving windows
 }
 \examples{
-library("raster")
+
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
 plot_gd(wpi, main = "Window pi")
