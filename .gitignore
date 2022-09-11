@@ -85,6 +85,6 @@ paperex/empex/EEMS
 paperex/empex/EEMS_notebook.Rmd
 !paperex/empex/data/Scelop.coords
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf
-paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
-paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
+!paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
+!paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
 cov_token.R
