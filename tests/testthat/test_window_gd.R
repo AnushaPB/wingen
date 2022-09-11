@@ -39,7 +39,7 @@ test_that("get error with just one individual", {
 test_that("window_gd returns expected value", {
   load_mini_ex()
   vcf <- mini_vcf[c(1, 4, 8), 1:3]
-  coords <- mini_coords[1:2,]
+  coords <- mini_coords[1:2, ]
 
   wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", min_n = 2)
   dos <- vcf_to_dosage(vcf)

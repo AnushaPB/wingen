@@ -15,7 +15,7 @@ test_that("wdim_check fixes wdim", {
 
 test_that("wdim_to_mat returns correct errors", {
   expect_error(wdim_to_mat(1), "wdim cannot be less than 3")
-  expect_error(wdim_to_mat(c(3,3,3)),  "wdim must be a single integer or a vector two integers")
+  expect_error(wdim_to_mat(c(3, 3, 3)), "wdim must be a single integer or a vector two integers")
 })
 
 test_that("wdim returns matrix with only one zero", {

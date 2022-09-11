@@ -48,27 +48,28 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
 
   # krige
   rstk <- purrr::map(rls,
-                     krig_gd_lyr,
-                     grd = grd,
-                     coords = coords,
-                     agg_grd = agg_grd,
-                     disagg_grd = disagg_grd,
-                     agg_r = agg_r,
-                     disagg_r = disagg_r,
-                     autoKrige_output = autoKrige_output,
-                     zero_correction = zero_correction,
-                     xy = xy,
-                     resample = resample,
-                     resample_first = resample_first)
+    krig_gd_lyr,
+    grd = grd,
+    coords = coords,
+    agg_grd = agg_grd,
+    disagg_grd = disagg_grd,
+    agg_r = agg_r,
+    disagg_r = disagg_r,
+    autoKrige_output = autoKrige_output,
+    zero_correction = zero_correction,
+    xy = xy,
+    resample = resample,
+    resample_first = resample_first
+  )
 
   # give names from stack to list
   names(rstk) <- names(r)
 
-  if(length(rls) == 1){
+  if (length(rls) == 1) {
     rstk <- rstk[[1]]
   }
 
-  if(!autoKrige_output){
+  if (!autoKrige_output) {
     # convert from list to stack
     rstk <- raster::stack(rstk)
   }
@@ -93,9 +94,11 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 
   # Transform raster layer
   if (inherits(grd, "RasterLayer")) {
-    stk <- raster_transform(r = r, grd = grd,
-                            agg_grd = agg_grd, disagg_grd = disagg_grd, agg_r = agg_r, disagg_r = disagg_r,
-                            resample = resample, resample_first = resample_first)
+    stk <- raster_transform(
+      r = r, grd = grd,
+      agg_grd = agg_grd, disagg_grd = disagg_grd, agg_r = agg_r, disagg_r = disagg_r,
+      resample = resample, resample_first = resample_first
+    )
     r <- stk[[names(r)]]
     grd <- stk[["grd"]]
   }
@@ -113,8 +116,9 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 
   # krige using autoKrige
   krig_r <- krig(krig_df, krig_grid,
-                 autoKrige_output = autoKrige_output,
-                 xy = xy, zero_correction = zero_correction)
+    autoKrige_output = autoKrige_output,
+    xy = xy, zero_correction = zero_correction
+  )
 
   return(krig_r)
 }
@@ -128,12 +132,13 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 #'
 #' @export
 #' @noRd
-krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_correction = TRUE){
+krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_correction = TRUE) {
   # autokrige
-  if (xy)
+  if (xy) {
     krig_res <- automap::autoKrige(layer ~ x + y, krig_df, krig_grid)
-  else
+  } else {
     krig_res <- automap::autoKrige(layer ~ 1, krig_df, krig_grid)
+  }
 
   # Get kriged spdf
   krig_spdf <- krig_res$krige_output
@@ -142,12 +147,12 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_
   krig_r <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
 
   # replace negative values with zero
-  if(zero_correction) krig_r[krig_r < 0] <- 0
+  if (zero_correction) krig_r[krig_r < 0] <- 0
 
   # create results
-  if(autoKrige_output){
-    krig_var <- raster::rasterFromXYZ(krig_spdf[,"var1.var"], crs = raster::crs(krig_grid))
-    krig_stdev <- raster::rasterFromXYZ(krig_spdf[,"var1.stdev"], crs = raster::crs(krig_grid))
+  if (autoKrige_output) {
+    krig_var <- raster::rasterFromXYZ(krig_spdf[, "var1.var"], crs = raster::crs(krig_grid))
+    krig_stdev <- raster::rasterFromXYZ(krig_spdf[, "var1.stdev"], crs = raster::crs(krig_grid))
     result <- list(raster = krig_r, var = krig_var, stdev = krig_stdev, autoKrige_output = krig_res)
   } else {
     result <- krig_r
@@ -162,7 +167,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_
 #'
 #' @export
 #' @noRd
-make_krig_df <- function(r, coords = NULL){
+make_krig_df <- function(r, coords = NULL) {
 
   # convert raster to df
   krig_df <- data.frame(raster::rasterToPoints(r))
@@ -193,7 +198,7 @@ make_krig_df <- function(r, coords = NULL){
 #'
 #' @export
 #' @noRd
-make_krige_grid <- function(r = NULL, grd = NULL){
+make_krige_grid <- function(r = NULL, grd = NULL) {
   if (is.null(grd)) {
     krig_grid <- raster_to_grid(r)
   } else if (inherits(grd, "RasterLayer")) {

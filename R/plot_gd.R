@@ -135,4 +135,3 @@ plot_count <- function(x, index = NULL, breaks = 10, col = viridis::mako(breaks)
 
   return(invisible(plt))
 }
-

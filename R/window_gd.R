@@ -113,15 +113,17 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
     future::plan(future::multisession, workers = ncores)
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr), window_helper,
-                                       lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
-                                       stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                                       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-                                       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster")))
+      lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
+      stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster"))
+    )
   } else {
     rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper,
-                                lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
-                                stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                                min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles)
+      lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
+      stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+    )
   }
 
 
@@ -555,7 +557,7 @@ check_vcf_NA <- function(vcf, coords = NULL) {
   }
 
   # check for invariant sites
-  if(any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
+  if (any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
 
   # make results
   if (is.null(coords)) {
@@ -641,4 +643,3 @@ return_stat <- function(x) {
 
   return(stat)
 }
-
