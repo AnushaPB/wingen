@@ -21,7 +21,7 @@ krig_gd(
 )
 }
 \arguments{
-\item{r}{RasterLayer or RasterStack}
+\item{r}{RasterLayer or RasterStack produced by \link[wingen]{window_gd}}
 
 \item{grd}{object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
 
@@ -54,7 +54,6 @@ a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
 Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
 }
 \examples{
-library("raster")
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)

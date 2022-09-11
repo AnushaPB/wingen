@@ -3,7 +3,7 @@
 #'
 #' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
 #'
-#' @param r RasterLayer or RasterStack
+#' @param r RasterLayer or RasterStack produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
 #' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates

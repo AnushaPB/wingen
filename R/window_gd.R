@@ -4,19 +4,20 @@
 #'
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
-#' @param vcf object of type vcf ( (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))
-#' @param stat genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
-#' @param lyr RasterLayer to move the window across
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
-#' @param fact aggregation factor to apply to the RasterLayer (*note:* increasing this value reduces computational time)
-#' @param rarify if rarify = TRUE, rarefaction is performed
-#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction
-#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction
+#' @param vcf object of type vcf (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
+#' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
+#' @param lyr RasterLayer to slide the window across
+#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
+#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
+#' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
+#' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
+#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
+#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5)
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
-#' @param fun function to use to summarize data in window (defaults to base R mean)
+#' @param fun function to use to summarize data in window (defaults to mean)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
 #' @param rarify_alleles for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
-#' @param parallel whether to parallelize the function (see vignette for setting up a cluster to do so)
+#' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
@@ -30,7 +31,7 @@
 #' plot_count(wpi)
 #'
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
-                      rarify = FALSE, rarify_n = 4, rarify_nit = 5, min_n = 2,
+                      rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL) {
 
