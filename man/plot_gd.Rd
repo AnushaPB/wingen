@@ -18,7 +18,7 @@ plot_gd(
 \arguments{
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}
 
-\item{bkg}{RasterLayer or other spatial object that will be plotted as the "background" in gray}
+\item{bkg}{optional RasterLayer or other spatial object that will be plotted as the "background" in gray}
 
 \item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 

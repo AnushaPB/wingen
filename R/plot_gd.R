@@ -3,7 +3,7 @@
 #' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
-#' @param bkg RasterLayer or other spatial object that will be plotted as the "background" in gray
+#' @param bkg optional RasterLayer or other spatial object that will be plotted as the "background" in gray
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)
