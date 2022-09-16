@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# wingen <img src="man/figures/logo.png" align="right" height=150 />
+# wingen <img src="man/figures/logo.png" align="right" height="150"/>
 
 <!-- badges: start -->
 <!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
@@ -10,6 +10,7 @@
 [![build](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
 [![license:
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+
 <!-- badges: end -->
 
 Generate continuous maps of genetic diversity using moving windows with
@@ -106,3 +107,7 @@ For an extended example, see the package vignette:
 ``` r
 vignette("wingen-vignette")
 ```
+
+Example analyses from Bishop et al. 202X can be found in the
+[paperex](https://github.com/AnushaPB/wingen/tree/main/paperex)
+directory.
