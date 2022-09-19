@@ -16,7 +16,7 @@
 #' data("mini_lyr")
 #' plot_gd(mini_lyr)
 #'
-plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, ...) {
+plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
   if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
 
@@ -44,7 +44,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @export
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, ...) {
+plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
 
   # suppress irrelevant plot warnings
   suppressWarnings({
@@ -106,7 +106,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
+plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
   if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
 
