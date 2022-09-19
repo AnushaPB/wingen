@@ -47,8 +47,8 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
   gen <- convert_vcf(vcf, stat)
 
   # run moving window
-  results <- window_gd_general(
-    gen = gen,
+  results <- window_general(
+    x = gen,
     coords = coords,
     lyr = lyr,
     stat = stat,
@@ -73,20 +73,20 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 
 #' Helper function for window_gd
 #'
-#' @param gen genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
+#' @param x genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @inheritParams window_gd
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #'
 #' @export
 #' @noRd
-window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
-                              rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
-                              fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                              parallel = FALSE, ncores = NULL) {
+window_general <- function(x, coords, lyr, stat = "pi", wdim = 3, fact = 0,
+                           rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
+                           fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                           parallel = FALSE, ncores = NULL) {
 
   # set L if pi is being calculated
-  if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(gen)
+  if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
 
   # replace stat with function to calculate diversity statistic
   stat <- return_stat(stat)
@@ -96,7 +96,7 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   colnames(coords) <- c("x", "y")
 
   # confirm that coords and gen align
-  check_data(gen, coords)
+  check_data(x, coords)
 
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
@@ -114,14 +114,14 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
     future::plan(future::multisession, workers = ncores)
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr), window_helper,
-      lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
+      lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster"))
     )
   } else {
     rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper,
-      lyr = lyr, gen = gen, coord_cells = coord_cells, nmat = nmat,
+      lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
@@ -146,13 +146,13 @@ window_gd_general <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @param coord_cells cell indices for each coordinate
 #' @param nmat neighborhood matrix
 #'
-#' @inheritParams window_gd_general
+#' @inheritParams window_general
 #'
 #' @return genetic diversity and counts for a single cell
 #'
 #' @export
 #' @noRd
-window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
+window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
 
@@ -171,9 +171,9 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
   if (length(sub) < min_n) {
     gd <- NA
   } else if (rarify) {
-    gd <- rarify_helper(gen, sub, rarify_n, rarify_nit, stat, fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat, fun, L = L, rarify_alleles = rarify_alleles)
   } else {
-    gd <- sample_gd(gen, sub, stat, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat, L = L, rarify_alleles = rarify_alleles)
   }
 
   # count the number of samples in the window
@@ -186,7 +186,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
 
 #' Rarefaction helper function
 #'
-#' @inheritParams window_gd_general
+#' @inheritParams window_general
 #'
 #' @noRd
 #'
@@ -194,7 +194,7 @@ window_helper <- function(i, lyr, gen, coord_cells, nmat, stat,
 #'
 #' @export
 #' @noRd
-rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
+rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
                           fun = mean, L = NULL, rarify_alleles = TRUE) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
@@ -203,12 +203,12 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
 
   # if number of samples is greater than rarify_n, rarify
   if (length(sub) > rarify_n) {
-    gd <- rarify_gd(gen, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L, rarify_alleles = rarify_alleles)
   }
 
   # if the number of samples is equal to rarify_n, calculate stat
   if (length(sub) == rarify_n) {
-    gd <- sample_gd(gen, sub, stat, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat, L = L, rarify_alleles = rarify_alleles)
   }
 
   return(gd)
@@ -217,13 +217,13 @@ rarify_helper <- function(gen, sub, rarify_n, rarify_nit, stat,
 
 #' Helper function to rarify subsample and calculate genetic diversity
 #'
-#' @inheritParams window_gd_general
+#' @inheritParams window_general
 #'
 #' @return rarified genetic diversity statistic
 
 #' @export
 #' @noRd
-rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
+rarify_gd <- function(x, sub, rarify_nit = 10, rarify_n = 4, stat,
                       fun, L = NULL, rarify_alleles = TRUE) {
 
   # check to make sure sub is greater than rarify_n
@@ -242,7 +242,7 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
   }
 
   # for each of the possible combos get gendiv stat
-  gdrar <- apply(cmb, 1, sample_gd, gen = gen, stat = stat, L = L, rarify_alleles = rarify_alleles)
+  gdrar <- apply(cmb, 1, sample_gd, x = x, stat = stat, L = L, rarify_alleles = rarify_alleles)
 
   # summarize rarefaction results
   gd <- stats::na.omit(fun(gdrar))
@@ -253,19 +253,19 @@ rarify_gd <- function(gen, sub, rarify_nit = 10, rarify_n = 4, stat,
 
 #' Helper function to calculate genetic diversity of a sample
 #'
-#' @inheritParams window_gd_general
+#' @inheritParams window_general
 #'
 #' @return mean allelic richness of a subsample
 #'
 #' @export
 #' @noRd
-sample_gd <- function(gen, sub, stat, L = NULL, rarify_alleles = TRUE) {
+sample_gd <- function(x, sub, stat, L = NULL, rarify_alleles = TRUE) {
   if (identical(stat, calc_mean_biar)) {
-    gd <- stat(gen[sub, ], rarify_alleles)
+    gd <- stat(x[sub, ], rarify_alleles)
   } else if (is.null(L) | !identical(stat, calc_pi)) {
-    gd <- stat(gen[sub, ])
+    gd <- stat(x[sub, ])
   } else {
-    gd <- stat(gen[sub, ], L)
+    gd <- stat(x[sub, ], L)
   }
   return(gd)
 }
@@ -293,12 +293,12 @@ calc_mean_ar <- function(genind) {
 #'
 #' @export
 #' @noRd
-helper_calc_ar <- function(gen) {
+helper_calc_ar <- function(genind) {
   # get number of individuals
-  nind <- nrow(gen@tab)
+  nind <- nrow(genind@tab)
 
   # assign pops so that the whole sample is treated as one pop
-  gen$pop <- rep(factor(1), nind)
+  genind$pop <- rep(factor(1), nind)
 
   # note: min.n is the The number of alleles down to which the number of alleles should be rarefied.
   # The default is the minimum number of individuals genotyped (times 2 for diploids). However, if there
@@ -308,7 +308,7 @@ helper_calc_ar <- function(gen) {
 
   # note: [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
   # ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
-  ar <- hierfstat::allelic.richness(gen)$Ar[, 1]
+  ar <- hierfstat::allelic.richness(genind)$Ar[, 1]
   return(ar)
 }
 
@@ -487,27 +487,27 @@ countgen <- function(x) {
 #'
 #' Check that the number of individuals in each data set align
 #'
-#' @param gen genetic data
+#' @param x moving window data
 #' @param coords coordinates
 #'
 #' @export
 #' @noRd
-check_data <- function(gen, coords = NULL) {
+check_data <- function(x, coords = NULL) {
 
   # check for one individual
   if (!is.null(coords)) if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
 
   # check number of samples
-  if (inherits(gen, "genind")) {
-    nind <- nrow(gen$tab)
+  if (inherits(x, "genind")) {
+    nind <- nrow(x$tab)
   }
 
-  if (inherits(gen, "vcfR")) {
-    nind <- (ncol(gen@gt) - 1)
+  if (inherits(x, "vcfR")) {
+    nind <- (ncol(x@gt) - 1)
   }
 
-  if (inherits(gen, "data.frame") | inherits(gen, "matrix")) {
-    nind <- nrow(gen)
+  if (inherits(x, "data.frame") | inherits(x, "matrix")) {
+    nind <- nrow(x)
   }
 
   # check coords
@@ -518,8 +518,8 @@ check_data <- function(gen, coords = NULL) {
   }
 
   # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
-  if (inherits(gen, "vcfR")) {
-    return(check_vcf_NA(gen, coords))
+  if (inherits(x, "vcfR")) {
+    return(check_vcf_NA(x, coords))
   }
 }
 
