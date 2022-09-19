@@ -80,7 +80,7 @@ Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to exclude
 mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 # Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 3)
+mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 ```
 
 ```{r result, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
@@ -90,7 +90,7 @@ plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
 plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
 ```
 
-For an extended example, see the package vignette:
+For an extended walk through, see the package vignette:
 
 ``` r
 vignette("wingen-vignette")

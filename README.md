@@ -90,7 +90,7 @@ undersampled.
 mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 # Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 3)
+mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 ```
 
 ``` r
@@ -102,7 +102,7 @@ plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)"
 
 <img src="man/figures/README-result-1.png" width="100%" />
 
-For an extended example, see the package vignette:
+For an extended walk through, see the package vignette:
 
 ``` r
 vignette("wingen-vignette")
