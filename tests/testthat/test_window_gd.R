@@ -239,6 +239,16 @@ test_that("return_stat returns correct functions", {
   expect_equal(return_stat("het"), calc_mean_het)
   expect_equal(return_stat("biallelic.richness"), calc_mean_biar)
   expect_equal(return_stat("allelic.richness"), calc_mean_ar)
+
+  # check custom functions work
+  x <- c(1,2,NA)
+  foo <- return_stat(mean, na.rm = TRUE)
+  expect_equal(foo(x), 1.5)
+  foo <- return_stat(mean, na.rm = FALSE)
+  expect_true(is.na(foo(x)))
+  foo_null <- function(x) NULL
+  foo <- return_stat(foo_null, na.rm = FALSE)
+  expect_error(foo(x))
 })
 
 test_that("raref works", {

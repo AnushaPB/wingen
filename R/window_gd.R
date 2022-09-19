@@ -71,25 +71,34 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
   return(results)
 }
 
-#' Helper function for window_gd
+#' General function for making moving window maps
+#'
+#' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity,
+#' `window_general` can be used to make moving window maps from different data inputs. Unlike `window_gd`, `window_general` will not convert your data into
+#' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2 To calculate
+#' `heterozygosity`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
+#' In addition, users can set `x` to a vector and create moving window maps with any function that can be applied to a vector and will take `na.rm = TRUE` (e.g. `stat = mean`, `var`, `sum`, etc.).
+#' Users can also potentially set `stat` to any custom function that can be applied to `x` and produces a single numeric value as output (e.g., a function that produces a custom diversity index), however this
+#' should be attempted with caution since this has not have been tested extensively and may produce errors.
 #'
 #' @param x genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
+#' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `het` for average heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic.richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix; this option faster than "allelic.richness"). If x is a vector, `stat` can also be `mean`, `sd`, or `var`).
+#' @param ... if a funciton is provided for `stat`, additional arguments to pass to the `stat`funciton (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_gd
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
 #'
 #' @export
-#' @noRd
-window_general <- function(x, coords, lyr, stat = "pi", wdim = 3, fact = 0,
+window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL) {
+                           parallel = FALSE, ncores = NULL, ...) {
 
   # set L if pi is being calculated
   if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
 
-  # replace stat with function to calculate diversity statistic
-  stat <- return_stat(stat)
+  # replace stat with function to calculate the desired statistic
+  stat <- return_stat(stat, ...)
 
   # format coords
   coords <- data.frame(coords)
@@ -633,7 +642,10 @@ name_results <- function(x, stat) {
 #'
 #' @export
 #' @noRd
-return_stat <- function(x) {
+return_stat <- function(x, ...) {
+
+  if (inherits(x, "function")) return(purrr::partial(x, ...))
+
   if (x == "pi") stat <- calc_pi
 
   if (x == "biallelic.richness") stat <- calc_mean_biar
@@ -641,6 +653,8 @@ return_stat <- function(x) {
   if (x == "allelic.richness") stat <- calc_mean_ar
 
   if (x == "het") stat <- calc_mean_het
+
+  if(!exists("stat")) stop("invalid stat argument provided")
 
   return(stat)
 }
