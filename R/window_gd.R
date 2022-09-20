@@ -8,13 +8,13 @@
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
 #' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
+#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to a 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5)
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
-#' @param fun function to use to summarize data in window (defaults to mean)
+#' @param fun function to use to summarize rarefaction results (defaults to mean)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
 #' @param rarify_alleles for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
@@ -73,17 +73,18 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 
 #' General function for making moving window maps
 #'
-#' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity,
+#' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,
 #' `window_general` can be used to make moving window maps from different data inputs. Unlike `window_gd`, `window_general` will not convert your data into
 #' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2 To calculate
-#' `heterozygosity`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
-#' In addition, users can set `x` to a vector and create moving window maps with any function that can be applied to a vector and will take `na.rm = TRUE` (e.g. `stat = mean`, `var`, `sum`, etc.).
-#' Users can also potentially set `stat` to any custom function that can be applied to `x` and produces a single numeric value as output (e.g., a function that produces a custom diversity index), however this
-#' should be attempted with caution since this has not have been tested extensively and may produce errors.
+#' `het`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
+#' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g. `stat = mean`, `var`, `sum`, etc.).
+#' Users can also provide any combination of `stat` and `x` for which the input of `stat` is `x` and the output of `stat` a single numeric value
+#' (e.g., a function that produces a custom diversity index), however this should be attempted with caution since this functionality has not have been tested extensively
+#' and may produce errors.
 #'
-#' @param x genetic data (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
-#' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `het` for average heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic.richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix; this option faster than "allelic.richness"). If x is a vector, `stat` can also be `mean`, `sd`, or `var`).
-#' @param ... if a funciton is provided for `stat`, additional arguments to pass to the `stat`funciton (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
+#' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
+#' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `het` for average heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic.richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix). `stat` can also be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
+#' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_gd
 #'
 #' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
@@ -95,7 +96,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            parallel = FALSE, ncores = NULL, ...) {
 
   # set L if pi is being calculated
-  if (stat == "pi" & !is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
+  if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
 
   # replace stat with function to calculate the desired statistic
   stat <- return_stat(stat, ...)
@@ -658,3 +659,4 @@ return_stat <- function(x, ...) {
 
   return(stat)
 }
+

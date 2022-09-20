@@ -256,6 +256,8 @@ test_that("raref works", {
   expect_equal(raref(allele.counts, min.n = 2), 1.5)
 })
 
+
+
 test_that("countgen works", {
   all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
   actual <- apply(all_possible_combos, 2, countgen)
@@ -281,4 +283,30 @@ test_that("invariant warning is given", {
   # all NA
   invariant_vcf <- mini_vcf_NA[9, ]
   expect_warning(expect_warning(check_data(invariant_vcf), "invariant sites found in vcf"))
+})
+
+test_that("custom functions with window general work", {
+  load_mini_ex(quiet = TRUE)
+  expect_warning(expect_warning(data <- check_data(mini_vcf_NA, mini_coords)))
+  mini_vcf_NA <- data$vcf
+  mini_coords <- data$coords
+  wp <- window_general(vcf_to_dosage(mini_vcf_NA), mini_coords, mini_lyr, stat = "pi", rarify = FALSE)
+  wh <- window_general(vcf_to_het(mini_vcf_NA), mini_coords, mini_lyr, stat = "het", rarify = FALSE)
+  wb <- window_general(vcf_to_dosage(mini_vcf_NA), mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE)
+  wbr <- window_general(vcf_to_dosage(mini_vcf_NA), mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE)
+  wa <- window_general(vcf_to_genind(mini_vcf_NA), mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE)
+
+  # examples with custom functions
+  toy <- vcf_to_dosage(mini_vcf_NA)
+  # test on vector
+  wm <- window_general(toy[,1], mini_coords, mini_lyr, stat = mean, na.rm = TRUE)
+  # test on matrix
+  wm <- window_general(toy, mini_coords, mini_lyr, stat = mean, na.rm = TRUE)
+  # test custom functions
+  foo <- function(x) var(apply(x, 2, var, na.rm = TRUE), na.rm = TRUE)
+  wm <- window_general(toy, mini_coords, mini_lyr, stat = foo)
+  foo <- function(x, na.rm = TRUE) var(apply(x, 2, var))
+  wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE)
+  foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var))*silly
+  wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3)
 })
