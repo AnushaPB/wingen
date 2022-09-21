@@ -283,5 +283,41 @@ plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
 plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
 ```
 
-### For additional information, see our paper found here: [LINK]
+# General moving window 
+
+We provide a `window_general` function that can be used to make moving window maps for other types of data inputs and functions. Unlike `window_gd`, `window_general` does not require a `vcfR` or a path to a vcf file as input. 
+
+The required input (`x`) depends on the statistic being calculated. 
+
+For the standard genetic diversity statistics: 
+- If `stat = pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2. 
+- If `stat = het`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity.
+- If `stat =  allelic_richness`, `x` must be a `genind` type object. 
+
+For other statistics:
+- If `x` is  a vector, `stat` can be any function that can be applied to a vector (e.g. `stat = mean, var, sum, etc.`). 
+- If `x` is a matrix or data frame (note: rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, use with caution)*.
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+# As an example, let's create a moving window map of our raster layer values (e.g. carrying capacity and conductance, in this case) at the sample coordinates
+
+# First, we extract the raster values at those coordinates
+vals <- raster::extract(lotr_lyr, lotr_coords)
+
+# Next, we run the window_general function with the env vector and set the stat to mean
+# Note: we can also provide additional arguments to functions, such as na.rm = TRUE
+we <- window_general(vals, 
+                     coords = lotr_coords,
+                     lyr = lotr_lyr, 
+                     stat = mean, 
+                     rarify_n = 2, 
+                     rarify_nit = 5,
+                     fact = 3, 
+                     wdim = 5, 
+                     rarify = TRUE, 
+                     na.rm = TRUE)
+
+plot_gd(we, bkg = lotr_range, main = "Mean raster value")
+```
+
 
