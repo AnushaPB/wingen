@@ -78,35 +78,6 @@ ggplot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), br
                    axis.ticks.y = ggplot2::element_blank(),
                    panel.border = ggplot2::element_blank())
 
-
-  raster::plot(x[[index]],
-    col = "white",
-    xlim = c(xmin, xmax),
-    ylim = c(ymin, ymax),
-    axes = FALSE,
-    box = box,
-    legend = FALSE
-  )
-  raster::plot(bkg,
-    col = "lightgray",
-    border = "white",
-    xlim = c(xmin, xmax),
-    ylim = c(ymin, ymax),
-    axes = FALSE,
-    box = FALSE,
-    legend = FALSE,
-    add = TRUE
-  )
-  raster::plot(x[[index]],
-    col = col,
-    add = TRUE,
-    axes = FALSE,
-    box = FALSE,
-    ...
-  )
-
-  title(main = list(main, font = 1), adj = 0)
-
   return()
 }
 
