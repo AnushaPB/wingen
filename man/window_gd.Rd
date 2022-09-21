@@ -31,7 +31,7 @@ window_gd(
 
 \item{stat}{genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
 
-\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)}
+\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to a 3 x 3 window)}
 
 \item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -43,7 +43,7 @@ window_gd(
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
 
-\item{fun}{function to use to summarize data in window (defaults to mean)}
+\item{fun}{function to use to summarize rarefaction results (defaults to mean)}
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
 
