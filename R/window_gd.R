@@ -78,9 +78,9 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 #' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2 To calculate
 #' `het`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
 #' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g. `stat = mean`, `var`, `sum`, etc.).
-#' Users can also provide any combination of `stat` and `x` for which the input of `stat` is `x` and the output of `stat` a single numeric value
-#' (e.g., a function that produces a custom diversity index), however this should be attempted with caution since this functionality has not have been tested extensively
-#' and may produce errors.
+#' `x` can also be a matrix or data frame (where rows are individuals), and then `stat` can be any function that takes a matrix or data frame and outputs a
+#' single numeric value (e.g., a function that produces a custom diversity index), however this should be attempted with caution since this functionality has
+#'  not have been tested extensively and may produce errors.
 #'
 #' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
 #' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `het` for average heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic.richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix). `stat` can also be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
@@ -104,6 +104,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # format coords
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
+
+  # convert vector to dataframe
+  if(is.vector(x)) x <- data.frame(x)
 
   # confirm that coords and gen align
   check_data(x, coords)
@@ -508,17 +511,13 @@ check_data <- function(x, coords = NULL) {
   if (!is.null(coords)) if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
 
   # check number of samples
-  if (inherits(x, "genind")) {
-    nind <- nrow(x$tab)
-  }
+  if (inherits(x, "genind")) nind <- nrow(x$tab)
 
-  if (inherits(x, "vcfR")) {
-    nind <- (ncol(x@gt) - 1)
-  }
+  if (inherits(x, "vcfR")) nind <- (ncol(x@gt) - 1)
 
-  if (inherits(x, "data.frame") | inherits(x, "matrix")) {
-    nind <- nrow(x)
-  }
+  if (inherits(x, "data.frame") | inherits(x, "matrix")) nind <- nrow(x)
+
+  if (is.vector(x)) nind <- length(x)
 
   # check coords
   if (!is.null(coords)) {
@@ -528,9 +527,8 @@ check_data <- function(x, coords = NULL) {
   }
 
   # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
-  if (inherits(x, "vcfR")) {
-    return(check_vcf_NA(x, coords))
-  }
+  if (inherits(x, "vcfR")) return(check_vcf_NA(x, coords))
+
 }
 
 #' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
