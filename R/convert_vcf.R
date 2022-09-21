@@ -3,10 +3,9 @@
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #'
-#' @return returns dosage matrix#'
+#' @return dosage matrix
 #'
 #' @export
-#' @noRd
 vcf_to_dosage <- function(x) {
   # check vcf
   vcf <- vcf_check(x)
@@ -37,7 +36,6 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
   # convert to genind
   genind <- vcfR::vcfR2genind(vcf)
-
 
   # leave pops NULL if pops is FALSE
   if (is.logical(pops)) if (!pops) {
