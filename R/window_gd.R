@@ -7,7 +7,7 @@
 #' @param vcf object of type vcf (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
-#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
+#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allele count across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
