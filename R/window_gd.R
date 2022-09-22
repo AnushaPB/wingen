@@ -595,13 +595,14 @@ get_allNA <- function(x, MARGIN = NULL) {
 #' @export
 #' @noRd
 convert_vcf <- function(vcf, stat) {
-  if (stat == "allelic_richness") gen <- vcf_to_genind(vcf)
+  if (stat == "allelic_richness") return(vcf_to_genind(vcf))
 
-  if (stat == "Ho") gen <- vcf_to_het(vcf)
+  if (stat == "Ho") return(vcf_to_het(vcf))
 
-  if (stat == "pi" | stat == "biallelic_richness") gen <- vcf_to_dosage(vcf)
+  if (stat == "pi" | stat == "biallelic_richness") return(vcf_to_dosage(vcf))
 
-  return(gen)
+  stop(paste0(stat, " is an invalid arugment for stat"))
+
 }
 
 #' Rename results from window_gd
@@ -628,13 +629,14 @@ name_results <- function(x, stat) {
 #' @export
 #' @noRd
 return_stat <- function(x) {
-  if (x == "pi") stat <- calc_pi
+  if (x == "pi") return(calc_pi)
 
-  if (x == "biallelic_richness") stat <- calc_mean_biar
+  if (x == "biallelic_richness") return(calc_mean_biar)
 
-  if (x == "allelic_richness") stat <- calc_mean_ar
+  if (x == "allelic_richness") return(calc_mean_ar)
 
-  if (x == "Ho") stat <- calc_mean_het
+  if (x == "Ho") return(calc_mean_het)
 
-  return(stat)
+  stop(paste(x, "is an invalid arugment for stat"))
+
 }
