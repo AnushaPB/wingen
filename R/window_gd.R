@@ -597,7 +597,7 @@ get_allNA <- function(x, MARGIN = NULL) {
 convert_vcf <- function(vcf, stat) {
   if (stat == "allelic.richness") gen <- vcf_to_genind(vcf)
 
-  if (stat == "Ho" | stat == "heterozygosity") gen <- vcf_to_het(vcf)
+  if (stat == "Ho") gen <- vcf_to_het(vcf)
 
   if (stat == "pi" | stat == "biallelic.richness") gen <- vcf_to_dosage(vcf)
 
@@ -614,13 +614,7 @@ convert_vcf <- function(vcf, stat) {
 name_results <- function(x, stat) {
   names(x[[2]]) <- "sample_count"
 
-  if (stat == "pi") names(x[[1]]) <- "pi"
-
-  if (stat == "Ho") names(x[[1]]) <- "heterozygosity"
-
-  if (stat == "allelic.richness") names(x[[1]]) <- "allelic_richness"
-
-  if (stat == "biallelic.richness") names(x[[1]]) <- "biallelic_richness"
+  names(x[[1]]) <- stat
 
   return(x)
 }
