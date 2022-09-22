@@ -95,7 +95,7 @@ And ran the moving window function again, this time kriging and masking the resu
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, message = FALSE, results = FALSE, warning = FALSE}
 # Run moving window
 set.seed(22)
-system.time(hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+system.time(hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
 system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
@@ -136,7 +136,7 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 set.seed(22)
-hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+hgn <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 
 set.seed(22)
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))

@@ -7,7 +7,7 @@
 #' @param vcf object of type vcf (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
-#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average number of alleles across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
+#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic.richness" for average number of alleles across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
@@ -597,7 +597,7 @@ get_allNA <- function(x, MARGIN = NULL) {
 convert_vcf <- function(vcf, stat) {
   if (stat == "allelic.richness") gen <- vcf_to_genind(vcf)
 
-  if (stat == "het" | stat == "heterozygosity") gen <- vcf_to_het(vcf)
+  if (stat == "Ho" | stat == "heterozygosity") gen <- vcf_to_het(vcf)
 
   if (stat == "pi" | stat == "biallelic.richness") gen <- vcf_to_dosage(vcf)
 
@@ -616,7 +616,7 @@ name_results <- function(x, stat) {
 
   if (stat == "pi") names(x[[1]]) <- "pi"
 
-  if (stat == "het") names(x[[1]]) <- "heterozygosity"
+  if (stat == "Ho") names(x[[1]]) <- "heterozygosity"
 
   if (stat == "allelic.richness") names(x[[1]]) <- "allelic_richness"
 
@@ -640,7 +640,7 @@ return_stat <- function(x) {
 
   if (x == "allelic.richness") stat <- calc_mean_ar
 
-  if (x == "het") stat <- calc_mean_het
+  if (x == "Ho") stat <- calc_mean_het
 
   return(stat)
 }

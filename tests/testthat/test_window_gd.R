@@ -10,7 +10,7 @@ test_that("window_gd returns expected output", {
 test_that("all stats and parallel works", {
   load_mini_ex(quiet = TRUE)
   expect_warning(expect_warning(wp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE)))
-  expect_warning(expect_warning(wh <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "het", rarify = FALSE)))
+  expect_warning(expect_warning(wh <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE)))
   expect_warning(expect_warning(wb <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE)))
   expect_warning(expect_warning(wbr <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE)))
   expect_warning(expect_warning(wa <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE)))
@@ -24,7 +24,7 @@ test_that("all stats and parallel works", {
 test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
   expect_warning(wp <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
-  expect_warning(wh <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "het", rarify = FALSE))
+  expect_warning(wh <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
   expect_warning(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = FALSE))
   expect_warning(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic.richness", rarify = FALSE, rarify_alleles = TRUE))
   expect_warning(wa <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "allelic.richness", rarify = FALSE))
@@ -45,7 +45,7 @@ test_that("window_gd returns expected value", {
   dos <- vcf_to_dosage(vcf)
   expect_equal(calc_pi(dos, L = ncol(dos)), unique(na.omit(raster::values(wg[[1]]))))
 
-  wg <- window_gd(vcf, coords, stat = "het", mini_lyr, min_n = 2)
+  wg <- window_gd(vcf, coords, stat = "Ho", mini_lyr, min_n = 2)
   het <- vcf_to_het(vcf)
   expect_equal(calc_mean_het(het), unique(na.omit(raster::values(wg[[1]]))))
 
@@ -236,7 +236,7 @@ test_that("error if bad vcf is given", {
 
 test_that("return_stat returns correct functions", {
   expect_equal(return_stat("pi"), calc_pi)
-  expect_equal(return_stat("het"), calc_mean_het)
+  expect_equal(return_stat("Ho"), calc_mean_het)
   expect_equal(return_stat("biallelic.richness"), calc_mean_biar)
   expect_equal(return_stat("allelic.richness"), calc_mean_ar)
 })

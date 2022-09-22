@@ -29,7 +29,7 @@ window_gd(
 
 \item{lyr}{RasterLayer to slide the window across}
 
-\item{stat}{genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
+\item{stat}{genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic.richness" for average number of alleles across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
 
 \item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)}
 

@@ -241,7 +241,7 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-In addition to pi, users can calculate heterozygosity (`"het"`), allelic richness (either using `"biallelic.richness"` [faster but only works on biallelic data] or `"allelic.richness"`):
+In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic richness (either using `"biallelic.richness"` [faster but only works on biallelic data] or `"allelic.richness"`):
 
 ```{r, cache = TRUE}
 pi_wgd <- window_gd(lotr_vcf,
@@ -258,7 +258,7 @@ pi_wgd <- window_gd(lotr_vcf,
 het_wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
-          stat = "het",
+          stat = "Ho",
           fact = 3,
           wdim = 5,
           rarify_n = 2,
