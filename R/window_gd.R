@@ -7,7 +7,7 @@
 #' @param vcf object of type vcf (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
-#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic.richness" for average number of alleles across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))
+#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic_richness" for average number of alleles across all loci, or "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic_richness"))
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
@@ -16,7 +16,7 @@
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize data in window (defaults to mean)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
-#' @param rarify_alleles for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
+#' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
@@ -595,11 +595,11 @@ get_allNA <- function(x, MARGIN = NULL) {
 #' @export
 #' @noRd
 convert_vcf <- function(vcf, stat) {
-  if (stat == "allelic.richness") gen <- vcf_to_genind(vcf)
+  if (stat == "allelic_richness") gen <- vcf_to_genind(vcf)
 
   if (stat == "Ho") gen <- vcf_to_het(vcf)
 
-  if (stat == "pi" | stat == "biallelic.richness") gen <- vcf_to_dosage(vcf)
+  if (stat == "pi" | stat == "biallelic_richness") gen <- vcf_to_dosage(vcf)
 
   return(gen)
 }
@@ -630,9 +630,9 @@ name_results <- function(x, stat) {
 return_stat <- function(x) {
   if (x == "pi") stat <- calc_pi
 
-  if (x == "biallelic.richness") stat <- calc_mean_biar
+  if (x == "biallelic_richness") stat <- calc_mean_biar
 
-  if (x == "allelic.richness") stat <- calc_mean_ar
+  if (x == "allelic_richness") stat <- calc_mean_ar
 
   if (x == "Ho") stat <- calc_mean_het
 

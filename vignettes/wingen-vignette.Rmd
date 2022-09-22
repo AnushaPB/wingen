@@ -101,7 +101,7 @@ The main arguments to `window_gd()` are:
 3. `lyr` - A RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
 
 
-4. `stat` - The genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) `“allelic.richness”` which uses the `allelic.richness()` function from the hierfstat package and (2) `“biallelic.richness”`, which provides a much faster calculation of allelic richness, but only works for bi-allelic data. When calculating `“biallelic.richness”`, users can choose to rarify allele counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE` (the default) or to use the raw allele counts by setting `rarify_alleles = FALSE`. It is recommended to performed allele count rarefaction (`rarify_alleles = TRUE`) if there are missing values in the genetic data, but for datasets with no missing data it is faster to use the raw counts (`rarify_alleles = FALSE`).
+4. `stat` - The genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) `“allelic_richness”` which uses the `allelic.richness()` function from the hierfstat package and (2) `“biallelic_richness”`, which provides a much faster calculation of allelic richness, but only works for bi-allelic data. When calculating `“biallelic_richness”`, users can choose to rarify allele counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE` (the default) or to use the raw allele counts by setting `rarify_alleles = FALSE`. It is recommended to performed allele count rarefaction (`rarify_alleles = TRUE`) if there are missing values in the genetic data, but for datasets with no missing data it is faster to use the raw counts (`rarify_alleles = FALSE`).
 
 
 5. `fact` - To decrease computational time, we provide the option to aggregate the input raster layer by some factor defined using the `fact` argument. Increasing `fact` will decrease the number of cells and thereby decrease the number of calculations, with the trade-off of decreasing the resolution of the output layers. Users should keep in mind that if they increase `fact`, they may simultaneously want to decrease `wdim` because the proportion of the landscape covered by the neighborhood matrix would otherwise increase substantially. 
@@ -241,7 +241,7 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic richness (either using `"biallelic.richness"` [faster but only works on biallelic data] or `"allelic.richness"`):
+In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic richness (either using `"biallelic_richness"` [faster but only works on biallelic data] or `"allelic_richness"`):
 
 ```{r, cache = TRUE}
 pi_wgd <- window_gd(lotr_vcf,
@@ -268,7 +268,7 @@ het_wgd <- window_gd(lotr_vcf,
 AR_wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
-          stat = "biallelic.richness",
+          stat = "biallelic_richness",
           rarify_n = 2,
           rarify_nit = 5,
           fact = 3,
