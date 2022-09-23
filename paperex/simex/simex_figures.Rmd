@@ -212,13 +212,13 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
                               "heterozygosity" = mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
                                "allelic richness" = "AR",
-                               "heterozygosity" = "H")) +
+                               "heterozygosity" = bquote(H[O]))) +
   scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
                               "heterozygosity"= mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
                                "allelic richness" = "AR",
-                               "heterozygosity" = "H")) +
+                               "heterozygosity" = bquote(H[O]))) +
   guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("Number of Samples") +

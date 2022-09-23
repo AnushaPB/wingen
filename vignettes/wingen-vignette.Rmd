@@ -28,11 +28,6 @@ In short, wingen uses a moving window approach to create maps of genetic diversi
 
 [CITATION]
 
-In it, we describe wingen in this paper as follows:
-
-*"(wingen) creates continuous maps of pi, heterozygosity, and allelic richness from standard genotypic and spatial data using a moving window approach. In our approach, the landscape is divided up into cells and genetic diversity is calculated from samples falling within a window (i.e. a box) around each cell (Fig 1). In such a way, the neighborhood around each cell, as defined by the window dimensions, is treated as a population for estimating genetic diversity. The output is a map in which each cell represents the genetic diversity of the neighborhood around it. Because these neighborhoods can contain different numbers of samples, we provide options for rarefaction to control for the effects of sample size differences on measures of genetic diversity. *
-
-*We also include options for spatial interpolation to create smoother genetic diversity surfaces from the moving window maps. To do this, we use a type of interpolation known as kriging, which estimates values at unknown points using a spatial model known as a variogram. Using kriging based interpolation allows for smoothing out of discontinuities created by the moving window. Finally, the original moving window map as well as the kriged surfaces can be masked to exclude regions that were not sampled or were undersampled. Altogether, wingen provides the tools to create informative maps of genetic diversity that can be used in conservation or population genetic analyses."*
 
 ## Example
 

@@ -35,13 +35,10 @@ The results and figures from the paper were created using the
     │   └───[middle_earth] - directory with original DEM raster layers
     |
     └───[time_tests]
-    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
+    │   │   AllelicRichness_time_test.R* - generates results for allelic_richness (WGS and rr dataset)
     │   │   FULL_time_test.R* - generates results for FULL dataset
     │   │   rr_time_test.R* - generates results for rr dataset
     │   │   WGS_time_test.R* - generates results for WGS dataset
-    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
-    │   │   RarifyAlleles_time_test.R* - generates results for biallelic.richness with allele rarefaction 
-    │   │   (WGS and rr dataset)
     │   
     └───[outputs] - directory for results from time tests
 
