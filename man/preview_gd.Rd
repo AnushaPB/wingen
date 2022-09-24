@@ -11,7 +11,7 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 
 \item{coords}{coordinates (two columns, the first should be x and the second should be y)}
 
-\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)}
+\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to a 3 x 3 window)}
 
 \item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
