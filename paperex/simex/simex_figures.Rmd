@@ -16,6 +16,9 @@ library(adegenet)
 
 wdir <- here("paperex", "simex")
 source(here(wdir, "simex_functions.R"))
+
+# create plot directory
+dir.create(here(wdir, "plots"))
 ```
 
 
@@ -211,13 +214,13 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
                               "heterozygosity" = mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
-                               "allelic richness" = "AR",
+                               "allelic richness" = bquote(A[R]),
                                "heterozygosity" = bquote(H[O]))) +
   scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
                               "heterozygosity"= mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
-                               "allelic richness" = "AR",
+                               "allelic richness" = bquote(A[R]),
                                "heterozygosity" = bquote(H[O]))) +
   guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
@@ -236,4 +239,4 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
 
 ```
 
-
+These plots were then edited in Adobe Illustrator to create the final figures
