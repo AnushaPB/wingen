@@ -7,7 +7,7 @@
 plot_count(
   x,
   index = NULL,
-  breaks = 10,
+  breaks = 20,
   col = viridis::mako(breaks),
   main = NULL,
   box = FALSE,

@@ -12,7 +12,7 @@ window_gd(
   wdim = 5,
   fact = 0,
   rarify = FALSE,
-  rarify_n = 4,
+  rarify_n = 2,
   rarify_nit = 5,
   min_n = 2,
   fun = mean,
@@ -23,31 +23,33 @@ window_gd(
 )
 }
 \arguments{
-\item{vcf}{object of type vcf ( (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.))}
+\item{vcf}{object of type vcf (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
 
-\item{lyr}{RasterLayer to move the window across}
+\item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
 
-\item{stat}{genetic diversity stat to calculate (can either be "pi" for nucleotide diversity, "het" for average heterozygosity across all loci, "allelic.richness" for average allelic richness across all loci, or "biallelic.richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic.richness"))}
+\item{lyr}{RasterLayer to slide the window across}
 
-\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created}
+\item{stat}{genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic_richness" for average number of alleles across all loci, or "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic_richness"))}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (\emph{note:} increasing this value reduces computational time)}
+\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to a 3 x 3 window)}
 
-\item{rarify}{if rarify = TRUE, rarefaction is performed}
+\item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction}
+\item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
-\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction}
+\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
+
+\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5)}
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
 
-\item{fun}{function to use to summarize data in window (defaults to base R mean)}
+\item{fun}{function to use to summarize rarefaction results (defaults to mean)}
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
 
-\item{rarify_alleles}{for calculating biallelic.richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+\item{rarify_alleles}{for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
-\item{parallel}{whether to parallelize the function (see vignette for setting up a cluster to do so)}
+\item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 }
@@ -58,7 +60,7 @@ RasterStack that includes a raster of genetic diversity and a raster of the numb
 Generate a continuous raster map of genetic diversity using moving windows
 }
 \examples{
-library("raster")
+
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
 plot_gd(wpi, main = "Window pi")

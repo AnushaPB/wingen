@@ -65,4 +65,3 @@ test_that("plots without errors", {
 
   expect_error(r <- coords_to_raster(mini_coords, plot = TRUE), NA)
 })
-

@@ -179,7 +179,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify
 #'
 #' @export
 run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRUE, parallel = TRUE, ncores = 10, file.name,
-                                  stats =  c("pi", "het", "biallelic.richness")){
+                                  stats =  c("pi", "Ho", "biallelic.richness")){
   # get wdir
   wdir <- get_exdir()
 
@@ -361,19 +361,20 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @param r raster
 #' @param bkg background plot
 #' @param legend whether to plot legend
+#' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
 #'
 #' @return
 #' @export
 #'
 #' @examples
-test_simex_plot <- function(r, bkg = NULL, legend = FALSE){
+test_simex_plot <- function(r, bkg = NULL, legend = FALSE, ...){
   stat <- names(r)[1]
 
   if(stat == "pi"){zlim <- c(0, 0.31)}
   if(stat == "biallelic_richness"){zlim <- c(1, 1.95)}
-  if(stat == "heterozygosity"){zlim <- c(0, 0.29)}
+  if(stat == "Ho"){zlim <- c(0, 0.29)}
 
-  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE)
+  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE, ...)
   return(NULL)
 }
 

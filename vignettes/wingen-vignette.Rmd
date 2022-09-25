@@ -28,11 +28,6 @@ In short, wingen uses a moving window approach to create maps of genetic diversi
 
 [CITATION]
 
-In it, we describe wingen in this paper as follows:
-
-*"(wingen) creates continuous maps of pi, heterozygosity, and allelic richness from standard genotypic and spatial data using a moving window approach. In our approach, the landscape is divided up into cells and genetic diversity is calculated from samples falling within a window (i.e. a box) around each cell (Fig 1). In such a way, the neighborhood around each cell, as defined by the window dimensions, is treated as a population for estimating genetic diversity. The output is a map in which each cell represents the genetic diversity of the neighborhood around it. Because these neighborhoods can contain different numbers of samples, we provide options for rarefaction to control for the effects of sample size differences on measures of genetic diversity. *
-
-*We also include options for spatial interpolation to create smoother genetic diversity surfaces from the moving window maps. To do this, we use a type of interpolation known as kriging, which estimates values at unknown points using a spatial model known as a variogram. Using kriging based interpolation allows for smoothing out of discontinuities created by the moving window. Finally, the original moving window map as well as the kriged surfaces can be masked to exclude regions that were not sampled or were undersampled. Altogether, wingen provides the tools to create informative maps of genetic diversity that can be used in conservation or population genetic analyses."*
 
 ## Example
 
@@ -101,7 +96,7 @@ The main arguments to `window_gd()` are:
 3. `lyr` - A RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
 
 
-4. `stat` - The genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) `“allelic.richness”` which uses the `allelic.richness()` function from the hierfstat package and (2) `“biallelic.richness”`, which provides a much faster calculation of allelic richness, but only works for bi-allelic data. When calculating `“biallelic.richness”`, users can choose to rarify allele counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE` (the default) or to use the raw allele counts by setting `rarify_alleles = FALSE`. It is recommended to performed allele count rarefaction (`rarify_alleles = TRUE`) if there are missing values in the genetic data, but for datasets with no missing data it is faster to use the raw counts (`rarify_alleles = FALSE`).
+4. `stat` - The genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (pi), average allelic richness, or average heterozygosity. Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) `“allelic_richness”` which uses the `allelic.richness()` function from the hierfstat package and (2) `“biallelic_richness”`, which provides a much faster calculation of allelic richness, but only works for bi-allelic data. When calculating `“biallelic_richness”`, users can choose to rarify allele counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE` (the default) or to use the raw allele counts by setting `rarify_alleles = FALSE`. It is recommended to performed allele count rarefaction (`rarify_alleles = TRUE`) if there are missing values in the genetic data, but for datasets with no missing data it is faster to use the raw counts (`rarify_alleles = FALSE`).
 
 
 5. `fact` - To decrease computational time, we provide the option to aggregate the input raster layer by some factor defined using the `fact` argument. Increasing `fact` will decrease the number of cells and thereby decrease the number of calculations, with the trade-off of decreasing the resolution of the output layers. Users should keep in mind that if they increase `fact`, they may simultaneously want to decrease `wdim` because the proportion of the landscape covered by the neighborhood matrix would otherwise increase substantially. 
@@ -241,7 +236,7 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-In addition to pi, users can calculate heterozygosity (`"het"`), allelic richness (either using `"biallelic.richness"` [faster but only works on biallelic data] or `"allelic.richness"`):
+In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic richness (either using `"biallelic_richness"` [faster but only works on biallelic data] or `"allelic_richness"`):
 
 ```{r, cache = TRUE}
 pi_wgd <- window_gd(lotr_vcf,
@@ -258,7 +253,7 @@ pi_wgd <- window_gd(lotr_vcf,
 het_wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
-          stat = "het",
+          stat = "Ho",
           fact = 3,
           wdim = 5,
           rarify_n = 2,
@@ -268,7 +263,7 @@ het_wgd <- window_gd(lotr_vcf,
 AR_wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
-          stat = "biallelic.richness",
+          stat = "biallelic_richness",
           rarify_n = 2,
           rarify_nit = 5,
           fact = 3,
@@ -283,5 +278,41 @@ plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
 plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
 ```
 
-### For additional information, see our paper found here: [LINK]
+# General moving window 
+
+We provide a `window_general` function that can be used to make moving window maps for other types of data inputs and functions. Unlike `window_gd`, `window_general` does not require a `vcfR` or a path to a vcf file as input. 
+
+The required input (`x`) depends on the statistic being calculated. 
+
+For the standard genetic diversity statistics: 
+- If `stat = pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2. 
+- If `stat = het`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity.
+- If `stat =  allelic_richness`, `x` must be a `genind` type object. 
+
+For other statistics:
+- If `x` is  a vector, `stat` can be any function that can be applied to a vector (e.g. `stat = mean, var, sum, etc.`). 
+- If `x` is a matrix or data frame (note: rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, use with caution)*.
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+# As an example, let's create a moving window map of our raster layer values (e.g. carrying capacity and conductance, in this case) at the sample coordinates
+
+# First, we extract the raster values at those coordinates
+vals <- raster::extract(lotr_lyr, lotr_coords)
+
+# Next, we run the window_general function with the env vector and set the stat to mean
+# Note: we can also provide additional arguments to functions, such as na.rm = TRUE
+we <- window_general(vals, 
+                     coords = lotr_coords,
+                     lyr = lotr_lyr, 
+                     stat = mean, 
+                     rarify_n = 2, 
+                     rarify_nit = 5,
+                     fact = 3, 
+                     wdim = 5, 
+                     rarify = TRUE, 
+                     na.rm = TRUE)
+
+plot_gd(we, bkg = lotr_range, main = "Mean raster value")
+```
+
 

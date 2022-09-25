@@ -46,7 +46,7 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
 #'
 #' @export
 #' @noRd
-make_raster <- function(coords, buffer = 0, res = NULL){
+make_raster <- function(coords, buffer = 0, res = NULL) {
   # format coords
   coords <- data.frame(coords)
   colnames(coords) <- c("x", "y")
@@ -68,10 +68,9 @@ make_raster <- function(coords, buffer = 0, res = NULL){
   raster::extent(r) <- c(xmin, xmax, ymin, ymax)
 
   # set resolution
-  if(length(res) > 2) stop("invalid res provided")
-  if(!is.null(res)) raster::res(r) <- res
+  if (length(res) > 2) stop("invalid res provided")
+  if (!is.null(res)) raster::res(r) <- res
 
 
   return(r)
-
 }

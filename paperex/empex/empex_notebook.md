@@ -126,13 +126,13 @@ the resulting rasters:
 ``` r
 # Run moving window
 set.seed(22)
-system.time(hg <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+system.time(hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
 system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 set.seed(22)
-system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
@@ -169,13 +169,13 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 ``` r
 set.seed(22)
-hgn <- window_gd(vcf, coords, lyr, stat = "het", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+hgn <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
 
 set.seed(22)
 pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
 
 set.seed(22)
-agn <- window_gd(vcf, coords, lyr, stat = "biallelic.richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
+agn <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
 ```
 
 ``` r

@@ -43,7 +43,7 @@ extent(agg2) <- c(0,110,0,110)
 # Crop to 100 x 100
 crp3 <- crop(agg2, c(0,100,0,100))
 
-# Rescale from 0 to 1
+# Rescale
 rms <- rescale(crp3)
 # Turn into matrix
 m <- as.matrix(rms)

@@ -11,13 +11,14 @@ knitr::opts_chunk$set(
 )
 ```
 
-# wingen <img src="man/figures/logo.png" align="right" height=150 />
+# wingen <img src="man/figures/logo.png" align="right" height="150"/>
 
 <!-- badges: start -->
+
 <!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
-[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
-[![build](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
-[![license: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen) [![build](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml) [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+
 <!-- badges: end -->
 
 Generate continuous maps of genetic diversity using moving windows with options for rarefaction, kriging, and masking.
@@ -72,14 +73,14 @@ plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
 plot_count(kgd_counts, main = "Kriged sample counts", legend.width = 1.5)
 ```
 
-Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to exclude areas that fall outside of the study area or that were undersampled. 
+Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to exclude areas that fall outside of the study area or that were undersampled.
 
 ```{r mask_gd, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
 # Mask results that fall outside of the "range"
 mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 # Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 3)
+mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 ```
 
 ```{r result, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
@@ -89,12 +90,10 @@ plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
 plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
 ```
 
-
-For an extended example, see the package vignette:
+For an extended walk through, see the package vignette:
 
 ``` r
 vignette("wingen-vignette")
 ```
 
-
-
+Example analyses from Bishop et al. 202X can be found in the  [paperex](https://github.com/AnushaPB/wingen/tree/main/paperex) directory.

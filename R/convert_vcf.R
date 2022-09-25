@@ -3,10 +3,9 @@
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #'
-#' @return returns dosage matrix#'
+#' @return dosage matrix
 #'
 #' @export
-#' @noRd
 vcf_to_dosage <- function(x) {
   # check vcf
   vcf <- vcf_check(x)
@@ -38,15 +37,17 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
   # convert to genind
   genind <- vcfR::vcfR2genind(vcf)
 
-
   # leave pops NULL if pops is FALSE
-  if (is.logical(pops)) if (!pops) return(genind)
+  if (is.logical(pops)) if (!pops) {
+    return(genind)
+  }
 
   # assign pops if null or pop vector provided
   if (is.null(pops)) genind$pop <- as.factor(1:nrow(genind@tab))
-  if (is.vector(pops))
+  if (is.vector(pops)) {
     if (length(pops) != nrow(genind@tab)) stop("length of pops does not match number of individuals in genind")
-        genind$pop <- as.factor(pops)
+  }
+  genind$pop <- as.factor(pops)
 
   return(genind)
 }
@@ -85,19 +86,17 @@ vcf_to_het <- function(x) {
 #' @export
 #' @noRd
 vcf_check <- function(x) {
-  if (class(x)[1] == "vcfR")
-
+  if (class(x)[1] == "vcfR") {
     vcf <- x
-
-  else if (is.character(x)) {
-
-    if (file.exists(x))
+  } else if (is.character(x)) {
+    if (file.exists(x)) {
       vcf <- vcfR::read.vcfR(x)
-
-    else
+    } else {
       stop("Cannot open file: No such file or directory")
-
-  } else stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
+    }
+  } else {
+    stop("Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
+  }
 
   return(vcf)
 }

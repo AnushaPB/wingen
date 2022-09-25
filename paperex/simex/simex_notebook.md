@@ -196,8 +196,8 @@ tdf <- dplyr::bind_rows(get_timeout("rr", rarify = "TRUE", parallel = "FALSE", n
                         get_timeout("WGS", rarify = "TRUE", parallel = "TRUE", nsamp = 200)
                         )
 
-tdf[tdf$dataset == "rr", "dataset"] <- "10,000 loci (w/o Parallelization)"
-tdf[tdf$dataset == "WGS", "dataset"] <- "100,000 loci (w/ Parallelization)"
+tdf[tdf$dataset == "rr", "dataset"] <- "(a)"
+tdf[tdf$dataset == "WGS", "dataset"] <- "(b)"
 
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "grey80", lwd = 1) + 
@@ -211,22 +211,32 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
             vjust = -0.5, position=position_dodge(width = .9)) + 
-  scale_color_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
-                              "allelic richness"=mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity"=mako(3, begin = 0.3, end = 0.8)[3])) +
+  scale_color_manual(values=c("pi"= mako(3, begin = 0.3, end = 0.8)[1], 
+                              "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
+                              "heterozygosity" = mako(3, begin = 0.3, end = 0.8)[3]), 
+                    labels = c("pi" = expression(pi),
+                               "allelic richness" = "AR",
+                               "heterozygosity" = "H")) +
   scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
-                              "allelic richness"=mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity"=mako(3, begin = 0.3, end = 0.8)[3])) +
+                              "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
+                              "heterozygosity"= mako(3, begin = 0.3, end = 0.8)[3]), 
+                    labels = c("pi" = expression(pi),
+                               "allelic richness" = "AR",
+                               "heterozygosity" = "H")) +
   guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
-  xlab("number of samples") +
-  ylab("time (seconds)") +
+  xlab("Number of Samples") +
+  ylab("Time (seconds)") +
   ylim(0,1000) +
   theme_bw() +
   theme(panel.grid.minor.y = element_blank(), 
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
-        panel.grid.major.x = element_blank())
+        panel.grid.major.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text.x = element_text(size = 14, hjust = 0),
+        legend.title=element_blank(),
+        legend.text = element_text(size=12))
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->

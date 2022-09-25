@@ -24,7 +24,10 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
   preview_window(lyr, nmat, coords)
 
   # plot count preview and return count raster
-  if (sample_count) {lyrc <- preview_count(lyr, coords, nmat, min_n); return(lyrc)}
+  if (sample_count) {
+    lyrc <- preview_count(lyr, coords, nmat, min_n)
+    return(lyrc)
+  }
 }
 
 #' Plot preview of moving window
@@ -35,7 +38,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 #'
 #' @export
 #' @noRd
-preview_window <- function(lyr, nmat, coords){
+preview_window <- function(lyr, nmat, coords) {
   # get center of raster
   center <- get_center(lyr)
 
@@ -54,7 +57,7 @@ preview_window <- function(lyr, nmat, coords){
   raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
   if (!is.null(coords)) graphics::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
-  }
+}
 
 #' Get center cell of a raster
 #'
@@ -62,7 +65,7 @@ preview_window <- function(lyr, nmat, coords){
 #'
 #' @export
 #' @noRd
-get_center <- function(x){
+get_center <- function(x) {
   e <- as.vector(raster::extent(x))
   c <- c(mean(e[c(1, 2)]), mean(e[c(3, 4)]))
   center <- raster::cellFromXY(x, c)
@@ -77,7 +80,7 @@ get_center <- function(x){
 #'
 #' @export
 #' @noRd
-preview_count <- function(lyr, coords, nmat, min_n){
+preview_count <- function(lyr, coords, nmat, min_n) {
   # get coord cells
   coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
 

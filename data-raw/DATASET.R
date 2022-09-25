@@ -28,7 +28,7 @@ lotr_coords <- lotr_coords[samples, ]
 # load genetic data
 # check if file exists locally and if not download it from figshare
 file <- "inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"
-if(!file.exists(file)){
+if (!file.exists(file)) {
   download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
 }
 vcf <- vcfR::read.vcfR(file)
@@ -54,7 +54,7 @@ usethis::use_data(lotr_vcf, overwrite = TRUE)
 mini_lyr <- raster::aggregate(lotr_lyr, 10)
 
 mini_vcf <- lotr_vcf[, 1:11]
-mini_vcf <- mini_vcf[is.polymorphic(mini_vcf),]
+mini_vcf <- mini_vcf[is.polymorphic(mini_vcf), ]
 mini_vcf <- mini_vcf[1:10, ]
 
 mini_coords <- lotr_coords[1:10, ]
