@@ -75,6 +75,7 @@ default_params.R
 paperex/simex/RData/
 paperex/simex/bdrive/
 paperex/simex/GNX_mod-sims_params
+paperex/simex/plots
 !paperex/simex/outputs/*.tif
 !paperex/simex/data/samples_seed42.csv
 !paperex/simex/data/middle_earth.csv
@@ -83,8 +84,10 @@ paperex/simex/GNX_mod-sims_params
 # EMPIRICAL
 paperex/empex/EEMS
 paperex/empex/EEMS_notebook.Rmd
+paperex/plots
 !paperex/empex/data/Scelop.coords
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
+
 cov_token.R
