@@ -153,6 +153,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify
                       parallel = parallel, ncores = ncores)
 
   df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
+                   stat = stat,
                    fact = fact,
                    wdim = wdim)
 
