@@ -179,7 +179,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify
 #'
 #' @export
 run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRUE, parallel = TRUE, ncores = 10, file.name,
-                                  stats =  c("pi", "Ho", "biallelic.richness")){
+                                  stats =  c("pi", "Ho", "biallelic_richness")){
   # get wdir
   wdir <- get_exdir()
 
