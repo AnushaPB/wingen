@@ -158,24 +158,6 @@ plot_gd(mhg, legend.width = 2,legend.shrink = 0.5, axis.args = list(cex.axis = 2
 dev.off()
 ```
 
-```{r}
-# load data & plot
-require(raster); data(volcano); r <- raster(volcano)
-plot(r, col=topo.colors(100), legend=FALSE, axes=FALSE)
-r.range <- c(minValue(r), maxValue(r))
-
-plot(r, legend.only=TRUE, col=topo.colors(100), legend.width=1, legend.shrink=0.75,
-    smallplot=c(0,.09, .3,.75)); par(mar = par("mar"))
-
-plot(r, legend.only=TRUE, col=topo.colors(100), legend.width=1, legend.shrink=0.75,
-    smallplot=c(0.3,0.5, 0.2,0.7)); par(mar = par("mar"))
-
-plot(r, legend.only=TRUE, col=topo.colors(100), legend.width=1, legend.shrink=0.75,
-    smallplot=c(0.85,0.9, 0.7,0.9)); par(mar = par("mar"))
-
-plot(r, legend.only=TRUE, col=topo.colors(100), legend.width=1, legend.shrink=0.75,
-    smallplot=c(0.7,0.90, 0.05,0.2)); par(mar = par("mar"))
-```
 
 ### **Figure S5:**  moving window calculations with and without rarefaction 
 
