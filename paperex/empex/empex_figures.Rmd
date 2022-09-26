@@ -68,7 +68,7 @@ dev.off()
 ```{r, fig.width = 3, fig.height = 5}
 pdf(here(wdir, "plots", "figure_4.2.pdf"))
 par(mar = rep(0,4))
-plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
+plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 3, main = "")
 dev.off()
 ```
 
@@ -108,13 +108,19 @@ And ran the moving window function again, this time kriging and masking the resu
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, message = FALSE, results = FALSE, warning = FALSE}
 # Run moving window
 set.seed(22)
-system.time(hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 set.seed(22)
-system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 set.seed(22)
-system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
@@ -133,18 +139,18 @@ mhg <- mask(khg, NUS)
 pdf(here(wdir, "plots", "figure_4.3.pdf"), width = 20, height = 10)
 par(mfrow = c(1,3), mar = rep(1.8,4), oma = rep(2.5,4))
 plot_gd(mpg, legend = FALSE)
-plot(NUS, add = TRUE, col = NA, border = "white", lwd = 2)
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2)
+plot(NUS, add = TRUE, col = NA, border = "white", lwd = 3)
+points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2.1)
 plot_gd(mpg, smallplot = c(0.0, .02, .2,.75), legend.width = 2, legend.shrink = 0.1, axis.args = list(cex.axis = 3), legend.only = TRUE, add = TRUE)
 
 plot_gd(mag, legend = FALSE)
-plot(NUS, add = TRUE, col = NA, border = "white", lwd = 2)
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2)
+plot(NUS, add = TRUE, col = NA, border = "white", lwd = 3)
+points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2.1)
 plot_gd(mag, smallplot = c(0.0, .02, .2,.75), legend.width = 2, legend.shrink = 0.1, axis.args = list(cex.axis = 3), legend.only = TRUE, add = TRUE)
 
 plot_gd(mhg, legend = FALSE)
-plot(NUS, add = TRUE, col = NA, border = "white", lwd = 2)
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2)
+plot(NUS, add = TRUE, col = NA, border = "white", lwd = 3)
+points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 2.1)
 plot_gd(mhg, smallplot = c(0.0, .02, .2,.75), legend.width = 2,legend.shrink = 0.1, axis.args = list(cex.axis = 3), legend.only = TRUE, add = TRUE)
 dev.off()
 
