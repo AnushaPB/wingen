@@ -76,7 +76,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 #' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,
 #' `window_general` can be used to make moving window maps from different data inputs. Unlike `window_gd`, `window_general` will not convert your data into
 #' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2 To calculate
-#' `het`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
+#' `Ho`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
 #' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g. `stat = mean`, `var`, `sum`, etc.).
 #' `x` can also be a matrix or data frame (where rows are individuals), and then `stat` can be any function that takes a matrix or data frame and outputs a
 #' single numeric value (e.g., a function that produces a custom diversity index), however this should be attempted with caution since this functionality has

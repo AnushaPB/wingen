@@ -144,7 +144,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 ```{r, fig.width = 6.75, fig.height = 4.5, cache = TRUE}
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
                                rarify = c("TRUE", "FALSE"),
-                               stat = c("pi", "biallelic_richness", "heterozygosity")))
+                               stat = c("pi", "biallelic_richness", "Ho")))
 
 # Get example layers for masking (doesn't matter which parameters other than nsamp)
 msk_lyr100 <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = 100)
@@ -212,16 +212,16 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
             vjust = -0.5, position=position_dodge(width = .9)) + 
   scale_color_manual(values=c("pi"= mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity" = mako(3, begin = 0.3, end = 0.8)[3]), 
+                              "Ho" = mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
                                "allelic richness" = bquote(A[R]),
-                               "heterozygosity" = bquote(H[O]))) +
+                               "Ho" = bquote(H[O]))) +
   scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity"= mako(3, begin = 0.3, end = 0.8)[3]), 
+                              "Ho"= mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
                                "allelic richness" = bquote(A[R]),
-                               "heterozygosity" = bquote(H[O]))) +
+                               "Ho" = bquote(H[O]))) +
   guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("Number of Samples") +
