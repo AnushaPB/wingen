@@ -284,7 +284,7 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   file <- here(rootPath, locFile)
   r <- purrr::map_dfr(file, read.csv)
 
-  r$stat <- c("pi", "heterozygosity", "allelic richness")
+  r$stat <- c("pi", "Ho", "allelic richness")
   r$parallel <- parallel
   r$rarify <- rarify
   r$nsamp <- nsamp
@@ -370,9 +370,10 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 test_simex_plot <- function(r, bkg = NULL, legend = FALSE, ...){
   stat <- names(r)[1]
 
-  if(stat == "pi"){zlim <- c(0, 0.31)}
-  if(stat == "biallelic_richness"){zlim <- c(1, 1.95)}
-  if(stat == "Ho"){zlim <- c(0, 0.29)}
+  if(stat == "pi") zlim <- c(0, 0.31)
+  if(stat == "biallelic_richness") zlim <- c(1, 1.95)
+  if(stat == "Ho") zlim <- c(0, 0.29)
+  if(!exists("zlim")) stop(paste(names(r)[1], "is not a valid stat"))
 
   plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE, ...)
   return(NULL)
