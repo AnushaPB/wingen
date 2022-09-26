@@ -38,10 +38,9 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(vcf)
 
-  # check to make sure coords and gen align and remove individuals or markers with no scores
-  data <- check_data(vcf, coords)
-  vcf <- data[["vcf"]]
-  coords <- data[["coords"]]
+  # check that coords and gen align and reformat data, if necessary
+  # note: list2env adds the new, corrected vcf and coords back to the environment
+  list2env(check_data(vcf, coords), envir = environment())
 
   # convert vcf based on statistic being calculated
   gen <- convert_vcf(vcf, stat)
@@ -101,15 +100,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # replace stat with function to calculate the desired statistic
   stat <- return_stat(stat, ...)
 
-  # format coords
-  coords <- data.frame(coords)
-  colnames(coords) <- c("x", "y")
-
-  # convert vector to dataframe
-  if(is.vector(x)) x <- data.frame(x)
-
-  # confirm that coords and gen align
-  check_data(x, coords)
+  # check that coords and gen align and reformat data, if necessary
+  #note: list2env adds the new, corrected x and coords back to the environment
+  list2env(check_data(x, coords), envir = environment())
 
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
@@ -507,8 +500,15 @@ countgen <- function(x) {
 #' @noRd
 check_data <- function(x, coords = NULL) {
 
-  # check for one individual
-  if (!is.null(coords)) if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
+  # if x is a vector, convert to a dataframe
+  if(is.vector(x)) x <- data.frame(x)
+
+  # format coords
+  if (!is.null(coords)){
+    coords <- data.frame(coords)
+    colnames(coords) <- c("x", "y")
+    if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
+  }
 
   # check number of samples
   if (inherits(x, "genind")) nind <- nrow(x$tab)
@@ -516,8 +516,6 @@ check_data <- function(x, coords = NULL) {
   if (inherits(x, "vcfR")) nind <- (ncol(x@gt) - 1)
 
   if (inherits(x, "data.frame") | inherits(x, "matrix")) nind <- nrow(x)
-
-  if (is.vector(x)) nind <- length(x)
 
   # check coords
   if (!is.null(coords)) {
@@ -527,7 +525,7 @@ check_data <- function(x, coords = NULL) {
   }
 
   # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
-  if (inherits(x, "vcfR")) return(check_vcf_NA(x, coords))
+  if (inherits(x, "vcfR")) return(check_vcf_NA(x, coords)) else return(list(x = x, coords = coords))
 
 }
 

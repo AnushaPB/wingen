@@ -2,7 +2,7 @@
 
 test_that("window_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
-  expect_error(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE), NA)
+  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
   expect_s4_class(wpi, "RasterStack")
   expect_equal(raster::nlayers(wpi), 2)
 })
