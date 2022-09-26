@@ -15,6 +15,9 @@ library(purrr)
 
 wdir <- here("paperex", "empex")
 source(here(wdir, "empex_functions.R"))
+
+# create plot directory
+dir.create(here(wdir, "plots"))
 ```
 
 # Empirical Dataset
@@ -216,3 +219,4 @@ par(mar = rep(0,4))
 plot_count(ag)
 ```
 
+These plots were then edited in Adobe Illustrator to create the final figures
