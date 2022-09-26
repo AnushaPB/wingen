@@ -11,9 +11,9 @@ cp GNX_mod-sim/it-0/spp-spp_0/*1000* data
 Rscript create_dataset.R
 
 # Run time tests
-Rscript time_tests/rr_time_test.R
-Rscript time_tests/WGS_time_test.R
-Rscript time_tests/FULL_time_test.R
-Rscript time_tests/AllelicRichness_time_test.R
+Rscript simex_tests/rr_simex_test.R
+Rscript simex_tests/WGS_simex_test.R
+Rscript simex_tests/FULL_simex_test.R
+Rscript simex_tests/AllelicRichness_simex_test.R
 
 # The rest of the analysis is carried out in the simex_notebook.Rmd
