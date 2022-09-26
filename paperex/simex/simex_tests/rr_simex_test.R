@@ -1,6 +1,4 @@
 library(wingen)
-library(foreach)
-library(doParallel)
 library(here)
 source(here("paperex", "simex", "simex_functions.R"))
 
