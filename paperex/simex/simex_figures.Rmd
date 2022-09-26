@@ -186,8 +186,8 @@ dev.off()
 ## Figure S3: Computational time for simulation example
 
 ```{r, warning = FALSE}
-# Loop reads in outputs from time_tests functions
-# To recreate these outputs use the run_sims.sh script (or run the scripts within time_tests individually)
+# Loop reads in outputs from simex_tests functions
+# To recreate these outputs use the run_sims.sh script (or run the scripts within simex_tests individually)
 
 tdf <- dplyr::bind_rows(get_timeout("rr", rarify = "TRUE", parallel = "FALSE", nsamp = 100),
                         get_timeout("rr", rarify = "TRUE", parallel = "FALSE", nsamp = 200),
