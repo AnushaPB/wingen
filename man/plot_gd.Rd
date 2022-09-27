@@ -28,6 +28,8 @@ plot_gd(
 
 \item{main}{character. Main plot title}
 
+\item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
+
 \item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
         such as axes=FALSE, main='title', ylab='latitude'}
 }

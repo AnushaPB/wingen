@@ -83,7 +83,6 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
 #'
 #' @inheritParams krig_gd
 #'
-#' @export
 #' @noRd
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
                         agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
@@ -130,7 +129,6 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 #' @param krig_grid grid for kriging
 #' @inheritParams krig_gd
 #'
-#' @export
 #' @noRd
 krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_correction = TRUE) {
   # autokrige
@@ -165,7 +163,6 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_
 #'
 #' @inheritParams krig_gd
 #'
-#' @export
 #' @noRd
 make_krig_df <- function(r, coords = NULL) {
 
@@ -196,7 +193,6 @@ make_krig_df <- function(r, coords = NULL) {
 #'
 #' @inheritParams krig_gd
 #'
-#' @export
 #' @noRd
 make_krige_grid <- function(r = NULL, grd = NULL) {
   if (is.null(grd)) {
@@ -217,7 +213,6 @@ make_krige_grid <- function(r = NULL, grd = NULL) {
 #'
 #' @return gridded SpatialPixelsDataFrame
 #'
-#' @export
 #' @noRd
 raster_to_grid <- function(x) {
   grd <- data.frame(raster::rasterToPoints(x))
@@ -230,7 +225,6 @@ raster_to_grid <- function(x) {
 #'
 #' @inheritParams krig_gd
 #'
-#' @export
 #' @noRd
 raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL, resample_first = TRUE) {
   if (raster::nlayers(r) > 1) stop(">1 layer provided for r")

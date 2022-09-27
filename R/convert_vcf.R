@@ -1,5 +1,5 @@
 
-#' Convert vcf to dosage matrix
+#' Convert a vcf to a dosage matrix
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
 #'
@@ -27,7 +27,6 @@ vcf_to_dosage <- function(x) {
 #'
 #' @return returns genind object
 #'
-#' @export
 #' @noRd
 vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 
@@ -58,7 +57,6 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' #'
 #' @return heterozygosity matrix
 #'
-#' @export
 #' @noRd
 vcf_to_het <- function(x) {
   # check vcf
@@ -83,7 +81,6 @@ vcf_to_het <- function(x) {
 #'
 #' @return vcf object
 #'
-#' @export
 #' @noRd
 vcf_check <- function(x) {
   if (class(x)[1] == "vcfR") {

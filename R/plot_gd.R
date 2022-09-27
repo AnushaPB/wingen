@@ -3,10 +3,12 @@
 #' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
+#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)
 #' @param bkg optional RasterLayer or other spatial object that will be plotted as the "background" in gray
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
-#' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)
+#' @param box whether to include a box around the Raster plot (defaults to FALSE)
+#'
 #' @inheritParams raster::plot
 #'
 #' @return plot of genetic diversity
@@ -31,7 +33,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0)
+      graphics::title(main = list(main, font = 1), adj = 0)
     }
   })
 
@@ -42,7 +44,6 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @inheritParams plot_gd
 #'
-#' @export
 #' @noRd
 plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
 
@@ -84,7 +85,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
     )
   })
 
-  title(main = list(main, font = 1), adj = 0)
+  graphics::title(main = list(main, font = 1), adj = 0)
 
   return()
 }
@@ -97,6 +98,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #' @param index if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)
 #' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
+#' @param box whether to include a box around the Raster plot (defaults to FALSE)
 #' @inheritParams plot_gd
 #' @inheritParams raster::plot
 #'
@@ -119,7 +121,7 @@ plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks)
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0)
+      graphics::title(main = list(main, font = 1), adj = 0)
     }
 
     if (raster::nlayers(x) == 1) {
@@ -129,7 +131,7 @@ plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks)
         box = box,
         ...
       )
-      title(main = list(main, font = 1), adj = 0)
+      graphics::title(main = list(main, font = 1), adj = 0)
     }
   })
 

@@ -44,7 +44,6 @@ coords_to_raster <- function(coords, buffer = 0, res = NULL, agg = NULL, disagg 
 #'
 #' @inheritParams coords_to_raster
 #'
-#' @export
 #' @noRd
 make_raster <- function(coords, buffer = 0, res = NULL) {
   # format coords

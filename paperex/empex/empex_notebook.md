@@ -126,13 +126,19 @@ the resulting rasters:
 ``` r
 # Run moving window
 set.seed(22)
-system.time(hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 set.seed(22)
-system.time(pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 set.seed(22)
-system.time(ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5))
+st <- Sys.time()
+ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
 
 # Krige and mask layers
 kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)

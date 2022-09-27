@@ -36,7 +36,6 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 #' @param nmat neighbor matrix
 #' @param coords coordinates
 #'
-#' @export
 #' @noRd
 preview_window <- function(lyr, nmat, coords) {
   # get center of raster
@@ -63,7 +62,6 @@ preview_window <- function(lyr, nmat, coords) {
 #'
 #' @param x raster
 #'
-#' @export
 #' @noRd
 get_center <- function(x) {
   e <- as.vector(raster::extent(x))
@@ -78,7 +76,6 @@ get_center <- function(x) {
 #' @param coords coordinates
 #' @param nmat neighborhood matrix
 #'
-#' @export
 #' @noRd
 preview_count <- function(lyr, coords, nmat, min_n) {
   # get coord cells
@@ -101,7 +98,7 @@ preview_count <- function(lyr, coords, nmat, min_n) {
 
   # plot results
   raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE)
-  title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
+  graphics::title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
 
   return(lyrc)
 }
@@ -113,7 +110,6 @@ preview_count <- function(lyr, coords, nmat, min_n) {
 #' @param nmat neighborhood matrix
 #' @param coord_cells cell indexes of coordinates
 #'
-#' @export
 #' @noRd
 sample_count <- function(x, lyr, nmat, coord_cells) {
   sub <- get_adj(x, lyr, nmat, coord_cells)

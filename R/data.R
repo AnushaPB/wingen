@@ -55,6 +55,14 @@
 #' @source created from simulations in Bishop et al., 202X
 "mini_vcf"
 
+#' Mini middle earth example vcf with NA values
+#'
+#' A Variant Call Format data set with NA values
+#'
+#' @format Object of class vcfR with 10 individuals and 10 loci
+#' @source created from simulations in Bishop et al., 202X
+"mini_vcf_NA"
+
 #' Mini middle earth example raster
 #'
 #' RasterLayer of middle earth from CITE
