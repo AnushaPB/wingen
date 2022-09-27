@@ -14,7 +14,7 @@ MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badg
 <!-- badges: end -->
 
 Generate continuous maps of genetic diversity using moving windows with
-options for rarefaction, kriging, and masking.
+options for rarefaction, interpolation, and masking.
 
 ## Installation
 
@@ -53,8 +53,8 @@ wgd <- window_gd(lotr_vcf,
           lotr_coords,
           lotr_lyr,
           stat = "pi",
-          wdim = 5,
-          fact = 4,
+          wdim = 7,
+          fact = 3,
           rarify = TRUE)
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
@@ -87,7 +87,7 @@ undersampled.
 
 ``` r
 # Mask results that fall outside of the "range"
-mgd_lyr <- mask_gd(kgd, lotr_range, minval = 0.01)
+mgd_lyr <- mask_gd(kgd, lotr_range)
 
 # Further mask results in areas where the sample count was less than minval
 mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
