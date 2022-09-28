@@ -43,7 +43,6 @@ test_that("check that setting the seed produces the same results", {
   set.seed(42)
   wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2)
   expect_equal(wg1p, wg2p)
-
 })
 
 test_that("all stats work with just one locus", {
@@ -266,7 +265,7 @@ test_that("return_stat returns correct functions", {
   expect_equal(return_stat("allelic_richness"), calc_mean_ar)
 
   # check custom functions work
-  x <- c(1,2,NA)
+  x <- c(1, 2, NA)
   foo <- return_stat(mean, na.rm = TRUE)
   expect_equal(foo(x), 1.5)
   foo <- return_stat(mean, na.rm = FALSE)
@@ -324,7 +323,7 @@ test_that("custom functions with window general work", {
   # examples with custom functions
   toy <- vcf_to_dosage(mini_vcf_NA)
   # test on vector
-  wm <- window_general(toy[,1], mini_coords, mini_lyr, stat = mean, na.rm = TRUE)
+  wm <- window_general(toy[, 1], mini_coords, mini_lyr, stat = mean, na.rm = TRUE)
   # test on matrix
   wm <- window_general(toy, mini_coords, mini_lyr, stat = mean, na.rm = TRUE)
   # test custom functions
@@ -332,6 +331,6 @@ test_that("custom functions with window general work", {
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo)
   foo <- function(x, na.rm = TRUE) var(apply(x, 2, var))
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE)
-  foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var))*silly
+  foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3)
 })

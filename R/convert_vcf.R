@@ -37,8 +37,10 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
   genind <- vcfR::vcfR2genind(vcf)
 
   # leave pops NULL if pops is FALSE
-  if (is.logical(pops)) if (!pops) {
-    return(genind)
+  if (is.logical(pops)) {
+    if (!pops) {
+      return(genind)
+    }
   }
 
   # assign pops if null or pop vector provided

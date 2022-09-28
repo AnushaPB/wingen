@@ -38,7 +38,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(vcf)
 
-  # check that coords and gen align and reformat data, if necessary
+  # check that coords and vcf align and reformat data, if necessary
   # note: list2env adds the new, corrected vcf and coords back to the environment
   list2env(check_data(vcf, coords), envir = environment())
 
@@ -100,8 +100,8 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # replace stat with function to calculate the desired statistic
   stat <- return_stat(stat, ...)
 
-  # check that coords and gen align and reformat data, if necessary
-  #note: list2env adds the new, corrected x and coords back to the environment
+  # check that coords and x align and reformat data, if necessary
+  # note: list2env adds the new, corrected x and coords back to the environment
   list2env(check_data(x, coords), envir = environment())
 
   # make neighbor matrix
@@ -235,7 +235,7 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
   }
 
   # define subsample to rarify
-   if (rarify_nit == "all") {
+  if (rarify_nit == "all") {
     # get all possible combos (transpose so rows are unique combos)
     cmb <- t(utils::combn(sub, rarify_n))
   } else if (choose(length(sub), rarify_n) < rarify_nit) {
@@ -491,10 +491,10 @@ countgen <- function(x) {
 check_data <- function(x, coords = NULL) {
 
   # if x is a vector, convert to a dataframe
-  if(is.vector(x)) x <- data.frame(x)
+  if (is.vector(x)) x <- data.frame(x)
 
   # format coords
-  if (!is.null(coords)){
+  if (!is.null(coords)) {
     coords <- data.frame(coords)
     colnames(coords) <- c("x", "y")
     if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
@@ -515,8 +515,11 @@ check_data <- function(x, coords = NULL) {
   }
 
   # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
-  if (inherits(x, "vcfR")) return(check_vcf_NA(x, coords)) else return(list(x = x, coords = coords))
-
+  if (inherits(x, "vcfR")) {
+    return(check_vcf_NA(x, coords))
+  } else {
+    return(list(x = x, coords = coords))
+  }
 }
 
 #' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
@@ -588,14 +591,19 @@ get_allNA <- function(x, MARGIN = NULL) {
 #'
 #' @noRd
 convert_vcf <- function(vcf, stat) {
-  if (stat == "allelic_richness") return(vcf_to_genind(vcf))
+  if (stat == "allelic_richness") {
+    return(vcf_to_genind(vcf))
+  }
 
-  if (stat == "Ho") return(vcf_to_het(vcf))
+  if (stat == "Ho") {
+    return(vcf_to_het(vcf))
+  }
 
-  if (stat == "pi" | stat == "biallelic_richness") return(vcf_to_dosage(vcf))
+  if (stat == "pi" | stat == "biallelic_richness") {
+    return(vcf_to_dosage(vcf))
+  }
 
   stop(paste0(stat, " is an invalid arugment for stat"))
-
 }
 
 #' Rename results from window_gd
@@ -621,17 +629,25 @@ name_results <- function(x, stat) {
 #'
 #' @noRd
 return_stat <- function(stat, ...) {
-  if (inherits(stat, "function")) return(purrr::partial(stat, ...))
+  if (inherits(stat, "function")) {
+    return(purrr::partial(stat, ...))
+  }
 
-  if (stat == "pi") return(calc_pi)
+  if (stat == "pi") {
+    return(calc_pi)
+  }
 
-  if (stat == "biallelic_richness") return(calc_mean_biar)
+  if (stat == "biallelic_richness") {
+    return(calc_mean_biar)
+  }
 
-  if (stat == "allelic_richness") return(calc_mean_ar)
+  if (stat == "allelic_richness") {
+    return(calc_mean_ar)
+  }
 
-  if (stat == "Ho") return(calc_mean_het)
+  if (stat == "Ho") {
+    return(calc_mean_het)
+  }
 
   stop(paste(stat, "is an invalid argument for stat"))
-
 }
-
