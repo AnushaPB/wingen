@@ -8,7 +8,7 @@
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
 #' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic_richness" for average number of alleles across all loci, or "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic_richness"))
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
+#' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
