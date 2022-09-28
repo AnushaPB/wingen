@@ -1,5 +1,18 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<style>
+div.red{ background-color:#FFCCCB; border-radius: 5px; padding: 20px;}
+</style>
+
+<div class="red">
+
+### <span style="color:red"> ! Caution: </span> wingen is currently under review
+
+We have made wingen publicly available for review, however, since it may
+change as a result of this process, **we discourage use of wingen at
+this time**. This message will disappear once reviews are completed.
+
+</div>
 
 # wingen <img src="man/figures/logo.png" align="right" height="150"/>
 
