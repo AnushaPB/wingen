@@ -22,8 +22,9 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
   file <- here::here(wdir, "data", "mod-sim_params_it-0_t-1000_spp-spp_0.vcf")
   if(!file.exists(file)){
     message("downloading vcf and storing locally...this will take some time, but only has to be done once")
-    download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
+    download.file("https://zenodo.org/record/7112468/files/mod-sim_params_it-0_t-1000_spp-spp_0.vcf?download=1", file)
   }
+
   vcf <- vcfR::read.vcfR(file, verbose = FALSE)
   assign("vcf", vcf, envir = .GlobalEnv)
 
