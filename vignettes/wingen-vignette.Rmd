@@ -291,15 +291,15 @@ For the standard genetic diversity statistics:
 
 For other statistics:
 - If `x` is  a vector, `stat` can be any function that can be applied to a vector (e.g. `stat = mean, var, sum, etc.`). 
-- If `x` is a matrix or data frame (note: rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, use with caution)*.
+- If `x` is a matrix or data frame (*note:* rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, so use with caution)*.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
-# As an example, let's create a moving window map of our raster layer values (e.g. carrying capacity and conductance, in this case) at the sample coordinates
+# As an example, let's create a moving window map of our raster layer values (e.g., carrying capacity and conductance, in this case) at the sample coordinates
 
 # First, we extract the raster values at those coordinates
 vals <- raster::extract(lotr_lyr, lotr_coords)
 
-# Next, we run the window_general function with the env vector and set the stat to mean
+# Next, we run the window_general function with the env vector and set the `stat` to mean
 # Note: we can also provide additional arguments to functions, such as na.rm = TRUE
 we <- window_general(vals, 
                      coords = lotr_coords,
