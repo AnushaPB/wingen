@@ -97,7 +97,7 @@ disagg = 4
 lyr <- coords_to_raster(coords, disagg = disagg, buffer = 1)
 ```
 
-And run the moving window function again, this time kriging and masking the resulting rasters:
+And ran the moving window function again, this time kriging and masking the resulting rasters:
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, message = FALSE, results = FALSE, warning = FALSE}
 # Run moving window
