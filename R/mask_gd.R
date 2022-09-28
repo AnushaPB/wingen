@@ -5,7 +5,7 @@
 #'
 #' @param x Raster object to mask
 #' @param mask Raster object or Spatial object to use as mask
-#' @param resample if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")
+#' @param resample if x and mask are non-matching rasters, which layer to resample to match them (defaults to "mask")
 #' @param minval if mask is a Raster object, value of mask below which to mask
 #' @param maxval if mask is a Raster object, value of mask above which to mask
 #'

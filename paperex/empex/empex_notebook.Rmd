@@ -24,7 +24,7 @@ Data used in this example is from Bouzid et al. (2022): https://doi.org/10.5061/
 **Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., & Leaché, A. D. (2022). Evidence for ephemeral ring species formation during the diversification history of western fence lizards ( Sceloporus occidentalis ). Molecular Ecology, 31(2), 620–631. https://doi.org/10.1111/mec.15836**
 
 
-The vcf used in this example was created from the ped and map file from Bouzid et al. 2022 using Plink (this is not run as part of the notebook, but we provide the code below)
+The vcf used in this example was created from the ped and map file from Bouzid et al. 2022 using Plink (this is not run as part of the notebook, but we provide the code below).
 
 ```bash
 ./plink --file populations_r20.haplotypes.filtered_m70_randomSNP --recode vcf-fid --out populations_r20.haplotypes.filtered_m70_randomSNP
@@ -74,7 +74,7 @@ plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 
 ## Run wingen analysis
 
-First, different parameter combinations are evaluated. Here we vary the window size (wdim), the raster resolutions (disagg), and the rarefaction size (rarify_n) to get the plots from Figure S4
+First, different parameter combinations are evaluated. Here, we vary the window size (`wdim`), the raster resolutions (`disagg`), and the rarefaction size (`rarify_n`) to get the plots from Figure S4.
 
 ```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
@@ -85,7 +85,7 @@ par(mfrow = c(2, 3), mar = rep(1, 4))
 purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
 ```
 
-Based on the results above we chose a final set of parameters:
+Based on the results above, we chose a final set of parameters:
 
 ```{r}
 # set parameters 

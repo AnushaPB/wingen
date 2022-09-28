@@ -4,18 +4,18 @@
 #' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
 #'
 #' @param r RasterLayer or RasterStack produced by \link[wingen]{window_gd}
-#' @param index integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)
-#' @param grd object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
+#' @param grd object to create grid for kriging; can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates
-#' @param agg_grd factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
-#' @param disagg_grd factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
-#' @param agg_r factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
-#' @param disagg_r factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)
+#' @param agg_grd factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
+#' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
+#' @param agg_r factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
+#' @param disagg_r factor to use for disaggregation, of `r` if provided (this will increase the number of points used in the kriging model; defaults to NULL)
 #' @param autoKrige_output whether to return full output from `autoKrige()` including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
 #' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
 #' @param xy whether to co-krige with x and y (~x+y)
-#' @param resample whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)
-#' @param resample_first if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
+#' @param resample whether to resample `grd` or `r`. Set to `"r"` to resample `r` to `grd`. Set to `"grd"` to resample `grd` to `r` (defaults to FALSE)
+#' @param resample_first if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #'
 #' @return a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
 #' @export

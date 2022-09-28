@@ -87,7 +87,7 @@ The workflow of wingen uses three main functions:
 
 The main arguments to `window_gd()` are:
 
-1. `vcf` - An object of type vcf with genotypic data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
+1. `vcf` - An object of type vcf with genotype data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
 
 
 2. `coords` - A matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e., Longitude) and the second should be y (i.e., Latitude). 
@@ -125,7 +125,7 @@ preview_gd(lotr_lyr,
 
 Next, we run the moving window function with our vcf, coords, and raster layer. Here, we set the parameters to calculate pi, use a window size of 5 x 5, an aggregation factor of 3, and rarefaction with a rarefaction size of 2 (minimum sample size of 2) and 5 iterations.
 
-The L argument is used in the calculation of pi. If `L=NULL` (default), the function returns the sum over SNPs of nucleotide diversity. Otherwise, the function returns the average nucleotide diversity per nucleotide given the length L of the sequence.
+The `L` argument is used in the calculation of pi. If `L=NULL` (default), the function returns the sum over SNPs of nucleotide diversity. Otherwise, the function returns the average nucleotide diversity per nucleotide given the length L of the sequence.
 
 We then plot the genetic diversity layer (the first layer of the produced RasterStack) and the sample counts layer (the second stack).
 
@@ -291,15 +291,15 @@ For the standard genetic diversity statistics:
 
 For other statistics:
 - If `x` is  a vector, `stat` can be any function that can be applied to a vector (e.g. `stat = mean, var, sum, etc.`). 
-- If `x` is a matrix or data frame (note: rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, use with caution)*.
+- If `x` is a matrix or data frame (*note:* rows must be individuals), `stat` can be any function that takes a matrix or data frame and outputs a single numeric value (e.g., a function that produces a custom diversity index) *(note: this functionality has not have been tested extensively and may produce errors, so use with caution)*.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
-# As an example, let's create a moving window map of our raster layer values (e.g. carrying capacity and conductance, in this case) at the sample coordinates
+# As an example, let's create a moving window map of our raster layer values (e.g., carrying capacity and conductance, in this case) at the sample coordinates
 
 # First, we extract the raster values at those coordinates
 vals <- raster::extract(lotr_lyr, lotr_coords)
 
-# Next, we run the window_general function with the env vector and set the stat to mean
+# Next, we run the window_general function with the env vector and set the `stat` to mean
 # Note: we can also provide additional arguments to functions, such as na.rm = TRUE
 we <- window_general(vals, 
                      coords = lotr_coords,

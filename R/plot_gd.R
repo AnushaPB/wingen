@@ -5,7 +5,7 @@
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
 #' @param index if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)
 #' @param bkg optional RasterLayer or other spatial object that will be plotted as the "background" in gray
-#' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
+#' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the Raster plot (defaults to FALSE)
 #'
@@ -96,7 +96,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #'
 #' @param x RasterLayer of counts or RasterStack where indexed layer is sample counts
 #' @param index if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)
-#' @param col color pallete to use for plotting (defaults to viridis::magma pallete)
+#' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the Raster plot (defaults to FALSE)
 #' @inheritParams plot_gd

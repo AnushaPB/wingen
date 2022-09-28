@@ -4,18 +4,18 @@
 #'
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
-#' @param vcf object of type vcf (*note:* order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)
+#' @param vcf object of type vcf (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
 #' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
 #' @param lyr RasterLayer to slide the window across
-#' @param stat genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic_richness" for average number of alleles across all loci, or "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic_richness"))
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)
+#' @param stat genetic diversity statistic to calculate (can either be `"pi"` for nucleotide diversity (default), `"Ho"` for average observed heterozygosity across all loci, `"allelic_richness"` for average number of alleles across all loci, or `"biallelic_richness"` to get average allelic richness across all loci for a biallelic dataset (this option faster than `"allelic_richness"`))
+#' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean)
-#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
+#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
 #' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
@@ -74,11 +74,11 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 #'
 #' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,
 #' `window_general` can be used to make moving window maps from different data inputs. Unlike `window_gd`, `window_general` will not convert your data into
-#' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2 To calculate
+#' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2. To calculate
 #' `Ho`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
-#' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g. `stat = mean`, `var`, `sum`, etc.).
+#' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g., `stat = mean`, `var`, `sum`, etc.).
 #' `x` can also be a matrix or data frame (where rows are individuals), and then `stat` can be any function that takes a matrix or data frame and outputs a
-#' single numeric value (e.g., a function that produces a custom diversity index), however this should be attempted with caution since this functionality has
+#' single numeric value (e.g., a function that produces a custom diversity index); however, this should be attempted with caution since this functionality has
 #'  not have been tested extensively and may produce errors.
 #'
 #' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
