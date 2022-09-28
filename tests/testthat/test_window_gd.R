@@ -21,6 +21,31 @@ test_that("all stats and parallel works", {
   expect_equal(wpp, wp)
 })
 
+test_that("rarifaction works for all options", {
+  load_mini_ex(quiet = TRUE)
+  expect_error(window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, rarify_nit = 100), NA)
+  expect_error(window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, rarify_nit = 10), NA)
+  expect_error(wpi1 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, rarify_nit = 1), NA)
+  expect_error(wpiall <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, rarify_nit = "all"), NA)
+})
+
+test_that("check that setting the seed produces the same results", {
+  load_mini_ex(quiet = TRUE)
+
+  set.seed(42)
+  wg1 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
+  set.seed(42)
+  wg2 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
+  expect_equal(wg1, wg2)
+
+  set.seed(42)
+  wg1p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2)
+  set.seed(42)
+  wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2)
+  expect_equal(wg1p, wg2p)
+
+})
+
 test_that("all stats work with just one locus", {
   load_mini_ex(quiet = TRUE)
   expect_warning(wp <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
