@@ -39,7 +39,7 @@ window_gd(
 
 \item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
 
-\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5)}
+\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
 
