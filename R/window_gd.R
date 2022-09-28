@@ -12,7 +12,7 @@
 #' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
-#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5)
+#' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `all` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).
@@ -43,11 +43,11 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
   list2env(check_data(vcf, coords), envir = environment())
 
   # convert vcf based on statistic being calculated
-  gen <- convert_vcf(vcf, stat)
+  x <- convert_vcf(vcf, stat)
 
   # run moving window
   results <- window_general(
-    x = gen,
+    x = x,
     coords = coords,
     lyr = lyr,
     stat = stat,
@@ -90,7 +90,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 5, fact = 0,
 #'
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
-                           rarify = FALSE, rarify_n = 2, rarify_nit = 10, min_n = 2,
+                           rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
 
@@ -226,7 +226,7 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
 #' @return rarified genetic diversity statistic
 #'
 #' @noRd
-rarify_gd <- function(x, sub, rarify_nit = 10, rarify_n = 4, stat,
+rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
                       fun, L = NULL, rarify_alleles = TRUE) {
 
   # check to make sure sub is greater than rarify_n
@@ -235,13 +235,18 @@ rarify_gd <- function(x, sub, rarify_nit = 10, rarify_n = 4, stat,
   }
 
   # define subsample to rarify
-  # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
-  if (choose(length(sub), rarify_n) < rarify_nit) {
+   if (rarify_nit == "all") {
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- t(utils::combn(sub, rarify_n))
+  } else if (choose(length(sub), rarify_n) < rarify_nit) {
+    # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
     # get all possible combos (transpose so rows are unique combos)
     cmb <- t(utils::combn(sub, rarify_n))
   } else {
-    # random sample subsets of size rarify_nit (transpose so rows are unique combos)
-    cmb <- t(replicate(rarify_nit, sample(sub, rarify_n), simplify = TRUE))
+    # randomly sample subsets of size rarify_nit (transpose so rows are unique combos)
+    # note: replace is set to FALSE so the same individual cannot be drawn multiple times within the same sample
+    # however, individuals can be drawn multiple times across different samples
+    cmb <- t(replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE))
   }
 
   # for each of the possible combos get gendiv stat
