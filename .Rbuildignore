@@ -23,3 +23,4 @@
 ^codecov\.yml$
 ^default_params\.R$
 ^cov_token\.R$
+^caution\.png$
