@@ -22,7 +22,7 @@ plot_gd(
 
 \item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 
-\item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
+\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 

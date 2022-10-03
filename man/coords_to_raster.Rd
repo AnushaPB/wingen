@@ -18,7 +18,7 @@ coords_to_raster(
 
 \item{buffer}{buffer to add to edge of raster (defaults to 0)}
 
-\item{res}{desired resolution of raster (defaults to NULL). Can be a single value for square cells or a vector with two values representing x and y resolutions.}
+\item{res}{desired resolution of raster (defaults to NULL). Can be a single value for square cells or a vector with two values representing x and y resolutions}
 
 \item{agg}{aggregation factor to apply to raster (defaults to NULL)}
 

@@ -9,7 +9,7 @@ window_gd(
   coords,
   lyr,
   stat = "pi",
-  wdim = 5,
+  wdim = 3,
   fact = 0,
   rarify = FALSE,
   rarify_n = 2,
@@ -23,15 +23,15 @@ window_gd(
 )
 }
 \arguments{
-\item{vcf}{object of type vcf (\emph{note:} order matters! the coordinate and genetic data should be in the same order, there are currently no checks for this.)}
+\item{vcf}{object of type vcf (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
 \item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
 
 \item{lyr}{RasterLayer to slide the window across}
 
-\item{stat}{genetic diversity statistic to calculate (can either be "pi" for nucleotide diversity (default), "Ho" for average observed heterozygosity across all loci, "allelic_richness" for average number of alleles across all loci, or "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (this option faster than "allelic_richness"))}
+\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all loci, \code{"allelic_richness"} for average number of alleles across all loci, or \code{"biallelic_richness"} to get average allelic richness across all loci for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
 
-\item{wdim}{dimensions (height x width) of window, if only one value is provided a square window is created (defaults to 3 x 3 window)}
+\item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
 \item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -45,7 +45,7 @@ window_gd(
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean)}
 
-\item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (note: L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not to use).}
+\item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
 \item{rarify_alleles}{for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 

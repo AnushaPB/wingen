@@ -23,35 +23,35 @@ krig_gd(
 \arguments{
 \item{r}{RasterLayer or RasterStack produced by \link[wingen]{window_gd}}
 
-\item{grd}{object to create grid for kriging, can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
+\item{grd}{object to create grid for kriging; can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
 
-\item{index}{integer indices of layers in raster stack to krige (defaults to 1, i.e. the first layer)}
+\item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
 
 \item{coords}{if provided, kriging will occur based only on values at these coordinates}
 
-\item{agg_grd}{factor to use for aggregation of grd, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
+\item{agg_grd}{factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
 
-\item{disagg_grd}{factor to use for disaggregation of grd, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
+\item{disagg_grd}{factor to use for disaggregation of \code{grd}, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
 
-\item{agg_r}{factor to use for aggregation of r, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)}
+\item{agg_r}{factor to use for aggregation of \code{r}, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)}
 
-\item{disagg_r}{factor to use for disaggregation, of r if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
+\item{disagg_r}{factor to use for disaggregation, of \code{r} if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
 
-\item{autoKrige_output}{whether to return full output from \code{autoKrige()} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
+\item{autoKrige_output}{whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
 
 \item{zero_correction}{if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)}
 
-\item{xy}{whether to co-krige with x and y (~x+y)}
+\item{xy}{whether to perform universal kriging (formula = ~ x + y). If \code{FALSE}, simple kriging is performed (default).}
 
-\item{resample}{whether to resample grd or r. Set to "r" to resample r to grd Set to "grd" to resample grd to r (defaults to FALSE)}
+\item{resample}{whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE)}
 
-\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
+\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 }
 \value{
 a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
 }
 \description{
-Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
+Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
 }
 \examples{
 load_mini_ex()

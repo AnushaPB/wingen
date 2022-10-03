@@ -11,7 +11,7 @@ mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
 
 \item{mask}{Raster object or Spatial object to use as mask}
 
-\item{resample}{if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")}
+\item{resample}{if x and mask are non-matching rasters, which layer to resample to match them (defaults to "mask")}
 
 \item{minval}{if mask is a Raster object, value of mask below which to mask}
 

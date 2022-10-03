@@ -21,7 +21,7 @@ plot_count(
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
-\item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
+\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
 \item{main}{character. Main plot title}
 
