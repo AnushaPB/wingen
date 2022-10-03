@@ -64,9 +64,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
     ncores = ncores
   )
 
-  # set raster layer names based on stat
-  results <- name_results(results, stat)
-
   return(results)
 }
 
@@ -142,6 +139,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   nsagg[] <- rast_vals[, "ns"]
 
   results <- raster::stack(alyr, nsagg)
+
+  # set raster layer names based on stat
+  results <- name_results(results, stat)
 
   return(results)
 }
