@@ -169,6 +169,17 @@ plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
+*Note:* by default, the kriging method is set to `krig_method = "ordinary"` for ordinary/simple kriging (model formula: ~ 1). Alternatively, `krig_method` can be set to `"universal"` for universal kriging (model formula: ~ x + y).
+
+For information on the differences between universal and ordinary kriging check out this article: https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm
+
+```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE}
+kgd_universal <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2, krig_method = "universal")
+
+plot_gd(kgd_universal, main = "Kriged pi")
+plot_count(kgd_universal, main = "Kriged sample counts")
+```
+
 Users can optionally get the full output from `autoKrige()`, including raster layers of standard deviation and variance, by setting `autoKrige_output = TRUE` 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
