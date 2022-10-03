@@ -95,13 +95,12 @@ test_that("raster_transform transformations are correct", {
   expect_error(raster_transform(r, grd, agg_grd = 2, disagg_grd = 2))
 })
 
-test_that("xy argument works", {
+test_that("krig_method argument works", {
   data("mini_lyr")
-  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = TRUE))
-
-  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, xy = FALSE))
+  expect_warning(expect_output(kpi <- krig_gd(mini_lyr, mini_lyr, krig_method = "ordinary"), "[using ordinary kriging]", fixed = TRUE))
+  expect_warning(expect_output(kpi <- krig_gd(mini_lyr, mini_lyr, krig_method = "universal"), "[using universal kriging]", fixed = TRUE))
+  expect_error(kpi <- krig_gd(mini_lyr, mini_lyr, krig_method = "invalid"), "invalid krig_method specified")
 })
-
 
 test_that("autoKrige_output argument works", {
   data("mini_lyr")

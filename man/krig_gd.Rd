@@ -15,7 +15,7 @@ krig_gd(
   disagg_r = NULL,
   autoKrige_output = FALSE,
   zero_correction = TRUE,
-  xy = FALSE,
+  krig_method = "ordinary",
   resample = FALSE,
   resample_first = TRUE
 )
@@ -41,14 +41,14 @@ krig_gd(
 
 \item{zero_correction}{if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)}
 
-\item{xy}{whether to perform universal kriging (formula = ~ x + y). If \code{FALSE}, simple kriging is performed (default).}
+\item{krig_method}{method to use for kriging. If \code{ordinary}, ordinary/simple kriging is performed (formula: ~ 1; default). If \code{universal},  universal kriging is performed (formula = ~ x + y).}
 
-\item{resample}{whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE)}
+\item{resample}{whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE for no resampling)}
 
 \item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 }
 \value{
-a Raster* object or a list of krige outputs (if autoKrige_output = TRUE)
+a Raster* object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
 }
 \description{
 Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
