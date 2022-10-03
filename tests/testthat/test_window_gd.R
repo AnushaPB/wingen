@@ -334,4 +334,3 @@ test_that("custom functions with window general work", {
   foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3)
 })
-

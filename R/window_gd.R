@@ -94,8 +94,8 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # set L if pi is being calculated
   if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
 
-  # replace stat with function to calculate the desired statistic
-  stat <- return_stat(stat, ...)
+  # Get function to calculate the desired statistic
+  stat_function <- return_stat(stat, ...)
 
   # check that coords and x align and reformat data, if necessary
   # note: list2env adds the new, corrected x and coords back to the environment
@@ -118,14 +118,14 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
     rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster"))
     )
   } else {
     rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat = stat, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
@@ -615,7 +615,7 @@ convert_vcf <- function(vcf, stat) {
 name_results <- function(x, stat) {
   names(x[[2]]) <- "sample_count"
 
-  names(x[[1]]) <- stat
+  if (is.character(stat)) names(x[[1]]) <- stat else names(x[[1]]) <- "custom"
 
   return(x)
 }
