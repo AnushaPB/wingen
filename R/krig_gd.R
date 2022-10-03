@@ -1,7 +1,7 @@
 
 #' Krige moving window maps
 #'
-#' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using 'autoKrige'
+#' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
 #'
 #' @param r RasterLayer or RasterStack produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
@@ -11,9 +11,9 @@
 #' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
 #' @param agg_r factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
 #' @param disagg_r factor to use for disaggregation, of `r` if provided (this will increase the number of points used in the kriging model; defaults to NULL)
-#' @param autoKrige_output whether to return full output from `autoKrige()` including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
+#' @param autoKrige_output whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
 #' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
-#' @param xy whether to co-krige with x and y (~x+y)
+#' @param xy whether to perform universal kriging (formula = ~ x + y). If `FALSE`, simple kriging is performed (default).
 #' @param resample whether to resample `grd` or `r`. Set to `"r"` to resample `r` to `grd`. Set to `"grd"` to resample `grd` to `r` (defaults to FALSE)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #'
@@ -133,9 +133,9 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, xy = FALSE, zero_correction = TRUE) {
   # autokrige
   if (xy) {
-    krig_res <- automap::autoKrige(layer ~ x + y, krig_df, krig_grid)
+    krig_res <- automap::autoKrige(layer ~ x + y, input_data = krig_df, new_data = krig_grid)
   } else {
-    krig_res <- automap::autoKrige(layer ~ 1, krig_df, krig_grid)
+    krig_res <- automap::autoKrige(layer ~ 1, input_data = krig_df, new_data = krig_grid)
   }
 
   # Get kriged spdf
@@ -172,13 +172,12 @@ make_krig_df <- function(r, coords = NULL) {
   # use coords if provided
   if (!is.null(coords)) {
     coords <- data.frame(coords)
-    colnames(coords) <- c("x", "y")
     rex <- raster::extract(r, coords)
     krig_df <- data.frame(coords, layer = rex)
   }
 
-  # Assign values to df
-  krig_df$layer <- krig_df[, 3]
+  # Define colnames
+  colnames(krig_df) <- c("x", "y", "layer")
 
   # convert to spdf
   sp::coordinates(krig_df) <- ~ x + y
