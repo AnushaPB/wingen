@@ -65,21 +65,21 @@ test_that("window_gd returns expected value", {
   vcf <- mini_vcf[c(1, 4, 8), 1:3]
   coords <- mini_coords[1:2, ]
 
-  wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", min_n = 2)
+  wg <- window_gd(vcf, coords, mini_lyr, stat = "pi", wdim = 5, min_n = 2)
   dos <- vcf_to_dosage(vcf)
   expect_equal(calc_pi(dos, L = ncol(dos)), unique(na.omit(raster::values(wg[[1]]))))
 
-  wg <- window_gd(vcf, coords, stat = "Ho", mini_lyr, min_n = 2)
+  wg <- window_gd(vcf, coords, stat = "Ho", mini_lyr, wdim = 5, min_n = 2)
   het <- vcf_to_het(vcf)
   expect_equal(calc_mean_het(het), unique(na.omit(raster::values(wg[[1]]))))
 
-  wg <- window_gd(vcf, coords, stat = "biallelic_richness", mini_lyr, min_n = 2, rarify_alleles = TRUE)
+  wg <- window_gd(vcf, coords, stat = "biallelic_richness", wdim = 5, mini_lyr, min_n = 2, rarify_alleles = TRUE)
   expect_equal(calc_mean_biar(dos, rarify_alleles = TRUE), unique(na.omit(raster::values(wg[[1]]))))
 
-  wg <- window_gd(vcf, coords, stat = "biallelic_richness", mini_lyr, min_n = 2, rarify_alleles = FALSE)
+  wg <- window_gd(vcf, coords, stat = "biallelic_richness", wdim = 5, mini_lyr, min_n = 2, rarify_alleles = FALSE)
   expect_equal(calc_mean_biar(dos, rarify_alleles = FALSE), unique(na.omit(raster::values(wg[[1]]))))
 
-  wg <- window_gd(vcf, coords, stat = "allelic_richness", mini_lyr, min_n = 2)
+  wg <- window_gd(vcf, coords, stat = "allelic_richness", wdim = 5, mini_lyr, min_n = 2)
   genind <- vcf_to_genind(vcf)
   expect_equal(calc_mean_ar(genind), unique(na.omit(raster::values(wg[[1]]))))
 })
@@ -334,3 +334,4 @@ test_that("custom functions with window general work", {
   foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3)
 })
+
