@@ -196,7 +196,7 @@ make_krig_df <- function(r, coords = NULL) {
 make_krige_grid <- function(r = NULL, grd = NULL) {
   if (is.null(grd)) {
     krig_grid <- raster_to_grid(r)
-  } else if (inherits(grd, "RasterLayer")) {
+  } else if (inherits(grd, "RasterLayer") | inherits(grd, "RasterStack")) {
     krig_grid <- raster_to_grid(grd)
   } else if (sp::gridded(grd)) {
     krig_grid <- grd
