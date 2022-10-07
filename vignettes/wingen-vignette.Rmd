@@ -176,7 +176,7 @@ For information on the differences between universal and ordinary kriging check 
 - https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation
 
 ```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE}
-kgd_universal <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2, krig_method = "universal")
+kgd_universal <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
 
 plot_gd(kgd_universal, main = "Kriged pi")
 plot_count(kgd_universal, main = "Kriged sample counts")
@@ -193,6 +193,8 @@ plot_gd(kgd_autoKrige$raster, main = "Kriged pi")
 plot_gd(kgd_autoKrige$var, main = "Kriged variance")
 plot_gd(kgd_autoKrige$stdev, main = "Kriged standard deviation")
 ```
+
+*Note:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`) to ensure that the values are bounded within the range of possible values. Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity you may want to set `lower_bound = 0` and `upper_bound = 1`).
 
 ### Mask results
 

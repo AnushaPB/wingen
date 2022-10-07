@@ -12,8 +12,9 @@
 #' @param agg_r factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)
 #' @param disagg_r factor to use for disaggregation, of `r` if provided (this will increase the number of points used in the kriging model; defaults to NULL)
 #' @param autoKrige_output whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
-#' @param zero_correction if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)
-#' @param krig_method method to use for kriging. If `ordinary`, ordinary/simple kriging is performed (formula: ~ 1). If `universal`,  universal kriging is performed (default, formula = ~ x + y).
+#' @param lower_bound if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum
+#' @param upper_bound if TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum
+#' @param krig_method method to use for kriging. If `ordinary`, ordinary/simple kriging is performed (formula: ~ 1; default). If `universal`,  universal kriging is performed (formula = ~ x + y).
 #' @param resample whether to resample `grd` or `r`. Set to `"r"` to resample `r` to `grd`. Set to `"grd"` to resample `grd` to `r` (defaults to FALSE for no resampling)
 #' @param resample_first if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)
 #'
@@ -29,8 +30,8 @@
 krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
                     agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
                     autoKrige_output = FALSE,
-                    zero_correction = TRUE,
-                    krig_method = "universal",
+                    lower_bound = TRUE, upper_bound = TRUE,
+                    krig_method = "ordinary",
                     resample = FALSE, resample_first = TRUE) {
 
   # subset desired layers
@@ -56,7 +57,8 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
     agg_r = agg_r,
     disagg_r = disagg_r,
     autoKrige_output = autoKrige_output,
-    zero_correction = zero_correction,
+    lower_bound = lower_bound,
+    upper_bound = upper_bound,
     krig_method = krig_method,
     resample = resample,
     resample_first = resample_first
@@ -87,7 +89,8 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
 krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
                         agg_grd = NULL, disagg_grd = NULL, agg_r = NULL, disagg_r = NULL,
                         autoKrige_output = FALSE,
-                        zero_correction = TRUE,
+                        lower_bound = TRUE,
+                        upper_bound = TRUE,
                         krig_method = "ordinary",
                         resample = FALSE, resample_first = TRUE) {
 
@@ -116,7 +119,9 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
   # krige using autoKrige
   krig_r <- krig(krig_df, krig_grid,
     autoKrige_output = autoKrige_output,
-    krig_method = krig_method, zero_correction = zero_correction
+    krig_method = krig_method,
+    lower_bound = lower_bound,
+    upper_bound = upper_bound
   )
 
   return(krig_r)
@@ -130,13 +135,15 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 #' @inheritParams krig_gd
 #'
 #' @noRd
-krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "ordinary", zero_correction = TRUE) {
+krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "ordinary", lower_bound = TRUE, upper_bound = TRUE) {
   # autokrige
   if (krig_method == "ordinary") {
     krig_res <- automap::autoKrige(layer ~ 1, input_data = krig_df, new_data = krig_grid)
   } else if (krig_method == "universal") {
     krig_res <- automap::autoKrige(layer ~ x + y, input_data = krig_df, new_data = krig_grid)
-  } else stop("invalid krig_method specified")
+  } else {
+    stop("invalid krig_method specified")
+  }
 
   # Get kriged spdf
   krig_spdf <- krig_res$krige_output
@@ -144,8 +151,17 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
   # turn spdf into raster (automatically just uses the first variable)
   krig_r <- raster::rasterFromXYZ(krig_spdf, crs = raster::crs(krig_grid))
 
-  # replace negative values with zero
-  if (zero_correction) krig_r[krig_r < 0] <- 0
+  # perform bounding
+  if (is.numeric(lower_bound)) krig_r[krig_r < lower_bound] <- lower_bound
+  if (is.numeric(upper_bound)) krig_r[krig_r > upper_bound] <- upper_bound
+
+  if (is.logical(lower_bound)) {
+    if (lower_bound) krig_r[krig_r < min(krig_df$layer, na.rm = TRUE)] <- min(krig_df$layer, na.rm = TRUE)
+  }
+
+  if (is.logical(upper_bound)) {
+    if (upper_bound) krig_r[krig_r > max(krig_df$layer, na.rm = TRUE)] <- max(krig_df$layer, na.rm = TRUE)
+  }
 
   # create results
   if (autoKrige_output) {
@@ -252,4 +268,3 @@ raster_transform <- function(r, grd, resample = FALSE, agg_grd = NULL, disagg_gr
 
   return(s)
 }
-

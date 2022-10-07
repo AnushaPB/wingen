@@ -127,3 +127,12 @@ test_that("raster transform check", {
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = FALSE), NA)
   expect_error(kpi <- raster_transform(mini_lyr, mini_lyr, resample_first = TRUE), NA)
 })
+
+test_that("bound check", {
+  data("mini_lyr")
+  load_mini_ex(quiet = TRUE)
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, upper_bound = TRUE, lower_bound = TRUE))
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, upper_bound = FALSE, lower_bound = FALSE))
+  expect_warning(kpi <- krig_gd(mini_lyr, mini_lyr, upper_bound = 0, lower_bound = 1))
+
+})
