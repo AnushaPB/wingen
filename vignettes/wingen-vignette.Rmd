@@ -169,7 +169,7 @@ plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
-*Note:* by default, the kriging method is set to `krig_method = "ordinary"` for ordinary/simple kriging (model formula: ~ 1). Alternatively, `krig_method` can be set to `"universal"` for universal kriging (model formula: ~ x + y).
+*Note:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
 
 For information on the differences between universal and ordinary kriging check out these articles:
 - https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm
