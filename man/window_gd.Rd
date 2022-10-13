@@ -23,7 +23,7 @@ window_gd(
 )
 }
 \arguments{
-\item{vcf}{object of type vcf (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
+\item{vcf}{object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
 \item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
 
