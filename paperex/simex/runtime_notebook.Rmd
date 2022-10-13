@@ -19,7 +19,7 @@ source(here(wdir, "runtime_functions.R"))
 # Creating dataset
 
 ```{r, fig.width = 8, fig.height = 8}
-# load middle earth example just to get a vcc to modify
+# load middle earth example just to get a vcf to modify
 load_middle_earth_ex(quiet = TRUE)
 
 # set dimensions of raster
