@@ -1,5 +1,5 @@
 ---
-title: "Simulation Example"
+title: "Simulation Example from Bishop et al. (in review)"
 output: github_document
 ---
  
@@ -21,7 +21,7 @@ source(here(wdir, "simex_functions.R"))
 
 ## Load simulation results
 
-The following function loads the simulated data and subsets it for the example walkthrough. 
+The following function loads the simulated data (produced by `run_simex.sh`) and subsets it for the example walkthrough. 
 
 ```{r}
 load_middle_earth(subset = TRUE)
@@ -52,6 +52,9 @@ legend(0,-80,
        cex = 1.5)
 
 ```
+
+
+**Example moving window analysis:**
 
 ```{r, fig.height = 5, fig.width = 5}
 set.seed(42)

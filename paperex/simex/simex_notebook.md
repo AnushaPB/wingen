@@ -1,4 +1,4 @@
-Simulation Example
+Simulation Example from Bishop et al. (in review)
 ================
 
 ``` r
@@ -18,8 +18,8 @@ source(here(wdir, "simex_functions.R"))
 
 ## Load simulation results
 
-The following function loads the simulated data and subsets it for the
-example walkthrough.
+The following function loads the simulated data (produced by
+`run_simex.sh`) and subsets it for the example walkthrough.
 
 ``` r
 load_middle_earth(subset = TRUE)
@@ -77,6 +77,8 @@ legend(0,-80,
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-3-3.png)<!-- -->
+
+**Example moving window analysis:**
 
 ``` r
 set.seed(42)
@@ -158,7 +160,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 ``` r
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
                                rarify = c("TRUE", "FALSE"),
-                               stat = c("pi", "biallelic_richness", "heterozygosity")))
+                               stat = c("pi", "biallelic_richness", "Ho")))
 
 # Get example layers for masking (doesn't matter which parameters other than nsamp)
 msk_lyr100 <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = 100)
@@ -187,8 +189,8 @@ purrr::walk(stk200, test_simex_plot, legend = TRUE)
 ## Figure S3: Computational time for simulation example
 
 ``` r
-# Loop reads in outputs from time_tests functions
-# To recreate these outputs use the run_sims.sh script (or run the scripts within time_tests individually)
+# Loop reads in outputs from simex_tests functions
+# To recreate these outputs use the run_sims.sh script (or run the scripts within simex_tests individually)
 
 tdf <- dplyr::bind_rows(get_timeout("rr", rarify = "TRUE", parallel = "FALSE", nsamp = 100),
                         get_timeout("rr", rarify = "TRUE", parallel = "FALSE", nsamp = 200),
@@ -213,16 +215,16 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
             vjust = -0.5, position=position_dodge(width = .9)) + 
   scale_color_manual(values=c("pi"= mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity" = mako(3, begin = 0.3, end = 0.8)[3]), 
+                              "Ho" = mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
-                               "allelic richness" = "AR",
-                               "heterozygosity" = "H")) +
+                               "allelic richness" = bquote(A[R]),
+                               "Ho" = bquote(H[O]))) +
   scale_fill_manual(values=c("pi"=mako(3, begin = 0.3, end = 0.8)[1], 
                               "allelic richness"= mako(3, begin = 0.3, end = 0.8)[2],
-                              "heterozygosity"= mako(3, begin = 0.3, end = 0.8)[3]), 
+                              "Ho"= mako(3, begin = 0.3, end = 0.8)[3]), 
                     labels = c("pi" = expression(pi),
-                               "allelic richness" = "AR",
-                               "heterozygosity" = "H")) +
+                               "allelic richness" = bquote(A[R]),
+                               "Ho" = bquote(H[O]))) +
   guides(color = guide_legend(override.aes = list(color = rgb(0,0,0,0)))) +
   facet_grid(~dataset,  scales = "free_y") +
   xlab("Number of Samples") +
