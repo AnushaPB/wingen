@@ -1,5 +1,5 @@
 ---
-title: "Empirical Example"
+title: "Empirical Example from Bishop et al. (in review)"
 output: github_document
 ---
 ```{r, message = FALSE, results = FALSE, warning = FALSE}
@@ -19,9 +19,9 @@ source(here(wdir, "empex_functions.R"))
 
 # Empirical Dataset
 
-Data used in this example is from Bouzid et al. (2022): https://doi.org/10.5061/dryad.n5tb2rbv2
+Data used in this example is from [Bouzid et al. (2022)](https://doi.org/10.5061/dryad.n5tb2rbv2)
 
-**Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., & Leaché, A. D. (2022). Evidence for ephemeral ring species formation during the diversification history of western fence lizards ( Sceloporus occidentalis ). Molecular Ecology, 31(2), 620–631. https://doi.org/10.1111/mec.15836**
+**Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., & Leaché, A. D. (2022). Evidence for ephemeral ring species formation during the diversification history of western fence lizards (Sceloporus occidentalis). Molecular Ecology, 31(2), 620–631. https://doi.org/10.1111/mec.15836**
 
 
 The vcf used in this example was created from the ped and map file from Bouzid et al. 2022 using Plink (this is not run as part of the notebook, but we provide the code below).

@@ -1,4 +1,4 @@
-Empirical Example
+Empirical Example from Bishop et al. (in review)
 ================
 
 ``` r
@@ -18,14 +18,22 @@ source(here(wdir, "empex_functions.R"))
 
 # Empirical Dataset
 
-Data used in this example is from Bouzid et al. (2022):
-<https://doi.org/10.5061/dryad.n5tb2rbv2>
+Data used in this example is from [Bouzid et
+al. (2022)](https://doi.org/10.5061/dryad.n5tb2rbv2)
 
 **Bouzid, N. M., Archie, J. W., Anderson, R. A., Grummer, J. A., &
 Leaché, A. D. (2022). Evidence for ephemeral ring species formation
-during the diversification history of western fence lizards ( Sceloporus
-occidentalis ). Molecular Ecology, 31(2), 620–631.
+during the diversification history of western fence lizards (Sceloporus
+occidentalis). Molecular Ecology, 31(2), 620–631.
 <https://doi.org/10.1111/mec.15836>**
+
+The vcf used in this example was created from the ped and map file from
+Bouzid et al. 2022 using Plink (this is not run as part of the notebook,
+but we provide the code below).
+
+``` bash
+./plink --file populations_r20.haplotypes.filtered_m70_randomSNP --recode vcf-fid --out populations_r20.haplotypes.filtered_m70_randomSNP
+```
 
 ``` r
 # Genetic data
@@ -93,9 +101,9 @@ plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 
 ## Run wingen analysis
 
-First, different parameter combinations are evaluated. Here we vary the
-window size (wdim), the raster resolutions (disagg), and the rarefaction
-size (rarify_n) to get the plots from Figure S4
+First, different parameter combinations are evaluated. Here, we vary the
+window size (`wdim`), the raster resolutions (`disagg`), and the
+rarefaction size (`rarify_n`) to get the plots from Figure S4.
 
 ``` r
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
@@ -108,7 +116,7 @@ purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
-Based on the results above we chose a final set of parameters:
+Based on the results above, we chose a final set of parameters:
 
 ``` r
 # set parameters 
@@ -127,17 +135,17 @@ the resulting rasters:
 # Run moving window
 set.seed(22)
 st <- Sys.time()
-hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
-Sys.time() - st
-
-set.seed(22)
-st <- Sys.time()
 pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
 Sys.time() - st
 
 set.seed(22)
 st <- Sys.time()
 ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+Sys.time() - st
+
+set.seed(22)
+st <- Sys.time()
+hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
 Sys.time() - st
 
 # Krige and mask layers
@@ -155,16 +163,15 @@ mhg <- mask(khg, NUS)
 
 ``` r
 par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
-plot_gd(mpg, legend.width = 2,  axis.args = list(cex.axis = 1.5))
-
+plot_gd(mpg, legend.width = 2,  breaks = 10, axis.args = list(cex.axis = 1.5))
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
-plot_gd(mag, legend.width = 2,  axis.args = list(cex.axis = 1.5))
+plot_gd(mag, legend.width = 2, breaks = 10, axis.args = list(cex.axis = 1.5))
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
-plot_gd(mhg, legend.width = 2,  axis.args = list(cex.axis = 1.5))
+plot_gd(mhg, legend.width = 2, breaks = 10, axis.args = list(cex.axis = 1.5))
 plot(NUS, add = TRUE, col = NA, border = "white")
 points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 ```
