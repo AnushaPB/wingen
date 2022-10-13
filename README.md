@@ -32,8 +32,7 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 The following example demonstrates the basic functionality of wingen
 using a **small subset (100 variant loci x 100 samples) of the simulated
-data from Bishop et al. (202X)**. For more details about this dataset,
-see the [original paper](LINK) and the package vignette.
+data from Bishop et al. (in review)**.
 
 ``` r
 library(wingen)
@@ -111,6 +110,6 @@ For an extended walk through, see the package vignette:
 vignette("wingen-vignette")
 ```
 
-Example analyses from Bishop et al. 202X can be found in the
+Example analyses from Bishop et al. can be found in the
 [paperex](https://github.com/AnushaPB/wingen/tree/main/paperex)
 directory.
