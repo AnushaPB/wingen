@@ -7,9 +7,10 @@
 *.shp*
 *.shx
 *.tif
-
-# private token
-token.R
+*.grd
+*.gri
+*.vcf
+*.zip
 
 # History files
 .Rhistory
@@ -55,23 +56,11 @@ vignettes/*.pdf
 # docs
 # inst/doc
 
-#vcfs
-*.vcf
-
-#random spatial files
-*.grd
-*.gri
-
-# private toke
-git_token.R
-
 # vignette files
 vignettes/wingen-vignette_files/*
 Meta
-*.zip
-default_params.R
 
-# SIMS
+# SIMULATION EXAMPLE
 paperex/simex/RData/
 paperex/simex/bdrive/
 paperex/simex/GNX_mod-sims_params
@@ -81,13 +70,12 @@ paperex/simex/plots
 !paperex/simex/data/middle_earth.csv
 !paperex/simex/data/mod-sim_params_it-0_t-1000_spp-spp_0.csv
 
-# EMPIRICAL
-paperex/empex/EEMS
-paperex/empex/EEMS_notebook.Rmd
+# EMPIRICAL EXAMPLE
 paperex/plots
 !paperex/empex/data/Scelop.coords
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
 
+# code coverage token
 cov_token.R
