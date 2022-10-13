@@ -3,7 +3,7 @@
 #' Generate a raster layer from coordinates which can be used in \link[wingen]{window_gd} as the RasterLayer to move the window across
 #'
 #' @param coords coordinates (two columns, the first should be x and the second should be y)
-#' @param buffer buffer to add to edge of raster (defaults to 0)
+#' @param buffer size of buffer to add to edge of raster (defaults to 0)
 #' @param res desired resolution of raster (defaults to NULL). Can be a single value for square cells or a vector with two values representing x and y resolutions
 #' @param agg aggregation factor to apply to raster (defaults to NULL)
 #' @param disagg disaggregation factor to apply to raster (defaults to NULL)
