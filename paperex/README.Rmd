@@ -1,5 +1,5 @@
 ---
-title: "Examples from Bishop et al. 202X"
+title: "Examples from Bishop et al. (in review)"
 output: github_document
 ---
 
@@ -21,6 +21,7 @@ The results and figures from the paper were created using the `simex_notebook.Rm
 │   simex_functions.R* - functions used for simulation example analysis
 |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
 |   gnxsim.py - script to run geonomics simulations
+|   create_datasets - script to create subsampled datasets
 |   runtime_notebook.Rmd - main notebook for runtime analyses and figures
 |   runtime_notebook.md - knitted runtime_notebook.Rmd 
 |   runtime_functions.R - functions used for runtime analysis
@@ -30,9 +31,10 @@ The results and figures from the paper were created using the `simex_notebook.Rm
 │   │   middle_earth.csv - matrix used to create raster layer for simulations
 │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
 |   |   mod-sim_params_it-0_t-1000_spp-spp_0.vcf - genomic data from simulations
-|   |   samples_seed42.csv - samples used in analysis
+|   |   
+│   └───[middle_earth] - directory with original DEM raster layers from Robert 2020 (https://doi.org/10.21220/RKEZ-X707)
 │   │
-│   └───[middle_earth] - directory with original DEM raster layers
+│   └───[samples] - directory with samples used in analysis
 |
 └───[simex_tests]
 │   │   AllelicRichness_simex_test.R* - generates results for allelic_richness (WGS and rr dataset)
@@ -66,6 +68,8 @@ The results and figures from the paper were created using the `empex_notebook.Rm
 
 ```
 
+## Figures
 
+PDF versions of figures from Bishop et al. are provided in the `figures` directory. 
 
 *\*Note: files with parallelized tasks are marked with an asterix*
