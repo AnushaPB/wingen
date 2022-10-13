@@ -14,7 +14,8 @@ krig_gd(
   agg_r = NULL,
   disagg_r = NULL,
   autoKrige_output = FALSE,
-  zero_correction = TRUE,
+  lower_bound = TRUE,
+  upper_bound = TRUE,
   krig_method = "ordinary",
   resample = FALSE,
   resample_first = TRUE
@@ -39,7 +40,9 @@ krig_gd(
 
 \item{autoKrige_output}{whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
 
-\item{zero_correction}{if TRUE (default), converts all values in the kriged raster less than zero, to zero (since genetic diversity and sample count values can't be negative)}
+\item{lower_bound}{if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum}
+
+\item{upper_bound}{if TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum}
 
 \item{krig_method}{method to use for kriging. If \code{ordinary}, ordinary/simple kriging is performed (formula: ~ 1; default). If \code{universal},  universal kriging is performed (formula = ~ x + y).}
 
