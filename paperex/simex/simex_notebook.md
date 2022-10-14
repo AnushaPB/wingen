@@ -1,4 +1,4 @@
-Simulation Example from Bishop et al. (in review)
+Simulation Example from Bishop et al. (submitted)
 ================
 
 ``` r
@@ -42,7 +42,7 @@ load_middle_earth(subset = TRUE)
 
     ## 
 
-## Figure 2: Simulation Example
+## **Figure 2:** Simulation Example
 
 ### Simulation setup plots
 
@@ -142,7 +142,7 @@ plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-5.png)<!-- -->
 
-### Figure S1: Window vs Aggregation Factor
+### **Figure S1:** Window vs Aggregation Factor
 
 ``` r
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -155,7 +155,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## Figure 3 & Figure S2: Comparison of datasets, statistics, and sample sizes
+## **Figure 3 & Figure S2:** Comparison of datasets, statistics, and sample sizes
 
 ``` r
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -186,7 +186,7 @@ purrr::walk(stk200, test_simex_plot, legend = TRUE)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
 
-## Figure S3: Computational time for simulation example
+## **Figure S5:** Computational time for simulation example
 
 ``` r
 # Loop reads in outputs from simex_tests functions

@@ -1,4 +1,4 @@
-Empirical Example from Bishop et al. (in review)
+Empirical Example from Bishop et al. (submitted)
 ================
 
 ``` r
@@ -105,6 +105,8 @@ First, different parameter combinations are evaluated. Here, we vary the
 window size (`wdim`), the raster resolutions (`disagg`), and the
 rarefaction size (`rarify_n`) to get the plots from Figure S4.
 
+### **Figure S3** Comparison of parameters
+
 ``` r
 params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
@@ -178,7 +180,7 @@ points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
 
 ![](empex_notebook_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
-### **Figure S5:** moving window calculations with and without rarefaction
+### **Figure S4:** moving window calculations with and without rarefaction
 
 ``` r
 set.seed(22)
