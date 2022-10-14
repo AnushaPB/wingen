@@ -1,4 +1,4 @@
-Examples from Bishop et al. (in review)
+Examples from Bishop et al. (submitted)
 ================
 
 ## Simulation Example
@@ -21,6 +21,7 @@ The results and figures from the paper were created using the
     │   simex_functions.R* - functions used for simulation example analysis
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
+    |   create_datasets - script to create subsampled datasets
     |   runtime_notebook.Rmd - main notebook for runtime analyses and figures
     |   runtime_notebook.md - knitted runtime_notebook.Rmd 
     |   runtime_functions.R - functions used for runtime analysis

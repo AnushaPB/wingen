@@ -32,7 +32,7 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 The following example demonstrates the basic functionality of wingen
 using a **small subset (100 variant loci x 100 samples) of the simulated
-data from Bishop et al. (in review)**.
+data from Bishop et al. (submitted)**.
 
 ``` r
 library(wingen)

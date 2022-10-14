@@ -1,5 +1,5 @@
 ---
-title: "Examples from Bishop et al. (in review)"
+title: "Examples from Bishop et al. (submitted)"
 output: github_document
 ---
 

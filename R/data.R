@@ -7,7 +7,7 @@
 #'   \item{x}{x coordinate}
 #'   \item{y}{y coordinate}
 #' }
-#' @source created from simulations in Bishop et al., 202X
+#' @source created from simulations in Bishop et al. (submitted)
 "lotr_coords"
 
 #' Middle earth example vcf
@@ -15,7 +15,7 @@
 #' A Variant Call Format data set
 #'
 #' @format Object of class vcfR with 100 individuals and 1000 loci
-#' @source created from simulations in Bishop et al., 202X
+#' @source created from simulations in Bishop et al. (submitted)
 "lotr_vcf"
 
 #' Middle earth example raster
