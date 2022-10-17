@@ -6,10 +6,10 @@ Authors@R: c(
                    comment = c(ORCID="0000-0003-1731-8683")),
             person("Anne", "Chambers", role ="aut", 
                    comment = c(ORCID="0000-0002-7369-0108")),
-            person("Ian", "Wang", , email = "ianwang@berkeley.edu", role = c("aut"),
+            person("Ian", "Wang", , email = "ianwang@berkeley.edu", role = "aut",
                    comment = c(ORCID = "0000-0003-2554-9414"))
             )
-Description: Visualize genetic diversity across space using a sliding window approach with options for rarefaction and interpolation.
+Description: Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
