@@ -45,7 +45,7 @@ test_that("check that setting the seed produces the same results", {
   expect_equal(wg1p, wg2p)
 })
 
-test_that("all stats work with just one locus", {
+test_that("all stats work with just one site", {
   load_mini_ex(quiet = TRUE)
   expect_warning(wp <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
   expect_warning(wh <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
@@ -297,7 +297,7 @@ test_that("countgen works", {
 
 test_that("invariant warning is given", {
   data("mini_vcf_NA")
-  # check for one locus
+  # check for one site
   ## no NA
   invariant_vcf <- mini_vcf_NA[3, c(1:5)]
   expect_warning(check_data(invariant_vcf), "invariant sites found in vcf")

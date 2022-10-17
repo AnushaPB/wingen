@@ -311,7 +311,7 @@ helper_calc_ar <- function(genind) {
   # OCCUR (since we have our own rarefaction step) min.n is set to the total number of individuals
   # (including those with NAs) times two (assuming diploids)
 
-  # note: [,1] references the first column which is AR for each locus across all inds (nrow(AR) == L)
+  # note: [,1] references the first column which is AR for each site across all inds (nrow(AR) == L)
   # ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
   ar <- hierfstat::allelic.richness(genind)$Ar[, 1]
   return(ar)

@@ -69,7 +69,7 @@ vcf_to_het <- function(x) {
   # IMPORTANT: transform matrix so that rows are individuals and cols are loci
   het <- t(het)
 
-  # if gen is a vector of only one locus, turn into matrix with one column
+  # if gen is a vector of only one site, turn into matrix with one column
   if (nrow(vcf@gt) == 1) {
     het <- matrix(het, ncol = 1)
   }

@@ -17,7 +17,7 @@ source(here(wdir, "runtime_functions.R"))
 # Creating dataset
 
 ``` r
-# load middle earth example just to get a vcc to modify
+# load middle earth example just to get a vcf to modify
 load_middle_earth_ex(quiet = TRUE)
 
 # set dimensions of raster
@@ -29,7 +29,7 @@ lyr <- raster(m)
 pts <- rasterToPoints(lyr)
 coords <- data.frame(pts[,c("x","y")])
 
-# create simple vcf with number of individuals = number of coords and only one locus
+# create simple vcf with number of individuals = number of coords and only one site
 vcf <- lotr_vcf[rep(1, 1), c(1, rep(2, nrow(coords)))]
 
 # visualize even sampling
@@ -70,7 +70,7 @@ resw_mean <- resw %>%
 
 plotw <- ggplot() +
   geom_line(data = resw, aes(x = wsize, y = time, group = it), 
-            col = mako(1, begin = 0.8), alpha = 0.15, lwd = 1) +
+            col = mako(1, begin = 0.8), alpha = 0.25, lwd = 1) +
   geom_line(data = resw_mean, aes(x = wsize, y = time), 
             col = mako(1, begin = 0.8), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 
@@ -90,7 +90,7 @@ resf_mean <- resf %>%
 
 (plotf <- ggplot() +
   geom_line(data = resf, aes(x = ncell, y = time, group = it), 
-            col = mako(1, begin = 0.6), alpha = 0.1, lwd = 1) +
+            col = mako(1, begin = 0.6), alpha = 0.25, lwd = 1) +
   geom_line(data = resf_mean, aes(x = ncell, y = time),
             col = mako(1, begin = 0.6), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 

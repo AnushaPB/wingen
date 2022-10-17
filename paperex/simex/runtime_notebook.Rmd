@@ -31,7 +31,7 @@ lyr <- raster(m)
 pts <- rasterToPoints(lyr)
 coords <- data.frame(pts[,c("x","y")])
 
-# create simple vcf with number of individuals = number of coords and only one locus
+# create simple vcf with number of individuals = number of coords and only one site
 vcf <- lotr_vcf[rep(1, 1), c(1, rep(2, nrow(coords)))]
 
 # visualize even sampling

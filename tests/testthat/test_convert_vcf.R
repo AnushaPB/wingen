@@ -113,7 +113,7 @@ test_that("check that vcf to het conversion is correct", {
   data("mini_vcf_NA")
   expect_error(genind <- vcf_to_het(mini_vcf_NA), NA)
 
-  # check for one locus
+  # check for one site
   obs <- as.vector(vcf_to_het(mini_vcf_NA[7, ]))
   # manually calculated:
   expected <- c(FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, NA, FALSE)
