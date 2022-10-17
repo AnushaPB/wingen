@@ -8,7 +8,7 @@
 Object of class vcfR with 100 individuals and 1000 loci
 }
 \source{
-created from simulations in Bishop et al., 202X
+created from simulations in Bishop et al. (submitted)
 }
 \usage{
 lotr_vcf
