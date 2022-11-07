@@ -14,7 +14,7 @@
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
-#' @param fun function to use to summarize rarefaction results (defaults to mean)
+#' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen defaults is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
 #' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
@@ -253,7 +253,7 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
   gdrar <- apply(cmb, 1, sample_gd, x = x, stat = stat, L = L, rarify_alleles = rarify_alleles)
 
   # summarize rarefaction results
-  gd <- stats::na.omit(fun(gdrar))
+  gd <- fun(gdrar, na.rm = TRUE)
 
   return(gd)
 }
@@ -467,16 +467,14 @@ get_minn <- function(dos) {
   return(min.n)
 }
 
-#' Count number of not NA genotypes
+#' Count not NA genotypes and return NA if all are NA
 #'
 #' @param x dosage matrix
 #'
 #' @noRd
 countgen <- function(x) {
-  notNA <- length(stats::na.omit(x))
-  if (notNA == 0) {
-    notNA <- NA
-  }
+  notNA <- sum(!is.na(x))
+  if (notNA == 0) notNA <- NA
   return(notNA)
 }
 
@@ -651,3 +649,4 @@ return_stat <- function(stat, ...) {
 
   stop(paste(stat, "is an invalid argument for stat"))
 }
+
