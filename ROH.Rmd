@@ -3,6 +3,54 @@ title: "ROH"
 output: html_document
 date: "2023-01-03"
 ---
+```{r, message = FALSE, results = FALSE, warning = FALSE}
+library(wingen)
+library(vcfR)
+library(rgdal)
+library(raster)
+library(viridis)
+library(here)
+library(tigris)
+library(sf)
+library(purrr)
+
+wdir <- here("paperex", "empex")
+source(here(wdir, "empex_functions.R"))
+```
+```{r, message = FALSE, results = FALSE}
+# download states from tigris
+states <- states(cb = TRUE)
+
+# reproject into wgs84 to match coordinates
+states <- st_transform(states, 4326)
+
+# convert to SPDF
+states <- as_Spatial(states)
+
+# subset out CONUS
+conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
+
+# subset out Northern US
+NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+```
+
+```{r, message = FALSE, results = FALSE}
+# download states from tigris
+states <- states(cb = TRUE)
+
+# reproject into wgs84 to match coordinates
+states <- st_transform(states, 4326)
+
+# convert to SPDF
+states <- as_Spatial(states)
+
+# subset out CONUS
+conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
+
+# subset out Northern US
+NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+```
+
 ```{r}
 library("detectRUNS")
 genotypeFilePath <- "paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped"
