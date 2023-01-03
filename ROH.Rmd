@@ -34,22 +34,7 @@ conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "Am
 NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
 ```
 
-```{r, message = FALSE, results = FALSE}
-# download states from tigris
-states <- states(cb = TRUE)
 
-# reproject into wgs84 to match coordinates
-states <- st_transform(states, 4326)
-
-# convert to SPDF
-states <- as_Spatial(states)
-
-# subset out CONUS
-conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
-
-# subset out Northern US
-NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
-```
 
 ```{r}
 library("detectRUNS")
@@ -89,18 +74,25 @@ library(dplyr)
 ROH_mat_cR <- consecutiveRuns %>% count(group)
 ROH_mat_sR <- slidingRuns %>% count(group)
 ```
+
 ```{r, fig.width = 5, fig.height = 5}
 # Coordinates
+
 coords <- read.table("paperex/empex/data/Scelop.coord")
+vcf <- vcfR::read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_randomSNP.vcf"))
+coords$group <- colnames(vcf@gt)[-1]
 
 library(wingen)
-lyr <- coords_to_raster(coords, disagg = 3)
-test <- window_general(ROH_mat_cR$n, coords, lyr, stat = mean, wdim = 5, rarify = TRUE, na.rm = TRUE)
+ROH_mat_cR <- left_join(ROH_mat_cR, coords)
+
+lyr <- coords_to_raster(coords[,c("V1","V2")], disagg = 3)
+test <- window_general(ROH_mat_cR$n, coords[,c("V1","V2")], lyr, stat = sum, wdim = 5, rarify = TRUE, na.rm = TRUE)
 test_kg <- krig_gd(test, grd = lyr, disagg_grd = 3)
 test_cR <- mask_gd(test_kg, NUS)
 plot_gd(test)
 plot_gd(test_cR, breaks = 10)
 
+wg <- window_gd(vcf, coords[,c("V1","V2")], lyr, stat = "pi", wdim = 5, rarify = TRUE)
 wg_kg <- krig_gd(wg, grd = lyr, disagg_grd = 3)
 wg_cr <- mask_gd(wg_kg, NUS)
 
