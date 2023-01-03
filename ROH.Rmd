@@ -1,0 +1,62 @@
+---
+title: "ROH"
+output: html_document
+date: "2023-01-03"
+---
+```{r}
+library("detectRUNS")
+genotypeFilePath <- "paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped"
+mapFilePath <- "paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map"
+
+consecutiveRuns <- consecutiveRUNS.run(
+  genotypeFile =genotypeFilePath,
+  mapFile = mapFilePath,
+  minSNP = 3,
+  ROHet = FALSE,
+  maxGap = 10^6,
+  minLengthBps = 1000,
+  maxOppRun = 1,
+  maxMissRun = 1
+)
+
+slidingRuns <- slidingRUNS.run(
+  genotypeFile = genotypeFilePath, 
+  mapFile = mapFilePath, 
+  windowSize = 15, 
+  threshold = 0.05,
+  minSNP = 3, 
+  ROHet = FALSE, 
+  maxOppWindow = 1, 
+  maxMissWindow = 1,
+  maxGap = 10^6, 
+  minLengthBps = 1000, 
+  minDensity = 1/10^3, # SNP/kbps
+  maxOppRun = NULL,
+  maxMissRun = NULL
+) 
+```
+
+```{r}
+library(dplyr)
+ROH_mat_cR <- consecutiveRuns %>% count(group)
+ROH_mat_sR <- slidingRuns %>% count(group)
+```
+```{r, fig.width = 5, fig.height = 5}
+# Coordinates
+coords <- read.table("paperex/empex/data/Scelop.coord")
+
+library(wingen)
+lyr <- coords_to_raster(coords, disagg = 3)
+test <- window_general(ROH_mat_cR$n, coords, lyr, stat = mean, wdim = 5, rarify = TRUE, na.rm = TRUE)
+test_kg <- krig_gd(test, grd = lyr, disagg_grd = 3)
+test_cR <- mask_gd(test_kg, NUS)
+plot_gd(test)
+plot_gd(test_cR, breaks = 10)
+
+wg_kg <- krig_gd(wg, grd = lyr, disagg_grd = 3)
+wg_cr <- mask_gd(wg_kg, NUS)
+
+plot_gd(wg_cr, breaks = 20)
+plot_gd(test_cR, col = magma(20, direction = -1))
+```
+
