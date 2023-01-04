@@ -78,11 +78,11 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
       return(message(cat(
         crayon::cyan(crayon::bold("\n---------------- middle earth data ----------------\n")),
         crayon::silver("\nObjects loaded:"),
-        crayon::yellow(crayon::bold("\n*lotr_vcf*")),
-        crayon::yellow(paste0("vcfR object (100 loci x 100 samples)")),
-        crayon::green(crayon::bold("\n*lotr_coords*")), crayon::green("dataframe with x and y coordinates"),
-        crayon::magenta(crayon::bold("\n*lotr_lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
-        crayon::blue(crayon::bold("\n*lotr_range*")), crayon::blue("SpatialPolygonsDataFrame of spp range"),
+        crayon::yellow(crayon::bold("\n*vcf*")),
+        crayon::yellow(paste0("vcfR object (142129 loci x 1697 samples)")),
+        crayon::green(crayon::bold("\n*coords*")), crayon::green("dataframe with x and y coordinates"),
+        crayon::magenta(crayon::bold("\n*lyr*")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
+        crayon::blue(crayon::bold("\n*bkg*")), crayon::blue("background layer"),
         crayon::cyan(crayon::bold("\n\n---------------------------------------------------\n"))
       )))
     }
