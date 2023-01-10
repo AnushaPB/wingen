@@ -79,3 +79,5 @@ paperex/plots
 
 # code coverage token
 cov_token.R
+*.map
+*.ped
