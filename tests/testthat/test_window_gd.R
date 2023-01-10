@@ -334,3 +334,30 @@ test_that("custom functions with window general work", {
   foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
   wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3)
 })
+
+
+test_that("get_adj works", {
+
+  data("mini_lyr")
+  data("mini_coords")
+
+  mini_lyr <- terra::rast(mini_lyr)
+  nmat <- wdim_to_mat(5)
+  coord_cells <- raster::extract(mini_lyr, mini_coords, cell = TRUE)[, "cells"]
+  adj <- get_adj(i = coord_cells[1], mini_lyr, nmat, coord_cells)
+
+  # fill in window of raster layer
+  adjc <- raster::adjacent(mini_lyr, cells = coord_cells[1], directions = nmat, include = TRUE, sorted = TRUE)
+  adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
+  mini_lyr[] <- 0
+  mini_lyr[adjci] <- 1
+
+  # left in just to help with a manual visual check
+  raster::plot(mini_lyr)
+  points(mini_coords)
+  points(mini_coords[adj,], col = "red")
+
+  # check that all coords within the window are counted and all outside the window are not
+  expect_true(all(raster::extract(mini_lyr, mini_coords[adj,]) == 1))
+  expect_true(all(raster::extract(mini_lyr, mini_coords[-adj,]) != 1))
+})
