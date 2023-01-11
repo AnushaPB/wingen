@@ -5,11 +5,11 @@
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
 #' @param vcf object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
-#' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
-#' @param lyr RasterLayer to slide the window across
+#' @param coords coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates
+#' @param lyr SpatRaster or RasterLayer to slide the window across
 #' @param stat genetic diversity statistic to calculate (can either be `"pi"` for nucleotide diversity (default), `"Ho"` for average observed heterozygosity across all sites, `"allelic_richness"` for average number of alleles across all sites, or `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option faster than `"allelic_richness"`))
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
-#' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
+#' @param fact aggregation factor to apply to `lyr` (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
 #' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
@@ -20,7 +20,7 @@
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #'
-#' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+#' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
 #'
 #' @examples
@@ -83,13 +83,17 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_gd
 #'
-#' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+#' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
+
+
+  # check layers and coords (only lyr is modified and returned)
+  lyr <- layer_coords_check(lyr, coords)
 
   # set L if pi is being calculated
   if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
@@ -105,43 +109,42 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
-  if (fact == 0) lyr <- lyr * 0 else lyr <- raster::aggregate(lyr, fact, fun = mean) * 0
+  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
 
   # get cell index for each coordinate
-  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
+  coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # run sliding window calculations
   if (parallel) {
+
+    # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
+    # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
+    lyr <- raster::raster(lyr)
+
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
     future::plan(future::multisession, workers = ncores)
 
-    rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr), window_helper,
+    rast_vals <- furrr::future_map_dfr(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster"))
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster"))
     )
+
+    # convert back to SpatRast
+    lyr <- terra::rast(lyr)
+
   } else {
-    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper,
+    rast_vals <- purrr::map_dfr(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
 
-
-  # make copies of rasters
-  alyr <- lyr
-  nsagg <- lyr
-  # assign values to rasters
-  alyr[] <- rast_vals[, "gd"]
-  nsagg[] <- rast_vals[, "ns"]
-
-  results <- raster::stack(alyr, nsagg)
-
-  # set raster layer names based on stat
-  results <- name_results(results, stat)
+  # format resulting raster values
+  results <- vals_to_lyr(lyr, rast_vals, stat)
 
   return(results)
 }
@@ -160,6 +163,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
+
+  # convert RasterLayer back to SpatRaster (necessary for parallelized task)
+  #if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if (rarify) min_n <- rarify_n
@@ -431,7 +437,7 @@ raref <- function(x, min.n) {
 #' Helper function to get adjacent cells to a given cell index
 #'
 #' @param i cell index
-#' @param r RasterLayer
+#' @param r SpatRast
 #' @param n neighborhood matrix
 #' @param coord_cells cell numbers of coordinates
 #'
@@ -440,7 +446,7 @@ raref <- function(x, min.n) {
 #' @noRd
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
-  adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
+  adjc <- terra::adjacent(r, i, directions = n, include = TRUE)
   # get indices of adjacent cells
   adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
   # get list of indices of coords in that set of cells
@@ -484,15 +490,14 @@ countgen <- function(x) {
 #' @param coords coordinates
 #'
 #' @noRd
+#'
 check_data <- function(x, coords = NULL) {
 
   # if x is a vector, convert to a dataframe
   if (is.vector(x)) x <- data.frame(x)
 
-  # format coords
+  # check and format coords
   if (!is.null(coords)) {
-    coords <- data.frame(coords)
-    colnames(coords) <- c("x", "y")
     if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
   }
 
@@ -604,7 +609,7 @@ convert_vcf <- function(vcf, stat) {
 
 #' Rename results from window_gd
 #'
-#' @param x RasterStack produced by window_gd
+#' @param x SpatRaster produced by window_gd
 #' @param stat genetic diversity statistic
 #'
 #' @noRd
@@ -648,3 +653,78 @@ return_stat <- function(stat, ...) {
   stop(paste(stat, "is an invalid argument for stat"))
 }
 
+#' Helper function to check lyr and coords
+#'
+#' @param lyr RasterLayer or SpatRaster
+#' @param coords sf object, data frame, or matrix representing coordinates
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+layer_coords_check <- function(lyr, coords){
+  # check coords and lyr
+  crs_check(lyr, coords)
+
+  # convert to terra
+  if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
+
+  # check number of layers
+  nlayers <- terra::nlyr(lyr)
+  if (nlayers > 1) {
+    warning(paste0(nlayers, " provided, but only one is need. Defaults to using the first layer."))
+    lyr <- lyr[[1]]
+  }
+
+  return(lyr)
+}
+
+
+#' Check CRS of coords and nlayer
+#'
+#' @param lyr RasterLayer or SpatRaster
+#' @param coords sf object, data frame, or matrix representing coordinates
+#'
+#' @return NULL
+#'
+#' @noRd
+crs_check <- function(lyr, coords){
+
+  coords_crs <- sf::st_crs(coords)
+  lyr_crs <- sf::st_crs(lyr)
+
+  if (is.na(coords_crs)) warning("No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming euclidean coordinates.")
+
+  if (is.na(lyr_crs)) warning("No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection.")
+
+  if (!is.na(lyr_crs) & !is.na(coords_crs)) {
+    if (coords_crs != lyr_crs) stop("CRS of the provided coordinates and raster do not match")
+  }
+
+  return()
+}
+
+#' Convert values into new raster layers
+#'
+#' @param lyr SpatRaster
+#' @param rast_vals dataframe of gd and ns
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+vals_to_lyr <- function(lyr, rast_vals, stat){
+
+  # make copies of rasters
+  alyr <- lyr
+  nsagg <- lyr
+
+  # assign values to rasters
+  alyr[] <- rast_vals[, "gd"]
+  nsagg[] <- rast_vals[, "ns"]
+
+  results <- c(alyr, nsagg)
+
+  # set raster layer names based on stat
+  results <- name_results(results, stat)
+
+  return(results)
+}
