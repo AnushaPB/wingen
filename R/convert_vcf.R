@@ -56,7 +56,7 @@ vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
 #' Convert vcf to heterozygosity matrix
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
-#' #'
+#'
 #' @return heterozygosity matrix
 #'
 #' @noRd
