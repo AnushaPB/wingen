@@ -21,8 +21,14 @@
 #'
 mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
 
+  # make sure x is a SpatRaster
+  if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
+
   # match raster layers
-  if (class(mask) == "RasterLayer" | class(mask) == "RasterStack" | class(mask) == "RasterBrick") {
+  if (inherits(mask, "RasterLayer") | inherits(mask, "RasterStack") | inherits(mask, "RasterBrick") |  inherits(mask, "SpatRaster")) {
+
+    # convert raster
+    if (!inherits(mask, "SpatRaster")) mask <- terra::rast(mask)
 
     # mask areas below min/max val if provided
     if (!is.null(minval)) {
@@ -33,15 +39,18 @@ mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
       mask[mask > maxval] <- NA
     }
 
-    if (!raster::compareRaster(x, mask, stopiffalse = FALSE)) {
-      if (resample == "mask") mask <- raster::resample(mask, x)
-      if (resample == "x") x <- raster::resample(x, mask)
+    if (!terra::compareGeom(x, mask, stopOnError = FALSE)) {
+      if (resample == "mask") mask <- terra::resample(mask, x)
+      if (resample == "x") x <- terra::resample(x, mask)
       if (resample != "x" & resample != "mask") stop("invalid arugment provided for resample (must be \"x\" or \"mask\")")
     }
   }
 
+  # if not a raster convert to a spat vector
+  if (!inherits(mask, "SpatRaster") & !inherits(mask, "SpatVector")) mask <- terra::vect(mask)
+
   # mask
-  x <- raster::mask(x, mask)
+  x <- terra::mask(x, mask)
 
   return(x)
 }
