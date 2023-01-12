@@ -663,7 +663,7 @@ return_stat <- function(stat, ...) {
 #' @noRd
 layer_coords_check <- function(lyr, coords){
   # check coords and lyr
-  crs_check(lyr, coords)
+  crs_check_window(lyr, coords)
 
   # convert to terra
   if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
@@ -676,31 +676,6 @@ layer_coords_check <- function(lyr, coords){
   }
 
   return(lyr)
-}
-
-
-#' Check CRS of coords and nlayer
-#'
-#' @param lyr RasterLayer or SpatRaster
-#' @param coords sf object, data frame, or matrix representing coordinates
-#'
-#' @return NULL
-#'
-#' @noRd
-crs_check <- function(lyr, coords){
-
-  coords_crs <- sf::st_crs(coords)
-  lyr_crs <- sf::st_crs(lyr)
-
-  if (is.na(coords_crs)) warning("No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming euclidean coordinates.")
-
-  if (is.na(lyr_crs)) warning("No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection.")
-
-  if (!is.na(lyr_crs) & !is.na(coords_crs)) {
-    if (coords_crs != lyr_crs) stop("CRS of the provided coordinates and raster do not match")
-  }
-
-  return()
 }
 
 #' Convert values into new raster layers
