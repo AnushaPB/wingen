@@ -1,36 +1,57 @@
 test_that("mask_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
 
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
-  expect_warning(kpi <- krig_gd(wpi, mini_lyr))
+  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
+  capture_warnings(kpi <- krig_gd(wpi, mini_lyr))
   mpi <- mask_gd(kpi, mini_lyr, minval = 2)
 
-  expect_s4_class(wpi, "RasterStack")
-  expect_equal(raster::nlayers(wpi), 2)
-  expect_true(raster::cellStats(is.na(mpi) == (mini_lyr < 2), all))
+  expect_s4_class(wpi, "SpatRaster")
+  expect_equal(terra::nlyr(wpi), 2)
+  expect_true(all(terra::values(is.na(mpi)) == terra::values(mini_lyr < 2)))
 
-  wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE)
-  expect_warning(kpi <- krig_gd(wpi, mini_lyr))
+  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
+  capture_warnings(kpi <- krig_gd(wpi, mini_lyr))
   mpi <- mask_gd(kpi, mini_lyr, maxval = 2)
 
-  expect_s4_class(wpi, "RasterStack")
-  expect_equal(raster::nlayers(wpi), 2)
-  expect_true(raster::cellStats(is.na(mpi) == (mini_lyr > 2), all))
+  expect_s4_class(wpi, "SpatRaster")
+  expect_equal(terra::nlyr(wpi), 2)
+  expect_true(all(terra::values(is.na(mpi)) == terra::values(mini_lyr > 2)))
 })
 
 test_that("resampling occurs correctly", {
   load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
-  mask <- raster::aggregate(mini_lyr, 2)
+  mask <- terra::aggregate(mini_lyr, 2)
 
   # resample to mask to match x
-  expect_error(msm <- mask_gd(x, mask, resample = "mask"), NA)
-  expect_true(raster::compareRaster(msm, x))
+  msm <- mask_gd(x, mask, resample = "mask")
+  expect_true(terra::compareGeom(msm, terra::rast(x)))
+
   # resample x to match mask
   expect_error(msx <- mask_gd(x, mask, resample = "x"), NA)
-  expect_true(raster::compareRaster(msx, mask))
+  expect_true(terra::compareGeom(msx, terra::rast(mask)))
 
   # check for error if invalid resample arg is supplied
   expect_error(mse <- mask_gd(x, mask, resample = "grid"))
+})
+
+test_that("different objects can be used for masking", {
+  data("lotr_lyr")
+  data("lotr_range")
+
+  # SpatVector
+  vect_range <- terra::vect(lotr_range)
+  m1 <- mask_gd(lotr_lyr, lotr_range)
+
+  # sf object
+  sf_range <-  sf::st_as_sf(lotr_range)
+  m2 <- mask_gd(lotr_lyr, sf_range)
+
+  # sp object
+  sp_range <-  sf::as_Spatial(sf_range)
+  m3 <- mask_gd(lotr_lyr, sp_range)
+
+  expect_true(terra::all.equal(m1, m2))
+  expect_true(terra::all.equal(m1, m3))
 })
