@@ -17,7 +17,7 @@ test_that("all stats and parallel works", {
 
   # check parallel
   capture_warnings(wpp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE, parallel = TRUE, ncores = 2))
-  expect_true(terra::all.equal(terra::rast(wpp), terra::rast(wp)))
+  expect_true(terra::all.equal(wpp, wp))
 })
 
 test_that("rarifaction works for all options", {
@@ -40,13 +40,13 @@ test_that("check that setting the seed produces the same results", {
   capture_warnings(wg1 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
   set.seed(42)
   capture_warnings(wg2 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
-  expect_true(terra::all.equal(terra::rast(wg1), terra::rast(wg2)))
+  expect_true(terra::all.equal(wg1, wg2))
 
   set.seed(42)
   capture_warnings(wg1p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
   set.seed(42)
   capture_warnings(wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
-  expect_true(terra::all.equal(terra::rast(wg1p), terra::rast(wg2p)))
+  expect_true(terra::all.equal(wg1p, wg2p))
 })
 
 test_that("all stats work with just one site", {
@@ -56,6 +56,8 @@ test_that("all stats work with just one site", {
   capture_warnings(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = FALSE))
   capture_warnings(wb <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = TRUE))
   capture_warnings(wa <- window_gd(mini_vcf_NA[8, ], mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
+
+  expect_true(TRUE)
 })
 
 test_that("get error with just one individual", {
@@ -180,7 +182,7 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
     )
 
   names(tra) <- names(trab)
-  expect_true(terra::all.equal(terra::rast(trab), terra::rast(tra)))
+  expect_true(terra::all.equal(trab, tra))
 })
 
 test_that("allelic richness is calculated correctly for dataset with no NAs", {
@@ -250,11 +252,11 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
 
   names(tra) <- names(trab_rar) <- names(trab_norar)
 
-  expect_true(terra::all.equal(terra::rast(tra), terra::rast(trab_rar)))
+  expect_true(terra::all.equal(tra, trab_rar))
 
-  expect_true(terra::all.equal(terra::rast(tra), terra::rast(trab_norar)))
+  expect_true(terra::all.equal(tra, trab_norar))
 
-  expect_true(terra::all.equal(terra::rast(trab_norar), terra::rast(trab_rar)))
+  expect_true(terra::all.equal(trab_norar, trab_rar))
 
 })
 
@@ -392,8 +394,8 @@ test_that("window_gd works for different spatial types", {
   capture_warnings(wpi_df <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
 
   # compare rasters
-  expect_true(terra::all.equal(terra::rast(wpi_df), terra::rast(wpi_mat)))
-  expect_true(terra::all.equal(terra::rast(wpi_df), terra::rast(wpi_sf)))
+  expect_true(terra::all.equal(wpi_df, wpi_mat))
+  expect_true(terra::all.equal(wpi_df, wpi_sf))
 
 })
 
