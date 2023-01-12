@@ -721,6 +721,7 @@ vals_to_lyr <- function(lyr, rast_vals, stat){
   alyr[] <- rast_vals[, "gd"]
   nsagg[] <- rast_vals[, "ns"]
 
+  # stack rasters
   results <- c(alyr, nsagg)
 
   # set raster layer names based on stat
