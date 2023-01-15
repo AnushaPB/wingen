@@ -20,9 +20,9 @@
 
 #' Middle earth example raster
 #'
-#' RasterLayer of middle earth
+#' SpatRaster of middle earth
 #'
-#' @format RasterLayer
+#' @format SpatRaster
 #' @source created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 #'
 "lotr_lyr"
@@ -65,9 +65,9 @@
 
 #' Mini middle earth example raster
 #'
-#' RasterLayer of middle earth from CITE
+#' SpatRaster of middle earth from CITE
 #'
 #'
-#' @format A RasterLayer of middle earth
+#' @format A SpatRaster of middle earth
 #' @source created from simulations in Bishop et al., 202X
 "mini_lyr"
