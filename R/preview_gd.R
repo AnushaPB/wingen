@@ -15,7 +15,11 @@
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
 preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0) {
-  if (fact != 0) lyr <- raster::aggregate(lyr, fact)
+
+  # convert to spat rast
+  if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
+
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
   # convert wdim to matrix
   nmat <- wdim_to_mat(wdim)
@@ -42,7 +46,7 @@ preview_window <- function(lyr, nmat, coords) {
   center <- get_center(lyr)
 
   # get adjacent cells to center cell
-  adjc <- raster::adjacent(lyr, center, directions = nmat)
+  adjc <- terra::adjacent(lyr, center, directions = nmat)
   # get list of indices of coords in that set of cells
   adjci <- purrr::map_dbl(adjc, 1, function(x) {
     seq(x[1], x[2])
@@ -53,9 +57,11 @@ preview_window <- function(lyr, nmat, coords) {
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
-  raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-  if (!is.null(coords)) graphics::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+  if (!is.null(coords)) {
+    if(is.matrix(coords)) coords <- data.frame(coords)
+    terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+  }
 }
 
 #' Get center cell of a raster
@@ -64,9 +70,9 @@ preview_window <- function(lyr, nmat, coords) {
 #'
 #' @noRd
 get_center <- function(x) {
-  e <- as.vector(raster::extent(x))
+  e <- as.vector(terra::ext(x))
   c <- c(mean(e[c(1, 2)]), mean(e[c(3, 4)]))
-  center <- raster::cellFromXY(x, c)
+  center <- terra::cellFromXY(x, xy = matrix(c, ncol = 2))
   return(center)
 }
 
@@ -79,7 +85,7 @@ get_center <- function(x) {
 #' @noRd
 preview_count <- function(lyr, coords, nmat, min_n) {
   # get coord cells
-  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
+  coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # make copy of raster for counting
   lyrc <- lyr
@@ -88,7 +94,7 @@ preview_count <- function(lyr, coords, nmat, min_n) {
   nc <- purrr::map_dbl(1:raster::ncell(lyr), sample_count, lyr, nmat, coord_cells)
 
   # assign values to raster
-  lyrc <- raster::setValues(lyr, nc)
+  lyrc <- terra::setValues(lyr, nc)
 
   # mask areas where counts are less than min value
   lyrc[lyrc < min_n] <- NA
@@ -97,7 +103,7 @@ preview_count <- function(lyr, coords, nmat, min_n) {
   names(lyrc) <- "sample_count"
 
   # plot results
-  raster::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE)
+  suppressWarnings(terra::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE))
   graphics::title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
 
   return(lyrc)
@@ -115,3 +121,4 @@ sample_count <- function(x, lyr, nmat, coord_cells) {
   sub <- get_adj(x, lyr, nmat, coord_cells)
   return(length(sub))
 }
+
