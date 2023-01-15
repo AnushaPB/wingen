@@ -393,9 +393,14 @@ test_that("window_gd works for different spatial types", {
   # df coords
   capture_warnings(wpi_df <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
 
+  # spatvec coords
+  vect_coords <- terra::vect(sf_coords)
+  capture_warnings(wpi_vect <- window_gd(mini_vcf, vect_coords, mini_lyr, rarify = FALSE))
+
   # compare rasters
   expect_true(terra::all.equal(wpi_df, wpi_mat))
   expect_true(terra::all.equal(wpi_df, wpi_sf))
+  expect_true(terra::all.equal(wpi_df, wpi_vect))
 
 })
 
