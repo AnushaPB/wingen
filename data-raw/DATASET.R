@@ -2,15 +2,17 @@
 
 # load and save raster layer
 lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
-lotr_lyr <- raster::raster(as.matrix(lyr))
-raster::extent(lotr_lyr) <- raster::extent(0, 100, -100, 0)
+lotr_lyr <- terra::rast(as.matrix(lyr))
+terra::ext(lotr_lyr) <- terra::ext(0, 100, -100, 0)
+lotr_lyr <- raster::raster(lotr_lyr)
 usethis::use_data(lotr_lyr, overwrite = TRUE)
 
 # make a fake range map
-lotr_range <- lotr_lyr
+lotr_range <- terra::rast(lotr_lyr)
 lotr_range[lotr_range < 0.01] <- NA
 lotr_range <- lotr_range * 0
-lotr_range <- raster::rasterToPolygons(lotr_range, dissolve = TRUE, n = 16)
+lotr_range <- terra::as.polygons(lotr_range, dissolve = TRUE)
+lotr_range <- sf::st_as_sf(lotr_range)
 usethis::use_data(lotr_range, overwrite = TRUE)
 
 # load coords
@@ -51,7 +53,7 @@ usethis::use_data(lotr_vcf, overwrite = TRUE)
 
 
 # Code to create tiny example dataset ------------------------------------------------------------------
-mini_lyr <- raster::aggregate(lotr_lyr, 10)
+mini_lyr <- terra::aggregate(lotr_lyr, 10)
 
 mini_vcf <- lotr_vcf[, 1:11]
 mini_vcf <- mini_vcf[is.polymorphic(mini_vcf), ]
