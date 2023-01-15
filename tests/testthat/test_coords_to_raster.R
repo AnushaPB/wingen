@@ -3,23 +3,9 @@ test_that("check dimensions of raster produced", {
 
   r <- coords_to_raster(mini_coords)
 
-  buffer <- 0
-  xmin <- min(mini_coords$x, na.rm = TRUE) - buffer
-  xmax <- max(mini_coords$x, na.rm = TRUE) + buffer
-  ymin <- min(mini_coords$y, na.rm = TRUE) - buffer
-  ymax <- max(mini_coords$y, na.rm = TRUE) + buffer
+  r1 <- coords_to_raster(mini_coords, buffer = 1)
 
-  expect_equal(dim(r), c(ymax - ymin, xmax - xmin, 1), tolerance = 1)
-
-  r <- coords_to_raster(mini_coords, buffer = 1)
-
-  buffer <- 1
-  xmin <- min(mini_coords$x, na.rm = TRUE) - buffer
-  xmax <- max(mini_coords$x, na.rm = TRUE) + buffer
-  ymin <- min(mini_coords$y, na.rm = TRUE) - buffer
-  ymax <- max(mini_coords$y, na.rm = TRUE) + buffer
-
-  expect_equal(dim(r), c(ymax - ymin, xmax - xmin, 1), tolerance = 1)
+  expect_true(all(range(terra::ext(r1)) - range(terra::ext(r)) == 2))
 })
 
 test_that("check resolution of raster produced", {
@@ -27,11 +13,11 @@ test_that("check resolution of raster produced", {
 
   r <- coords_to_raster(mini_coords, res = 5)
   # check resolution is 5
-  expect_equal(raster::res(r), c(5, 5))
+  expect_equal(terra::res(r), c(5, 5))
 
   r <- coords_to_raster(mini_coords, res = c(5, 4))
   # check resolution is about 4 , 5 (also confirm order of x, y)
-  expect_equal(round(raster::res(r), 0), c(5, 4))
+  expect_equal(round(terra::res(r), 0), c(5, 4))
 
   expect_error(r <- coords_to_raster(mini_coords, res = c(5, 4, 3)), "invalid res provided")
 })
@@ -39,9 +25,24 @@ test_that("check resolution of raster produced", {
 test_that("make sure it works if coords are in different formats", {
   load_mini_ex(quiet = TRUE)
 
-  rdf <- coords_to_raster(mini_coords)
+  # sf object
+  sf_coords <-  sf::st_as_sf(mini_coords, coords = c("x", "y"))
+  rsf <- coords_to_raster(sf_coords)
+
+  # SpatVector
+  vect_coords <- terra::vect(sf_coords)
+  rvect <- coords_to_raster(sf_coords)
+
+  # mat
   rmat <- coords_to_raster(as.matrix(mini_coords))
-  expect_equal(rdf, rmat)
+
+  # df
+  rdf <- coords_to_raster(mini_coords)
+
+  expect_true(terra::all.equal(rvect, rmat))
+  expect_true(terra::all.equal(rvect, rdf))
+  expect_true(terra::all.equal(rvect, rsf))
+
 })
 
 test_that("aggregation and disaggregation produce correct rasters", {
@@ -50,14 +51,14 @@ test_that("aggregation and disaggregation produce correct rasters", {
   r0 <- coords_to_raster(mini_coords)
 
   ra <- coords_to_raster(mini_coords, agg = 2)
-  expect_true(raster::compareRaster(ra, raster::aggregate(r0, 2)))
+  expect_true(terra::compareGeom(ra, terra::aggregate(r0, 2)))
 
   rd <- coords_to_raster(mini_coords, disagg = 2)
-  expect_true(raster::compareRaster(rd, raster::disaggregate(r0, 2)))
+  expect_true(terra::compareGeom(rd, terra::disagg(r0, 2)))
 
   expect_warning(rad <- coords_to_raster(mini_coords, agg = 2, disagg = 2))
-  r0_rad <- raster::disaggregate(raster::aggregate(r0, 2), 2)
-  expect_true(raster::compareRaster(rad, r0_rad))
+  r0_rad <- terra::disagg(terra::aggregate(r0, 2), 2)
+  expect_true(terra::compareGeom(rad, r0_rad))
 })
 
 test_that("plots without errors", {
