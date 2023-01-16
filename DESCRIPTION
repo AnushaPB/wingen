@@ -26,6 +26,7 @@ Imports:
     purrr,
     raster,
     sp,
+    sf,
     terra,
     utils,
     vcfR,
