@@ -1600,10 +1600,10 @@
     },
     "raster": {
       "Package": "raster",
-      "Version": "3.6-13",
+      "Version": "3.6-14",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "2398b7f3d73637adfe6adc286e6844f4",
+      "Hash": "2406e2380237f4dcf84e83260419895a",
       "Requirements": [
         "Rcpp",
         "sp",
@@ -2060,10 +2060,10 @@
     },
     "terra": {
       "Package": "terra",
-      "Version": "1.6-47",
+      "Version": "1.6-53",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "67b7ba63622fbab6820434ac7ac296d6",
+      "Hash": "3bd9337c86c21c0f6d15ebecc6cb0ea9",
       "Requirements": [
         "Rcpp"
       ]
