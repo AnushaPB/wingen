@@ -29,7 +29,6 @@ vcf_to_dosage <- function(x) {
 #'
 #' @noRd
 vcf_to_genind <- function(x, pops = NULL, warning = FALSE) {
-
   # check vcf
   vcf <- vcf_check(x)
 

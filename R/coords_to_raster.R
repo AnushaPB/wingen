@@ -16,7 +16,6 @@
 #' load_mini_ex()
 #' coords_to_raster(mini_coords, buffer = 1, plot = TRUE)
 coords_to_raster <- function(coords, buffer = 0, res = 1, agg = NULL, disagg = NULL, plot = FALSE) {
-
   # make a matrix
   r <- make_raster(coords, buffer = buffer, res = res)
 
@@ -46,7 +45,6 @@ coords_to_raster <- function(coords, buffer = 0, res = 1, agg = NULL, disagg = N
 #'
 #' @noRd
 make_raster <- function(coords, buffer = 0, res = 1) {
-
   # get crs
   crs <- terra::crs(coords)
   if (is.na(crs)) crs <- ""

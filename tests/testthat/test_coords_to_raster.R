@@ -26,7 +26,7 @@ test_that("make sure it works if coords are in different formats", {
   load_mini_ex(quiet = TRUE)
 
   # sf object
-  sf_coords <-  sf::st_as_sf(mini_coords, coords = c("x", "y"))
+  sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
   rsf <- coords_to_raster(sf_coords)
 
   # SpatVector
@@ -42,7 +42,6 @@ test_that("make sure it works if coords are in different formats", {
   expect_true(terra::all.equal(rvect, rmat))
   expect_true(terra::all.equal(rvect, rdf))
   expect_true(terra::all.equal(rvect, rsf))
-
 })
 
 test_that("aggregation and disaggregation produce correct rasters", {

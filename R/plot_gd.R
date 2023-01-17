@@ -19,7 +19,6 @@
 #' plot_gd(mini_lyr)
 #'
 plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
-
   if (inherits(x, "RasterLayer") | inherits(x, "RasterStack")) x <- terra::rast(x)
   if (inherits(x, "RasterLayer") | inherits(x, "RasterStack")) bkg <- terra::rast(bkg)
 
@@ -50,10 +49,8 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' @noRd
 plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
-
   # suppress irrelevant plot warnings
   suppressWarnings({
-
     # calculate extent
     extx <- terra::ext(x)
     extb <- terra::ext(bkg)

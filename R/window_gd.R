@@ -34,7 +34,6 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL) {
-
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(vcf)
 
@@ -90,8 +89,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
-
-
   # check layers and coords (only lyr is modified and returned)
   lyr <- layer_coords_check(lyr, coords)
 
@@ -116,7 +113,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
   # run sliding window calculations
   if (parallel) {
-
     # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
     # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
     lyr <- raster::raster(lyr)
@@ -134,7 +130,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
-
   } else {
     rast_vals <- purrr::map_dfr(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
@@ -163,9 +158,8 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
-
   # convert RasterLayer back to SpatRaster (necessary for parallelized task)
-  #if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
+  # if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if (rarify) min_n <- rarify_n
@@ -234,7 +228,6 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
 #' @noRd
 rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
                       fun, L = NULL, rarify_alleles = TRUE) {
-
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
     stop("rarify_n is less than the number of samples provided")
@@ -492,7 +485,6 @@ countgen <- function(x) {
 #' @noRd
 #'
 check_data <- function(x, coords = NULL) {
-
   # if x is a vector, convert to a dataframe
   if (is.vector(x)) x <- data.frame(x)
 
@@ -530,7 +522,6 @@ check_data <- function(x, coords = NULL) {
 #'
 #' @noRd
 check_vcf_NA <- function(vcf, coords = NULL) {
-
   # check for mismatch before indexing
   if (!is.null(coords)) {
     if ((ncol(vcf@gt) - 1) != nrow(coords)) {
@@ -661,7 +652,7 @@ return_stat <- function(stat, ...) {
 #' @return SpatRaster
 #'
 #' @noRd
-layer_coords_check <- function(lyr, coords){
+layer_coords_check <- function(lyr, coords) {
   # check coords and lyr
   crs_check_window(lyr, coords)
 
@@ -686,8 +677,7 @@ layer_coords_check <- function(lyr, coords){
 #' @return SpatRaster
 #'
 #' @noRd
-vals_to_lyr <- function(lyr, rast_vals, stat){
-
+vals_to_lyr <- function(lyr, rast_vals, stat) {
   # make copies of rasters
   alyr <- lyr
   nsagg <- lyr

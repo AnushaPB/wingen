@@ -7,8 +7,7 @@
 #' @return NULL
 #'
 #' @noRd
-crs_check_window <- function(lyr, coords){
-
+crs_check_window <- function(lyr, coords) {
   # get CRS of each object
   coords_crs <- sf::st_crs(coords)
   lyr_crs <- sf::st_crs(lyr)
@@ -20,7 +19,6 @@ crs_check_window <- function(lyr, coords){
   if (!is.na(lyr_crs) & !is.na(coords_crs)) {
     if (coords_crs != lyr_crs) stop("CRS of the provided coordinates and raster do not match")
   }
-
 }
 
 #' Check CRS of coords and layer for krig_gd
@@ -33,7 +31,6 @@ crs_check_window <- function(lyr, coords){
 #'
 #' @noRd
 crs_check_krig <- function(r, grd = NULL, coords = NULL) {
-
   r_crs <- sf::st_crs(r)
   if (is.na(r_crs)) {
     if (!is.null(grd) & is.null(coords)) warning("No CRS found for the provided raster (r). Make sure that r and grd have the same projection.")
@@ -60,7 +57,6 @@ crs_check_krig <- function(r, grd = NULL, coords = NULL) {
     if (!is.na(r_crs) & !is.na(coords_crs)) {
       if (coords_crs != r_crs) stop("CRS of the provided coordinates and raster (r) do not match")
     }
-
   }
 
   if (!is.null(coords) & !is.null(grd)) {
@@ -68,5 +64,4 @@ crs_check_krig <- function(r, grd = NULL, coords = NULL) {
       if (coords_crs != grd_crs) stop("CRS of the provided coordinates and raster (grd) do not match")
     }
   }
-
 }

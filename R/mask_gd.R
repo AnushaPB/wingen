@@ -20,13 +20,11 @@
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
 mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
-
   # make sure x is a SpatRaster
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   # match raster layers
-  if (inherits(mask, "RasterLayer") | inherits(mask, "RasterStack") | inherits(mask, "RasterBrick") |  inherits(mask, "SpatRaster")) {
-
+  if (inherits(mask, "RasterLayer") | inherits(mask, "RasterStack") | inherits(mask, "RasterBrick") | inherits(mask, "SpatRaster")) {
     # convert raster
     if (!inherits(mask, "SpatRaster")) mask <- terra::rast(mask)
 

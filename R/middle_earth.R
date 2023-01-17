@@ -10,7 +10,6 @@
 #' @examples
 #' load_middle_earth_ex()
 load_middle_earth_ex <- function(quiet = FALSE) {
-
   # load all data
   utils::data(list = c("lotr_vcf", "lotr_lyr", "lotr_coords", "lotr_range"))
 
@@ -41,7 +40,6 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 #' @examples
 #' load_mini_ex()
 load_mini_ex <- function(quiet = FALSE) {
-
   # load all data
   utils::data(list = c("mini_vcf", "mini_vcf_NA", "mini_coords", "mini_lyr"))
 

@@ -33,7 +33,6 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
                     lower_bound = TRUE, upper_bound = TRUE,
                     krig_method = "ordinary",
                     resample = FALSE, resample_first = TRUE) {
-
   # check CRS
   crs_check_krig(r = r, grd = grd, coords = coords)
 
@@ -100,7 +99,6 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
                         upper_bound = TRUE,
                         krig_method = "ordinary",
                         resample = FALSE, resample_first = TRUE) {
-
   # Transform raster layer
   if (inherits(grd, "SpatRaster")) {
     stk <- raster_transform(
@@ -184,10 +182,9 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
 #'
 #' @noRd
 make_krig_df <- function(r, coords = NULL) {
-
   # use coords if provided
   if (!is.null(coords)) {
-    if(inherits(coords, "sf")) coords <- terra::vect(coords)
+    if (inherits(coords, "sf")) coords <- terra::vect(coords)
     krig_df <- terra::extract(r, coords, ID = FALSE, xy = TRUE)
   } else {
     # convert raster to df
@@ -240,7 +237,7 @@ make_krige_grid <- function(r = NULL, grd = NULL) {
 #' @noRd
 raster_to_grid <- function(x) {
   grd <- terra::as.data.frame(x, xy = TRUE)
-  sp::coordinates(grd) <- ~ x+y
+  sp::coordinates(grd) <- ~ x + y
   sp::gridded(grd) <- TRUE
   return(grd)
 }

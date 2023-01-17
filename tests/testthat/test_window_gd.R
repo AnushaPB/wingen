@@ -30,7 +30,6 @@ test_that("rarifaction works for all options", {
 
   # test doesn't matter, just checking if above lines don't error
   expect_true(TRUE)
-
 })
 
 test_that("check that setting the seed produces the same results", {
@@ -112,7 +111,6 @@ test_that("L argument works", {
 
   # test doesn't matter, just checking if above lines don't error
   expect_true(TRUE)
-
 })
 
 
@@ -151,35 +149,35 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
   # check rasters
   set.seed(22)
   capture_warnings(
-      trab <- window_gd(mini_vcf_NA,
-        mini_coords,
-        mini_lyr,
-        stat = "biallelic_richness",
-        wdim = 3,
-        fact = 3,
-        rarify_n = 2,
-        rarify_nit = 5,
-        rarify = TRUE,
-        parallel = FALSE,
-        rarify_alleles = TRUE
-      )
+    trab <- window_gd(mini_vcf_NA,
+      mini_coords,
+      mini_lyr,
+      stat = "biallelic_richness",
+      wdim = 3,
+      fact = 3,
+      rarify_n = 2,
+      rarify_nit = 5,
+      rarify = TRUE,
+      parallel = FALSE,
+      rarify_alleles = TRUE
     )
+  )
 
 
   set.seed(22)
   capture_warnings(
-      tra <- window_gd(mini_vcf_NA,
-        mini_coords,
-        mini_lyr,
-        stat = "allelic_richness",
-        wdim = 3,
-        fact = 3,
-        rarify_n = 2,
-        rarify_nit = 5,
-        rarify = TRUE,
-        parallel = FALSE
-      )
+    tra <- window_gd(mini_vcf_NA,
+      mini_coords,
+      mini_lyr,
+      stat = "allelic_richness",
+      wdim = 3,
+      fact = 3,
+      rarify_n = 2,
+      rarify_nit = 5,
+      rarify = TRUE,
+      parallel = FALSE
     )
+  )
 
   names(tra) <- names(trab)
   expect_true(terra::all.equal(trab, tra))
@@ -221,33 +219,33 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
   # check rasters
   set.seed(22)
   capture_warnings(
-  trab_norar <- window_gd(mini_vcf,
-    mini_coords,
-    mini_lyr,
-    stat = "biallelic_richness",
-    wdim = 3,
-    fact = 3,
-    rarify_n = 2,
-    rarify_nit = 5,
-    rarify = TRUE,
-    parallel = FALSE,
-    rarify_alleles = FALSE
-  )
+    trab_norar <- window_gd(mini_vcf,
+      mini_coords,
+      mini_lyr,
+      stat = "biallelic_richness",
+      wdim = 3,
+      fact = 3,
+      rarify_n = 2,
+      rarify_nit = 5,
+      rarify = TRUE,
+      parallel = FALSE,
+      rarify_alleles = FALSE
+    )
   )
 
   set.seed(22)
   capture_warnings(
-  tra <- window_gd(mini_vcf,
-    mini_coords,
-    mini_lyr,
-    stat = "allelic_richness",
-    wdim = 3,
-    fact = 3,
-    rarify_n = 2,
-    rarify_nit = 5,
-    rarify = TRUE,
-    parallel = FALSE
-  )
+    tra <- window_gd(mini_vcf,
+      mini_coords,
+      mini_lyr,
+      stat = "allelic_richness",
+      wdim = 3,
+      fact = 3,
+      rarify_n = 2,
+      rarify_nit = 5,
+      rarify = TRUE,
+      parallel = FALSE
+    )
   )
 
   names(tra) <- names(trab_rar) <- names(trab_norar)
@@ -257,7 +255,6 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
   expect_true(terra::all.equal(tra, trab_norar))
 
   expect_true(terra::all.equal(trab_norar, trab_rar))
-
 })
 
 test_that("vcf path works", {
@@ -371,11 +368,11 @@ test_that("get_adj works", {
   # left in just to help with a manual visual check
   raster::plot(mini_lyr)
   points(mini_coords)
-  points(mini_coords[adj,], col = "red")
+  points(mini_coords[adj, ], col = "red")
 
   # check that all coords within the window are counted and all outside the window are not
-  expect_true(all(terra::extract(mini_lyr, mini_coords[adj,], ID = FALSE) == 1))
-  expect_true(all(terra::extract(mini_lyr, mini_coords[-adj,], ID = FALSE) != 1))
+  expect_true(all(terra::extract(mini_lyr, mini_coords[adj, ], ID = FALSE) == 1))
+  expect_true(all(terra::extract(mini_lyr, mini_coords[-adj, ], ID = FALSE) != 1))
 })
 
 
@@ -401,7 +398,6 @@ test_that("window_gd works for different spatial types", {
   expect_true(terra::all.equal(wpi_df, wpi_mat))
   expect_true(terra::all.equal(wpi_df, wpi_sf))
   expect_true(terra::all.equal(wpi_df, wpi_vect))
-
 })
 
 test_that("CRS are handled correctly", {
@@ -413,9 +409,9 @@ test_that("CRS are handled correctly", {
 
   # CRS
   crs_lyr <- mini_lyr
-  terra::crs(crs_lyr) <-  "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
+  terra::crs(crs_lyr) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
   crs_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
-  sf::st_crs(crs_coords) <-  "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
+  sf::st_crs(crs_coords) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
 
   # no CRS lyr and coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, nocrs_lyr, rarify = FALSE))
@@ -437,6 +433,4 @@ test_that("CRS are handled correctly", {
   terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
   +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
-
 })
-
