@@ -25,6 +25,7 @@ Imports:
     magrittr,
     purrr,
     raster,
+    Rcpp,
     sp,
     sf,
     terra,
