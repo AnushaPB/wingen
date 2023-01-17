@@ -8,6 +8,10 @@
 #'
 #' @noRd
 crs_check_window <- function(lyr, coords) {
+
+  # change matrix to df
+  if (is.matrix(coords)) coords <- data.frame(coords)
+
   # get CRS of each object
   coords_crs <- sf::st_crs(coords)
   lyr_crs <- sf::st_crs(lyr)
