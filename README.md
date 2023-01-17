@@ -52,15 +52,16 @@ function are described in the vignette and function documentation.
 ``` r
 # Run moving window calculations of pi with rarefaction
 wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "pi",
-          wdim = 7,
-          fact = 3,
-          rarify = TRUE)
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  wdim = 7,
+  fact = 3,
+  rarify = TRUE
+)
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
-par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
 plot_gd(wgd, bkg = lotr_range, main = "Moving window pi", legend.width = 1.5)
 plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
 ```
@@ -76,7 +77,7 @@ kgd <- krig_gd(wgd[["pi"]], lotr_lyr, disagg_grd = 2)
 # Krige counts (aggregate input raster to decrease computational time)
 kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr, agg_r = 2, disagg_grd = 2)
 
-par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
 plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
 plot_count(kgd_counts, main = "Kriged sample counts", legend.width = 1.5)
 ```
@@ -97,7 +98,7 @@ mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
 
 ``` r
 # Plot results
-par(mfrow = c(1,2), oma = rep(1,4), mar = rep(2,4))
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
 plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
 plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
 ```
