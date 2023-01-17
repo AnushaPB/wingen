@@ -429,7 +429,7 @@ test_that("CRS are handled correctly", {
   expect_true(sf::st_crs(wg) == sf::st_crs(crs_lyr))
 
   # mismatched CRS
-  crs2_lyr <- mini_lyr
+  crs2_lyr <- terra::rast(mini_lyr)
   terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
   +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
