@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(wingen)
-library(raster)
+library(terra)
 library(viridis)
 ```
 
@@ -41,7 +41,7 @@ The small Middle Earth example dataset used here contains four objects which are
 
 3. `lotr_lyr` - a raster object of the landscape (higher values indicate greater connectivity/carrying capacity)
 
-4. `lotr_range` - a SpatialPolygonsDataFrame object outlining the "range" of the simulated species
+4. `lotr_range` - a polygon outlining the "range" of the simulated species
 
 ```{r load example data, fig.width = 5, fig.height = 5}
 load_middle_earth_ex()
@@ -58,7 +58,6 @@ lotr_lyr
 # Map of data
 plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
 points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
-
 ```
 
 If users don't have a raster layer of their landscape, they can generate one from their coordinates using the `coords_to_raster()` function. The resolution of this raster can be either tuned with the `agg` (to aggregate) and `disagg` (to disaggregate) arguments or defined using the `res` argument. The `res` argument can either be a single value (e.g., 0.00833) or a vector of two values with the x and y resolutions. The `buffer` argument can be used to add an edge to the raster (i.e., buffer away from the coordinates). 
@@ -88,10 +87,10 @@ The main arguments to `window_gd()` are:
 1. `vcf` - An object of type vcf or a path to a vcf file with genotype data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
 
 
-2. `coords` - A matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e., Longitude) and the second should be y (i.e., Latitude). 
+2. `coords` -  `sf` points or a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e., Longitude) and the second should be y (i.e., Latitude). 
 
 
-3. `lyr` - A RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
+3. `lyr` - A SpatRaster or RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
 
 
 4. `stat` - The genetic diversity summary statistic to calculate. We provide options for calculating nucleotide diversity (`stat = pi`), average allelic richness across all sites (`stat = allelic_richness` or `stat = biallelic_richness`), or average observed heterozygosity across all sites (`stat = Ho`). Currently, the option to calculate nucleotide diversity only works for bi-allelic data. In addition, there are two functions for calculating allelic richness: (1) `“allelic_richness”` which uses the `allelic.richness()` function from the hierfstat package and (2) `“biallelic_richness”`, which provides a much faster calculation of allelic richness, but only works for bi-allelic data. When calculating `“biallelic_richness”`, users can choose to rarify allele counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE` (the default) or to use the raw allele counts by setting `rarify_alleles = FALSE`. It is recommended to performed allele count rarefaction (`rarify_alleles = TRUE`) if there are missing values in the genetic data, but for datasets with no missing data it is faster to use the raw counts (`rarify_alleles = FALSE`).
@@ -114,11 +113,12 @@ Before running `window_gd()`, users can preview the moving window and the counts
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 preview_gd(lotr_lyr,
-           lotr_coords,
-           wdim = 7, 
-           fact = 3, 
-           sample_count = TRUE, 
-           min_n = 2)
+  lotr_coords,
+  wdim = 7,
+  fact = 3,
+  sample_count = TRUE,
+  min_n = 2
+)
 ```
 
 Next, we run the moving window function with our vcf, coordinates, and raster layer. Here, we set the parameters to calculate pi, use a window size of 7 x 7, an aggregation factor of 3, and rarefaction with a rarefaction size of 2 (minimum sample size of 2) and 5 iterations.
@@ -129,15 +129,16 @@ We then plot the genetic diversity layer (the first layer of the produced Raster
 
 ```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE}
 wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "pi",
-          wdim = 7,
-          fact = 3,
-          rarify = TRUE,
-          rarify_n = 2,
-          rarify_nit = 5,
-          L = 100)
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  wdim = 7,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  rarify_nit = 5,
+  L = 100
+)
 
 # The plot_gd function plots the genetic diversity layer
 plot_gd(wgd, main = "Moving window pi")
@@ -244,16 +245,17 @@ To increase computational speed, users can perform the `window_gd()` calculation
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
 wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "pi",
-          wdim = 7,
-          fact = 3,
-          rarify_n = 2,
-          rarify_nit = 5,
-          rarify = TRUE,
-          parallel = TRUE,
-          ncores = 2)
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  wdim = 7,
+  fact = 3,
+  rarify_n = 2,
+  rarify_nit = 5,
+  rarify = TRUE,
+  parallel = TRUE,
+  ncores = 2
+)
 ```
 
 ## Other genetic diversity metrics
@@ -262,35 +264,38 @@ In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic
 
 ```{r, cache = TRUE}
 pi_wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "pi",
-          wdim = 7,
-          fact = 3,
-          rarify_n = 2,
-          rarify_nit = 5,
-          rarify = TRUE,
-          L = 100)
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  wdim = 7,
+  fact = 3,
+  rarify_n = 2,
+  rarify_nit = 5,
+  rarify = TRUE,
+  L = 100
+)
 
 het_wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "Ho",
-          wdim = 7,
-          fact = 3,
-          rarify_n = 2,
-          rarify_nit = 5,
-          rarify = TRUE)
+  lotr_coords,
+  lotr_lyr,
+  stat = "Ho",
+  wdim = 7,
+  fact = 3,
+  rarify_n = 2,
+  rarify_nit = 5,
+  rarify = TRUE
+)
 
 AR_wgd <- window_gd(lotr_vcf,
-          lotr_coords,
-          lotr_lyr,
-          stat = "biallelic_richness",
-          wdim = 7,
-          fact = 3,
-          rarify_n = 2,
-          rarify_nit = 5,
-          rarify = TRUE)
+  lotr_coords,
+  lotr_lyr,
+  stat = "biallelic_richness",
+  wdim = 7,
+  fact = 3,
+  rarify_n = 2,
+  rarify_nit = 5,
+  rarify = TRUE
+)
 ```
 
 
@@ -320,20 +325,21 @@ As an example, let's create a moving window map of our raster layer values (e.g.
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 
 # First, we extract the raster values at those coordinates
-vals <- raster::extract(lotr_lyr, lotr_coords)
+vals <- terra::extract(lotr_lyr, lotr_coords)
 
 # Next, we run the window_general function with the env vector and set the `stat` to mean
 # Note: we can also provide additional arguments to functions, such as na.rm = TRUE
-we <- window_general(vals, 
-                     coords = lotr_coords,
-                     lyr = lotr_lyr, 
-                     stat = mean, 
-                     wdim = 7,
-                     fact = 3, 
-                     rarify_n = 2, 
-                     rarify_nit = 5,
-                     rarify = TRUE, 
-                     na.rm = TRUE)
+we <- window_general(vals,
+  coords = lotr_coords,
+  lyr = lotr_lyr,
+  stat = mean,
+  wdim = 7,
+  fact = 3,
+  rarify_n = 2,
+  rarify_nit = 5,
+  rarify = TRUE,
+  na.rm = TRUE
+)
 
 plot_gd(we, bkg = lotr_range, main = "Mean raster value")
 ```
