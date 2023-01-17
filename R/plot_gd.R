@@ -19,8 +19,8 @@
 #' plot_gd(mini_lyr)
 #'
 plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
-  if (inherits(x, "RasterLayer") | inherits(x, "RasterStack")) x <- terra::rast(x)
-  if (inherits(x, "RasterLayer") | inherits(x, "RasterStack")) bkg <- terra::rast(bkg)
+  if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
+  if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
@@ -112,7 +112,7 @@ plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), brea
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
 plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
-  if (inherits(x, "RasterLayer") | inherits(x, "RasterStack")) x <- terra::rast(x)
+  if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
