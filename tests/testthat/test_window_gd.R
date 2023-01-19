@@ -434,3 +434,13 @@ test_that("CRS are handled correctly", {
   +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
 })
+
+
+test_that("edge cropping is performed correctly", {
+  load_mini_ex(quiet = TRUE)
+  wdim <- c(3, 5)
+  capture_warnings(wg <- window_gd(mini_vcf, mini_coords, mini_lyr, wdim = wdim, rarify = FALSE, crop_edges = TRUE))
+
+  expect_true((dim(mini_lyr)[1] - dim(wg)[1]) / 2 == (wdim[2] - 1) / 2)
+  expect_true((dim(mini_lyr)[2] - dim(wg)[2]) / 2 == (wdim[1] - 1) / 2)
+})
