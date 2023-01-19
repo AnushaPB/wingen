@@ -30,6 +30,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
     if (!is.null(bkg)) {
       plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
     } else {
+      par(pty = "s")
       plt <- terra::plot(x[[index]],
         col = col,
         axes = FALSE,
@@ -48,7 +49,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @inheritParams plot_gd
 #'
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     # calculate extent
