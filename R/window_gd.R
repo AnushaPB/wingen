@@ -19,6 +19,7 @@
 #' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
+#' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
@@ -33,7 +34,7 @@
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL) {
+                      parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(vcf)
 
@@ -45,7 +46,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   x <- convert_vcf(vcf, stat)
 
   # run moving window
-  results <- window_general(
+  result <- window_general(
     x = x,
     coords = coords,
     lyr = lyr,
@@ -60,10 +61,11 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
     L = L,
     rarify_alleles = rarify_alleles,
     parallel = parallel,
-    ncores = ncores
+    ncores = ncores,
+    crop_edges = crop_edges
   )
 
-  return(results)
+  return(result)
 }
 
 #' General function for making moving window maps
@@ -88,9 +90,12 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL, ...) {
+                           parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
   # check layers and coords (only lyr is modified and returned)
   lyr <- layer_coords_check(lyr, coords)
+
+  # check wdim
+  wdim <- wdim_check(wdim)
 
   # set L if pi is being calculated
   if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
@@ -139,9 +144,12 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   }
 
   # format resulting raster values
-  results <- vals_to_lyr(lyr, rast_vals, stat)
+  result <- vals_to_lyr(lyr, rast_vals, stat)
 
-  return(results)
+  # crop resulting raster
+  if (crop_edges) result <- edge_crop(result, wdim)
+
+  return(result)
 }
 
 #' Helper function for window calculations
@@ -693,4 +701,35 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
   results <- name_results(results, stat)
 
   return(results)
+}
+
+
+#' Crop edge off raster
+#'
+#' @param x SpatRaster
+#' @param wdim window dimensions
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+edge_crop <- function(x, wdim) {
+  if (length(wdim) == 1) wdim <- c(wdim, wdim)
+
+  # get extent
+  x_ext <- terra::ext(x)
+
+  # calculate x edge buffer
+  x_edge_size <- res(x)[1] * ((wdim[1] - 1) / 2)
+  xmin <- x_ext$xmin + x_edge_size
+  xmax <- x_ext$xmax - x_edge_size
+
+  # calculate y edge buffer
+  y_edge_size <- res(x)[2] * ((wdim[2] - 1) / 2)
+  ymin <- x_ext$ymin + y_edge_size
+  ymax <- x_ext$ymax - y_edge_size
+
+  # crop raster
+  x_crop <- terra::crop(x, terra::ext(xmin, xmax, ymin, ymax))
+
+  return(x_crop)
 }
