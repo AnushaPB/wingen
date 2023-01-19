@@ -16,7 +16,7 @@
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
 preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0) {
   # convert to spat rast
-  if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
@@ -54,6 +54,7 @@ preview_window <- function(lyr, nmat, coords) {
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
+  raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
   graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
   if (!is.null(coords)) {
     if (is.matrix(coords)) coords <- data.frame(coords)
