@@ -22,6 +22,11 @@ library(terra)
 library(viridis)
 ```
 
+```{r, include=FALSE}
+devtools::load_all()
+```
+
+
 ## Background
 
 In short, wingen uses a moving window approach to create maps of genetic diversity. The method and its rationale is described in Bishop et al. (in review).
@@ -87,7 +92,7 @@ The main arguments to `window_gd()` are:
 1. `vcf` - An object of type vcf or a path to a vcf file with genotype data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
 
 
-2. `coords` -  `sf` points or a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x (i.e., Longitude) and the second should be y (i.e., Latitude). 
+2. `coords` -  `sf` points or a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x and the second should be y. 
 
 
 3. `lyr` - A SpatRaster or RasterLayer which the window will move across to create the final map. In most cases, this will take the form of a raster of the study area. 
@@ -106,6 +111,8 @@ The main arguments to `window_gd()` are:
 
 
 8. `parallel` - In order to increase computational efficiency, we provide the option for parallelization by setting the `parallel` argument to `TRUE`. Parallelization is performed using the furrr package. Use the `ncores` argument to set the number of cores to use for parallelization. 
+
+9. `crop_edges` - whether to crop out the cells along the edge of the raster that are not surrounded by a full window. Users may want to do so to avoid "edge effects" caused by incomplete windows along the borders of the raster. As wingen is relatively insensitive to sample size, edge effects are not likely to have a very strong effect, so by default `crop_edges = FALSE`.
 
 ----------------------------------------------------------------------------------------------------------
 
@@ -188,9 +195,9 @@ kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_out
 
 summary(kgd_autoKrige)
 
-plot_gd(kgd_autoKrige$raster, main = "Kriged pi")
-plot_gd(kgd_autoKrige$var, main = "Kriged variance")
-plot_gd(kgd_autoKrige$stdev, main = "Kriged standard deviation")
+plot_gd(kgd_autoKrige$raster$pred, main = "Kriged pi")
+plot_gd(kgd_autoKrige$raster$var, main = "Kriged variance")
+plot_gd(kgd_autoKrige$raster$stdev, main = "Kriged standard deviation")
 ```
 
 *Note:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, in order to ensure that the values are bounded within the range of possible values, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`). Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity or pi you may want to set `lower_bound = 0` and `upper_bound = 1`).
@@ -218,7 +225,7 @@ plot_gd(mgd, main = "Kriged & range masked pi")
 **Method 3:** mask the layer using the standard deviation or variance layer produced by `krig_gd` when `autoKrige_output = TRUE` to exclude areas where uncertainty is high (in this case, areas where the standard deviation is greater than 0.05): 
 
 ```{r mask results 3, fig.width = 5, fig.height = 5}
-mgd <- mask_gd(kgd_autoKrige[["raster"]], kgd_autoKrige[["stdev"]], maxval = 0.05)
+mgd <- mask_gd(kgd_autoKrige[["raster"]][["pred"]], kgd_autoKrige[["raster"]][["stdev"]], maxval = 0.05)
 
 plot_gd(mgd, main = "Kriged & uncertainty masked pi")
 ```
@@ -231,10 +238,36 @@ mgd <- mask_gd(kgd, kgd[["sample_count"]], minval = 2)
 plot_gd(mgd, main = "Kriged & sample count masked pi")
 ```
 
+**Method 5:** mask the layer using a spatial Kernel Density Estimation (KDE) of sample density to exclude areas with low sampling density:
+
+```{r mask results 5, fig.width = 5, fig.height = 5}
+# Spatial KDE requires an sf data.frame containing only POINTS that is projected
+lotr_sf <- sf::st_as_sf(lotr_coords, coords = c("x", "y")) %>% sf::st_set_crs(32031)
+
+# The grid layer must also be a RasterLayer
+grid <- raster::raster(kgd[[1]])
+
+# See the SpatialKDE package for more options and details about using KDE
+kde_lyr <- SpatialKDE::kde(
+  lotr_sf,
+  kernel = "quartic", 
+  band_width = 15,
+  decay = 1,
+  grid = grid,
+)
+
+# Visualize KDE layer
+plot_count(kde_lyr)
+
+# Mask with mask_gd
+mgd <- mask_gd(kgd, kde_lyr, minval = 1)
+
+plot_gd(mgd, main = "Kriged & sample density masked pi")
+```
 
 Another nice visualization option is to add a "background" to your plots in the form of a RasterLayer or other spatial object (e.g., a country or range boundary) which can help provide geographic context:
 
-```{r range map background, fig.width = 6, fig.height = 5}
+```{r range map background, fig.width = 5, fig.height = 5}
 plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 ```
 
@@ -300,6 +333,7 @@ AR_wgd <- window_gd(lotr_vcf,
 
 
 ```{r, fig.width = 5, fig.height = 5}
+par(pty = "s", oma = rep(1, 4))
 plot_gd(pi_wgd, bkg = lotr_range, main = "Pi")
 plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
 plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
