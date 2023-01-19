@@ -5,7 +5,7 @@
 \alias{lotr_lyr}
 \title{Middle earth example raster}
 \format{
-RasterLayer
+SpatRaster
 }
 \source{
 created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
@@ -14,6 +14,6 @@ created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) 
 lotr_lyr
 }
 \description{
-RasterLayer of middle earth
+SpatRaster of middle earth
 }
 \keyword{datasets}

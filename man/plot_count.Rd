@@ -15,20 +15,19 @@ plot_count(
 )
 }
 \arguments{
-\item{x}{RasterLayer of counts or RasterStack where indexed layer is sample counts}
+\item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
+\item{index}{if a raster stack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
 \item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
-\item{main}{character. Main plot title}
+\item{main}{character. Main plot titles (one for each layer to be plotted)}
 
-\item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
+\item{box}{whether to include a box around the raster plot (defaults to FALSE)}
 
-\item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
-        such as axes=FALSE, main='title', ylab='latitude'}
+\item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }
 \value{
 plot of sample counts

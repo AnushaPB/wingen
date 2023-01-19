@@ -19,21 +19,22 @@ window_gd(
   L = "nvariants",
   rarify_alleles = TRUE,
   parallel = FALSE,
-  ncores = NULL
+  ncores = NULL,
+  crop_edges = FALSE
 )
 }
 \arguments{
 \item{vcf}{object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
-\item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
+\item{coords}{coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates}
 
-\item{lyr}{RasterLayer to slide the window across}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across}
 
 \item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
@@ -52,9 +53,11 @@ window_gd(
 \item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
+
+\item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 }
 \value{
-RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
 Generate a continuous raster map of genetic diversity using moving windows

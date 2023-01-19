@@ -16,22 +16,21 @@ plot_gd(
 )
 }
 \arguments{
-\item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}
+\item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (SpatRaster where first layer is genetic diversity)}
 
-\item{bkg}{optional RasterLayer or other spatial object that will be plotted as the "background" in gray}
+\item{bkg}{optional SpatRaster or other spatial object that will be plotted as the "background" in gray}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
+\item{index}{if a raster stack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 
 \item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
-\item{main}{character. Main plot title}
+\item{main}{character. Main plot titles (one for each layer to be plotted)}
 
 \item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
 
-\item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
-        such as axes=FALSE, main='title', ylab='latitude'}
+\item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }
 \value{
 plot of genetic diversity

@@ -5,7 +5,7 @@
 \alias{mini_lyr}
 \title{Mini middle earth example raster}
 \format{
-A RasterLayer of middle earth
+A SpatRaster of middle earth
 }
 \source{
 created from simulations in Bishop et al., 202X
@@ -14,6 +14,6 @@ created from simulations in Bishop et al., 202X
 mini_lyr
 }
 \description{
-RasterLayer of middle earth from CITE
+SpatRaster of middle earth from CITE
 }
 \keyword{datasets}
