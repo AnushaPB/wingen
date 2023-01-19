@@ -8,7 +8,6 @@
 #'
 #' @noRd
 crs_check_window <- function(lyr, coords) {
-
   # change matrix to df
   if (is.matrix(coords)) coords <- data.frame(coords)
 

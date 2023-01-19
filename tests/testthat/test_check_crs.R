@@ -1,6 +1,5 @@
 
 test_that("CRS are handled correctly by window_gd", {
-
   capture_warnings(library(raster))
   load_mini_ex(quiet = TRUE)
 
@@ -115,4 +114,3 @@ test_that("CRS are handled correctly by krig_gd (r vs grd)", {
   expect_error(krig_gd(r = crs2_lyr, grd = crs_lyr))
   expect_error(krig_gd(grd = crs2_lyr, r = crs_lyr))
 })
-
