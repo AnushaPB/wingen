@@ -18,8 +18,13 @@ test_that("krig_gd returns warning when not provided grd", {
 
 test_that("coord kriging works", {
   load_mini_ex(quiet = TRUE)
-  capture_warnings(kpi <- krig_gd(mini_lyr, grd = mini_lyr, coords = mini_coords))
-  expect_true(TRUE)
+  capture_warnings(kpi1 <- krig_gd(mini_lyr, grd = mini_lyr, coords = mini_coords))
+
+  # sf coords
+  sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
+  capture_warnings(kpi2 <- krig_gd(mini_lyr, grd = mini_lyr, coords = sf_coords))
+
+  expect_true(terra::all.equal(kpi1, kpi2))
 })
 
 test_that("grd kriging works", {
