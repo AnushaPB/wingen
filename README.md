@@ -41,8 +41,9 @@ load_middle_earth_ex()
 ```
 
 The core function of this package is `window_gd()`, which takes as
-inputs a vcfR object (or a path to a .vcf file), sample coordinates, and
-a raster layer which the moving window will slide across. Users can
+inputs a vcfR object (or a path to a .vcf file), sample coordinates (as
+a data.frame, matrix, or sf object), and a raster layer (as a SpatRaster
+or RasterLayer) which the moving window will slide across. Users can
 control the genetic diversity statistic that is calculated (`stat`), the
 window dimensions (`wdim`), the aggregation factor to use on the raster
 (`fact`), whether to perform rarefaction (`rarify`), and other aspects

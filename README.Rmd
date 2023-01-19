@@ -45,7 +45,7 @@ library(wingen)
 load_middle_earth_ex()
 ```
 
-The core function of this package is `window_gd()`, which takes as inputs a vcfR object (or a path to a .vcf file), sample coordinates, and a raster layer which the moving window will slide across. Users can control the genetic diversity statistic that is calculated (`stat`), the window dimensions (`wdim`), the aggregation factor to use on the raster (`fact`), whether to perform rarefaction (`rarify`), and other aspects of the moving window calculations. Additional arguments for this function are described in the vignette and function documentation.
+The core function of this package is `window_gd()`, which takes as inputs a vcfR object (or a path to a .vcf file), sample coordinates (as a data.frame, matrix, or sf object), and a raster layer (as a SpatRaster or RasterLayer) which the moving window will slide across. Users can control the genetic diversity statistic that is calculated (`stat`), the window dimensions (`wdim`), the aggregation factor to use on the raster (`fact`), whether to perform rarefaction (`rarify`), and other aspects of the moving window calculations. Additional arguments for this function are described in the vignette and function documentation.
 
 ```{r window_gd, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
 # Run moving window calculations of pi with rarefaction
