@@ -47,9 +47,7 @@ preview_window <- function(lyr, nmat, coords) {
   # get adjacent cells to center cell
   adjc <- terra::adjacent(lyr, center, directions = nmat)
   # get list of indices of coords in that set of cells
-  adjci <- purrr::map_dbl(adjc, 1, function(x) {
-    seq(x[1], x[2])
-  })
+  adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
 
   # fill in window
   lyrw <- lyr * 0
