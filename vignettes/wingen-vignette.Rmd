@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 library(wingen)
 library(terra)
 library(viridis)
+library(sf)
 ```
 
 ```{r, include=FALSE}
@@ -116,6 +117,22 @@ The main arguments to `window_gd()` are:
 
 ----------------------------------------------------------------------------------------------------------
 
+*Note:* Coordinates and rasters used in wingen should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances. Therefore, longitude-latitude systems should be transformed. An example of how this can be accomplished is shown here:
+
+```{r}
+# First, we create example latitude-longitude coordinates and rasters
+## The simulated coordinates and rasters are actually already Euclidean, however for this example we are pretending they are latitude-longitude coordinates
+## Convert coords data.frame to sf points
+coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
+wgd_longlat <- wgd
+crs(wgd_longlat) <- "+proj=longlat"
+
+# Next, the coordinates and raster can then be projected to UTM like this:
+coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
+wgd_utm <- project(wgd_longlat, "+proj=utm")
+# They can be switched back to latitude-longitude the same way (just replace "utm" with "longlat")
+```
+
 Before running `window_gd()`, users can preview the moving window and the counts within each cell of the raster to get a sense of how big the window is and what the density of counts looks like across their landscape. Here, we provide the raster layer (`lotr_lyr`), the coordinates (`lotr_coords`), the window dimensions (5), the aggregation factor (3), and the minimum sample number (`min_n`). `min_n` will be used to mask the sample count layer to show how much of the landscape will be excluded due to low sample counts (note: `min_n` is equivalent to `rarify_n` if rarefaction is used).
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
@@ -175,7 +192,7 @@ plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
-*Note 1:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
+*Note:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
 
 For information on the differences between universal and ordinary kriging check out these articles:
 - https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm
@@ -196,23 +213,9 @@ kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_out
 summary(kgd_autoKrige)
 ```
 
-*Note 2:* `autoKrige()` does not work for non-projected systems (i.e. latitude-longitude) and will throw an error. Below we provide an example of how latitude-longitude coordinates and rasters can be projected.
+*Note:* `autoKrige()` does not work for non-projected systems (i.e. latitude-longitude) and will throw an error. See above example of how latitude-longitude coordinates and rasters can be transformed.
 
-```{r}
-# Creating example latitude-longitude coordinates and rasters
-# The simulated coordinates and rasters are actually euclidean, however for this example we are pretending they are latitude-longitude coordinates
-coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
-wgd_longlat <- wgd
-crs(wgd_longlat) <-  "+proj=longlat"
-
-# The coordinates and raster can then be reprojected to UTM like this:
-coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
-wgd_utm <- project(wgd, "+proj=utm")
-```
-
-
-
-*Note 3:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, in order to ensure that the values are bounded within the range of possible values, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`). Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity or pi you may want to set `lower_bound = 0` and `upper_bound = 1`).
+*Note:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, in order to ensure that the values are bounded within the range of possible values, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`). Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity or pi you may want to set `lower_bound = 0` and `upper_bound = 1`).
 
 ### Mask results
 
