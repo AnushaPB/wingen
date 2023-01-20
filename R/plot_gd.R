@@ -8,6 +8,7 @@
 #' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the Raster plot (defaults to FALSE)
+#' @param range numeric. minimum and maximum values to be used for the continuous legend
 #'
 #' @inheritParams terra::plot
 #'
@@ -18,22 +19,27 @@
 #' data("mini_lyr")
 #' plot_gd(mini_lyr)
 #'
-plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, range = NULL, ...) {
+
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
 
+  # raster zlim = terra range (adding this for users who try and use raster arguments)
+  if (exists("zlim")) range <- zlim
+
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
-      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
+      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, range = range, ...)
     } else {
       plt <- terra::plot(x[[index]],
         col = col,
         axes = FALSE,
         box = box,
+        range = range,
         ...
       )
       graphics::title(main = list(main, font = 1), adj = 0)
@@ -48,7 +54,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @inheritParams plot_gd
 #'
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, range = NULL, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     # calculate extent
@@ -65,6 +71,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
       ylim = c(ymin, ymax),
       axes = FALSE,
       box = box,
+      range = range,
       legend = FALSE
     )
 
@@ -84,6 +91,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
       add = TRUE,
       axes = FALSE,
       box = FALSE,
+      range = range,
       ...
     )
   })
@@ -102,6 +110,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 #' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the raster plot (defaults to FALSE)
+#' @param range numeric. minimum and maximum values to be used for the continuous legend
 #' @inheritParams plot_gd
 #' @inheritParams terra::plot
 #'
@@ -111,11 +120,14 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
+plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, range = range, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
+
+  # raster zlim = terra range (adding this for users who try and use raster arguments)
+  if (exists("zlim")) range <- zlim
 
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
@@ -124,6 +136,7 @@ plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks)
         col = col,
         axes = FALSE,
         box = box,
+        range = range,
         ...
       )
       graphics::title(main = list(main, font = 1), adj = 0)
@@ -134,6 +147,7 @@ plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks)
         col = col,
         axes = FALSE,
         box = box,
+        range = range,
         ...
       )
       graphics::title(main = list(main, font = 1), adj = 0)
