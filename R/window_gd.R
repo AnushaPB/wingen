@@ -5,7 +5,7 @@
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
 #' @param vcf object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
-#' @param coords coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates
+#' @param coords coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates.
 #' @param lyr SpatRaster or RasterLayer to slide the window across
 #' @param stat genetic diversity statistic to calculate (can either be `"pi"` for nucleotide diversity (default), `"Ho"` for average observed heterozygosity across all sites, `"allelic_richness"` for average number of alleles across all sites, or `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option faster than `"allelic_richness"`))
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
@@ -20,6 +20,8 @@
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
+#' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
+#' As such, longitude-latitude systems should be transformed before using window_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
