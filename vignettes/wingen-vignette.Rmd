@@ -132,7 +132,7 @@ Next, we run the moving window function with our vcf, coordinates, and raster la
 
 The `L` argument is used in the calculation of pi. If `L = NULL` (default), the function returns the sum over SNPs of nucleotide diversity. Otherwise, the function returns the average nucleotide diversity per nucleotide given the length L of the sequence.
 
-We then plot the genetic diversity layer (the first layer of the produced RasterStack) and the sample counts layer (the second layer).
+We then plot the genetic diversity layer (the first layer of the produced raster stack) and the sample counts layer (the second layer).
 
 ```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE}
 wgd <- window_gd(lotr_vcf,
@@ -155,16 +155,16 @@ plot_count(wgd, main = "Moving window sample counts")
 
 ### Krige results
 
-To produce smoother maps of genetic diversity, we provide the function `krig_gd()` which creates a spatially interpolated raster from the moving window raster produced by `window_gd()`. This function uses the `autoKrige()` function from the R package automap to perform kriging on the moving window raster using an automatically generated variogram. Note that the RasterStack from `window_gd()`, including both the genetic diversity layer and the sample count layer, can be used to generate kriged maps of both genetic diversity and sample count.
+To produce smoother maps of genetic diversity, we provide the function `krig_gd()` which creates a spatially interpolated raster from the moving window raster produced by `window_gd()`. This function uses the `autoKrige()` function from the R package automap to perform kriging on the moving window raster using an automatically generated variogram. Note that the raster stack from `window_gd()`, including both the genetic diversity layer and the sample count layer, can be used to generate kriged maps of both genetic diversity and sample count.
 
 
 Kriging is performed by first transforming the moving window layer into a set of coordinates with corresponding genetic diversity (or sample count) values and then interpolating using these coordinates across the grid provided. Because of this, it is important to keep in mind how the coordinates from the moving window raster and the grid align. If the resolution of the moving window raster is much lower than that of the grid, there are fewer points for interpolation which can result in grid-like artifacts during kriging.
 
 
-To deal with this issue, users can either (1) resample their moving window raster layers and grid layers to the same resolution using the `resample` argument, or (2) manually disaggregate or aggregate either the moving window or grid layers using the `r_agg`, `r_disagg`, `grd_agg`, or `grd_disagg` arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the `grd_disagg` argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a RasterLayer. Keep in mind that increasing the resolution of the moving window layer (i.e., either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, though to a lesser extent.
+To deal with this issue, users can either (1) resample their moving window raster layers and grid layers to the same resolution using the `resample` argument, or (2) manually disaggregate or aggregate either the moving window or grid layers using the `r_agg`, `r_disagg`, `grd_agg`, or `grd_disagg` arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the `grd_disagg` argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a raster layer. Keep in mind that increasing the resolution of the moving window layer (i.e., either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, though to a lesser extent.
 
 
-To run this function, we provide the RasterStack output from `window_gd()`, the indices of the layers we want to krige (in this case both the (1) genetic diversity and (2) sample count layers), and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a RasterStack of the kriged input layers. 
+To run this function, we provide the raster stack output from `window_gd()`, the indices of the layers we want to krige (in this case both the (1) genetic diversity and (2) sample count layers), and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a raster stack of the kriged input layers. 
 
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
@@ -175,32 +175,44 @@ plot_gd(kgd, main = "Kriged pi")
 plot_count(kgd, main = "Kriged sample counts")
 ```
 
-*Note:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
+*Note 1:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
 
 For information on the differences between universal and ordinary kriging check out these articles:
 - https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm
 - https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation
 
 ```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE}
-kgd_ordinary <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
+kgd_ordinary <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
 
 plot_gd(kgd_ordinary, main = "Kriged pi")
 plot_count(kgd_ordinary, main = "Kriged sample counts")
 ```
 
-Users can optionally get the full output from `autoKrige()`, including raster layers of standard deviation and variance, by setting `autoKrige_output = TRUE` 
+Users can optionally get the full output from `autoKrige()`
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_output = TRUE)
 
 summary(kgd_autoKrige)
-
-plot_gd(kgd_autoKrige$raster$pred, main = "Kriged pi")
-plot_gd(kgd_autoKrige$raster$var, main = "Kriged variance")
-plot_gd(kgd_autoKrige$raster$stdev, main = "Kriged standard deviation")
 ```
 
-*Note:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, in order to ensure that the values are bounded within the range of possible values, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`). Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity or pi you may want to set `lower_bound = 0` and `upper_bound = 1`).
+*Note 2:* `autoKrige()` does not work for non-projected systems (i.e. latitude-longitude) and will throw an error. Below we provide an example of how latitude-longitude coordinates and rasters can be projected.
+
+```{r}
+# Creating example latitude-longitude coordinates and rasters
+# The simulated coordinates and rasters are actually euclidean, however for this example we are pretending they are latitude-longitude coordinates
+coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
+wgd_longlat <- wgd
+crs(wgd_longlat) <-  "+proj=longlat"
+
+# The coordinates and raster can then be reprojected to UTM like this:
+coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
+wgd_utm <- project(wgd, "+proj=utm")
+```
+
+
+
+*Note 3:* kriging can produce values that fall outside the range of possible values (e.g. genetic diversity values less than 0 or greater than the possible maximum). By default, in order to ensure that the values are bounded within the range of possible values, `krig_gd` converts all values greater than the maximum of the input raster, to that maximum (`upper_bound = TRUE`) and all values less than the minimum of the input raster, to that minimum (`lower_bound = TRUE`). Users can turn off this functionality by setting `lower_bound` and `upper_bound` to `FALSE`. Users can also set there own custom `lower_bound` and `upper_bound` values (e.g. for heterozygosity or pi you may want to set `lower_bound = 0` and `upper_bound = 1`).
 
 ### Mask results
 
@@ -265,7 +277,7 @@ mgd <- mask_gd(kgd, kde_lyr, minval = 1)
 plot_gd(mgd, main = "Kriged & sample density masked pi")
 ```
 
-Another nice visualization option is to add a "background" to your plots in the form of a RasterLayer or other spatial object (e.g., a country or range boundary) which can help provide geographic context:
+Another nice visualization option is to add a "background" to your plots in the form of a raster or other sp or sf object (e.g., a country or range boundary) which can help provide geographic context:
 
 ```{r range map background, fig.width = 5, fig.height = 5}
 plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
