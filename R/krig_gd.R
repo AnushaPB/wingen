@@ -168,7 +168,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
 
   # create results
   if (autoKrige_output) {
-    return(list(raster = krig_r, autoKrige_output = krig_res))
+    return(list(raster = krig_r[["pred"]], autoKrige_output = krig_res))
   } else {
     return(krig_r[[1]])
   }
