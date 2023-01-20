@@ -30,7 +30,6 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
     if (!is.null(bkg)) {
       plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
     } else {
-      par(pty = "s")
       plt <- terra::plot(x[[index]],
         col = col,
         axes = FALSE,
