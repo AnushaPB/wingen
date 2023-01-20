@@ -17,7 +17,8 @@
 #' plot_gd(mini_lyr)
 #'
 ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
-  if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
+
+  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
 
   # suppress irrelevant plot warnings
@@ -25,11 +26,12 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks),
     if (!is.null(bkg)) {
       plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
     } else {
-      plt <- raster::plot(x[[index]],
-        col = col,
-        axes = FALSE,
-        box = box,
-        ...
+
+      plt <- terra::plot(x[[index]],
+                          col = col,
+                          axes = FALSE,
+                          box = box,
+                          ...
       )
       title(main = list(main, font = 1), adj = 0)
     }
@@ -47,25 +49,24 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks),
 ggplot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
 
   x_df <- x[[index]] %>%
-    raster::rasterToPoints() %>%
+    terra::as.data.frame(xy = TRUE) %>%
     tidyr::as_tibble()
   colnames(x_df) <- c("x", "y", "layer")
 
-  # calculate extent
-  xmin <- min(raster::extent(bkg)@xmin, raster::extent(x)@xmin)
-  xmax <- max(raster::extent(bkg)@xmax, raster::extent(x)@xmax)
-  ymin <- min(raster::extent(bkg)@ymin, raster::extent(x)@ymin)
-  ymax <- max(raster::extent(bkg)@ymax, raster::extent(x)@ymax)
+  if (!is.null(breaks)) x_df <- x_df  %>% dplyr::mutate(layer = dplyr::ntile(layer, n = breaks))
 
-  # TODO: change so it is more cusotmizable
+  gg <- ggplot2::ggplot()
+  if (!is.null(bkg)) gg <- gg + ggplot2::geom_polygon(data = bkg, ggplot2::aes(x = long, y = lat, group = group), fill = "lightgray")
+
+  # TODO: change so it is more cusotomizable
   # TODO: change so legend isn't cramped
-  gg <- ggplot2::ggplot() +
+  gg <- gg +
     # change so works if bkg is a raster
-    ggplot2::geom_polygon(data = bkg, ggplot2::aes(x = long, y = lat, group = group), fill = "lightgray") +
     ggplot2::geom_tile(data = x_df, ggplot2::aes(x = x, y = y, fill = layer)) +
     ggplot2::coord_fixed() +
     ggplot2::theme_bw() +
-    ggplot2::scale_fill_stepsn(n.breaks = breaks, colours = col) +
+    #ggplot2::scale_fill_stepsn(n.breaks = breaks, colours = col) +
+    ggplot2::scale_fill_viridis_c(n.breaks = 20) +
     ggplot2::theme(panel.grid.minor.y = ggplot2::element_blank(),
                    panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.minor.x = ggplot2::element_blank(),
@@ -78,7 +79,7 @@ ggplot_gd_bkg <- function(index, x, bkg = NULL, col = viridis::magma(breaks), br
                    axis.ticks.y = ggplot2::element_blank(),
                    panel.border = ggplot2::element_blank())
 
-  return()
+  return(gg)
 }
 
 #' Plot moving window map of sample counts
