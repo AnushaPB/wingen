@@ -26,9 +26,6 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 1
 
-  # raster zlim = terra range (adding this for users who try and use raster arguments)
-  if (exists("zlim")) range <- zlim
-
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
@@ -124,9 +121,6 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
-
-  # raster zlim = terra range (adding this for users who try and use raster arguments)
-  if (exists("zlim")) range <- zlim
 
   # suppress irrelevant plot warnings
   suppressWarnings({
