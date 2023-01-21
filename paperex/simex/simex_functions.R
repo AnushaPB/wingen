@@ -340,15 +340,21 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @param bkg background plot
 #' @param legend whether to plot legend
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
-test_simex_plot <- function(r, bkg = NULL, legend = FALSE, ...){
+test_simex_plot <- function(r, bkg = NULL, legend = FALSE, box = FALSE, zlim = NULL, polyx = 83, polyy = -100,...){
   stat <- names(r)[1]
 
-  if(stat == "pi") zlim <- c(0, 0.31)
-  if(stat == "biallelic_richness") zlim <- c(1, 1.95)
-  if(stat == "Ho") zlim <- c(0, 0.29)
-  if(!exists("zlim")) stop(paste(names(r)[1], "is not a valid stat"))
+  if(is.null(zlim)){
+    if(stat == "pi") zlim <- c(0, 0.31)
+    if(stat == "biallelic_richness") zlim <- c(1, 1.95)
+    if(stat == "Ho") zlim <- c(0, 0.29)
+  }
 
-  plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = TRUE, ...)
+  if(inherits(r, "SpatRaster")) r <- raster::raster(r)
+
+  par(pty = "s")
+  raster_plot_gd(r, bkg = bkg, zlim = zlim, legend = legend, breaks = 100, box = FALSE, ...)
+  polygon(x = c(0, 0, polyx, polyx), y = c(polyy, 0, 0, polyy), border = "black")
+
   return(NULL)
 }
 
@@ -392,7 +398,7 @@ simex_get_dif <- function(dataset, params, nsamp){
   return(dif)
 }
 
-#' Plot_gd rewritten for raster
+#' raster_plot_gd rewritten for raster
 #'
 #'
 raster_plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
@@ -405,7 +411,7 @@ raster_plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(bre
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
-      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
+      plt <- purrr::map(index, raster_plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
     } else {
       plt <- raster::plot(x[[index]],
                           col = col,
@@ -420,12 +426,12 @@ raster_plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(bre
   return(invisible(plt))
 }
 
-#' Helper function for plot_gd
+#' Helper function for raster_plot_gd
 #'
-#' @inheritParams plot_gd
+#' @inheritParams raster_plot_gd
 #'
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+raster_plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     # calculate extent
@@ -479,7 +485,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 #' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the raster plot (defaults to FALSE)
-#' @inheritParams plot_gd
+#' @inheritParams raster_plot_gd
 #' @inheritParams terra::plot
 #'
 #' @return plot of sample counts
@@ -488,16 +494,16 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
+raster_plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
   if (inherits(x, "SpatRaster")) x <- raster::raster(x)
 
-  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
+  if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
 
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
-    if (raster::nlyr(x) > 1) {
-      plt <- terra::plot(x[[index]],
+    if (raster::nlayers(x) > 1) {
+      plt <- raster::plot(x[[index]],
                          col = col,
                          axes = FALSE,
                          box = box,
@@ -506,7 +512,7 @@ raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(
       graphics::title(main = list(main, font = 1), adj = 0)
     }
 
-    if (terra::nlyr(x) == 1) {
+    if (raster::nlayers(x) == 1) {
       plt <- raster::plot(x,
                           col = col,
                           axes = FALSE,
@@ -519,3 +525,4 @@ raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(
 
   return(invisible(plt))
 }
+
