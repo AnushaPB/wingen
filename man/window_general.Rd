@@ -27,9 +27,9 @@ window_general(
 \arguments{
 \item{x}{data to be summarized by the moving window (\emph{note:} order matters! \code{coords} should be in the same order, there are currently no checks for this). The class of \code{x} required depends on the statistic being calculated (see the \code{stat} argument and the function description for more details)}
 
-\item{coords}{coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates}
+\item{coords}{coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{stat}{moving window statistic to calculate (can either be \code{pi} for nucleotide diversity (\code{x} must be a dosage matrix), \code{Ho} for average observed heterozygosity across all loci (\code{x} must be a heterozygosity matrix) , "allelic_richness" for average allelic richness across all loci (\code{x} must be a \code{genind} type object), "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (\code{x} must be a dosage matrix). \code{stat} can also be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
 

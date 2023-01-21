@@ -102,15 +102,8 @@ kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
     ## [using ordinary kriging]
 
 ``` r
-kc <- krig_gd(wg, lyr, index = 2, agg_r = 2, disagg_grd = 2)
-```
-
-    ## [using ordinary kriging]
-
-``` r
 # mask areas with less than one count
-mg <- mask_gd(kg, kc, minval = 2)
-mg <- mask_gd(mg, bkg)
+mg <- mask_gd(kg, bkg)
 
 par(mar = rep(0,4))
 plot_gd(wg, bkg, zlim = c(0, 0.31))
@@ -131,16 +124,10 @@ plot_gd(kg, zlim = c(0, 0.31))
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
 
 ``` r
-plot_count(kc, zlim = c(0,30))
-```
-
-![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
-
-``` r
 plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-4-5.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
 
 ### **Figure S1:** Window vs Aggregation Factor
 
@@ -203,13 +190,17 @@ tdf[tdf$dataset == "WGS", "dataset"] <- "(b)"
 
 ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
   geom_hline(yintercept = 60, linetype = "dashed", col = "grey80", lwd = 1) + 
-  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), col = "grey80", fontface = "italic") +
+  geom_text(aes(factor(200), 60, label = "1 min", vjust = -1, hjust = -0.7), 
+            col = "grey80", fontface = "italic") +
   geom_hline(yintercept = 60*5, linetype = "dashed", col = "grey70", lwd = 1) + 
-  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), col = "grey70", fontface = "italic") +
+  geom_text(aes(factor(200), 60*5, label = "5 min", vjust = -1, hjust = -0.7), 
+            col = "grey70", fontface = "italic") +
   geom_hline(yintercept = 60*10, linetype = "dashed", col = "grey60", lwd = 1) + 
-  geom_text(aes(factor(200), 60*10, label = "10 min", vjust = -1, hjust = -0.4), col = "grey60", fontface = "italic") +
+  geom_text(aes(factor(200), 60*10, label = "10 min", vjust = -1, hjust = -0.4), 
+            col = "grey60", fontface = "italic") +
   geom_hline(yintercept = 60*15, linetype = "dashed", col = "grey50", lwd = 1) + 
-  geom_text(aes(factor(200), 60*15, label = "15 min", vjust = -1, hjust = -0.4), col = "grey50", fontface = "italic") +
+  geom_text(aes(factor(200), 60*15, label = "15 min", vjust = -1, hjust = -0.4), 
+            col = "grey50", fontface = "italic") +
   geom_col(position=position_dodge()) +
   geom_text(aes(label = round(time, 0), col = stat), 
             vjust = -0.5, position=position_dodge(width = .9)) + 

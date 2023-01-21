@@ -7,7 +7,7 @@
 preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 }
 \arguments{
-\item{lyr}{SpatRaster or RasterLayer to slide the window across}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{coords}{coordinates (two columns, the first should be x and the second should be y)}
 

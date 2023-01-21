@@ -9,9 +9,10 @@ plot_gd(
   bkg = NULL,
   index = NULL,
   col = viridis::magma(breaks),
-  breaks = 20,
+  breaks = 100,
   main = NULL,
   box = FALSE,
+  range = NULL,
   ...
 )
 }
@@ -29,6 +30,8 @@ plot_gd(
 \item{main}{character. Main plot titles (one for each layer to be plotted)}
 
 \item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
+
+\item{range}{numeric. minimum and maximum values to be used for the continuous legend}
 
 \item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }

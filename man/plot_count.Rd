@@ -7,10 +7,11 @@
 plot_count(
   x,
   index = NULL,
-  breaks = 20,
+  breaks = 100,
   col = viridis::mako(breaks),
   main = NULL,
   box = FALSE,
+  range = NULL,
   ...
 )
 }
@@ -26,6 +27,8 @@ plot_count(
 \item{main}{character. Main plot titles (one for each layer to be plotted)}
 
 \item{box}{whether to include a box around the raster plot (defaults to FALSE)}
+
+\item{range}{numeric. minimum and maximum values to be used for the continuous legend}
 
 \item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }
