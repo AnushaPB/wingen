@@ -19,8 +19,7 @@
 #' data("mini_lyr")
 #' plot_gd(mini_lyr)
 #'
-plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, range = NULL, ...) {
-
+plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
 
@@ -54,7 +53,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @inheritParams plot_gd
 #'
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, range = NULL, ...) {
+plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     # calculate extent
@@ -120,7 +119,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, range = range, ...) {
+plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, range = NULL, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
@@ -129,7 +128,7 @@ plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks)
   # raster zlim = terra range (adding this for users who try and use raster arguments)
   if (exists("zlim")) range <- zlim
 
-  # suppress annoying and irrelevant plot warnings
+  # suppress irrelevant plot warnings
   suppressWarnings({
     if (terra::nlyr(x) > 1) {
       plt <- terra::plot(x[[index]],
