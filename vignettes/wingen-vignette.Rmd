@@ -265,7 +265,7 @@ grid <- raster::raster(kgd[[1]])
 # See the SpatialKDE package for more options and details about using KDE
 kde_lyr <- SpatialKDE::kde(
   lotr_sf,
-  kernel = "quartic", 
+  kernel = "quartic",
   band_width = 15,
   decay = 1,
   grid = grid,
