@@ -54,12 +54,15 @@ preview_window <- function(lyr, nmat, coords) {
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
-  raster::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
-  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-  if (!is.null(coords)) {
-    if (is.matrix(coords)) coords <- data.frame(coords)
-    terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
-  }
+  # suppress annoying and irrelevant plot warnings
+  suppressWarnings({
+    terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
+    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+    if (!is.null(coords)) {
+      if (is.matrix(coords)) coords <- data.frame(coords)
+      terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+    }
+  })
 }
 
 #' Get center cell of a raster
