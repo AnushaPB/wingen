@@ -1,6 +1,6 @@
 #' Get directory for files
 #'
-#' @export
+#'
 #'
 get_exdir <- function(){
   return(here::here("paperex", "simex"))
@@ -11,7 +11,7 @@ get_exdir <- function(){
 #' @param subset if TRUE, subsets data
 #' @param quiet if TRUE, no message is printed
 #'
-#' @export
+#'
 #'
 load_middle_earth <- function(subset = FALSE, quiet = FALSE){
   # get wdir
@@ -100,7 +100,7 @@ load_middle_earth <- function(subset = FALSE, quiet = FALSE){
 #' @param nvariants number of variants (either 10000 or 100000)
 #'
 #' @return
-#' @export
+#'
 #'
 #' @examples
 subset_data <- function(vcf, coords, nsamples, nvariants){
@@ -131,7 +131,7 @@ subset_data <- function(vcf, coords, nsamples, nvariants){
 #' @inheritParams window_gd
 #' @param file.name file name to append to beginning of outputs
 #'
-#' @export
+#'
 default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
                               min_n = 2, fun = mean, rarify_alleles = TRUE, parallel = FALSE, ncores = 10, file.name){
 
@@ -179,7 +179,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify
 #'
 #' @inheritParams default_time_test
 #'
-#' @export
+#'
 run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRUE, parallel = TRUE, ncores = 10, file.name,
                                   stats =  c("pi", "Ho", "biallelic_richness")){
   # get wdir
@@ -206,7 +206,6 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRU
 #' @param res results
 #' @inheritParams default_time_test
 #'
-#' @export
 #'
 write_time_test <- function(res, file.name){
   df <- purrr::map_dfr(res, function(x){x[[1]]})
@@ -217,9 +216,6 @@ write_time_test <- function(res, file.name){
 #'
 #' @param res results
 #' @inheritParams default_time_test
-#'
-#' @export
-#'
 write_rast_test <- function(res, file.name){
   if(class(res[[2]]) == "RasterStack"){
     resl <- res[[2]]
@@ -233,9 +229,6 @@ write_rast_test <- function(res, file.name){
 #' Helper function for write_rast_test
 #'
 #' @inheritParams write_rast_test
-#'
-#' @export
-#'
 write_rast_helper <- function(resl, file.name){
   lyrname <- names(resl)[1]
   terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
@@ -246,8 +239,6 @@ write_rast_helper <- function(resl, file.name){
 #' @inheritParams default_time_test
 #' @param file.type type of file (defaults to tif)
 #' @param rootPath directory root
-#'
-#' @export
 get_divout <- function(file.name, rarify = NULL, stat = NULL, nsamp = NULL, file.type = ".tif", rootPath = here(get_exdir(), "outputs")){
   # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
@@ -271,8 +262,6 @@ get_divout <- function(file.name, rarify = NULL, stat = NULL, nsamp = NULL, file
 #' @inheritParams default_time_test
 #' @param file.type type of file (defaults to csv)
 #' @param rootPath directory root
-#'
-#' @export
 get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL, file.type = ".csv", rootPath = here(get_exdir(), "outputs")){
   # Searches for file in directory
   listFiles <- list.files(rootPath, recursive = FALSE)
@@ -299,11 +288,6 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
 #'
 #' @param params vector of wdim and fact values
 #' @inheritParams window_gd
-#'
-#' @return
-#' @export
-#'
-#' @examples
 test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
   wdim <- as.numeric(params["wdim"])
   fact <- as.numeric(params["fact"])
@@ -324,9 +308,6 @@ test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
 #' Convert dataframe to list of vectors
 #'
 #' @param x dataframe
-#'
-#' @export
-#'
 df_to_ls <- function(x){
   x <- split(x, seq(nrow(x)))
   return(x)
@@ -337,11 +318,6 @@ df_to_ls <- function(x){
 #' @param params vector with dataset type, rarify value, and stat
 #' @param nsamp number of samples
 #' @param msk_lyr mask layer
-#'
-#' @return
-#' @export
-#'
-#' @examples
 test_datasets_simex <- function(params, nsamp, msk_lyr){
   file.name <- as.character(params[["datasets"]])
   rarify <- as.character(params[["rarify"]])
@@ -364,11 +340,6 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @param bkg background plot
 #' @param legend whether to plot legend
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
-#'
-#' @return
-#' @export
-#'
-#' @examples
 test_simex_plot <- function(r, bkg = NULL, legend = FALSE, ...){
   stat <- names(r)[1]
 
@@ -381,3 +352,170 @@ test_simex_plot <- function(r, bkg = NULL, legend = FALSE, ...){
   return(NULL)
 }
 
+#' Create difference plots from default time test raster results
+#'
+#' @param r raster
+#' @param bkg background plot
+#' @param legend whether to plot legend
+#' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
+test_simex_dif_plot <- function(r, bkg = NULL, legend = FALSE, ...){
+
+  coldiv <- colorRampPalette(c("#00CCD3", 'gray96', "orange"))
+
+  raster_plot_gd(r, bkg = bkg, col = coldiv(100), zlim = c(-0.48, 0.48), legend = legend, breaks = 100, box = TRUE, ...)
+  return(NULL)
+}
+
+#' Calculate difference between full and subsampled rasters
+#' @param dataset dataset type (i.e., WGS or rr)
+#' @param params parameters for filtering
+#' @param nsamp number of samples (i.e., 100 or 200)
+#' @param msk_lyr layer for masking
+#'
+simex_get_dif <- function(dataset, params, nsamp){
+
+  # Get example layers for masking (doesn't matter which parameters other than nsamp)
+  msk_lyr <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = nsamp)
+
+  subsample <-
+    keep(params, ~.x$datasets == dataset) %>%
+    purrr::map(test_datasets_simex, nsamp = nsamp, msk_lyr = msk_lyr)
+
+  full <-
+    keep(params, ~.x$datasets == "FULL") %>%
+    purrr::map(test_datasets_simex, nsamp = nsamp, msk_lyr = msk_lyr)
+
+  dif <-
+    purrr::map2(subsample, full, ~(.x - .y)) %>%
+    purrr::map2(subsample, function(x, y) {names(x) <- names(y); return(x)})
+
+  return(dif)
+}
+
+#' Plot_gd rewritten for raster
+#'
+#'
+raster_plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+  if (inherits(x, "SpatRaster")) x <- raster::raster(x)
+  if (inherits(x, "SpatRaster")) bkg <- raster::raster(bkg)
+
+  if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
+  if (is.null(index)) index <- 1
+
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+    if (!is.null(bkg)) {
+      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, ...)
+    } else {
+      plt <- raster::plot(x[[index]],
+                          col = col,
+                          axes = FALSE,
+                          box = box,
+                          ...
+      )
+      graphics::title(main = list(main, font = 1), adj = 0)
+    }
+  })
+
+  return(invisible(plt))
+}
+
+#' Helper function for plot_gd
+#'
+#' @inheritParams plot_gd
+#'
+#' @noRd
+plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20, main = NULL, box = FALSE, ...) {
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+    # calculate extent
+    extx <- raster::extent(x)
+    extb <- raster::extent(bkg)
+    xmin <- min(extx[1], extb[1])
+    xmax <- max(extx[2], extb[2])
+    ymin <- min(extx[3], extb[3])
+    ymax <- max(extx[4], extb[4])
+
+    raster::plot(x[[index]],
+                 col = "white",
+                 xlim = c(xmin, xmax),
+                 ylim = c(ymin, ymax),
+                 axes = FALSE,
+                 box = box,
+                 legend = FALSE
+    )
+
+    raster::plot(bkg,
+                 col = "lightgray",
+                 border = "white",
+                 xlim = c(xmin, xmax),
+                 ylim = c(ymin, ymax),
+                 axes = FALSE,
+                 box = FALSE,
+                 legend = FALSE,
+                 add = TRUE
+    )
+
+    raster::plot(x[[index]],
+                 col = col,
+                 add = TRUE,
+                 axes = FALSE,
+                 box = FALSE,
+                 ...
+    )
+  })
+
+  graphics::title(main = list(main, font = 1), adj = 0)
+
+  return()
+}
+
+#' Plot moving window map of sample counts
+#'
+#' Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
+#'
+#' @param x single SpatRaster of counts or SpatRaster where indexed layer is sample counts
+#' @param index if a raster stack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)
+#' @param col color palette to use for plotting (defaults to viridis::magma palette)
+#' @param breaks number of breaks to use in color scale (defaults to 10)
+#' @param box whether to include a box around the raster plot (defaults to FALSE)
+#' @inheritParams plot_gd
+#' @inheritParams terra::plot
+#'
+#' @return plot of sample counts
+#' @export
+#'
+#' @examples
+#' data("mini_lyr")
+#' plot_count(mini_lyr)
+raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
+  if (inherits(x, "SpatRaster")) x <- raster::raster(x)
+
+  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
+  if (is.null(index)) index <- 2
+
+  # suppress annoying and irrelevant plot warnings
+  suppressWarnings({
+    if (raster::nlyr(x) > 1) {
+      plt <- terra::plot(x[[index]],
+                         col = col,
+                         axes = FALSE,
+                         box = box,
+                         ...
+      )
+      graphics::title(main = list(main, font = 1), adj = 0)
+    }
+
+    if (terra::nlyr(x) == 1) {
+      plt <- raster::plot(x,
+                          col = col,
+                          axes = FALSE,
+                          box = box,
+                          ...
+      )
+      graphics::title(main = list(main, font = 1), adj = 0)
+    }
+  })
+
+  return(invisible(plt))
+}
