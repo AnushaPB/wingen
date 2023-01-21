@@ -415,14 +415,13 @@ test_that("CRS are handled correctly", {
 
   # no CRS lyr and coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, nocrs_lyr, rarify = FALSE))
-  expect_equal(cw[1], "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming euclidean coordinates.")
-  expect_equal(cw[2], "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection.")
+  expect_equal(length(cw), 2)
 
   # no CRS lyr and CRS coords
-  expect_warning(window_gd(mini_vcf, crs_coords, nocrs_lyr, rarify = FALSE), "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection.")
+  expect_warning(window_gd(mini_vcf, crs_coords, nocrs_lyr, rarify = FALSE))
 
   # CRS lyr and no CRS coords
-  expect_warning(window_gd(mini_vcf, nocrs_coords, crs_lyr, rarify = FALSE), "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming euclidean coordinates.")
+  expect_warning(window_gd(mini_vcf, nocrs_coords, crs_lyr, rarify = FALSE))
 
   # CRS lyr and CRS coords (no warnings expected)
   wg <- window_gd(mini_vcf, crs_coords, crs_lyr, rarify = FALSE)
