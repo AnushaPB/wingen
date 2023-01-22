@@ -17,6 +17,10 @@ test_that("all stats and parallel works", {
 
   # check parallel
   capture_warnings(wpp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE, parallel = TRUE, ncores = 2))
+  capture_warnings(whp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE, parallel = TRUE, ncores = 2))
+  capture_warnings(wbp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
+  capture_warnings(wap <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
+
   expect_true(terra::all.equal(wpp, wp))
 })
 

@@ -132,7 +132,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster"))
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
     # convert back to SpatRast
