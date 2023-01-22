@@ -32,7 +32,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-circle_gd <- function(vcf, coords, lyr, radius, stat = "pi", fact = 0,
+circle_gd <- function(vcf, coords, lyr, radius, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
@@ -52,6 +52,7 @@ circle_gd <- function(vcf, coords, lyr, radius, stat = "pi", fact = 0,
     coords = coords,
     lyr = lyr,
     radius = radius,
+    distmat = distmat,
     stat = stat,
     fact = fact,
     rarify = rarify,
@@ -88,10 +89,11 @@ circle_gd <- function(vcf, coords, lyr, radius, stat = "pi", fact = 0,
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
-circle_general <- function(x, coords, lyr, stat, radius, fact = 0,
+circle_general <- function(x, coords, lyr, stat, radius, distmat = NULL, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+
   # check layers and coords (only lyr is modified and returned)
   lyr <- layer_coords_check(lyr, coords)
 
@@ -108,15 +110,16 @@ circle_general <- function(x, coords, lyr, stat, radius, fact = 0,
   # make aggregated raster
   if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
 
+  # make distmat if not provided
+  if (is.null(distmat)) distmat <- make_distmat(coords, lyr, parallel = parallel, ncores = ncores)
+  distmat[distmat > radius] <- NA
+
   # run sliding window calculations
   if (parallel) {
 
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
     future::plan(future::multisession, workers = ncores)
-
-    # make distmat
-    distmat <- make_distmat(coords, lyr, radius, parallel = TRUE)
 
     # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
     # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
@@ -132,9 +135,6 @@ circle_general <- function(x, coords, lyr, stat, radius, fact = 0,
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
-
-    # make distmat
-    distmat <- make_distmat(coords, lyr, radius, parallel = TRUE)
 
     rast_vals <- purrr::map_dfr(1:terra::ncell(lyr), circle_helper,
                                 lyr = lyr, x = x, distmat = distmat,
@@ -193,15 +193,20 @@ circle_helper <- function(i, lyr, x, distmat, stat_function,
   return(data.frame(gd = gd, ns = ns))
 }
 
-make_distmat <- function(coords, lyr, radius, parallel = TRUE){
-  if (inherits(coords, "data.frame")) coords <- sf::st_as_sf(coords, coords = c("x","y"))
+make_distmat <- function(coords, lyr, parallel = FALSE, ncores = NULL){
   lyr_df <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)
   lyr_sf <- sf::st_as_sf(lyr_df, coords = c("x", "y"), crs = terra::crs(lyr))
-  distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x,], coords), lyr_sf,
-                              .options = furrr::furrr_options(seed = TRUE, packages = c("sf")))
+
+  if (parallel){
+    if (is.null(ncores)) ncores <- future::availableCores() - 1
+    distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x,], coords), lyr_sf,
+                                .options = furrr::furrr_options(seed = TRUE, packages = c("sf")))
+  } else {
+    distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x,], coords), lyr_sf)
+  }
+
 
   distmat <- matrix(unlist(distls), ncol = length(distls[[1]]), byrow = TRUE)
-  distmat[distmat > radius] <- NA
 
   return(distmat)
 }
@@ -253,3 +258,4 @@ geo_dist <- function(coords, type = "Euclidean", lyr = NULL){
 
   return(distmat)
 }
+

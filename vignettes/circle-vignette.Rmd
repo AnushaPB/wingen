@@ -1,0 +1,89 @@
+---
+title: "circle_vignette"
+output: html_document
+date: "2023-01-21"
+---
+```{r}
+library(terra)
+library(sf)
+```
+
+```{r}
+load_mini_ex()
+
+sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
+
+lyr_coords <- terra::as.data.frame(mini_lyr, xy = TRUE, na.rm = FALSE)[,1:2]
+
+plot(mini_lyr)
+points(lyr_coords)
+```
+
+```{r}
+lyr = 1/mini_lyr
+cond.r <- 1 / lyr
+trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8) # Create transition surface
+trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+df_to_ls <- function(x) split(x, seq(nrow(x)))
+
+getdist <- function(x, y, trSurface, lyr_coords, sample_coords){
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], sample_coords[y,]))
+  distmat <- possible_gdist(trSurface, sp) # Calculate circuit distances
+  if(!is.na(distmat)) distmat <- distmat[1,2]
+  return(distmat)
+}
+
+sample_coords <- mini_coords
+
+params <- expand.grid(list(lyr = 1:nrow(lyr_coords), sample_coords = 1:nrow(sample_coords)))
+
+possible_gdist <- possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
+
+distvec <- furrr::future_map2_dbl(params$lyr, params$sample_coords, getdist, trSurface, lyr_coords, sample_coords)
+distdf <- data.frame(params, dist = distvec) %>% tidyr::pivot_wider(names_from = sample_coords, values_from = dist)
+distmat <- as.matrix(distdf[,-1])
+
+```
+
+```{r}
+cg <- circle_gd(mini_vcf, sf_coords, mini_lyr, radius = 50)
+plot_gd(cg)
+
+cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, radius = 250)
+plot_gd(cgr)
+```
+```{r}
+cond.r <- aggregate(lotr_lyr, 3)
+trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8) # Create transition surface
+trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+df_to_ls <- function(x) split(x, seq(nrow(x)))
+
+getdist <- function(x, y, trSurface, lyr_coords, sample_coords){
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], sample_coords[y,]))
+  distmat <- possible_gdist(trSurface, sp) # Calculate circuit distances
+  if(!is.na(distmat)) distmat <- distmat[1,2]
+  return(distmat)
+}
+
+sample_coords <- lotr_coords
+
+params <- expand.grid(list(lyr = 1:nrow(lyr_coords), sample_coords = 1:nrow(sample_coords)))
+
+possible_gdist <- possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
+
+distvec <- furrr::future_map2_dbl(params$lyr, params$sample_coords, getdist, trSurface, lyr_coords, sample_coords)
+distdf <- data.frame(params, dist = distvec) %>% tidyr::pivot_wider(names_from = sample_coords, values_from = dist)
+distmat <- as.matrix(distdf[,-1])
+
+```
+
+```{r}
+sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+cg <- circle_gd(lotr_vcf, sf_coords, lotr_lyr, radius = 10, fact = 3)
+plot_gd(cg)
+
+cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, fact = 3, radius = 250)
+plot_gd(cgr)
+```
