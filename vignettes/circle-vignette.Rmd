@@ -6,6 +6,7 @@ date: "2023-01-21"
 ```{r}
 library(terra)
 library(sf)
+library(wingen)
 ```
 
 ```{r}
@@ -53,8 +54,11 @@ plot_gd(cg)
 cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, radius = 250)
 plot_gd(cgr)
 ```
-```{r}
-cond.r <- aggregate(lotr_lyr, 3)
+
+```{r, warnings = FALSE}
+load_middle_earth_ex()
+lyr <- aggregate(lotr_lyr, 3)
+cond.r <- lyr 
 trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8) # Create transition surface
 trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
@@ -69,10 +73,14 @@ getdist <- function(x, y, trSurface, lyr_coords, sample_coords){
 
 sample_coords <- lotr_coords
 
+lyr_coords <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)[,1:2]
+
 params <- expand.grid(list(lyr = 1:nrow(lyr_coords), sample_coords = 1:nrow(sample_coords)))
 
-possible_gdist <- possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
+possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
 
+future::plan(future::multisession, workers = 3)
+    
 distvec <- furrr::future_map2_dbl(params$lyr, params$sample_coords, getdist, trSurface, lyr_coords, sample_coords)
 distdf <- data.frame(params, dist = distvec) %>% tidyr::pivot_wider(names_from = sample_coords, values_from = dist)
 distmat <- as.matrix(distdf[,-1])
@@ -81,9 +89,26 @@ distmat <- as.matrix(distdf[,-1])
 
 ```{r}
 sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
-cg <- circle_gd(lotr_vcf, sf_coords, lotr_lyr, radius = 10, fact = 3)
-plot_gd(cg)
 
-cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, fact = 3, radius = 250)
-plot_gd(cgr)
+
+wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
+
+cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+
+cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = log(distmat), radius = 7.5, min_n = 1)
 ```
+
+```{r, fig.height = 3, fig.width = 12}
+
+par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+
+plot_gd(lyr)
+plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
+
+plot_gd(wg, bkg = lotr_range, main = "Rectangle")
+plot_gd(cg, bkg = lotr_range, main = "Circle")
+plot_gd(cgr, bkg = lotr_range, main = "Resistance")
+```
+
+
+
