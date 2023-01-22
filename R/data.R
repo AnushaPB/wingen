@@ -20,20 +20,20 @@
 
 #' Middle earth example raster
 #'
-#' SpatRaster of middle earth
+#' RasterLayer of middle earth
 #'
-#' @format SpatRaster
-#' @source created from simulations in Bishop et al., 202X based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+#' @format RasterLayer
+#' @source created from simulations in Bishop et al. (submitted) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 #'
 "lotr_lyr"
 
 #' Middle earth example range polygon
 #'
-#' SpatialPolygonsDataFrame of range map
+#' sf polygon of range map
 #'
 #'
-#' @format SpatialPolygonsDataFrame
-#' @source  created from simulations in Bishop et al., 202X
+#' @format sf
+#' @source  created from simulations in Bishop et al. (submitted)
 "lotr_range"
 
 
@@ -44,7 +44,7 @@
 #'   \item{x}{x coordinate}
 #'   \item{y}{y coordinate}
 #' }
-#' @source created from simulations in Bishop et al., 202X
+#' @source created from simulations in Bishop et al. (submitted)
 "mini_coords"
 
 #' Mini middle earth example vcf
@@ -52,7 +52,7 @@
 #' A Variant Call Format data set
 #'
 #' @format Object of class vcfR with 10 individuals and 10 loci
-#' @source created from simulations in Bishop et al., 202X
+#' @source created from simulations in Bishop et al. (submitted)
 "mini_vcf"
 
 #' Mini middle earth example vcf with NA values
@@ -60,14 +60,14 @@
 #' A Variant Call Format data set with NA values
 #'
 #' @format Object of class vcfR with 10 individuals and 10 loci
-#' @source created from simulations in Bishop et al., 202X
+#' @source created from simulations in Bishop et al. (submitted)
 "mini_vcf_NA"
 
 #' Mini middle earth example raster
 #'
-#' SpatRaster of middle earth from CITE
+#' RasterLayer of middle earth from CITE
 #'
 #'
-#' @format A SpatRaster of middle earth
-#' @source created from simulations in Bishop et al., 202X
+#' @format A RasterLayer of middle earth
+#' @source created from simulations in Bishop et al. (submitted)
 "mini_lyr"
