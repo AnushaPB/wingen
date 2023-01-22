@@ -5,7 +5,7 @@
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
 #' @param vcf object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
-#' @param coords coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
+#' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param lyr SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param stat genetic diversity statistic to calculate (can either be `"pi"` for nucleotide diversity (default), `"Ho"` for average observed heterozygosity across all sites, `"allelic_richness"` for average number of alleles across all sites, or `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option faster than `"allelic_richness"`))
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
@@ -657,7 +657,7 @@ return_stat <- function(stat, ...) {
 #' Helper function to check lyr and coords
 #'
 #' @param lyr RasterLayer or SpatRaster
-#' @param coords sf object, data frame, or matrix representing coordinates
+#' @param coords sf points, data frame, or matrix representing coordinates
 #'
 #' @return SpatRaster
 #'

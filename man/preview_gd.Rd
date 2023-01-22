@@ -9,7 +9,7 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 \arguments{
 \item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{coords}{coordinates (two columns, the first should be x and the second should be y)}
+\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
