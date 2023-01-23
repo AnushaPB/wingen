@@ -217,7 +217,8 @@ write_time_test <- function(res, file.name){
 #' @param res results
 #' @inheritParams default_time_test
 write_rast_test <- function(res, file.name){
-  if(class(res[[2]]) == "RasterStack"){
+  if(inherits(res[[2]], "RasterStack")) res[[2]] <- terra::rast(res[[2]])
+  if(inherits(res[[2]], "SpatRaster")){
     resl <- res[[2]]
     write_rast_helper(resl, file.name)
   } else {
@@ -230,8 +231,9 @@ write_rast_test <- function(res, file.name){
 #'
 #' @inheritParams write_rast_test
 write_rast_helper <- function(resl, file.name){
+  if(!inherits(resl, "SpatRaster")) resl <- terra::rast(resl)
   lyrname <- names(resl)[1]
-  terra::writeRaster(terra::rast(resl), paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
+  terra::writeRaster(resl, paste0(file.name,"_", lyrname, ".tif"), overwrite = TRUE)
 }
 
 #' Get raster outputs from default time test files
