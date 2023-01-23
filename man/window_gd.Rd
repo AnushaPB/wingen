@@ -12,7 +12,7 @@ window_gd(
   wdim = 3,
   fact = 0,
   rarify = FALSE,
-  rarify_n = 2,
+  rarify_n = NULL,
   rarify_nit = 5,
   min_n = 2,
   fun = mean,
@@ -38,7 +38,7 @@ window_gd(
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
+\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 

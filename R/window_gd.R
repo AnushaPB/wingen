@@ -11,7 +11,7 @@
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to `lyr` (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
-#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
+#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
@@ -34,7 +34,7 @@
 #' plot_count(wpi)
 #'
 window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
-                      rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+                      rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
   # check that the input file is a vcf or a path to a vcf object
@@ -90,7 +90,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #'
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
-                           rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+                           rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
   # check layers and coords (only lyr is modified and returned)
@@ -168,11 +168,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 window_helper <- function(i, lyr, x, coord_cells, nmat, stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
-  # convert RasterLayer back to SpatRaster (necessary for parallelized task)
-  # if (inherits(lyr, "RasterLayer")) lyr <- terra::rast(lyr)
 
-  # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
-  if (rarify) min_n <- rarify_n
+  # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
+  if (is.null(rarify_n)) rarify_n <- min_n
 
   # skip if raster value is NA
   if (is.na(lyr[i])) {
