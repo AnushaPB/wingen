@@ -32,7 +32,7 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 The following example demonstrates the basic functionality of wingen
 using a **small subset (100 variant loci x 100 samples) of the simulated
-data from Bishop et al. (submitted)**.
+data from Bishop et al. (in review)**.
 
 ``` r
 library(wingen)
@@ -62,9 +62,9 @@ wgd <- window_gd(lotr_vcf,
 )
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
 plot_gd(wgd, bkg = lotr_range, main = "Moving window pi", legend.width = 1.5)
-plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
+plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-window_gd-1.png" width="100%" />
@@ -74,13 +74,10 @@ with the `krig_gd()` function.
 
 ``` r
 # Krige genetic diversity (disaggregate grid to project across a smoother final surface)
-kgd <- krig_gd(wgd[["pi"]], lotr_lyr, disagg_grd = 2)
-# Krige counts (aggregate input raster to decrease computational time)
-kgd_counts <- krig_gd(wgd[["sample_count"]], lotr_lyr, agg_r = 2, disagg_grd = 2)
+kgd <- krig_gd(wgd, lotr_lyr, index = 1, disagg_grd = 2)
 
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
 plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
-plot_count(kgd_counts, main = "Kriged sample counts", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-krig_gd-1.png" width="100%" />
@@ -91,17 +88,13 @@ undersampled.
 
 ``` r
 # Mask results that fall outside of the "range"
-mgd_lyr <- mask_gd(kgd, lotr_range)
-
-# Further mask results in areas where the sample count was less than minval
-mgd_counts <- mask_gd(mgd_lyr, kgd_counts, minval = 2)
+mgd <- mask_gd(kgd, lotr_range)
 ```
 
 ``` r
 # Plot results
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4))
-plot_gd(mgd_lyr, main = "Masked pi (range)", legend.width = 1.5)
-plot_gd(mgd_counts, bkg = lotr_range, main = "Masked pi (sample counts + range)", legend.width = 1.5)
+par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
+plot_gd(mgd, bkg = lotr_range, main = "Masked pi", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-result-1.png" width="100%" />
@@ -111,6 +104,8 @@ For an extended walk through, see the package vignette:
 ``` r
 vignette("wingen-vignette")
 ```
+
+A pdf of the vignette can also be found here:
 
 Example analyses from Bishop et al. can be found in the
 [paperex](https://github.com/AnushaPB/wingen/tree/main/paperex)
