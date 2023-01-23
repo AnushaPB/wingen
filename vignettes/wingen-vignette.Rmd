@@ -14,8 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Wingen
-
 ```{r setup, warning = FALSE, message = FALSE}
 library(wingen)
 library(terra)
@@ -35,7 +33,7 @@ In short, wingen uses a moving window approach to create maps of genetic diversi
 
 ## Example
 
-To demonstrate how wingen works, we will use a subset the data from the Bishop et al. simulation example (submitted). These simulations were created using Geonomics (Terasaki Hart et al., 2022) to generate a realistic landscape genomic dataset. In this simulation, spatial variation in genetic diversity is produced by varying population size and gene flow across the landscape via heterogenous carrying capacity and conductance surfaces. These surfaces are based on an example digital elevation model of Tolkien’s Middle Earth produced by the Center for Geospatial Analysis at William & Mary ([Robert, 2020](https://scholarworks.wm.edu/asoer/3/)).
+To demonstrate how wingen works, we will use a subset the data from the Bishop et al. simulation example (in review). These simulations were created using Geonomics (Terasaki Hart et al., 2022) to generate a realistic landscape genomic dataset. In this simulation, spatial variation in genetic diversity is produced by varying population size and gene flow across the landscape via heterogenous carrying capacity and conductance surfaces. These surfaces are based on an example digital elevation model of Tolkien’s Middle Earth produced by the Center for Geospatial Analysis at William & Mary ([Robert, 2020](https://scholarworks.wm.edu/asoer/3/)).
 
 ### Load Middle Earth example
 
@@ -117,19 +115,20 @@ The main arguments to `window_gd()` are:
 
 ----------------------------------------------------------------------------------------------------------
 
-*Note:* Coordinates and rasters used in wingen should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances. Therefore, longitude-latitude systems should be transformed. An example of how this can be accomplished is shown here:
+*Note:* Coordinates and rasters used in wingen should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances. Therefore, longitude-latitude systems should be transformed. An example of how this can be accomplished is shown below. If no CRS is provided, a warning will be given and wingen will assume a euclidean system.
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
 ## The simulated coordinates and rasters are actually already Euclidean, however for this example we are pretending they are latitude-longitude coordinates
 ## Convert coords data.frame to sf points
 coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
-wgd_longlat <- wgd
-crs(wgd_longlat) <- "+proj=longlat"
+## Convert RasterLayer to SpatRaster if it is not in this format already
+lyr_longlat <- rast(lotr_lyr)
+crs(lyr_longlat) <- "+proj=longlat"
 
 # Next, the coordinates and raster can then be projected to UTM like this:
 coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
-wgd_utm <- project(wgd_longlat, "+proj=utm")
+lyr_utm <- project(lyr_longlat, "+proj=utm")
 # They can be switched back to latitude-longitude the same way (just replace "utm" with "longlat")
 ```
 
@@ -151,7 +150,7 @@ The `L` argument is used in the calculation of pi. If `L = NULL` (default), the 
 
 We then plot the genetic diversity layer (the first layer of the produced raster stack) and the sample counts layer (the second layer).
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -184,7 +183,7 @@ To deal with this issue, users can either (1) resample their moving window raste
 To run this function, we provide the raster stack output from `window_gd()`, the indices of the layers we want to krige (in this case both the (1) genetic diversity and (2) sample count layers), and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a raster stack of the kriged input layers. 
 
 
-```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # Note: this step can take a little while
 kgd <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2)
 
@@ -198,16 +197,15 @@ For information on the differences between universal and ordinary kriging check 
 - https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm
 - https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation
 
-```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_ordinary <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
 
 plot_gd(kgd_ordinary, main = "Kriged pi")
-plot_count(kgd_ordinary, main = "Kriged sample counts")
 ```
 
 Users can optionally get the full output from `autoKrige()`
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_output = TRUE)
 
 summary(kgd_autoKrige)
@@ -229,7 +227,7 @@ mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
 ```
 
-**Method 2:** mask the layer using a species range map (a *SpatialPolygonsDataFrame* type object) to exclude areas falling outside the species range.
+**Method 2:** mask the layer using a species range map (in this case, a sf polygon) to exclude areas falling outside the species range.
 
 ```{r mask results 2, fig.width = 5, fig.height = 5}
 mgd <- mask_gd(kgd, lotr_range)
@@ -237,25 +235,9 @@ mgd <- mask_gd(kgd, lotr_range)
 plot_gd(mgd, main = "Kriged & range masked pi")
 ```
 
-**Method 3:** mask the layer using the standard deviation or variance layer produced by `krig_gd` when `autoKrige_output = TRUE` to exclude areas where uncertainty is high (in this case, areas where the standard deviation is greater than 0.05): 
+**Method 3:** mask the layer using a spatial Kernel Density Estimation (KDE) of sample density to exclude areas with low sampling density:
 
-```{r mask results 3, fig.width = 5, fig.height = 5}
-mgd <- mask_gd(kgd_autoKrige[["raster"]][["pred"]], kgd_autoKrige[["raster"]][["stdev"]], maxval = 0.05)
-
-plot_gd(mgd, main = "Kriged & uncertainty masked pi")
-```
-
-**Method 4:** mask the layer using the sample counts layer produced by wingen to exclude undersampled areas (in this case, areas where the kriged value is lower than 1): 
-
-```{r mask results 4, fig.width = 5, fig.height = 5}
-mgd <- mask_gd(kgd, kgd[["sample_count"]], minval = 2)
-
-plot_gd(mgd, main = "Kriged & sample count masked pi")
-```
-
-**Method 5:** mask the layer using a spatial Kernel Density Estimation (KDE) of sample density to exclude areas with low sampling density:
-
-```{r mask results 5, fig.width = 5, fig.height = 5}
+```{r mask results 3, fig.width = 5, fig.height = 5, results = FALSE, message = FALSE}
 # Spatial KDE requires an sf data.frame containing only POINTS that is projected
 lotr_sf <- sf::st_as_sf(lotr_coords, coords = c("x", "y")) %>% sf::st_set_crs(32031)
 
@@ -310,7 +292,7 @@ wgd <- window_gd(lotr_vcf,
 
 In addition to pi, users can calculate observed heterozygosity (`"Ho"`), allelic richness (either using `"biallelic_richness"` [faster but only works on biallelic data] or `"allelic_richness"`):
 
-```{r, cache = TRUE}
+```{r, cache = TRUE, warning=FALSE}
 pi_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -371,7 +353,7 @@ For other statistics:
 
 
 As an example, let's create a moving window map of our raster layer values (e.g., carrying capacity and conductance, in this case) at the sample coordinates
-```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning=FALSE}
 
 # First, we extract the raster values at those coordinates
 vals <- terra::extract(lotr_lyr, lotr_coords)
