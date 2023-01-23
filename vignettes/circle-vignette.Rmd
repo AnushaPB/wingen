@@ -7,7 +7,9 @@ date: "2023-01-21"
 library(terra)
 library(sf)
 library(wingen)
+library(raster)
 ```
+
 
 ```{r}
 load_mini_ex()
@@ -112,5 +114,76 @@ plot_gd(cgr, bkg = lotr_range, main = "Resistance")
 
 ```
 
+```{r}
+library(randomForest)
+
+pa <- data.frame(lotr_coords, pa = 1)
 
 
+abs <- data.frame(layer = sampleRandom(lotr_lyr, 100), pa = 0)
+pres <- data.frame(layer = raster::extract(lotr_lyr, lotr_coords), pa = 1)
+df <- rbind(pres, abs)
+
+mod <- randomForest(pa ~ layer, df, mtry = 1)
+pred <- predict(lotr_lyr, mod)
+plot(pred)
+```
+
+
+```{r, warnings = FALSE}
+load_middle_earth_ex()
+lyr <- aggregate(pred, 3)
+cond.r <- lyr 
+trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8) # Create transition surface
+trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+df_to_ls <- function(x) split(x, seq(nrow(x)))
+
+getdist <- function(x, y, trSurface, lyr_coords, sample_coords){
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], sample_coords[y,]))
+  distmat <- possible_gdist(trSurface, sp) # Calculate circuit distances
+  if(!is.na(distmat)) distmat <- distmat[1,2]
+  return(distmat)
+}
+
+sample_coords <- lotr_coords
+
+lyr_coords <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)[,1:2]
+
+params <- expand.grid(list(lyr = 1:nrow(lyr_coords), sample_coords = 1:nrow(sample_coords)))
+
+possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
+
+future::plan(future::multisession, workers = 3)
+    
+
+distvec <- furrr::future_map2_dbl(params$lyr, params$sample_coords, getdist, trSurface, lyr_coords, sample_coords)
+distdf <- data.frame(params, dist = distvec) %>% tidyr::pivot_wider(names_from = sample_coords, values_from = dist)
+distmat <- as.matrix(distdf[,-1])
+
+```
+
+```{r}
+sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+
+
+wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
+
+cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+
+cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
+                 radius = quantile(distmat, 0.05, na.rm = TRUE))
+```
+
+```{r, fig.height = 3, fig.width = 12}
+
+par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+
+plot_gd(lyr)
+plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
+
+plot_gd(wg, bkg = lotr_range, main = "Rectangle")
+plot_gd(cg, bkg = lotr_range, main = "Circle")
+plot_gd(cgr, bkg = lotr_range, main = "Resistance")
+
+```
