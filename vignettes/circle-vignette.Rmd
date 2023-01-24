@@ -62,8 +62,6 @@ plot_gd(cgr, bkg = lotr_range, main = "Resistance")
 ```{r}
 library(randomForest)
 
-pa <- data.frame(lotr_coords, pa = 1)
-
 abs <- data.frame(layer = sampleRandom(lotr_lyr, 100), pa = 0)
 pres <- data.frame(layer = raster::extract(lotr_lyr, lotr_coords), pa = 1)
 df <- rbind(pres, abs)
