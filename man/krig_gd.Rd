@@ -28,7 +28,7 @@ krig_gd(
 
 \item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
 
-\item{coords}{if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf object, a two-column matrix, or a data.frame representing x and y coordinates}
+\item{coords}{if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates}
 
 \item{agg_grd}{factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
 

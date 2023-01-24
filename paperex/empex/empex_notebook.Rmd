@@ -143,18 +143,19 @@ mhg <- empex_krig_mask(hg, lyr_utm, NUS_longlat)
 ### **Figure 4:** Comparison of different measures: 
 
 ```{r, fig.width = 12, fig.height = 6}
+colpal <- colorRampPalette(c("white", "#EFEDF5", "#DADAEB","#BCBDDC", "#9E9AC8", "#807DBA", "#6A51A3", "#54278F"))
 par(mfrow = c(1,3), mar = rep(2,4), oma = rep(2.5,4))
-raster_plot_gd(mpg, legend.width = 2,  breaks = 20, axis.args = list(cex.axis = 1.5))
-plot(NUS_longlat, add = TRUE, col = NA, border = "white")
-plot(coords_longlat, pch = 16, col = mako(1, begin = 0.8), cex = 1.5, add = TRUE)
+raster_plot_gd(mpg, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 
-raster_plot_gd(mag, legend.width = 2, breaks = 20, axis.args = list(cex.axis = 1.5))
-plot(NUS_longlat, add = TRUE, col = NA, border = "white")
-plot(coords_longlat, pch = 16, col = mako(1, begin = 0.8), cex = 1.5, add = TRUE)
+raster_plot_gd(mag, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 
-raster_plot_gd(mhg, legend.width = 2, breaks = 20, axis.args = list(cex.axis = 1.5))
-plot(NUS_longlat, add = TRUE, col = NA, border = "white")
-plot(coords_longlat, pch = 16, col = mako(1, begin = 0.8), cex = 1.5, add = TRUE)
+raster_plot_gd(mhg, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 ```
 
 ### **Figure S4:**  moving window calculations with and without rarefaction 

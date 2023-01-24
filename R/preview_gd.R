@@ -3,7 +3,7 @@
 #'
 #' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
 #'
-#' @param coords coordinates (two columns, the first should be x and the second should be y)
+#' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @inheritParams window_gd
@@ -17,7 +17,6 @@
 preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0) {
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
-
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
   # convert wdim to matrix

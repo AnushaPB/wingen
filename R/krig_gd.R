@@ -6,7 +6,7 @@
 #' @param r SpatRaster produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
 #' @param grd object to create grid for kriging; can be a SpatRaster, RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
-#' @param coords if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf object, a two-column matrix, or a data.frame representing x and y coordinates
+#' @param coords if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates
 #' @param agg_grd factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
 #' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
 #' @param agg_r factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)

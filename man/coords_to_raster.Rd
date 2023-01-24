@@ -14,7 +14,7 @@ coords_to_raster(
 )
 }
 \arguments{
-\item{coords}{coordinates of samples as an sf object, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates}
+\item{coords}{coordinates of samples as sf points, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates}
 
 \item{buffer}{size of buffer to add to edge of raster (defaults to 0)}
 

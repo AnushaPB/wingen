@@ -12,7 +12,7 @@ A data frame with 10 rows and 2 columns
 }
 }
 \source{
-created from simulations in Bishop et al., 202X
+created from simulations in Bishop et al. (submitted)
 }
 \usage{
 mini_coords

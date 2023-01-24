@@ -12,7 +12,7 @@ window_general(
   wdim = 3,
   fact = 0,
   rarify = FALSE,
-  rarify_n = 2,
+  rarify_n = NULL,
   rarify_nit = 5,
   min_n = 2,
   fun = mean,
@@ -27,7 +27,7 @@ window_general(
 \arguments{
 \item{x}{data to be summarized by the moving window (\emph{note:} order matters! \code{coords} should be in the same order, there are currently no checks for this). The class of \code{x} required depends on the statistic being calculated (see the \code{stat} argument and the function description for more details)}
 
-\item{coords}{coordinates of samples as an sf object, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
+\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
@@ -39,7 +39,7 @@ window_general(
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
+\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
