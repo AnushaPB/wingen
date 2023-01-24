@@ -203,4 +203,53 @@ raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn
 par(mar = rep(0,4))
 raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
+#CIRCLE GD
+```{r}
+library(randomForest)
+
+env <- stack(here(wdir, "data", "CLEANED_ENVDATA_NOCOR.tif"))
+abs <- data.frame(layer = sampleRandom(env, 100), pa = 0)
+pres <- data.frame(layer = raster::extract(env, coords), pa = 1)
+df <- rbind(pres, abs)
+df <- df[complete.cases(df),]
+names(df) <- c(names(env), "pa")
+
+mod <- randomForest(pa ~ ., df, mtry = 1)
+pred <- predict(env, mod)
+plot(pred)
+
+writeRaster(pred, "data/SDM.tif")
+plot(aggregate(pred, 30))
+
+
+trSurface <- gdistance::transition(aggregate(pred, 30), transitionFunction = mean, directions = 8)
+trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+plot_gd(raster(trSurface))
+```
+
+```{r, fig.width = 6, fig.height = 6}
+distmat <- read.csv("distmat30.csv")
+distmat <- as.matrix(distmat)
+cgd <- circle_gd(vcf, coords, lyr = aggregate(pred, 30), distmat = distmat, 
+                 radius = quantile(distmat, 0.05, na.rm = TRUE))
+
+geodistmat <- make_distmat(coords_longlat, lyr = aggregate(pred, 30), 
+                           parallel = TRUE, ncores = 3)
+
+cg <- circle_gd(vcf, coords, lyr = aggregate(pred, 30), distmat = geodistmat, 
+                radius = quantile(geodistmat, 0.015, na.rm = TRUE))
+cg <- terra::mask(cg, rast(aggregate(pred, 30)))
+
+wg <- window_gd(vcf, coords_longlat, lyr = aggregate(pred, 30), wdim = 5, crop_edges = TRUE)
+
+par(mfrow = c(2,2), oma = rep(0,4), mar = rep(2,4), pty = "s")
+raster_plot_gd(wg, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE, 
+        main = "Rectangle")
+raster_plot_gd(cg, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE,
+        main = "Circle")
+raster_plot_gd(cgd, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE,
+        main = "Resistance")
+raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
+```
+
 
