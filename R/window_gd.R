@@ -448,10 +448,16 @@ raref <- function(x, min.n) {
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
   adjc <- terra::adjacent(r, i, directions = n, include = TRUE)
+
   # get indices of adjacent cells
   adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
-  # get list of indices of coords in that set of cells
-  sub <- which(coord_cells %in% adjci)
+
+  # remove NA values from indices
+  ## note: if NA values are not removed, coord_cells with NA values will be included
+  adjci_nona <- adjci[!is.na(adjci)]
+
+  # get vector of indices of coords in that set of cells
+  sub <- which(coord_cells %in% adjci_nona)
 
   return(sub)
 }

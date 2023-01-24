@@ -91,7 +91,7 @@ preview_count <- function(lyr, coords, nmat, min_n) {
   lyrc <- lyr
 
   # get counts for each raster cell
-  nc <- purrr::map_dbl(1:raster::ncell(lyr), sample_count, lyr, nmat, coord_cells)
+  nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count, lyr, nmat, coord_cells)
 
   # assign values to raster
   lyrc <- terra::setValues(lyr, nc)
