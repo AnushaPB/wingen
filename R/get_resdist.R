@@ -1,5 +1,8 @@
 
-get_resdist <- function(coords, cond.r, ncores = 1){
+get_resdist <- function(coords, cond.r, ncores = 1, progress = TRUE){
+  # rename coords
+  colnames(coords) <- c("x", "y")
+
   # Create transition surface
   trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8)
   trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
@@ -14,7 +17,7 @@ get_resdist <- function(coords, cond.r, ncores = 1){
   future::plan(future::multisession, workers = ncores)
 
   suppressWarnings({
-  distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords)
+  distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords, .progress = progress)
   })
 
   # convert from vector to matrix
