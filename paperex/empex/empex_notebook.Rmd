@@ -219,37 +219,47 @@ pred <- predict(env, mod)
 plot(pred)
 
 writeRaster(pred, "data/SDM.tif")
-plot(aggregate(pred, 30))
+plot(lyr)
 
 
-trSurface <- gdistance::transition(aggregate(pred, 30), transitionFunction = mean, directions = 8)
+trSurface <- gdistance::transition(aggregate(pred, 20), transitionFunction = mean, directions = 8)
 trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
-plot_gd(raster(trSurface))
 ```
 
 ```{r, fig.width = 6, fig.height = 6}
+
+geodistmat <- make_distmat(coords_longlat, lyr = lyr, 
+                           parallel = TRUE, ncores = 3)
 distmat <- read.csv("distmat30.csv")
 distmat <- as.matrix(distmat)
-cgd <- circle_gd(vcf, coords, lyr = aggregate(pred, 30), distmat = distmat, 
+lyr <-  aggregate(pred, 30)
+cgd <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
                  radius = quantile(distmat, 0.05, na.rm = TRUE))
 
-geodistmat <- make_distmat(coords_longlat, lyr = aggregate(pred, 30), 
-                           parallel = TRUE, ncores = 3)
-
-cg <- circle_gd(vcf, coords, lyr = aggregate(pred, 30), distmat = geodistmat, 
+cg <- circle_gd(vcf, coords, lyr = lyr, distmat = geodistmat, 
                 radius = quantile(geodistmat, 0.015, na.rm = TRUE))
-cg <- terra::mask(cg, rast(aggregate(pred, 30)))
+cg <- terra::mask(cg, rast(lyr))
 
-wg <- window_gd(vcf, coords_longlat, lyr = aggregate(pred, 30), wdim = 5, crop_edges = TRUE)
+wg <- window_gd(vcf, coords_longlat, lyr = lyr, wdim = 5)
+wg <- terra::mask(wg, rast(lyr))
 
-par(mfrow = c(2,2), oma = rep(0,4), mar = rep(2,4), pty = "s")
-raster_plot_gd(wg, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE, 
-        main = "Rectangle")
-raster_plot_gd(cg, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE,
-        main = "Circle")
-raster_plot_gd(cgd, bkg = aggregate(pred, 10), range = c(0.028, 0.137), legend = FALSE,
-        main = "Resistance")
-raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
 ```
 
+```{r,fig.height = 3, fig.width = 9}
+par(mfrow = c(1,3), oma = rep(0,4), mar = rep(2,4), pty = "s")
+raster_plot_gd(wg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE, 
+        main = "Rectangle")
+raster_plot_gd(cg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
+        main = "Circle")
+raster_plot_gd(cgd, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
+        main = "Resistance")
+
+
+```
+
+```{r, fig.height = 3, fig.width=3}
+
+par(oma = rep(0,4), mar = rep(1,4), pty = "s")
+raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
+```
 
