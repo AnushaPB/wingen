@@ -233,6 +233,7 @@ geodistmat <- make_distmat(coords_longlat, lyr = lyr,
 distmat <- read.csv("distmat30.csv")
 distmat <- as.matrix(distmat)
 lyr <-  aggregate(pred, 30)
+
 cgd <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
                  radius = quantile(distmat, 0.05, na.rm = TRUE))
 
@@ -261,5 +262,10 @@ raster_plot_gd(cgd, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend =
 
 par(oma = rep(0,4), mar = rep(1,4), pty = "s")
 raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
+```
+
+# PROJECTIONS
+```{r}
+
 ```
 
