@@ -77,16 +77,13 @@ get_minmax <- function(x, y){
 #' Krige and mask with appropriate projections
 #'
 #' @param x RasterLayer
-#' @param lyr UTM layer for kriging
+#' @param lyr layer for kriging
 #' @param mask longlat layer for masking
 empex_krig_mask <- function(x, lyr, mask){
-
-  x_utm <- terra::project(x, "+proj=utm")
-
-  kx <- krig_gd(x_utm, index = 1, lyr, disagg_grd = 4)
+  kx <- krig_gd(x, index = 1, lyr, disagg_grd = 4)
 
   mx <-
-    terra::project(kx, "+proj=longlat") %>%
+    terra::project(kx, terra::crs(mask)) %>%
     mask(mask) %>%
     trim()
 
@@ -192,13 +189,13 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 20
 raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(breaks), main = NULL, box = FALSE, ...) {
   if (inherits(x, "SpatRaster")) x <- raster::raster(x)
 
-  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
+  if (is.null(index) & raster::nlayers(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
   if (is.null(index)) index <- 2
 
   # suppress annoying and irrelevant plot warnings
   suppressWarnings({
-    if (raster::nlyr(x) > 1) {
-      plt <- terra::plot(x[[index]],
+    if (raster::nlayers(x) > 1) {
+      plt <- raster::plot(x[[index]],
                          col = col,
                          axes = FALSE,
                          box = box,
@@ -207,7 +204,7 @@ raster_plot_count <- function(x, index = NULL, breaks = 20, col = viridis::mako(
       graphics::title(main = list(main, font = 1), adj = 0)
     }
 
-    if (terra::nlyr(x) == 1) {
+    if (raster::nlayers(x) == 1) {
       plt <- raster::plot(x,
                           col = col,
                           axes = FALSE,
