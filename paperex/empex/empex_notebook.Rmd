@@ -221,7 +221,6 @@ plot(pred)
 writeRaster(pred, "data/SDM.tif")
 plot(lyr)
 
-
 trSurface <- gdistance::transition(aggregate(pred, 20), transitionFunction = mean, directions = 8)
 trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 ```
@@ -254,8 +253,6 @@ raster_plot_gd(cg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = 
         main = "Circle")
 raster_plot_gd(cgd, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
         main = "Resistance")
-
-
 ```
 
 ```{r, fig.height = 3, fig.width=3}
@@ -264,8 +261,55 @@ par(oma = rep(0,4), mar = rep(1,4), pty = "s")
 raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
 ```
 
+
+change resolution and see what distance differences are
+double the resolution and see if it changes
+convert to real world units by multiplying by real world units
+
+
 # PROJECTIONS
 ```{r}
+# set parameters 
+wdim = 5
+fact = 0
+disagg = 4
 
+```
+
+```{r}
+geodistmat <- make_distmat(coords_utm, lyr = lyr, parallel = TRUE, ncores = 3)
+
+cg <- circle_gd(vcf, coords_utm, lyr, distmat = geodistmat, 
+                radius = quantile(geodistmat, 0.10, na.rm = TRUE))
+cg_longlat <- terra::project(cg, "+proj = longlat")
+
+plot_gd(cg)
+plot_gd(cg_longlat)
+```
+
+```{r, fig.width = 15, fig.height = 5}
+# Read in and transform coords
+coords <- read.table(here(wdir, "data", "Scelop.coord"))
+# project as long lat
+coords_longlat <- st_as_sf(coords, coords = c("V1", "V2"), crs = "+proj=longlat") 
+# reproject as utm
+coords_utm <- st_transform(coords_longlat, proj4string = "+init=epsg:9835")
+
+# Create final layer 
+lyr <- coords_to_raster(coords_utm, res = 0.25, buffer = 10)
+plot(lyr)
+
+# run moving window
+pg <- window_gd(vcf, coords_utm, lyr, stat = "pi", wdim = 5, rarify = TRUE)
+
+# project back to longlat
+pg_longlat <- terra::project(pg, "+proj=longlat")
+# project back and increase resolution
+pg_longlat2 <- terra::project(pg, "+proj=longlat", res = 0.1)
+
+par(pty = "s", oma = rep(1,4), mfrow = c(1,3), mar = rep(0,4))
+plot_gd(pg, legend = FALSE)
+plot_gd(pg_longlat, bkg = NUS_longlat, legend = FALSE)
+plot_gd(pg_longlat2, bkg = NUS_longlat, legend = FALSE)
 ```
 
