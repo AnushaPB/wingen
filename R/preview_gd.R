@@ -39,7 +39,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 #' @param coords coordinates
 #'
 #' @noRd
-preview_window <- function(lyr, nmat, coords) {
+preview_window <- function(lyr, nmat, coords = NULL) {
   # get center of raster
   center <- get_center(lyr)
 
