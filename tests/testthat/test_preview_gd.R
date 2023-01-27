@@ -26,11 +26,11 @@ test_that("preview_gd returns expected output", {
 test_that("preview_gd works for different coord types", {
   load_mini_ex(quiet = TRUE)
 
-  coords_sf <- sf::st_as_sf(mini_coords, coords = c("x","y"))
+  coords_sf <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
   coords_mat <- as.matrix(mini_coords)
   coords_vect <- terra::vect(coords_sf)
 
-  par(mfrow = c(1,2))
+  par(mfrow = c(1, 2))
   pw1 <- preview_gd(
     mini_lyr,
     coords_sf,
@@ -40,7 +40,7 @@ test_that("preview_gd works for different coord types", {
     min_n = 2
   )
 
- pw2 <- preview_gd(
+  pw2 <- preview_gd(
     mini_lyr,
     coords_mat,
     wdim = 3,
@@ -49,17 +49,15 @@ test_that("preview_gd works for different coord types", {
     min_n = 2
   )
 
- pw3 <- preview_gd(
-   mini_lyr,
-   coords_vect,
-   wdim = 3,
-   fact = 3,
-   sample_count = TRUE,
-   min_n = 2
- )
+  pw3 <- preview_gd(
+    mini_lyr,
+    coords_vect,
+    wdim = 3,
+    fact = 3,
+    sample_count = TRUE,
+    min_n = 2
+  )
 
- expect_true(terra::all.equal(pw1, pw2))
- expect_true(terra::all.equal(pw1, pw3))
-
+  expect_true(terra::all.equal(pw1, pw2))
+  expect_true(terra::all.equal(pw1, pw3))
 })
-

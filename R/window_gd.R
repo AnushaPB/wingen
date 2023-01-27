@@ -168,7 +168,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 window_helper <- function(i, lyr, x, coord_cells, nmat, stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
-
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
   if (is.null(rarify_n)) rarify_n <- min_n
 
