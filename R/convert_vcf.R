@@ -84,7 +84,7 @@ vcf_to_het <- function(x) {
 #'
 #' @noRd
 vcf_check <- function(x) {
-  if (class(x)[1] == "vcfR") {
+  if (inherits(x, "vcfR")) {
     vcf <- x
   } else if (is.character(x)) {
     if (file.exists(x)) {
