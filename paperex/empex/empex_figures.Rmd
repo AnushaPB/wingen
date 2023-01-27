@@ -210,7 +210,7 @@ raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn
 
 ```{r, fig.width = 4, fig.height = 5}
 par(mar = rep(0,4), oma = rep(0,4))
-raster_plot_count(ag[[2]], legend.width = 2)
+raster_plot_count(ag[[2]], legend.width = 1, col = mako(100))
 ```
 
 These plots were then edited in Adobe Illustrator to create the final figures
