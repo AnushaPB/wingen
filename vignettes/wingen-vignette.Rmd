@@ -88,7 +88,7 @@ The workflow of wingen uses three main functions:
 
 The main arguments to `window_gd()` are:
 
-1. `vcf` - An object of type vcf or a path to a vcf file with genotype data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
+1. `gen` - An object of type vcf or a path to a vcf file with genotype data. The order of this file matters! The coordinate and genetic data should be in the same order, as there are currently no checks for this.
 
 
 2. `coords` -  `sf` points or a matrix or dataframe with two columns representing the coordinates of the samples. The first column should be x and the second should be y. 
@@ -375,4 +375,38 @@ we <- window_general(vals,
 plot_gd(we, bkg = lotr_range, main = "Mean raster value")
 ```
 
+# Converting from genind to VCF
+
+Some users may have files in a genind format instead of vcf. The dartR package can be used to convert from genind to vcf. Currently, dartR requires SNPRelate which must be installed from BiocManager. Below we provide code to install the required packages and convert from genind to vcf:
+```{r}
+if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+if (!require("SeqArray", quietly = TRUE)) BiocManager::install("SeqArray")
+if (!require("devtools", quietly = TRUE)) install.packages("devtools")
+if (!require("radiator", quietly = TRUE)) devtools::install_github("thierrygosselin/radiator")
+library(radiator)
+
+df <- genind2df(genind, oneColPerAll = TRUE)
+vcf <- dartR::gl2vcf(genlight)
+
+## Not run:
+require("dartR.data")
+dartR::gl2vcf(platypus.gl,
+  snp_pos = "ChromPos_Platypus_Chrom_NCBIv1",
+  snp_chr = "Chrom_Platypus_Chrom_NCBIv1"
+)
+```
+
+```{r}
+devtools::package_info(pkgs = "SeqArray") # to verify version
+
+# If manually installing SeqArray is necessary
+BiocManager::install("SeqArray")
+BiocManager::install("gdsfmt")
+devtools::install_github("thierrygosselin/radiator", INSTALL_opts = c("--no-multiarch"))
+
+library(radiator)
+genind <- vcfR2genind(mini_vcf)
+genind@pop <- rep(factor(1), nrow(genind@tab))
+genomic_converter(data = genind, output = "vcf")
+```
 

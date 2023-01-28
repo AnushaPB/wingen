@@ -5,7 +5,7 @@
 \title{Create a moving window map of genetic diversity}
 \usage{
 window_gd(
-  vcf,
+  gen,
   coords,
   lyr,
   stat = "pi",
@@ -24,7 +24,7 @@ window_gd(
 )
 }
 \arguments{
-\item{vcf}{object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
+\item{gen}{genetic data either as an object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
