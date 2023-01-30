@@ -8,7 +8,7 @@
 Object of class vcfR with 10 individuals and 10 loci
 }
 \source{
-created from simulations in Bishop et al. (submitted)
+created from simulations in Bishop et al. (in review)
 }
 \usage{
 mini_vcf_NA
