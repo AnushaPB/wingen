@@ -342,7 +342,7 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @param bkg background plot
 #' @param legend whether to plot legend
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
-test_simex_plot <- function(r, bkg = NULL, legend = FALSE, box = FALSE, zlim = NULL, polyx = 83, polyy = -100,...){
+test_simex_plot <- function(r, bkg = NULL, legend = FALSE, zlim = NULL, polyx = 83, polyy = -100,...){
   stat <- names(r)[1]
 
   if(is.null(zlim)){

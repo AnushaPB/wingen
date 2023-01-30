@@ -1,8 +1,8 @@
 ---
-title: "Empirical Example"
+title: "Empirical Example Figures"
 output: github_document
 ---
-```{r, message = FALSE, results = FALSE, warning = FALSE}
+```{r, message = FALSE, results = FALSE, warning = FALSE, include = FALSE}
 library(wingen)
 library(vcfR)
 library(rgdal)
@@ -19,6 +19,9 @@ source(here(wdir, "empex_functions.R"))
 
 # create plot directory
 dir.create(here(wdir, "plots"))
+
+# temporary:
+devtools::load_all()
 ```
 
 # Empirical Dataset
@@ -81,6 +84,8 @@ dev.off()
 ## Run wingen analysis
 
 First, different parameter combinations are evaluated. Here we vary the window size (wdim), the raster resolution (res), and the rarefaction size (rarify_n) to get the plots from Figure S4
+
+### **Figure S5** Comparison of parameters
 
 ```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
 params <- df_to_ls(expand.grid(res = c(30000, 40000, 50000), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
@@ -168,7 +173,7 @@ dev.off()
 ```
 
 
-### **Figure S5:**  moving window calculations with and without rarefaction 
+### **Figure S6:**  moving window calculations with and without rarefaction 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 set.seed(22)

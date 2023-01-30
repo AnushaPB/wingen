@@ -1,5 +1,5 @@
 ---
-title: "Simulation Example"
+title: "Simulation Example Figures"
 output: github_document
 ---
  
@@ -30,8 +30,20 @@ The following function loads the simulated data and subsets it for the example w
 load_middle_earth(subset = TRUE)
 ```
 
+### Figure 2: Window vs Aggregation Factor
 
-## Figure 2: Simulation Example
+```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
+
+stk <- map(params, test_params_simex, subvcf, subcoords, lyr)
+
+pdf(here(wdir, "plots", "figure_2.1.pdf"), width = 5, height = 5)
+par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
+walk(stk, test_simex_plot, bkg = bkg, polyx = 86, polyy = -102)
+dev.off()
+```
+
+## Figure 3: Simulation Example
 
 ### Simulation setup plots
 
@@ -42,19 +54,19 @@ kde <- raster(MASS::kde2d(coords$x, coords$y, h = c(10,10), n = 100, lims = c(0,
 # Plot simulation setup (original lyr, population density, and sample distribution)
 
 # plot of carrying capacity/conductance
-pdf(here(wdir, "plots", "figure_2.1.pdf"))
+pdf(here(wdir, "plots", "figure_3.1.pdf"))
 par(mar = rep(2,4), oma = rep(3,4))
 plot(lyr, col = viridis::magma(100), axes = FALSE, box = FALSE, axis.args=list(cex.axis = 2), legend.shrink = 0.75, legend.width = 1.5)
 dev.off()
 
 # plot of population density
-pdf(here(wdir, "plots", "figure_2.2.pdf"))
+pdf(here(wdir, "plots", "figure_3.2.pdf"))
 par(mar = rep(2,4), oma = rep(3,4))
 plot(kde, col = viridis::magma(100), axes = FALSE, box = FALSE, axis.args = list(cex.axis = 2), legend.shrink = 0.75, legend.width = 1.5)
 dev.off()
 
 # plot of individual distribtuion
-pdf(here(wdir, "plots", "figure_2.3.pdf"))
+pdf(here(wdir, "plots", "figure_3.3.pdf"))
 plot(lyr, col = mako(1, begin = 0.1, alpha = 0.1), axes = FALSE, box = FALSE, zlim = c(0.01,1), legend = FALSE)
 
 points(coords$x, coords$y, pch = 16, cex = 1, col = mako(1, begin = 0.7, alpha = 0.4), xlab = "", ylab = "")
@@ -94,40 +106,30 @@ mg <- mask_gd(kg, bkg)
 
 par(mar = rep(0,4))
 
-pdf(here(wdir, "plots", "figure_2.4.pdf"))
+pdf(here(wdir, "plots", "figure_3.4.pdf"))
 raster_plot_gd(wg, bkg, zlim = c(0, 0.31), legend = FALSE)
 dev.off()
 
-pdf(here(wdir, "plots", "figure_2.5.pdf"))
+pdf(here(wdir, "plots", "figure_3.5.pdf"))
 raster_plot_count(wg[[2]], legend = FALSE)
 dev.off()
 
-pdf(here(wdir, "plots", "figure_2.6.pdf"))
+pdf(here(wdir, "plots", "figure_3.6.pdf"))
 raster_plot_gd(kg, zlim = c(0, 0.31), breaks = 20, legend = FALSE)
 dev.off()
 
-pdf(here(wdir, "plots", "figure_2.8.pdf"))
+pdf(here(wdir, "plots", "figure_3.7.pdf"))
 raster_plot_gd(mg, bkg,zlim = c(0, 0.31), breaks = 20, legend = FALSE)
 dev.off()
 
-pdf(here(wdir, "plots", "figure_2.9.pdf"))
+pdf(here(wdir, "plots", "figure_3.8.pdf"))
 par(oma = rep(2,4))
 raster_plot_gd(kg, zlim = c(0, 0.31), breaks = 20, axis.args = list(cex.axis = 1.75), legend.shrink = 0.7, legend.width = 1.5, legend.only = TRUE)
 dev.off()
 ```
 
-### Figure S1: Window vs Aggregation Factor
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE}
-params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
-
-stk <- map(params, test_params_simex, subvcf, subcoords, lyr)
-
-par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-walk(stk, test_simex_plot, bkg = bkg, box = FALSE)
-```
-
-## Figure S2, S3, and S4: Comparison of datasets, statistics, and sample sizes
+## Figure S1, S2, S3, and S4: Comparison of datasets, statistics, and sample sizes
 
 ```{r, fig.width = 6.75, fig.height = 4.5, cache = TRUE}
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -185,7 +187,7 @@ test_simex_dif_plot(dif200[[1]][[1]], legend.only = TRUE, legend = TRUE,
                     legend.width = 1, legend.shrink = 0.75, axis.args = list(cex.axis = 1.5))
 ```
 
-## Figure S3: Computational time for simulation example
+## Figure S7: Computational time for simulation example
 
 ```{r, warning = FALSE}
 # Loop reads in outputs from simex_tests functions

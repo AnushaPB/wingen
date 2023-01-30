@@ -1,5 +1,5 @@
 ---
-title: "Empirical Example from Bishop et al. (submitted)"
+title: "Empirical Example"
 output: github_document
 ---
 ```{r, message = FALSE, results = FALSE, warning = FALSE, include = FALSE}
@@ -16,7 +16,7 @@ library(purrr)
 wdir <- here("paperex", "empex")
 source(here(wdir, "empex_functions.R"))
 
-# temporary add:
+# temporary:
 devtools::load_all()
 ```
 
@@ -83,7 +83,7 @@ plot(NUS_longlat, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = 
 
 First, different parameter combinations are evaluated. Here, we vary the window size (`wdim`), the raster resolutions (`res`), and the rarefaction size (`rarify_n`).
 
-### **Figure S3** Comparison of parameters
+### **Figure S5** Comparison of parameters
 
 ```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
 params <- df_to_ls(expand.grid(res = c(30000, 40000, 50000), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
@@ -157,7 +157,7 @@ plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
 plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 ```
 
-### **Figure S4:**  moving window calculations with and without rarefaction 
+### **Figure S6:**  moving window calculations with and without rarefaction 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 set.seed(22)
