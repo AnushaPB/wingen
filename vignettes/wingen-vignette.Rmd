@@ -111,6 +111,7 @@ The main arguments to `window_gd()` are:
 
 8. `parallel` - In order to increase computational efficiency, we provide the option for parallelization by setting the `parallel` argument to `TRUE`. Parallelization is performed using the furrr package. Use the `ncores` argument to set the number of cores to use for parallelization. 
 
+
 9. `crop_edges` - whether to crop out the cells along the edge of the raster that are not surrounded by a full window. Users may want to do so to avoid "edge effects" caused by incomplete windows along the borders of the raster. As wingen is relatively insensitive to sample size, edge effects are not likely to have a very strong effect, so by default `crop_edges = FALSE`.
 
 ----------------------------------------------------------------------------------------------------------
@@ -119,17 +120,21 @@ The main arguments to `window_gd()` are:
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
+
 ## The simulated coordinates and rasters are actually already Euclidean, however for this example we are pretending they are latitude-longitude coordinates
+
 ## Convert coords data.frame to sf points
 coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
+
 ## Convert RasterLayer to SpatRaster if it is not in this format already
 lyr_longlat <- rast(lotr_lyr)
 crs(lyr_longlat) <- "+proj=longlat"
 
-# Next, the coordinates and raster can then be projected to UTM like this:
+# Next, the coordinates and raster can be projected to UTM like this:
 coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
 lyr_utm <- project(lyr_longlat, "+proj=utm")
-# They can be switched back to latitude-longitude the same way (just replace "utm" with "longlat")
+
+# Coordinates can be switched back to latitude-longitude the same way (just replace "utm" with "longlat")
 ```
 
 Before running `window_gd()`, users can preview the moving window and the counts within each cell of the raster to get a sense of how big the window is and what the density of counts looks like across their landscape. Here, we provide the raster layer (`lotr_lyr`), the coordinates (`lotr_coords`), the window dimensions (5), the aggregation factor (3), and the minimum sample number (`min_n`). `min_n` will be used to mask the sample count layer to show how much of the landscape will be excluded due to low sample counts (note: `min_n` is equivalent to `rarify_n` if rarefaction is used).
@@ -180,15 +185,15 @@ Kriging is performed by first transforming the moving window layer into a set of
 To deal with this issue, users can either (1) resample their moving window raster layers and grid layers to the same resolution using the `resample` argument, or (2) manually disaggregate or aggregate either the moving window or grid layers using the `r_agg`, `r_disagg`, `grd_agg`, or `grd_disagg` arguments. Generally, if users want a smoother resulting surface, a higher resolution grid layer should be used (this can be accomplished by using the `grd_disagg` argument to disaggregate the grid layer). The resampling, aggregation, and disaggregation options currently only work if the object provided to create the grid is a raster layer. Keep in mind that increasing the resolution of the moving window layer (i.e., either by resampling or disaggregating) can increase computational time substantially as this increases the number of coordinates being used for kriging. This is also the case for increasing the resolution of the grid layer, though to a lesser extent.
 
 
-To run this function, we provide the raster stack output from `window_gd()`, the indices of the layers we want to krige (in this case both the (1) genetic diversity and (2) sample count layers), and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a raster stack of the kriged input layers. 
+To run this function, we provide the raster stack output from `window_gd()`, the indices of the layers we want to krige, and the raster layer to interpolate across. We also disaggregate the original layer by a factor of two to get a smoother output surface (users should play around with this parameter). The output of this function is a raster stack of the kriged input layers. 
 
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # Note: this step can take a little while
-kgd <- krig_gd(wgd, index = 1:2, lotr_lyr, disagg_grd = 2)
+# index = 1 kriges the first layer in wgd (the genetic diversity layer)
+kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
 
 plot_gd(kgd, main = "Kriged pi")
-plot_count(kgd, main = "Kriged sample counts")
 ```
 
 *Note:* by default, the kriging method is set to `krig_method = "universal"` for universal kriging (model formula: ~ x + y), which allows the mean to vary across locations, while variance is held constant. Alternatively, `krig_method` can be set to `"ordinary"` for ordinary/simple kriging (model formula: ~ 1) which assumes that the mean and variance are constant across space.
@@ -241,8 +246,9 @@ plot_gd(mgd, main = "Kriged & range masked pi")
 # Spatial KDE requires an sf data.frame containing only POINTS that is projected
 lotr_sf <- sf::st_as_sf(lotr_coords, coords = c("x", "y")) %>% sf::st_set_crs(32031)
 
-# The grid layer must also be a RasterLayer
-grid <- raster::raster(kgd[[1]])
+# The grid layer must also be a RasterLayer for SpatialKDE
+# Here we use the kriged raster as our grid to get a KDE layer of the same spatial scale 
+grid <- raster::raster(kgd)
 
 # See the SpatialKDE package for more options and details about using KDE
 kde_lyr <- SpatialKDE::kde(
