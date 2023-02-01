@@ -3,7 +3,6 @@
 export(circle_gd)
 export(circle_general)
 export(coords_to_raster)
-export(geo_dist)
 export(krig_gd)
 export(load_middle_earth_ex)
 export(load_mini_ex)
