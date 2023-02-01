@@ -89,7 +89,7 @@ test_that("window_gd returns expected value", {
   expect_true(calc_mean_biar(dos, rarify_alleles = FALSE) == unique(na.omit(raster::values(wg[[1]]))))
 
   capture_warnings(wg <- window_gd(vcf, coords, stat = "allelic_richness", wdim = 5, mini_lyr, min_n = 2))
-  genind <- vcf_to_genind(vcf)
+  genind <- vcfR::vcfR2genind(vcf)
   expect_true(calc_mean_ar(genind) == unique(na.omit(raster::values(wg[[1]]))))
 })
 
@@ -141,7 +141,7 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
 test_that("allelic richness is calculated correctly for dataset with NAs (and rarefaction)", {
   load_mini_ex()
 
-  expect_warning(expect_warning(gen <- vcf_to_genind(mini_vcf_NA)))
+  expect_warning(expect_warning(gen <- vcfR::vcfR2genind(mini_vcf_NA)))
   observed_ar <- helper_calc_ar(gen)
 
   expect_warning(expect_warning(data <- check_data(mini_vcf_NA, mini_coords)))
@@ -190,7 +190,7 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
 test_that("allelic richness is calculated correctly for dataset with no NAs", {
   load_mini_ex()
 
-  gen <- vcf_to_genind(mini_vcf)
+  gen <- vcfR::vcfR2genind(mini_vcf)
   observed_ar <- helper_calc_ar(gen)
 
   data <- check_data(mini_vcf, mini_coords)
@@ -335,7 +335,7 @@ test_that("custom functions with window general work", {
   capture_warnings(wh <- window_general(vcf_to_het(mini_vcf_NA), mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
   capture_warnings(wb <- window_general(vcf_to_dosage(mini_vcf_NA), mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = FALSE))
   capture_warnings(wbr <- window_general(vcf_to_dosage(mini_vcf_NA), mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = TRUE))
-  capture_warnings(wa <- window_general(vcf_to_genind(mini_vcf_NA), mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
+  capture_warnings(wa <- window_general(vcfR::vcfR2genind(mini_vcf_NA), mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
 
   # examples with custom functions
   toy <- vcf_to_dosage(mini_vcf_NA)

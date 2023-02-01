@@ -312,14 +312,11 @@ helper_calc_ar <- function(genind) {
   # assign pops so that the whole sample is treated as one pop
   genind$pop <- rep(factor(1), nind)
 
-  # note: min.n is the The number of alleles down to which the number of alleles should be rarefied.
-  # The default is the minimum number of individuals genotyped (times 2 for diploids). However, if there
-  # are NA values then it doesn't count those as genotypes. Therefore, to ensure that rarefaciton DOES NOT
-  # OCCUR (since we have our own rarefaction step) min.n is set to the total number of individuals
-  # (including those with NAs) times two (assuming diploids)
-
   # note: [,1] references the first column which is AR for each site across all inds (nrow(AR) == L)
-  # ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
+  # note: these are rarified allele counts (to make them not rarified set min.n = nind*2)
+  # min.n is the The number of alleles down to which the number of alleles should be rarefied.
+  # The default is the minimum number of individuals genotyped (times 2 for diploids). However, if there
+  # are NA values then it doesn't count those as genotypes.
   ar <- hierfstat::allelic.richness(genind)$Ar[, 1]
   return(ar)
 }
