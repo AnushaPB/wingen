@@ -129,7 +129,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
     future::plan(future::multisession, workers = ncores)
 
-    rast_vals <- furrr::future_map_dfr(1:terra::ncell(lyr), window_helper,
+    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
@@ -139,7 +139,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
-    rast_vals <- purrr::map_dfr(1:terra::ncell(lyr), window_helper,
+    rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
       stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
@@ -192,7 +192,7 @@ window_helper <- function(i, lyr, x, coord_cells, nmat, stat_function,
   # count the number of samples in the window
   ns <- length(sub)
 
-  return(data.frame(gd = gd, ns = ns))
+  return(list(gd = gd, ns = ns))
 }
 
 
@@ -689,19 +689,17 @@ layer_coords_check <- function(lyr, coords) {
 #'
 #' @noRd
 vals_to_lyr <- function(lyr, rast_vals, stat) {
-  # make copies of rasters
-  alyr <- lyr
-  nsagg <- lyr
+  # transpose list to get a vector per layer
+  tls <- purrr::list_transpose(rast_vals)
 
-  # assign values to rasters
-  alyr[] <- rast_vals[, "gd"]
-  nsagg[] <- rast_vals[, "ns"]
+  # assign vector values to rasters
+  rast_list <- purrr::map(tls, ~terra::setValues(lyr, .x))
 
-  # stack rasters
-  results <- c(alyr, nsagg)
+  # convert from list to raster stack
+  rast_stack <- terra::rast(rast_list)
 
-  # set raster layer names based on stat
-  results <- name_results(results, stat)
+  # set raster layer names based on stats
+  results <- name_results(rast_stack, stat)
 
   return(results)
 }
