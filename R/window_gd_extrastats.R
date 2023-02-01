@@ -1,7 +1,7 @@
 
 calc_prop_hwe <- function(genind, sig = 0.05){
   hwe <- pegas::hw.test(genind)
-  prop <- sum(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
+  prop <- mean(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
   return(prop)
 }
 
