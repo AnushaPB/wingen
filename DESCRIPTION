@@ -28,6 +28,7 @@ Imports:
     raster,
     Rcpp,
     sp,
+    SpatialKDE,
     sf,
     terra,
     utils,
