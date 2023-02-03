@@ -31,7 +31,7 @@ coords_to_raster <- function(coords, buffer = 0, res = 1, agg = NULL, disagg = N
 
   # plot raster
   if (plot) {
-    terra::plot(r, legend = FALSE, col = viridis::mako(raster::ncell(r)))
+    terra::plot(r, legend = FALSE, col = viridis::mako(terra::ncell(r)))
     if (is.matrix(coords)) coords <- data.frame(coords)
     terra::points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
   }
