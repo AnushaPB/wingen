@@ -106,7 +106,7 @@ vignette("wingen-vignette")
 ```
 
 A pdf of the vignette can also be found
-[here](https://github.com/AnushaPB/wingen/blob/dev/vignettes/wingen-vignette.pdf)
+[here](https://github.com/AnushaPB/wingen/blob/main/vignettes/wingen-vignette.pdf)
 
 Example analyses from Bishop et al. can be found in the
 [paperex](https://github.com/AnushaPB/wingen/tree/main/paperex)
