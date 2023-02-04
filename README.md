@@ -63,8 +63,8 @@ wgd <- window_gd(lotr_vcf,
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
 par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
-plot_gd(wgd, bkg = lotr_range, main = "Moving window pi", legend.width = 1.5)
-plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts", legend.width = 1.5)
+plot_gd(wgd, main = "Moving window pi", legend.width = 1.5)
+plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-window_gd-1.png" width="100%" />
@@ -75,12 +75,7 @@ with the `krig_gd()` function.
 ``` r
 # Krige genetic diversity (disaggregate grid to project across a smoother final surface)
 kgd <- krig_gd(wgd, lotr_lyr, index = 1, disagg_grd = 2)
-
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
-plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
 ```
-
-<img src="man/figures/README-krig_gd-1.png" width="100%" />
 
 Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to
 exclude areas that fall outside of the study area or that were
@@ -94,7 +89,10 @@ mgd <- mask_gd(kgd, lotr_range)
 ``` r
 # Plot results
 par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
-plot_gd(mgd, bkg = lotr_range, main = "Masked pi", legend.width = 1.5)
+
+plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
+
+plot_gd(mgd, main = "Masked pi", legend.width = 1.5)
 ```
 
 <img src="man/figures/README-result-1.png" width="100%" />
