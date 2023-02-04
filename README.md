@@ -62,7 +62,7 @@ wgd <- window_gd(lotr_vcf,
 )
 
 # Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
+par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
 plot_gd(wgd, main = "Moving window pi", legend.width = 1.5)
 plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
 ```
@@ -88,7 +88,7 @@ mgd <- mask_gd(kgd, lotr_range)
 
 ``` r
 # Plot results
-par(mfrow = c(1, 2), oma = rep(1, 4), mar = rep(2, 4), pty = "s")
+par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
 
 plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
 
