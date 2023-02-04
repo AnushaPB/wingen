@@ -1,8 +1,8 @@
 ---
-title: "Empirical Example from Bishop et al. (submitted)"
+title: "Empirical Example"
 output: github_document
 ---
-```{r, message = FALSE, results = FALSE, warning = FALSE}
+```{r, message = FALSE, results = FALSE, warning = FALSE, include = FALSE}
 library(wingen)
 library(vcfR)
 library(rgdal)
@@ -15,6 +15,9 @@ library(purrr)
 
 wdir <- here("paperex", "empex")
 source(here(wdir, "empex_functions.R"))
+
+# temporary:
+devtools::load_all()
 ```
 
 # Empirical Dataset
@@ -31,13 +34,14 @@ The vcf used in this example was created from the ped and map file from Bouzid e
 ```
 
 ```{r, fig.width = 5, fig.height = 5}
-
 # Genetic data
 vcf <- read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_randomSNP.vcf"))
 
 # Coordinates
 coords <- read.table(here(wdir, "data", "Scelop.coord"))
-
+coords_longlat <- st_as_sf(coords, coords = c("V1", "V2"), crs = "+proj=longlat") 
+coords_proj <- st_transform(coords_longlat, crs = 3085)
+plot(coords_proj)
 ```
 
 Additionally, state data is used from TIGRIS:
@@ -47,16 +51,19 @@ Additionally, state data is used from TIGRIS:
 states <- states(cb = TRUE)
 
 # reproject into wgs84 to match coordinates
-states <- st_transform(states, 4326)
-
-# convert to SPDF
-states <- as_Spatial(states)
+states_longlat <- st_transform(states, crs = "+proj=longlat")
+states_proj <- st_transform(states, crs = 3085)
 
 # subset out CONUS
-conus <- states[-which(states$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
+conus <- states_longlat[-which(states_longlat$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
+# convert to SPDF for plotting
+conus <- as_Spatial(conus)
 
 # subset out Northern US
-NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+NUS_proj <- states_proj[which(states_proj$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+NUS_longlat <- states_longlat[which(states_longlat$NAME %in% c("California", "Oregon", "Washington", "Nevada", "Idaho")), "STUSPS"]
+
+plot(NUS_proj)
 ```
 
 ### **Figure 4:** Geographic context plots
@@ -64,27 +71,29 @@ NUS <- states[which(states$NAME %in% c("California", "Oregon", "Washington", "Ne
 ```{r, fig.width = 8, fig.height = 5}
 par(mar = rep(0,4))
 plot(conus, col = "lightgray", border = "lightgray", main = "")
-plot(NUS, col = mako(1, begin = 0.7), border = "white", add = TRUE, main = "")
+plot(NUS_longlat, col = mako(1, begin = 0.7), border = "white", add = TRUE, main = "")
 ```
 
 ```{r, fig.width = 3, fig.height = 5}
 par(mar = rep(0,4))
-plot(NUS, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
+plot(NUS_longlat, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 ```
 
 ## Run wingen analysis
 
-First, different parameter combinations are evaluated. Here, we vary the window size (`wdim`), the raster resolutions (`disagg`), and the rarefaction size (`rarify_n`) to get the plots from Figure S4.
+First, different parameter combinations are evaluated. Here, we vary the window size (`wdim`), the raster resolutions (`res`), and the rarefaction size (`rarify_n`).
 
-### **Figure S3** Comparison of parameters
+### **Figure S5** Comparison of parameters
 
 ```{r, fig.width = 7, fig.height = 8, cache = TRUE, result = FALSE, message = FALSE}
-params <- df_to_ls(expand.grid(disagg = c(4, 3, 2), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
+params <- df_to_ls(expand.grid(res = c(30000, 40000, 50000), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
-stk <- purrr::map(params, test_params_empex, vcf, coords)
+stk <- map(params, test_params_empex, vcf, coords_proj)
+
+stk_longlat <- map(stk, ~terra::project(.x, "+proj=longlat"))
 
 par(mfrow = c(2, 3), mar = rep(1, 4))
-purrr::walk(stk, test_empex_plot, bkg = NUS, zlim = c(0.02, 0.11))
+walk(stk_longlat, test_empex_plot, bkg = NUS_longlat, zlim = c(0.02, 0.11))
 ```
 
 Based on the results above, we chose a final set of parameters:
@@ -93,10 +102,12 @@ Based on the results above, we chose a final set of parameters:
 # set parameters 
 wdim = 5
 fact = 0
-disagg = 4
+res = 30000
 
 # Create final layer 
-lyr <- coords_to_raster(coords, disagg = disagg, buffer = 1)
+lyr <- coords_to_raster(coords_proj, res = res, buffer = 10)
+
+plot_gd(lyr, breaks = 100)
 ```
 
 And ran the moving window function again, this time kriging and masking the resulting rasters:
@@ -105,58 +116,62 @@ And ran the moving window function again, this time kriging and masking the resu
 # Run moving window
 set.seed(22)
 st <- Sys.time()
-pg <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+pg <- window_gd(vcf, coords_proj, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+pg_longlat <- terra::project(pg, "+proj=longlat")
+Sys.time() - st
+
+plot_gd(pg)
+set.seed(22)
+st <- Sys.time()
+ag <- window_gd(vcf, coords_proj, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+ag_longlat <- terra::project(ag, "+proj=longlat")
 Sys.time() - st
 
 set.seed(22)
 st <- Sys.time()
-ag <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+hg <- window_gd(vcf, coords_proj, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
+hg_longlat <- terra::project(hg, "+proj=longlat")
 Sys.time() - st
 
-set.seed(22)
-st <- Sys.time()
-hg <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = TRUE, rarify_n = 2, rarify_nit = 5)
-Sys.time() - st
-
-# Krige and mask layers
-kpg <- krig_gd(pg, index = 1, lyr, disagg_grd = 4)
-mpg <- mask(kpg, NUS)
-
-kag <- krig_gd(ag, index = 1, lyr, disagg_grd = 4)
-mag <- mask(kag, NUS)
-
-khg <- krig_gd(hg, index = 1, lyr, disagg_grd = 4)
-mhg <- mask(khg, NUS)
+# krige and mask layers
+mpg <- empex_krig_mask(pg, lyr, NUS_longlat)
+mag <- empex_krig_mask(ag, lyr, NUS_longlat)
+mhg <- empex_krig_mask(hg, lyr, NUS_longlat)
 ```
 
 ### **Figure 4:** Comparison of different measures: 
 
 ```{r, fig.width = 12, fig.height = 6}
-par(mfrow = c(1,3), mar = rep(0.5,4), oma = rep(2.5,4))
-plot_gd(mpg, legend.width = 2,  breaks = 10, axis.args = list(cex.axis = 1.5))
-plot(NUS, add = TRUE, col = NA, border = "white")
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
+colpal <- colorRampPalette(c("white", "#EFEDF5", "#DADAEB","#BCBDDC", "#9E9AC8", "#807DBA", "#6A51A3", "#54278F"))
+par(mfrow = c(1,3), mar = rep(2,4), oma = rep(2.5,4))
+raster_plot_gd(mpg, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 
-plot_gd(mag, legend.width = 2, breaks = 10, axis.args = list(cex.axis = 1.5))
-plot(NUS, add = TRUE, col = NA, border = "white")
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
+raster_plot_gd(mag, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 
-plot_gd(mhg, legend.width = 2, breaks = 10, axis.args = list(cex.axis = 1.5))
-plot(NUS, add = TRUE, col = NA, border = "white")
-points(coords, pch = 16, col = mako(1, begin = 0.8), cex = 1.5)
+raster_plot_gd(mhg, legend.width = 2, axis.args = list(cex.axis = 1.5), col = colpal(20))
+plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
+plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 ```
 
-### **Figure S4:**  moving window calculations with and without rarefaction 
+### **Figure S6:**  moving window calculations with and without rarefaction 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
 set.seed(22)
-hgn <- window_gd(vcf, coords, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+pgn <- window_gd(vcf, coords_proj, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
+pgn_longlat <- terra::project(pgn, "+proj=longlat")
 
 set.seed(22)
-pgn <- window_gd(vcf, coords, lyr, stat = "pi", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, L = nrow(vcf))
+agn <- window_gd(vcf, coords_proj, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
+agn_longlat <- terra::project(agn, "+proj=longlat")
 
 set.seed(22)
-agn <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2, rarify_alleles = TRUE)
+hgn <- window_gd(vcf, coords_proj, lyr, stat = "Ho", wdim = wdim, fact = fact, rarify = FALSE, min_n = 2)
+hgn_longlat <- terra::project(hgn, "+proj=longlat")
+
 ```
 
 
@@ -164,27 +179,27 @@ agn <- window_gd(vcf, coords, lyr, stat = "biallelic_richness", wdim = wdim, fac
 
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
-plot_gd(pg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(ag, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(hg, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(pg_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(ag_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(hg_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 
-plot_gd(pgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(agn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(hgn, NUS, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(pgn_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(agn_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
 
-plot_gd(pg, NUS, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(ag, NUS, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(hg, NUS, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(pg_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(ag_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(hg_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
 
-plot_gd(pgn, NUS, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(agn, NUS, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
-plot_gd(hgn, NUS, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(pgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(pg, pgn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(agn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(ag, agn), legend.width = 2, axis.args = list(cex.axis = 2))
+raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
 ```{r, fig.width = 4, fig.height = 5}
 par(mar = rep(0,4))
-plot_count(ag)
+raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
 

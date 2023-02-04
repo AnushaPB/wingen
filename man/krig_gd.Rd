@@ -22,13 +22,13 @@ krig_gd(
 )
 }
 \arguments{
-\item{r}{RasterLayer or RasterStack produced by \link[wingen]{window_gd}}
+\item{r}{SpatRaster produced by \link[wingen]{window_gd}}
 
-\item{grd}{object to create grid for kriging; can be RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
+\item{grd}{object to create grid for kriging; can be a SpatRaster, RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
 
 \item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
 
-\item{coords}{if provided, kriging will occur based only on values at these coordinates}
+\item{coords}{if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates}
 
 \item{agg_grd}{factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
 
@@ -51,7 +51,7 @@ krig_gd(
 \item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 }
 \value{
-a Raster* object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
+a SpatRaster object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
 }
 \description{
 Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}

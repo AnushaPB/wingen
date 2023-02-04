@@ -2,15 +2,17 @@
 
 # load and save raster layer
 lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
-lotr_lyr <- raster::raster(as.matrix(lyr))
-raster::extent(lotr_lyr) <- raster::extent(0, 100, -100, 0)
+lotr_lyr <- terra::rast(as.matrix(lyr))
+terra::ext(lotr_lyr) <- terra::ext(0, 100, -100, 0)
+lotr_lyr <- raster::raster(lotr_lyr)
 usethis::use_data(lotr_lyr, overwrite = TRUE)
 
 # make a fake range map
-lotr_range <- lotr_lyr
+lotr_range <- terra::rast(lotr_lyr)
 lotr_range[lotr_range < 0.01] <- NA
 lotr_range <- lotr_range * 0
-lotr_range <- raster::rasterToPolygons(lotr_range, dissolve = TRUE, n = 16)
+lotr_range <- terra::as.polygons(lotr_range, dissolve = TRUE)
+lotr_range <- sf::st_as_sf(lotr_range)
 usethis::use_data(lotr_range, overwrite = TRUE)
 
 # load coords
@@ -20,7 +22,7 @@ lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv")
 
 # get subsample
 # use lotr layer as probability so that sampling is more even across the landscape
-p <- extract(lotr_lyr, lotr_coords[, c("x", "y")])
+p <- terra::extract(lotr_lyr, lotr_coords[, c("x", "y")])
 set.seed(42)
 samples <- sample(nrow(lotr_coords), 100, prob = 1 / p)
 lotr_coords <- lotr_coords[samples, ]
@@ -37,7 +39,7 @@ vcf <- vcfR::read.vcfR(file)
 # note: first column is FORMAT, hence c(1, samples + 1)
 lotr_vcf <- vcf[, c(1, samples + 1)]
 # retain only variant sites
-lotr_vcf <- lotr_vcf[is.polymorphic(lotr_vcf), ]
+lotr_vcf <- lotr_vcf[vcfR::is.polymorphic(lotr_vcf), ]
 # subsample loci
 set.seed(42)
 lotr_vcf <- lotr_vcf[sample(1:nrow(lotr_vcf@gt), 100), ]
@@ -51,10 +53,10 @@ usethis::use_data(lotr_vcf, overwrite = TRUE)
 
 
 # Code to create tiny example dataset ------------------------------------------------------------------
-mini_lyr <- raster::aggregate(lotr_lyr, 10)
+mini_lyr <- terra::aggregate(lotr_lyr, 10)
 
 mini_vcf <- lotr_vcf[, 1:11]
-mini_vcf <- mini_vcf[is.polymorphic(mini_vcf), ]
+mini_vcf <- mini_vcf[vcfR::is.polymorphic(mini_vcf), ]
 mini_vcf <- mini_vcf[1:10, ]
 
 mini_coords <- lotr_coords[1:10, ]

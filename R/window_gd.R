@@ -4,14 +4,14 @@
 #'
 #' Generate a continuous raster map of genetic diversity using moving windows
 #'
-#' @param vcf object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
-#' @param coords two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples
-#' @param lyr RasterLayer to slide the window across
+#' @param gen genetic data either as an object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
+#' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
+#' @param lyr SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param stat genetic diversity statistic to calculate (can either be `"pi"` for nucleotide diversity (default), `"Ho"` for average observed heterozygosity across all sites, `"allelic_richness"` for average number of alleles across all sites, or `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option faster than `"allelic_richness"`))
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
-#' @param fact aggregation factor to apply to the RasterLayer (defaults to 0; *note:* increasing this value reduces computational time)
+#' @param fact aggregation factor to apply to `lyr` (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
-#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to 2)
+#' @param rarify_n if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
@@ -19,8 +19,11 @@
 #' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
+#' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
+#' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
+#' As such, longitude-latitude systems should be transformed before using window_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
-#' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+#' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
 #'
 #' @examples
@@ -30,13 +33,13 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
-                      rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
+                      rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL) {
+                      parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
 
   # check that the input file is a vcf or a path to a vcf object
-  vcf <- vcf_check(vcf)
+  vcf <- vcf_check(gen)
 
   # check that coords and vcf align and reformat data, if necessary
   # note: list2env adds the new, corrected vcf and coords back to the environment
@@ -46,7 +49,7 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   x <- convert_vcf(vcf, stat)
 
   # run moving window
-  results <- window_general(
+  result <- window_general(
     x = x,
     coords = coords,
     lyr = lyr,
@@ -61,10 +64,11 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
     L = L,
     rarify_alleles = rarify_alleles,
     parallel = parallel,
-    ncores = ncores
+    ncores = ncores,
+    crop_edges = crop_edges
   )
 
-  return(results)
+  return(result)
 }
 
 #' General function for making moving window maps
@@ -83,13 +87,18 @@ window_gd <- function(vcf, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_gd
 #'
-#' @return RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+#' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
-                           rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+                           rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL, ...) {
+                           parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+  # check layers and coords (only lyr is modified and returned)
+  lyr <- layer_coords_check(lyr, coords)
+
+  # check wdim
+  wdim <- wdim_check(wdim)
 
   # set L if pi is being calculated
   if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
@@ -105,45 +114,45 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
-  if (fact == 0) lyr <- lyr * 0 else lyr <- raster::aggregate(lyr, fact, fun = mean) * 0
+  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
 
   # get cell index for each coordinate
-  coord_cells <- raster::extract(lyr, coords, cell = TRUE)[, "cells"]
+  coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # run sliding window calculations
   if (parallel) {
+    # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
+    # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
+    lyr <- raster::raster(lyr)
+
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
     future::plan(future::multisession, workers = ncores)
 
-    rast_vals <- furrr::future_map_dfr(1:raster::ncell(lyr), window_helper,
+    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "raster"))
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
+
+    # convert back to SpatRast
+    lyr <- terra::rast(lyr)
   } else {
-    rast_vals <- purrr::map_dfr(1:raster::ncell(lyr), window_helper,
+    rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
 
+  # format resulting raster values
+  result <- vals_to_lyr(lyr, rast_vals, stat)
 
-  # make copies of rasters
-  alyr <- lyr
-  nsagg <- lyr
-  # assign values to rasters
-  alyr[] <- rast_vals[, "gd"]
-  nsagg[] <- rast_vals[, "ns"]
+  # crop resulting raster
+  if (crop_edges) result <- edge_crop(result, wdim)
 
-  results <- raster::stack(alyr, nsagg)
-
-  # set raster layer names based on stat
-  results <- name_results(results, stat)
-
-  return(results)
+  return(result)
 }
 
 #' Helper function for window calculations
@@ -157,12 +166,11 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 #' @return genetic diversity and counts for a single cell
 #'
 #' @noRd
-window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
+window_helper <- function(i, lyr, x, coord_cells, nmat, stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
-
-  # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
-  if (rarify) min_n <- rarify_n
+  # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
+  if (is.null(rarify_n)) rarify_n <- min_n
 
   # skip if raster value is NA
   if (is.na(lyr[i])) {
@@ -176,15 +184,15 @@ window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
   if (length(sub) < min_n) {
     gd <- NA
   } else if (rarify) {
-    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat, fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat_function, fun, L = L, rarify_alleles = rarify_alleles)
   } else {
-    gd <- sample_gd(x, sub, stat, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
   }
 
   # count the number of samples in the window
   ns <- length(sub)
 
-  return(data.frame(gd = gd, ns = ns))
+  return(list(gd = gd, ns = ns))
 }
 
 
@@ -198,7 +206,7 @@ window_helper <- function(i, lyr, x, coord_cells, nmat, stat,
 #' @return genetic diversity statistic for a rarified subsample
 #'
 #' @noRd
-rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
+rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
                           fun = mean, L = NULL, rarify_alleles = TRUE) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
@@ -207,12 +215,12 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
 
   # if number of samples is greater than rarify_n, rarify
   if (length(sub) > rarify_n) {
-    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat = stat, fun = fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles)
   }
 
   # if the number of samples is equal to rarify_n, calculate stat
   if (length(sub) == rarify_n) {
-    gd <- sample_gd(x, sub, stat, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
   }
 
   return(gd)
@@ -226,9 +234,8 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat,
 #' @return rarified genetic diversity statistic
 #'
 #' @noRd
-rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
+rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
                       fun, L = NULL, rarify_alleles = TRUE) {
-
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
     stop("rarify_n is less than the number of samples provided")
@@ -250,7 +257,7 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
   }
 
   # for each of the possible combos get gendiv stat
-  gdrar <- apply(cmb, 1, sample_gd, x = x, stat = stat, L = L, rarify_alleles = rarify_alleles)
+  gdrar <- apply(cmb, 1, sample_gd, x = x, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles)
 
   # summarize rarefaction results
   gd <- fun(gdrar, na.rm = TRUE)
@@ -266,13 +273,13 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat,
 #' @return mean allelic richness of a subsample
 #'
 #' @noRd
-sample_gd <- function(x, sub, stat, L = NULL, rarify_alleles = TRUE) {
-  if (identical(stat, calc_mean_biar)) {
-    gd <- stat(x[sub, ], rarify_alleles)
-  } else if (is.null(L) | !identical(stat, calc_pi)) {
-    gd <- stat(x[sub, ])
+sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
+  if (identical(stat_function, calc_mean_biar)) {
+    gd <- stat_function(x[sub, ], rarify_alleles)
+  } else if (is.null(L) | !identical(stat_function, calc_pi)) {
+    gd <- stat_function(x[sub, ])
   } else {
-    gd <- stat(x[sub, ], L)
+    gd <- stat_function(x[sub, ], L)
   }
   return(gd)
 }
@@ -305,14 +312,11 @@ helper_calc_ar <- function(genind) {
   # assign pops so that the whole sample is treated as one pop
   genind$pop <- rep(factor(1), nind)
 
-  # note: min.n is the The number of alleles down to which the number of alleles should be rarefied.
-  # The default is the minimum number of individuals genotyped (times 2 for diploids). However, if there
-  # are NA values then it doesn't count those as genotypes. Therefore, to ensure that rarefaciton DOES NOT
-  # OCCUR (since we have our own rarefaction step) min.n is set to the total number of individuals
-  # (including those with NAs) times two (assuming diploids)
-
   # note: [,1] references the first column which is AR for each site across all inds (nrow(AR) == L)
-  # ar <- hierfstat::allelic.richness(genind, min.n = nind * 2)$Ar[, 1]
+  # note: these are rarified allele counts (to make them not rarified set min.n = nind*2)
+  # min.n is the The number of alleles down to which the number of alleles should be rarefied.
+  # The default is the minimum number of individuals genotyped (times 2 for diploids). However, if there
+  # are NA values then it doesn't count those as genotypes.
   ar <- hierfstat::allelic.richness(genind)$Ar[, 1]
   return(ar)
 }
@@ -431,7 +435,7 @@ raref <- function(x, min.n) {
 #' Helper function to get adjacent cells to a given cell index
 #'
 #' @param i cell index
-#' @param r RasterLayer
+#' @param r SpatRast
 #' @param n neighborhood matrix
 #' @param coord_cells cell numbers of coordinates
 #'
@@ -440,13 +444,17 @@ raref <- function(x, min.n) {
 #' @noRd
 get_adj <- function(i, r, n, coord_cells) {
   # get adjacent cells to cell i
-  adjc <- raster::adjacent(r, i, directions = n, include = TRUE, sorted = TRUE)
+  adjc <- terra::adjacent(r, i, directions = n, include = TRUE)
+
   # get indices of adjacent cells
-  adjci <- purrr::map_dbl(adjc, 1, function(x) {
-    seq(x[1], x[2])
-  })
-  # get list of indices of coords in that set of cells
-  sub <- which(coord_cells %in% adjci)
+  adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
+
+  # remove NA values from indices
+  ## note: if NA values are not removed, coord_cells with NA values will be included
+  adjci_nona <- adjci[!is.na(adjci)]
+
+  # get vector of indices of coords in that set of cells
+  sub <- which(coord_cells %in% adjci_nona)
 
   return(sub)
 }
@@ -486,15 +494,13 @@ countgen <- function(x) {
 #' @param coords coordinates
 #'
 #' @noRd
+#'
 check_data <- function(x, coords = NULL) {
-
   # if x is a vector, convert to a dataframe
   if (is.vector(x)) x <- data.frame(x)
 
-  # format coords
+  # check and format coords
   if (!is.null(coords)) {
-    coords <- data.frame(coords)
-    colnames(coords) <- c("x", "y")
     if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
   }
 
@@ -527,7 +533,6 @@ check_data <- function(x, coords = NULL) {
 #'
 #' @noRd
 check_vcf_NA <- function(vcf, coords = NULL) {
-
   # check for mismatch before indexing
   if (!is.null(coords)) {
     if ((ncol(vcf@gt) - 1) != nrow(coords)) {
@@ -590,7 +595,7 @@ get_allNA <- function(x, MARGIN = NULL) {
 #' @noRd
 convert_vcf <- function(vcf, stat) {
   if (stat == "allelic_richness") {
-    return(vcf_to_genind(vcf))
+    return(vcfR::vcfR2genind(vcf))
   }
 
   if (stat == "Ho") {
@@ -606,7 +611,7 @@ convert_vcf <- function(vcf, stat) {
 
 #' Rename results from window_gd
 #'
-#' @param x RasterStack produced by window_gd
+#' @param x SpatRaster produced by window_gd
 #' @param stat genetic diversity statistic
 #'
 #' @noRd
@@ -650,3 +655,82 @@ return_stat <- function(stat, ...) {
   stop(paste(stat, "is an invalid argument for stat"))
 }
 
+#' Helper function to check lyr and coords
+#'
+#' @param lyr RasterLayer or SpatRaster
+#' @param coords sf points, data frame, or matrix representing coordinates
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+layer_coords_check <- function(lyr, coords) {
+  # check coords and lyr
+  crs_check_window(lyr, coords)
+
+  # convert to terra
+  if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
+
+  # check number of layers
+  nlayers <- terra::nlyr(lyr)
+  if (nlayers > 1) {
+    warning(paste0(nlayers, " provided, but only one is need. Defaults to using the first layer."))
+    lyr <- lyr[[1]]
+  }
+
+  return(lyr)
+}
+
+#' Convert values into new raster layers
+#'
+#' @param lyr SpatRaster
+#' @param rast_vals dataframe of gd and ns
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+vals_to_lyr <- function(lyr, rast_vals, stat) {
+  # transpose list to get a vector per layer
+  tls <- purrr::list_transpose(rast_vals)
+
+  # assign vector values to rasters
+  rast_list <- purrr::map(tls, ~terra::setValues(lyr, .x))
+
+  # convert from list to raster stack
+  rast_stack <- terra::rast(rast_list)
+
+  # set raster layer names based on stats
+  results <- name_results(rast_stack, stat)
+
+  return(results)
+}
+
+
+#' Crop edge off raster
+#'
+#' @param x SpatRaster
+#' @param wdim window dimensions
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+edge_crop <- function(x, wdim) {
+  if (length(wdim) == 1) wdim <- c(wdim, wdim)
+
+  # get extent
+  x_ext <- terra::ext(x)
+
+  # calculate x edge buffer
+  x_edge_size <- res(x)[1] * ((wdim[1] - 1) / 2)
+  xmin <- x_ext$xmin + x_edge_size
+  xmax <- x_ext$xmax - x_edge_size
+
+  # calculate y edge buffer
+  y_edge_size <- res(x)[2] * ((wdim[2] - 1) / 2)
+  ymin <- x_ext$ymin + y_edge_size
+  ymax <- x_ext$ymax - y_edge_size
+
+  # crop raster
+  x_crop <- terra::crop(x, terra::ext(xmin, xmax, ymin, ymax))
+
+  return(x_crop)
+}

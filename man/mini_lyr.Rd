@@ -8,12 +8,14 @@
 A RasterLayer of middle earth
 }
 \source{
-created from simulations in Bishop et al., 202X
+created from simulations in Bishop et al. (in review)
 }
 \usage{
 mini_lyr
 }
 \description{
-RasterLayer of middle earth from CITE
+Small RasterLayer of middle earth based on an example digital elevation model of Tolkien's
+Middle Earth produced by the Center for Geospatial Analysis at William & Mary
+(\href{https://scholarworks.wm.edu/asoer/3/}{Robert, 2020}).
 }
 \keyword{datasets}

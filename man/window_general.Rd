@@ -12,7 +12,7 @@ window_general(
   wdim = 3,
   fact = 0,
   rarify = FALSE,
-  rarify_n = 2,
+  rarify_n = NULL,
   rarify_nit = 5,
   min_n = 2,
   fun = mean,
@@ -20,25 +20,26 @@ window_general(
   rarify_alleles = TRUE,
   parallel = FALSE,
   ncores = NULL,
+  crop_edges = FALSE,
   ...
 )
 }
 \arguments{
 \item{x}{data to be summarized by the moving window (\emph{note:} order matters! \code{coords} should be in the same order, there are currently no checks for this). The class of \code{x} required depends on the statistic being calculated (see the \code{stat} argument and the function description for more details)}
 
-\item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
+\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{lyr}{RasterLayer to slide the window across}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{stat}{moving window statistic to calculate (can either be \code{pi} for nucleotide diversity (\code{x} must be a dosage matrix), \code{Ho} for average observed heterozygosity across all loci (\code{x} must be a heterozygosity matrix) , "allelic_richness" for average allelic richness across all loci (\code{x} must be a \code{genind} type object), "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (\code{x} must be a dosage matrix). \code{stat} can also be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
+\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
@@ -54,10 +55,12 @@ window_general(
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 
+\item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
+
 \item{...}{if a function is provided for \code{stat}, additional arguments to pass to the \code{stat} function (e.g. if \code{stat = mean}, users may want to set \code{na.rm = TRUE})}
 }
 \value{
-RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
 Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,

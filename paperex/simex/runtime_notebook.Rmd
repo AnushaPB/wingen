@@ -108,7 +108,7 @@ resf_mean <- resf %>%
         aspect.ratio = 1))
 
 ```
-
+# Figure S8 
 ```{r, fig.width = 10, fig.height = 5.5}
 ggarrange(plotw, NULL, plotf, 
           nrow = 1, widths = c(1, 0.05, 1),
