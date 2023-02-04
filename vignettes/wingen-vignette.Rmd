@@ -432,7 +432,7 @@ lotr_sf <- st_as_sf(lotr_coords, coords = c("x", "y")) %>% st_set_crs(32031)
 
 # The grid layer must also be a RasterLayer for SpatialKDE
 # Here, we use the kriged raster as our grid to get a KDE layer of the same spatial extent and resolution
-grid <- rast(kgd)
+grid <- raster(kgd)
 
 # See the SpatialKDE package for more options and details about using KDE
 kde_lyr <- kde(
