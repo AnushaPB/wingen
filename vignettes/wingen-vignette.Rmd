@@ -25,10 +25,6 @@ library(sf)
 library(SpatialKDE)
 ```
 
-```{r, include=FALSE}
-devtools::load_all()
-```
-
 ## Background
 
 wingen uses a moving window approach to create maps of genetic
