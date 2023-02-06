@@ -78,7 +78,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
   }
 
   if (!autoKrige_output) {
-    # convert to stack
+    # convert to stack if a list
     if (!inherits(rstk, "SpatRaster")) rstk <- terra::rast(rstk)
   }
 

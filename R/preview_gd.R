@@ -39,7 +39,7 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
 #' @param coords coordinates
 #'
 #' @noRd
-preview_window <- function(lyr, nmat, coords) {
+preview_window <- function(lyr, nmat, coords = NULL) {
   # get center of raster
   center <- get_center(lyr)
 
@@ -59,7 +59,9 @@ preview_window <- function(lyr, nmat, coords) {
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
     if (!is.null(coords)) {
       if (is.matrix(coords)) coords <- data.frame(coords)
-      terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+      # note: sf coords also inherit "data.frame" so second condition is needed
+      if (inherits(coords, "data.frame") & !inherits(coords, "sf")) terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+      if (inherits(coords, "sf") | inherits(coords, "SpatVector")) terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
     }
   })
 }

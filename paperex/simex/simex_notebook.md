@@ -1,20 +1,5 @@
-Simulation Example from Bishop et al. (submitted)
+Simulation Example
 ================
-
-``` r
-library(wingen)
-library(raster)
-library(vcfR)
-library(viridis)
-library(here)
-library(ggplot2)
-library(dplyr)
-library(purrr)
-library(adegenet)
-
-wdir <- here("paperex", "simex")
-source(here(wdir, "simex_functions.R"))
-```
 
 ## Load simulation results
 
@@ -42,7 +27,7 @@ load_middle_earth(subset = TRUE)
 
     ## 
 
-## **Figure 2:** Simulation Example
+## **Figure 3:** Simulation Example
 
 ### Simulation setup plots
 
@@ -129,7 +114,7 @@ plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
 
-### **Figure S1:** Window vs Aggregation Factor
+### **Figure 2:** Window vs Aggregation Factor
 
 ``` r
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
@@ -142,7 +127,7 @@ purrr::walk(stk, test_simex_plot, bkg = bkg)
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
-## **Figure 3 & Figure S2:** Comparison of datasets, statistics, and sample sizes
+## Figure S1, S2, S3, and S4: Comparison of datasets, statistics, and sample sizes
 
 ``` r
 params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
@@ -155,25 +140,79 @@ msk_lyr100 <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = 1
 msk_lyr200 <- get_divout(file.name = "rr", rarify = TRUE, stat = "pi", nsamp = 200)
 
 # Get output raster layers
-stk100 <- purrr::map(params, test_datasets_simex, nsamp = 100, msk_lyr = msk_lyr100)
+stk100 <- map(params, test_datasets_simex, nsamp = 100, msk_lyr = msk_lyr100)
 
-stk200 <- purrr::map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
+stk200 <- map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-purrr::walk(stk100, test_simex_plot, legend = FALSE)
+walk(stk100, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-purrr::walk(stk200, test_simex_plot, legend = TRUE)
+walk(stk200, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->
 
-## **Figure S5:** Computational time for simulation example
+``` r
+# Figure legends:
+par(oma = rep(1,4))
+plot(stk200[[1]], zlim = c(0, 0.31), legend = TRUE, col = magma(100), legend.only = TRUE,
+    legend.width = 2, legend.shrink = 0.75, axis.args = list(cex.axis = 2))
+
+par(oma = rep(1,4))
+test_simex_plot(stk200[[1]], zlim = c(1, 1.95), legend = TRUE, col = magma(100), legend.only = TRUE,
+        legend.width = 2, legend.shrink = 0.75, axis.args = list(cex.axis = 2))
+```
+
+    ## NULL
+
+``` r
+par(oma = rep(1,4))
+test_simex_plot(stk200[[1]], zlim = c(0, 0.29), legend = TRUE, col = magma(100), legend.only = TRUE,
+        legend.width = 2, legend.shrink = 0.75, axis.args = list(cex.axis = 2))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-6-6.png)<!-- -->
+
+    ## NULL
+
+``` r
+params <- df_to_ls(expand.grid(datasets = c("rr", "WGS", "FULL"),
+                               stat = c("pi", "biallelic_richness", "Ho"), 
+                               rarify = c("TRUE", "FALSE")))
+
+dif200 <- map(c("rr", "WGS"), simex_get_dif, params = params, nsamp = 200)
+dif100 <- map(c("rr", "WGS"), simex_get_dif, params = params, nsamp = 100)
+
+par(mfrow = c(2,3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
+walk(dif200, ~ map(.x, test_simex_dif_plot, legend = FALSE))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+par(mfrow = c(2,3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
+walk(dif100, ~ map(.x, test_simex_dif_plot, legend = FALSE))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
+``` r
+par(oma = rep(1,4))
+test_simex_dif_plot(dif200[[1]][[1]], legend.only = TRUE, legend = TRUE,
+                    legend.width = 1, legend.shrink = 0.75, axis.args = list(cex.axis = 1.5))
+```
+
+![](simex_notebook_files/figure-gfm/unnamed-chunk-7-4.png)<!-- -->
+
+    ## NULL
+
+## **Figure S7:** Computational time for simulation example
 
 ``` r
 # Loop reads in outputs from simex_tests functions
@@ -232,4 +271,4 @@ ggplot(data = tdf, aes(x = factor(nsamp), y = time, fill = stat)) +
         legend.text = element_text(size=12))
 ```
 
-![](simex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](simex_notebook_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->

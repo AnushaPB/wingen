@@ -1,4 +1,4 @@
-Examples from Bishop et al. (submitted)
+Examples from Bishop et al. (in review)
 ================
 
 ## Simulation Example

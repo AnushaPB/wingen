@@ -31,7 +31,7 @@ coords_to_raster <- function(coords, buffer = 0, res = 1, agg = NULL, disagg = N
 
   # plot raster
   if (plot) {
-    terra::plot(r, legend = FALSE, col = viridis::mako(raster::ncell(r)))
+    terra::plot(r, legend = FALSE, col = viridis::mako(terra::ncell(r)))
     if (is.matrix(coords)) coords <- data.frame(coords)
     terra::points(coords, col = viridis::magma(1, begin = 0.7), pch = 3, lwd = 2)
   }
@@ -45,17 +45,13 @@ coords_to_raster <- function(coords, buffer = 0, res = 1, agg = NULL, disagg = N
 #'
 #' @noRd
 make_raster <- function(coords, buffer = 0, res = 1) {
-  # get crs
-  crs <- terra::crs(coords)
-  if (is.na(crs)) crs <- ""
-
   # format coords if not a spat vector
   if (inherits(coords, "sf")) coords <- terra::vect(coords)
   if (inherits(coords, "data.frame") | inherits(coords, "matrix")) coords <- terra::vect(as.matrix(coords), type = "points", atts = NULL)
 
   # turn into raster
   if (length(res) > 2) stop("invalid res provided")
-  r <- terra::rast(coords, crs = crs, res = res)
+  r <- terra::rast(coords, res = res)
 
   # extend based on buffer
   r <- terra::extend(r, buffer)
