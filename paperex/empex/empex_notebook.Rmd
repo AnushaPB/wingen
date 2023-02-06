@@ -202,6 +202,7 @@ raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn
 par(mar = rep(0,4))
 raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
+
 #CIRCLE GD
 ```{r}
 library(randomForest)
@@ -222,10 +223,14 @@ plot(lyr)
 
 trSurface <- gdistance::transition(aggregate(pred, 20), transitionFunction = mean, directions = 8)
 trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+distmat <- get_resdist(lotr_coords, cond.r = pred, ncores= 25)
+write.csv(distmat, "distmat30.csv")
 ```
 
 ```{r, fig.width = 6, fig.height = 6}
 
+pred <- rast("data/SDM.tif")
 geodistmat <- make_distmat(coords_longlat, lyr = lyr, 
                            parallel = TRUE, ncores = 3)
 distmat <- read.csv("distmat30.csv")
@@ -234,6 +239,15 @@ lyr <-  aggregate(pred, 30)
 
 cgd <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
                  radius = quantile(distmat, 0.05, na.rm = TRUE))
+
+cgd_hwe <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 radius = quantile(distmat, 0.05, na.rm = TRUE), stat = "hwe",
+                 parallel = TRUE, ncores = 25)
+
+cgd_fis <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 radius = quantile(distmat, 0.05, na.rm = TRUE), stat = "Fis",
+                 parallel = TRUE, ncores = 25)
+
 
 cg <- circle_gd(vcf, coords, lyr = lyr, distmat = geodistmat, 
                 radius = quantile(geodistmat, 0.015, na.rm = TRUE))
