@@ -129,7 +129,7 @@ circle_general <- function(x, coords, lyr, stat, radius, distmat = NULL, fact = 
                                        lyr = lyr, x = x, distmat = distmat,
                                        stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                                        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-                                       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster"))
+                                       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
     # convert back to SpatRast
