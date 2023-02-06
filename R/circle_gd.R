@@ -125,7 +125,7 @@ circle_general <- function(x, coords, lyr, stat, radius, distmat = NULL, fact = 
     # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
     lyr <- raster::raster(lyr)
 
-    rast_vals <- furrr::future_map_dfr(1:terra::ncell(lyr), circle_helper,
+    rast_vals <- furrr::future_map(1:terra::ncell(lyr), circle_helper,
                                        lyr = lyr, x = x, distmat = distmat,
                                        stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                                        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
@@ -136,7 +136,7 @@ circle_general <- function(x, coords, lyr, stat, radius, distmat = NULL, fact = 
     lyr <- terra::rast(lyr)
   } else {
 
-    rast_vals <- purrr::map_dfr(1:terra::ncell(lyr), circle_helper,
+    rast_vals <- purrr::map(1:terra::ncell(lyr), circle_helper,
                                 lyr = lyr, x = x, distmat = distmat,
                                 stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                                 min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
