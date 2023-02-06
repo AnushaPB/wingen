@@ -1,0 +1,89 @@
+---
+title: "HWE"
+output: html_document
+date: "2023-02-01"
+---
+```{r}
+library(adegenet)
+library(wingen)
+devtools::load_all()
+load_mini_ex()
+load_middle_earth_ex()
+
+genind <- vcfR::vcfR2genind(mini_vcf)
+
+prop_hwe_test <- function(genind, sig = 0.05){
+  hwe <- pegas::hw.test(genind)
+  prop <- sum(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
+  return(prop)
+}
+
+res <- window_general(genind, mini_coords, mini_lyr, stat = prop_hwe_test, wdim = 7)
+plot_gd(res)
+```
+
+```{r}
+genind <- vcfR::vcfR2genind(lotr_vcf)
+
+prop_hwe_test <- function(genind, sig = 0.05){
+  hwe <- pegas::hw.test(genind)
+  prop <- sum(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
+  return(prop)
+}
+
+res <- window_general(genind, lotr_coords, lotr_lyr, stat = prop_hwe_test, wdim = 7, parallel = TRUE, ncores = 3)
+plot_gd(res)
+
+hwe <- window_general(genind,
+  lotr_coords,
+  lotr_lyr,
+  stat = prop_hwe_test,
+  wdim = 7,
+  fact = 3,
+  parallel = TRUE,
+  ncores = 25
+)
+
+hf <- hierfstat::genind2hierfstat(genind, pop = 1)
+
+fis_test <- function(hf){
+  hfstat <- hierfstat::basic.stats(hf)
+  # check why this is different from overall when NA values are present
+  #Fis <- mean(hfstat$Fis[,1], na.rm = TRUE)
+  Fis <- hfstat$overall["Fis"]
+  return(Fis)
+}
+
+fis <- window_general(hf,
+  lotr_coords,
+  lotr_lyr,
+  stat = fis_test,
+  wdim = 7,
+  fact = 3,
+  parallel = TRUE,
+  ncores = 25
+)
+
+fis3 <- window_general(hf,
+  lotr_coords,
+  lotr_lyr,
+  stat = fis_test,
+  wdim = 3,
+  fact = 3,
+  parallel = TRUE,
+  ncores = 25
+)
+
+
+fis5 <- window_general(hf,
+  lotr_coords,
+  lotr_lyr,
+  stat = fis_test,
+  wdim = 5,
+  fact = 3,
+  parallel = TRUE,
+  ncores = 25
+)
+
+```
+

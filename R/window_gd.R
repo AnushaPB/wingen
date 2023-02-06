@@ -594,7 +594,7 @@ get_allNA <- function(x, MARGIN = NULL) {
 #'
 #' @noRd
 convert_vcf <- function(vcf, stat) {
-  if (stat == "allelic_richness") {
+  if (stat == "allelic_richness" | stat == "hwe") {
     return(vcfR::vcfR2genind(vcf))
   }
 
@@ -604,6 +604,10 @@ convert_vcf <- function(vcf, stat) {
 
   if (stat == "pi" | stat == "biallelic_richness") {
     return(vcf_to_dosage(vcf))
+  }
+
+  if (stat == "Fis") {
+    return(hierfstat::genind2hierfstat(vcfR::vcfR2genind(vcf), pop = 1))
   }
 
   stop(paste0(stat, " is an invalid arugment for stat"))
@@ -650,6 +654,14 @@ return_stat <- function(stat, ...) {
 
   if (stat == "Ho") {
     return(calc_mean_het)
+  }
+
+  if (stat == "hwe") {
+    return(calc_prop_hwe)
+  }
+
+  if (stat == "Fis") {
+    return(calc_mean_fis)
   }
 
   stop(paste(stat, "is an invalid argument for stat"))
