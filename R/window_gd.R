@@ -326,7 +326,7 @@ helper_calc_ar <- function(genind) {
 #'
 #' @param hetmat matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)
 #'
-#' @return heterozygosity averaged across all individuals and then all loci
+#' @return heterozygosity averaged across all individuals and all loci
 #'
 #' @noRd
 calc_mean_het <- function(hetmat) {
