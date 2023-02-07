@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.1.0",
+    "Version": "4.2.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -127,6 +127,16 @@
       "Hash": "e749cae40fa9ef469b6050959517453c",
       "Requirements": []
     },
+    "RcppArmadillo": {
+      "Package": "RcppArmadillo",
+      "Version": "0.11.4.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "836c1aeec6a7a2b28273bd42a0511a9e",
+      "Requirements": [
+        "Rcpp"
+      ]
+    },
     "RcppEigen": {
       "Package": "RcppEigen",
       "Version": "0.3.3.9.3",
@@ -190,22 +200,24 @@
     },
     "ade4": {
       "Package": "ade4",
-      "Version": "1.7-20",
+      "Version": "1.7-22",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "425a89023d742d7b49e5387157973680",
+      "Hash": "9768be866e8e02810e94ceb95b32b367",
       "Requirements": [
         "MASS",
+        "Rcpp",
+        "RcppArmadillo",
         "pixmap",
         "sp"
       ]
     },
     "adegenet": {
       "Package": "adegenet",
-      "Version": "2.1.9",
+      "Version": "2.1.10",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "2d7e099cd0a60ef7669009e2cc46a592",
+      "Hash": "c1024005fc1ae5ceba236544c597b2d4",
       "Requirements": [
         "MASS",
         "ade4",
@@ -638,12 +650,13 @@
     },
     "dplyr": {
       "Package": "dplyr",
-      "Version": "1.0.10",
+      "Version": "1.1.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "539412282059f7f0c07295723d23f987",
+      "Hash": "d3c34618017e7ae252d46d79a1b9ec32",
       "Requirements": [
         "R6",
+        "cli",
         "generics",
         "glue",
         "lifecycle",
@@ -657,10 +670,10 @@
     },
     "e1071": {
       "Package": "e1071",
-      "Version": "1.7-12",
+      "Version": "1.7-13",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "0d776df7577206e100c2c4b508208b10",
+      "Hash": "1046cb48d06cb40c2900d8878f03a0fe",
       "Requirements": [
         "class",
         "proxy"
@@ -729,10 +742,10 @@
     },
     "fs": {
       "Package": "fs",
-      "Version": "1.5.2",
+      "Version": "1.6.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "7c89603d81793f0d5486d91ab1fc6f1d",
+      "Hash": "f4dcd23b67e33d851d2079f703e8b985",
       "Requirements": []
     },
     "furrr": {
@@ -752,10 +765,10 @@
     },
     "future": {
       "Package": "future",
-      "Version": "1.30.0",
+      "Version": "1.31.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "d8a0dcbc9350c1e40edc644611d1ee15",
+      "Hash": "f3f0fbe5ce9b77c002f8c5170790538a",
       "Requirements": [
         "digest",
         "globals",
@@ -1863,10 +1876,10 @@
     },
     "sass": {
       "Package": "sass",
-      "Version": "0.4.4",
+      "Version": "0.4.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "c76cbac7ca04ce82d8c38e29729987a3",
+      "Hash": "2bb4371a4c80115518261866eab6ab11",
       "Requirements": [
         "R6",
         "fs",
@@ -1980,18 +1993,18 @@
     },
     "sourcetools": {
       "Package": "sourcetools",
-      "Version": "0.1.7",
+      "Version": "0.1.7-1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "947e4e02a79effa5d512473e10f41797",
+      "Hash": "5f5a7629f956619d519205ec475fe647",
       "Requirements": []
     },
     "sp": {
       "Package": "sp",
-      "Version": "1.5-1",
+      "Version": "1.6-0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "7b6b37e9d8e3295ccd5a73ac6d62db98",
+      "Hash": "6674e075a078d9c3bde8ba800367347c",
       "Requirements": [
         "lattice"
       ]
@@ -2313,10 +2326,10 @@
     },
     "utf8": {
       "Package": "utf8",
-      "Version": "1.2.2",
+      "Version": "1.2.3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "c9c462b759a5cc844ae25b5942654d13",
+      "Hash": "1fe17157424bb09c48a8b3b550c753bc",
       "Requirements": []
     },
     "uuid": {
