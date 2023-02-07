@@ -5,39 +5,40 @@
 \title{Create a moving window map of genetic diversity}
 \usage{
 window_gd(
-  vcf,
+  gen,
   coords,
   lyr,
   stat = "pi",
   wdim = 3,
   fact = 0,
   rarify = FALSE,
-  rarify_n = 2,
+  rarify_n = NULL,
   rarify_nit = 5,
   min_n = 2,
   fun = mean,
   L = "nvariants",
   rarify_alleles = TRUE,
   parallel = FALSE,
-  ncores = NULL
+  ncores = NULL,
+  crop_edges = FALSE
 )
 }
 \arguments{
-\item{vcf}{object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
+\item{gen}{genetic data either as an object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
-\item{coords}{two-column matrix or data.frame representing x (longitude) and y (latitude) coordinates of samples}
+\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{lyr}{RasterLayer to slide the window across}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
 \item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
-\item{fact}{aggregation factor to apply to the RasterLayer (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
 \item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to 2)}
+\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
@@ -52,12 +53,18 @@ window_gd(
 \item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
+
+\item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 }
 \value{
-RasterStack that includes a raster of genetic diversity and a raster of the number of samples within the window for each cell
+SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
 Generate a continuous raster map of genetic diversity using moving windows
+}
+\details{
+Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
+As such, longitude-latitude systems should be transformed before using window_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 }
 \examples{
 
