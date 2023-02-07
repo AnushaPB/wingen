@@ -15,16 +15,16 @@ test_that("CRS are handled correctly by window_gd", {
 
   # no CRS lyr and coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, nocrs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a euclidean system (see function details or wingen vignette)"))
-  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
 
   # no CRS lyr and CRS coords
   cw <- capture_warnings(window_gd(mini_vcf, crs_coords, nocrs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
 
   # CRS lyr and no CRS coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, crs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
 
   # CRS lyr and CRS coords (no warnings expected)
   wg <- window_gd(mini_vcf, crs_coords, crs_lyr, rarify = FALSE)

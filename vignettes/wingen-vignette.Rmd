@@ -22,27 +22,24 @@ library(wingen)
 library(terra)
 library(viridis)
 library(sf)
-```
-
-```{r, include=FALSE}
-devtools::load_all()
+library(SpatialKDE)
 ```
 
 ## Background
 
-In short, wingen uses a moving window approach to create maps of genetic
-diversity. The method and its rationale is described in Bishop et al.
+wingen uses a moving window approach to create maps of genetic
+diversity. The method and its rationale are described in Bishop et al.
 (in review).
 
 ## Example
 
 To demonstrate how wingen works, we will use a subset of the data from
-the Bishop et al. simulation example (in review). These simulations were
+the Bishop et al. (in review) simulation example. These simulations were
 created using Geonomics ([Terasaki Hart et al.,
 2022](https://doi.org/10.1093/molbev/msab175)) to generate a realistic
 landscape genomic dataset. In this simulation, spatial variation in
 genetic diversity is produced by varying population size and gene flow
-across the landscape via heterogenous carrying capacity and conductance
+across the landscape via heterogeneous carrying capacity and conductance
 surfaces. These surfaces are based on an example digital elevation model
 of Tolkien's Middle Earth produced by the Center for Geospatial Analysis
 at William & Mary ([Robert,
@@ -81,13 +78,13 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```
 
 If users don't have a raster layer of their landscape, they can generate
-one from their coordinates using the `coords_to_raster()` function. The
-resolution of this raster can be either tuned with the `agg` (to
-aggregate) and `disagg` (to disaggregate) arguments or defined using the
-`res` argument. The `res` argument can either be a single value (e.g.,
-0.00833) or a vector of two values with the x and y resolutions. The
-`buffer` argument can be used to add an edge to the raster (i.e., buffer
-away from the coordinates).
+one using their sample coordinates with the `coords_to_raster()`
+function. The resolution of this raster can be either tuned with the
+`agg` (to aggregate) or `disagg` (to disaggregate) arguments, or defined
+using the `res` argument. The `res` argument can either be a single
+value (e.g., 0.00833) or a vector of two values with the x and y
+resolutions. The `buffer` argument can be used to add an edge to the
+raster (i.e., buffer away from the coordinates).
 
 ```{r, fig.width = 5, fig.height = 5}
 ex_raster1 <- coords_to_raster(lotr_coords, buffer = 1, plot = TRUE)
@@ -116,7 +113,7 @@ The main arguments to `window_gd()` are:
     data should be in the same order, as there are currently no checks
     for this.
 
-2.  `coords` - sf points or a matrix or dataframe with two columns
+2.  `coords` - sf points, or a matrix or dataframe with two columns
     representing the coordinates of the samples. The first column should
     be x and the second should be y.
 
@@ -132,34 +129,35 @@ The main arguments to `window_gd()` are:
     nucleotide diversity only works for bi-allelic data. In addition,
     there are two functions for calculating allelic richness: (1)
     `“allelic_richness”` which uses the `allelic.richness()` function
-    from the hierfstat package and (2) `“biallelic_richness”`, which
+    from the hierfstat package, and (2) `“biallelic_richness”`, which
     provides a much faster calculation of allelic richness, but only
     works for bi-allelic data. When calculating `“biallelic_richness”`,
     users can choose to rarify allele counts (as in
     `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE`
     (the default) or to use the raw allele counts by setting
-    `rarify_alleles = FALSE`. It is recommended to performed allele
-    count rarefaction (`rarify_alleles = TRUE`) if there are missing
-    values in the genetic data, but for datasets with no missing data it
-    is faster to use the raw counts (`rarify_alleles = FALSE`).
+    `rarify_alleles = FALSE`. We recommend performing allele count
+    rarefaction (`rarify_alleles = TRUE`) if there are missing values in
+    the genetic data, but for datasets with no missing data, it is
+    faster to use the raw counts (`rarify_alleles = FALSE`).
 
 5.  `fact` - To decrease computational time, we provide the option to
     aggregate the input raster layer by some factor defined using the
     `fact` argument. Increasing `fact` will decrease the number of cells
     and thereby decrease the number of calculations, with the trade-off
-    of decreasing the resolution of the output layers. Users should keep
-    in mind that if they increase `fact`, they may simultaneously want
-    to decrease `wdim` because the proportion of the landscape covered
-    by the neighborhood matrix could otherwise increase substantially.
+    that the resolution of the output layers will decrease. Users should
+    keep in mind that if they increase `fact`, they may simultaneously
+    want to decrease `wdim` because the proportion of the landscape
+    covered by the neighborhood matrix could otherwise increase
+    substantially.
 
 6.  `wdim` - Used to create the neighborhood matrix for the moving
     window based on the dimensions provided. This argument can either be
     set to one value (e.g., 3) which will create a square window (e.g.,
-    3 x 3), or two values can be provided to create a rectangular window
-    (e.g., 3 x 5). We encourage users to experiment with different
-    values of `wdim` to determine the sensitivity of their results to
-    this parameter. Ideally, `wdim` would be set with some knowledge of
-    the study system in mind (e.g., the dispersal patterns and/or
+    3 x 3), or two values, which will create a rectangular window (e.g.,
+    3 x 5). We encourage users to experiment with different values of
+    `wdim` to determine the sensitivity of their results to this
+    parameter. Ideally, `wdim` would be set with some knowledge of the
+    study system in mind (e.g., the dispersal patterns and/or
     neighborhood size of the study organism). A preview of the window
     size relative to the landscape can be obtained using the
     `preview_gd()` function.
@@ -183,23 +181,24 @@ The main arguments to `window_gd()` are:
     rarefaction is implemented and that set of samples is subsampled
     `rarify_nit` times to a size of `rarify_n` and the mean (or another
     summary statistic set using `fun`) of those `rarify_nit` iterations
-    is used. <br/><br/> We suggest that users select `rarify_n` and
-    `rarify_nit` such that the number of possible ways to choose
-    `rarify_n` from a sample of size `rarify_n` plus one is greater than
-    `rarify_nit` in order for there to always be `rarify_nit` number of
-    unique combinations of size `rarify_n`. If `rarify = FALSE`,
-    rarefaction is not performed and only steps (1) and (2) occur such
-    that: (1) if the number of samples in the window is less than the
-    `min_n` argument, genetic diversity is not calculated and a raster
-    value of `NA` is assigned, and (2) if the number of samples is equal
-    to or greater than `min_n`, the genetic diversity statistic is
-    calculated for those samples. We highly encourage users to perform
-    rarefaction as genetic diversity statistics are sensitive to sample
-    size. The main benefit of not performing rarefaction is decreased
-    computational time; however, this is not worth the trade-off in
-    inaccuracy unless you are confident that there is no effect of
-    rarefaction after performing your analysis with and without
-    rarefaction.
+    is used.
+
+    We suggest that users select `rarify_n` and `rarify_nit` such that
+    the number of possible ways to choose `rarify_n` from a sample of
+    size `rarify_n` plus one is greater than `rarify_nit` in order for
+    there to always be `rarify_nit` number of unique combinations of
+    size `rarify_n`. If `rarify = FALSE`, rarefaction is not performed
+    and only steps (1) and (2) occur such that: (1) if the number of
+    samples in the window is less than the `min_n` argument, genetic
+    diversity is not calculated and a raster value of `NA` is assigned,
+    and (2) if the number of samples is equal to or greater than
+    `min_n`, the genetic diversity statistic is calculated for those
+    samples. We highly encourage users to perform rarefaction as genetic
+    diversity statistics are sensitive to sample size. The main benefit
+    of not performing rarefaction is decreased computational time;
+    however, this is not worth the trade-off in inaccuracy unless you
+    are confident that there is no effect of rarefaction after
+    performing your analysis with and without rarefaction.
 
 8.  `parallel` - In order to increase computational efficiency, we
     provide the option for parallelization by setting the `parallel`
@@ -207,12 +206,12 @@ The main arguments to `window_gd()` are:
     package. Use the `ncores` argument to set the number of cores to use
     for parallelization.
 
-9.  `crop_edges` - whether to crop out the cells along the edge of the
+9.  `crop_edges` - Whether to crop out the cells along the edge of the
     raster that are not surrounded by a full window. Users may want to
     do so to avoid "edge effects" caused by incomplete windows along the
     borders of the raster. As wingen is relatively insensitive to sample
-    size, edge effects are not likely to have a very strong effect, so
-    by default `crop_edges = FALSE`.
+    size, edge effects are not likely to have a very strong effect on
+    diversity estimates, so by default `crop_edges = FALSE`.
 
 ------------------------------------------------------------------------
 
@@ -221,25 +220,25 @@ coordinate system (i.e., UTM coordinates) such that raster cell width
 and height are equal distances. Therefore, longitude-latitude systems
 should be transformed. An example of how this can be accomplished is
 shown below. If no CRS is provided, a warning will be given and wingen
-will assume a euclidean system.
+will assume the data are provided in a Euclidean system.
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
 
-## The simulated coordinates and rasters are actually already Euclidean, however for this example we are pretending they are latitude-longitude coordinates
+## The simulated coordinates and rasters are actually already Euclidean, but for the sake of this example, let's assume they are latitude-longitude coordinates
 
 ## Convert coords data.frame to sf points
 coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
 
-## Convert RasterLayer to SpatRaster if it is not in this format already
+## Convert RasterLayer to SpatRaster if it is not in this format already and assign a projection to it
 lyr_longlat <- rast(lotr_lyr)
 crs(lyr_longlat) <- "+proj=longlat"
 
-# Next, the coordinates and raster can be projected to UTM like this:
-coords_utm <- st_transform(coords_longlat, crs = "+proj=utm")
-lyr_utm <- project(lyr_longlat, "+proj=utm")
+# Next, the coordinates and raster can be projected to Equal Earth projection:
+coords_eq <- st_transform(coords_longlat, crs = "+proj=eqearth")
+lyr_eq <- project(lyr_longlat, "+proj=eqearth")
 
-# Coordinates can be switched back to latitude-longitude the same way (just replace "utm" with "longlat")
+# Coordinates can be switched back to latitude-longitude the same way by replacing "eqearth" with "longlat"
 ```
 
 Before running `window_gd()`, users can preview the moving window and
@@ -252,7 +251,7 @@ used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
 to `rarify_n` if rarefaction is used).
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
   wdim = 7,
@@ -265,12 +264,15 @@ preview_gd(lotr_lyr,
 Next, we run the moving window function with our vcf, coordinates, and
 raster layer. Here, we set the parameters to calculate pi, use a window
 size of 7 x 7, an aggregation factor of 3, and rarefaction with a
-rarefaction size of 2 (minimum sample size of 2) and 5 iterations.
+rarefaction size of 2 (i.e., minimum sample size of 2), and 5
+iterations.
 
 The `L` argument is used in the calculation of pi. If `L = NULL`
 (default), the function returns the sum over SNPs of nucleotide
 diversity. Otherwise, the function returns the average nucleotide
-diversity per nucleotide given the length L of the sequence.
+diversity per nucleotide given the length L of the sequence. Users may
+want to set `L` differently depending on amounts of missing data, for
+example, so that missing sites are not considered in the calculation.
 
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
@@ -345,7 +347,7 @@ kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
 plot_gd(kgd, main = "Kriged pi")
 ```
 
-*Note:* by default, the kriging method is set to
+*Note:* By default, the kriging method is set to
 `krig_method = "universal"` for universal kriging (model formula: \~ x +
 y), which allows the mean to vary across locations, while variance is
 held constant. Alternatively, `krig_method` can be set to `"ordinary"`
@@ -353,9 +355,13 @@ for ordinary/simple kriging (model formula: \~ 1) which assumes that the
 mean and variance are constant across space.
 
 For information on the differences between universal and ordinary
-kriging check out these articles: -
-<https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm> -
-<https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation>
+kriging, we recommend these articles:
+
+-   [What are the different kriging
+    models?](https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm)
+
+-   [Kriging
+    interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
 
 ```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_ordinary <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
@@ -371,60 +377,61 @@ kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_out
 summary(kgd_autoKrige)
 ```
 
-*Note:* `autoKrige()` does not work for non-projected systems (i.e.
+*Note:* `autoKrige()` does not work for non-projected systems (i.e.,
 latitude-longitude) and will throw an error. See above example of how
 latitude-longitude coordinates and rasters can be transformed.
 
-*Note:* kriging can produce values that fall outside the range of
-possible values (e.g. genetic diversity values less than 0 or greater
+*Note:* Kriging can produce values that fall outside the range of
+possible values (e.g., genetic diversity values less than 0 or greater
 than the possible maximum). By default, in order to ensure that the
 values are bounded within the range of possible values, `krig_gd`
-converts all values greater than the maximum of the input raster, to
-that maximum (`upper_bound = TRUE`) and all values less than the minimum
-of the input raster, to that minimum (`lower_bound = TRUE`). Users can
-turn off this functionality by setting `lower_bound` and `upper_bound`
-to `FALSE`. Users can also set there own custom `lower_bound` and
-`upper_bound` values (e.g. for heterozygosity or pi you may want to set
-`lower_bound = 0` and `upper_bound = 1`).
+converts all values greater than the maximum of the input raster to that
+maximum (`upper_bound = TRUE`), and all values less than the minimum of
+the input raster to that minimum (`lower_bound = TRUE`). Users can turn
+off this functionality by setting `lower_bound` and `upper_bound` to
+`FALSE`. Users can also set their own custom `lower_bound` and
+`upper_bound` values (e.g., for heterozygosity or pi, you may want to
+set `lower_bound = 0` and `upper_bound = 1`).
 
 ### Mask results
 
 Next, we mask the resulting kriged layers. Masking can be performed
 using a variety of methods.
 
-**Method 1:** mask using the carrying capacity layer to exclude any
-areas where the carrying capacity is lower than 0.01 (alternatively, one
+**Method 1:** Mask using the carrying capacity layer to exclude any
+areas where the carrying capacity is lower than 0.01. Alternatively, one
 could use a species distribution model or habitat suitability model to
-exclude areas where the probability of presence is very low):
+exclude areas where the probability of presence is very low:
 
-```{r mask results 1, fig.width = 5, fig.height = 5}
+```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
 mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
 ```
 
-**Method 2:** mask the layer using a species range map (in this case, a
+**Method 2:** Mask the layer using a species range map (in this case, an
 sf polygon) to exclude areas falling outside the species range.
 
-```{r mask results 2, fig.width = 5, fig.height = 5}
+```{r mask results 2, fig.width = 5, fig.height = 5, warning = FALSE}
 mgd <- mask_gd(kgd, lotr_range)
 
 plot_gd(mgd, main = "Kriged & range masked pi")
 ```
 
-**Method 3:** mask the layer using a spatial Kernel Density Estimation
-(KDE) of sample density to exclude areas with low sampling density:
+**Method 3:** Mask the layer using a spatial Kernel Density Estimation
+(KDE) of sample density to exclude areas with low sampling density using
+the SpatialKDE package:
 
-```{r mask results 3, fig.width = 5, fig.height = 5, results = FALSE, message = FALSE}
+```{r mask results 3, fig.width = 5, fig.height = 5, results = FALSE, message = FALSE, warning = FALSE}
 # Spatial KDE requires an sf data.frame containing only POINTS that is projected
-lotr_sf <- sf::st_as_sf(lotr_coords, coords = c("x", "y")) %>% sf::st_set_crs(32031)
+lotr_sf <- st_as_sf(lotr_coords, coords = c("x", "y")) %>% st_set_crs(32031)
 
 # The grid layer must also be a RasterLayer for SpatialKDE
-# Here we use the kriged raster as our grid to get a KDE layer of the same spatial extent and resolution
-grid <- raster::raster(kgd)
+# Here, we use the kriged raster as our grid to get a KDE layer of the same spatial extent and resolution
+grid <- raster(kgd)
 
 # See the SpatialKDE package for more options and details about using KDE
-kde_lyr <- SpatialKDE::kde(
+kde_lyr <- kde(
   lotr_sf,
   kernel = "quartic",
   band_width = 15,
@@ -445,7 +452,7 @@ Another nice visualization option is to add a "background" to your plots
 in the form of a raster or other sp or sf object (e.g., a country or
 range boundary) which can help provide geographic context:
 
-```{r range map background, fig.width = 5, fig.height = 5}
+```{r range map background, fig.width = 5, fig.height = 5, warning = FALSE}
 plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 ```
 
@@ -477,7 +484,7 @@ In addition to pi, users can calculate observed heterozygosity (`"Ho"`),
 allelic richness (either using `"biallelic_richness"` [faster but only
 works on biallelic data] or `"allelic_richness"`):
 
-```{r, cache = TRUE, warning=FALSE}
+```{r, cache = TRUE, warning = FALSE}
 pi_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -513,7 +520,7 @@ AR_wgd <- window_gd(lotr_vcf,
 )
 ```
 
-```{r, fig.width = 5, fig.height = 5}
+```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s", oma = rep(1, 4))
 plot_gd(pi_wgd, bkg = lotr_range, main = "Pi")
 plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
@@ -523,26 +530,27 @@ plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
 # Other genetic data input file types in wingen
 
 Although the default input data type for wingen is a VCF file, which is
-a standard file type to encode genomic-scale data, a user's input data
-can be converted quite easily such that wingen can be run.
+a standard file type to encode genomic data, a user's input data can be
+converted quite easily such that wingen can be run.
 
-For example, a typical file format for encoding microsatellite data are
-genepop files (.gen), in which each allele within a locus is coded using
+For example, genepop (.gen) is a typical file format for encoding
+microsatellite data, in which each allele within a locus is coded using
 a two- or three-digit system (i.e., in a diploid organism, in a
 two-digit system, each locus would be assigned four digits specifying
 each of two alleles. In a three-digit system in the same organism, each
 locus would be assigned six digits encoding those same two alleles).
-*N.B.: Keep in mind that in some cases, microsatellite data may not be
-biallelic, and may contain more than one observed allele at a given
-locus. wingen currently only accepts biallelic data for calculating pi
-and biallelic richness.*
 
-In any case, the `genomic_converter()` function within the `radiator`
-package (available on Github
+The `genomic_converter()` function within the radiator package
+(available on Github
 [here](https://github.com/thierrygosselin/radiator/)) is particularly
 useful, as it can convert between most genotype or genomic data file
 types to a VCF. It can also check if your input data are biallelic using
 the `detect_biallelic_problems()` function.
+
+*Note:* Keep in mind that in some cases, microsatellite data may not be
+biallelic, and may contain more than one observed allele at a given
+locus. wingen currently only accepts biallelic data for calculating pi
+and biallelic richness.
 
 An example of converting from a genepop file to a VCF, assuming a user
 has a genepop file named "test.gen", is as follows:
@@ -553,7 +561,7 @@ library(devtools)
 devtools::install_github("thierrygosselin/radiator")
 library(radiator)
 
-# Can verify the file type of your input data if you wish:
+# You can verify the file type of your input data if you wish:
 radiator::detect_genomic_format(data = "test.gen")
 
 # Now, convert from genepop file to vcf; outputted vcf will be saved as "test.vcf" in the working directory
@@ -583,28 +591,34 @@ vcf file as input.
 The required input (`x`) depends on the statistic (`stat`) being
 calculated.
 
-For the standard genetic diversity statistics: - If `stat = pi` or
-`biallelic_richness`, `x` must be a dosage matrix with values of 0, 1,
-or 2. - If `stat = het`, `x` must be a heterozygosity matrix where
-values of 0 = homozygosity and values of 1 = heterozygosity. - If
-`stat =  allelic_richness`, `x` must be a `genind` type object.
+For the standard genetic diversity statistics:
 
-For other statistics: - If `x` is a vector, `stat` can be any function
-that can be applied to a vector (e.g. `stat = mean, var, sum, etc.`). -
-If `x` is a matrix or data frame (*note:* rows must be individuals),
-`stat` can be any function that takes a matrix or data frame and outputs
-a single numeric value (e.g., a function that produces a custom
-diversity index) *(note: this functionality has not have been tested
-extensively and may produce errors, so use with caution)*.
+-   If `stat = pi` or `biallelic_richness`, `x` must be a dosage matrix
+    with values of 0, 1, or 2.
+
+-   If `stat = het`, `x` must be a heterozygosity matrix where values of
+    0 = homozygosity and values of 1 = heterozygosity. - If
+    `stat =  allelic_richness`, `x` must be a `genind` type object.
+
+For other statistics:
+
+-   If `x` is a vector, `stat` can be any function that can be applied
+    to a vector (e.g., `stat = mean, var, sum, etc.`).
+
+-   If `x` is a matrix or data frame (*note:* rows must be individuals),
+    `stat` can be any function that takes a matrix or data frame and
+    outputs a single numeric value (e.g., a function that produces a
+    custom diversity index) *(note: this functionality has not have been
+    tested extensively and may produce errors, so use with caution)*.
 
 As an example, let's create a moving window map of our raster layer
 values (e.g., carrying capacity and conductance, in this case) at the
-sample coordinates
+sample coordinates:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning=FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 
 # First, we extract the raster values at those coordinates
-vals <- terra::extract(lotr_lyr, lotr_coords)
+vals <- extract(lotr_lyr, lotr_coords)
 
 # Next, we run the window_general function with the env vector and set the `stat` to mean
 # Note: we can also provide additional arguments to functions, such as na.rm = TRUE

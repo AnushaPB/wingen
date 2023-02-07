@@ -4,7 +4,7 @@
 \name{wingen-package}
 \alias{wingen}
 \alias{wingen-package}
-\title{wingen: Sliding Window Maps of Genetic Diversity}
+\title{wingen: Continuous mapping of genetic diversity in R}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
