@@ -5,16 +5,9 @@ calc_prop_hwe <- function(genind, sig = 0.05){
   return(prop)
 }
 
-calc_mean_fis <- function(hf){
-  hfstat <- hierfstat::basic.stats(hf)
-  # check why this is different from overall when NA values are present
-  #Fis <- mean(hfstat$Fis[,1], na.rm = TRUE)
-  Fis <- hfstat$overall["Fis"]
-  return(Fis)
-}
-
 calc_mean_basic_stats <- function(hf){
   hfstat <- hierfstat::basic.stats(hf)
   mean_stats <- hfstat$overall
+  names(mean_stats) <- paste0(names(mean_stats), "_hierfstat")
   return(mean_stats)
 }
