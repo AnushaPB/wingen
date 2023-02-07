@@ -132,6 +132,49 @@ subset_data <- function(vcf, coords, nsamples, nvariants){
 #' @param file.name file name to append to beginning of outputs
 #'
 #'
+default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify, rarify_n = 2, rarify_nit = 5,
+                              min_n = 2, fun = mean, rarify_alleles = TRUE, parallel = FALSE, ncores = 10, file.name){
+
+  # get wdir
+  wdir <- get_exdir()
+
+  ptm <- Sys.time()
+  gdmapr <- window_gd(vcf = vcf,
+                      coords = coords,
+                      lyr = lyr,
+                      stat = stat,
+                      wdim = wdim,
+                      fact = fact,
+                      rarify = rarify,
+                      rarify_n = rarify_n,
+                      rarify_nit = rarify_nit,
+                      min_n = min_n,
+                      fun = mean,
+                      rarify_alleles = rarify_alleles,
+                      parallel = parallel, ncores = ncores)
+
+  df <- data.frame(time = as.numeric(Sys.time() - ptm, units = "secs"),
+                   stat = stat,
+                   fact = fact,
+                   wdim = wdim)
+
+  if(rarify){
+    df$rarify_n <- rarify_n
+    df$rarify_nit <- rarify_nit
+  } else {
+    df$min_n <- min_n
+  }
+
+  # make ls of results
+  results <- list(df, gdmapr)
+
+  write_rast_test(results, here(wdir, "outputs", paste0(file.name,"_rarify", rarify, "_nsamp", nrow(coords), "_nsnps", nrow(vcf@gt))))
+
+  message("calculation of ", stat, " complete...")
+
+  return(results)
+}
+
 #' Helper function for default_time_test
 #'
 #' @inheritParams default_time_test
@@ -144,7 +187,7 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRU
 
   results <- purrr::map(stats,
                         default_time_test,
-                        gen = vcf,
+                        vcf = vcf,
                         coords = coords,
                         lyr = lyr,
                         rarify = rarify,
