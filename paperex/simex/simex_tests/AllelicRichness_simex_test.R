@@ -23,4 +23,4 @@ subvcf <- subdata[["vcf"]]
 subcoords <- subdata[["coords"]]
 
 # run test
-run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 30, file.name = "AR", stats = "allelic.richness")
+run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 30, file.name = "AR", stats = "allelic_richness")
