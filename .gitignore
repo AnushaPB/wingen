@@ -75,7 +75,7 @@ paperex/plots
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.vcf
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.ped
 !paperex/empex/data/populations_r20.haplotypes.filtered_m70_randomSNP.map
-!paperex/empex/data/SDM.tif
+!paperex/empex/data/*.tif
 
 # code coverage token
 cov_token.R
