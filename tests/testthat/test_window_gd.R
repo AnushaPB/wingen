@@ -124,7 +124,7 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
 
   ar_vals <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = FALSE)
   expect_equal(ar_vals, expected)
-  expect_equal(calc_mean_biar(all_possible_combos, rarify_alleles = FALSE), mean(expected, na.rm = TRUE))
+  expect_true(calc_mean_biar(all_possible_combos, rarify_alleles = FALSE) == mean(expected, na.rm = TRUE))
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 

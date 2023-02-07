@@ -12,3 +12,9 @@ calc_mean_fis <- function(hf){
   Fis <- hfstat$overall["Fis"]
   return(Fis)
 }
+
+calc_mean_basic_stats <- function(hf){
+  hfstat <- hierfstat::basic.stats(hf)
+  mean_stats <- hfstat$overall
+  return(mean_stats)
+}
