@@ -746,3 +746,25 @@ edge_crop <- function(x, wdim) {
 
   return(x_crop)
 }
+
+# FIX THIS:
+pre_general_check <- function(x, lyr, coords, stat, L){
+  # check layers and coords (only lyr is modified and returned)
+  lyr <- layer_coords_check(lyr, coords)
+
+  # Get function to calculate the desired statistic
+  stat_function <- return_stat(stat, ...)
+
+  # check that coords and x align and reformat data, if necessary
+  # note: list2env adds the new, corrected x and coords back to the environment
+  list2env(check_data(x, coords), envir = environment())
+
+  # make aggregated raster
+  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
+
+  # set L if pi is being calculated
+  if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
+
+  # add lyr and L to environment
+  list2env(list(lyr = lyr, L = L), envir = environment())
+}
