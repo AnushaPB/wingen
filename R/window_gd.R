@@ -720,12 +720,12 @@ edge_crop <- function(x, wdim) {
   x_ext <- terra::ext(x)
 
   # calculate x edge buffer
-  x_edge_size <- res(x)[1] * ((wdim[1] - 1) / 2)
+  x_edge_size <- terra::res(x)[1] * ((wdim[1] - 1) / 2)
   xmin <- x_ext$xmin + x_edge_size
   xmax <- x_ext$xmax - x_edge_size
 
   # calculate y edge buffer
-  y_edge_size <- res(x)[2] * ((wdim[2] - 1) / 2)
+  y_edge_size <- terra::res(x)[2] * ((wdim[2] - 1) / 2)
   ymin <- x_ext$ymin + y_edge_size
   ymax <- x_ext$ymax - y_edge_size
 
