@@ -1257,10 +1257,10 @@
     },
     "memuse": {
       "Package": "memuse",
-      "Version": "4.2-2",
+      "Version": "4.2-3",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "38cca78b5fdf5418eba3a4a41e0d5aa7",
+      "Hash": "5cfd074e79d5443c523360bbe203d904",
       "Requirements": []
     },
     "mgcv": {

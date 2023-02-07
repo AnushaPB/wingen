@@ -6,6 +6,8 @@ on:
       - "R/**.R"
       - "tests/testthat/**.R"
       - .github/workflows/test-coverage.yml
+    branches:
+      - main
   pull_request:
      paths:
       - "R/**.R"
