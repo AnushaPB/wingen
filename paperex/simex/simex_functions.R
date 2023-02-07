@@ -139,7 +139,7 @@ default_time_test <- function(stat, vcf, coords, lyr, wdim = 7, fact = 3, rarify
   wdir <- get_exdir()
 
   ptm <- Sys.time()
-  gdmapr <- window_gd(vcf = vcf,
+  gdmapr <- window_gd(gen = vcf,
                       coords = coords,
                       lyr = lyr,
                       stat = stat,
@@ -187,7 +187,7 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRU
 
   results <- purrr::map(stats,
                         default_time_test,
-                        vcf = vcf,
+                        gen = vcf,
                         coords = coords,
                         lyr = lyr,
                         rarify = rarify,
