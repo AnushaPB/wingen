@@ -29,7 +29,6 @@ resist_gd <- function(vcf, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL
   # make distmat
   if(!is.null(con_lyr)) con_lyr <- lyr
   if(!is.null(distmat)) distmat <- get_resdist(coords, cond.r = cond_layer, parallel = parallel, ncores = ncores)
-  distmat[distmat > maxdist] <- NA
 
   # run dist_gd
   results <-
@@ -56,8 +55,14 @@ resist_gd <- function(vcf, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL
 
 
 get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = TRUE){
-  # rename coords
-  colnames(coords) <- c("x", "y")
+
+  # convert cond.r to raster
+  if(!inherits(cond.r, "RasterLayer")) cond.r <- raster::raster(cond.r)
+
+  # get crs
+  if (inherits(coords, "sf")) crs <- sp::proj4string(sf::as_Spatial(coords)) else crs <- NULL
+  # convert coords to dataframe and rename
+  coords <- coords_to_df(coords)
 
   # Create transition surface
   trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8)
@@ -67,13 +72,13 @@ get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = 
   lyr_coords <- terra::as.data.frame(cond.r, xy = TRUE, na.rm = FALSE)[,1:2]
 
   # get all combinations of layer and sample coordinate indices
-  params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords)))
+  params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
 
   # make vector of distances
   future::plan(future::multisession, workers = ncores)
 
   suppressWarnings({
-    distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords, .progress = progress)
+    distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords, crs, .progress = progress)
   })
 
   # convert from vector to matrix
@@ -87,9 +92,9 @@ get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = 
 }
 
 
-run_gdist <- function(x, y, trSurface, lyr_coords, coords){
+run_gdist <- function(x, y, trSurface, lyr_coords, coords, crs){
   # Make spatial points
-  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], coords[y,]))
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], coords[y,]), proj4string = crs)
 
   # Calculate circuit distances
   distmat <- possible_gdist(trSurface, sp)
@@ -101,3 +106,10 @@ run_gdist <- function(x, y, trSurface, lyr_coords, coords){
 }
 
 possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
+
+coords_to_df <- function(coords){
+  if(is.matrix(coords)) coords <- data.frame(coords)
+  if(inherits(coords, "sf")) coords <- as.data.frame(sf::as_Spatial(coords))
+  colnames(coords) <- c("x", "y")
+  return(coords)
+}

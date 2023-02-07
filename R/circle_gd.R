@@ -28,7 +28,6 @@ circle_gd <- function(vcf, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 
   # make distmat
   if(!is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
-  distmat[distmat > maxdist] <- NA
 
   # run dist_gd
   results <-

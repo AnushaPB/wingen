@@ -60,10 +60,13 @@ dist_gd <- function(vcf, coords, lyr, distmat = NULL, stat = "pi", fact = 0,
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
-dist_general <- function(x, coords, lyr, stat, distmat, fact = 0,
+dist_general <- function(x, coords, lyr, stat, maxdist, distmat, fact = 0,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                          fun = mean, L = "nvariants", rarify_alleles = TRUE,
                          parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+
+  # Modify dist matrix
+  distmat[distmat > maxdist] <- NA
 
   # run sliding window calculations
   if (parallel) {
