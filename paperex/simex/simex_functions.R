@@ -368,7 +368,7 @@ test_simex_plot <- function(r, bkg = NULL, legend = FALSE, zlim = NULL, polyx = 
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
 test_simex_dif_plot <- function(r, bkg = NULL, legend = FALSE, ...){
 
-  coldiv <- colorRampPalette(c("#00CCD3", 'gray96', "orange"))
+  coldiv <- colorRampPalette(c("#0056A4", "#008DBC", "#00CCD3", 'gray96', "#FAAB36", "#F78104", "#FD5901"))
 
   raster_plot_gd(r, bkg = bkg, col = coldiv(100), zlim = c(-0.48, 0.48), legend = legend, breaks = 100, box = TRUE, ...)
   return(NULL)
