@@ -378,7 +378,8 @@ helper_calc_ar <- function(genind) {
 #'
 #' @noRd
 calc_mean_het <- function(hetmat) {
-  gd <- mean(hetmat, na.rm = TRUE)
+  het_by_locus <- colMeans(hetmat, na.rm = TRUE)
+  gd <- mean(het_by_locus, na.rm = TRUE)
   names(gd) <- "Ho"
   return(gd)
 }
