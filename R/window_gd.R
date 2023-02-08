@@ -26,6 +26,12 @@
 #' As such, longitude-latitude systems should be transformed before using window_gd.
 #' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
+#' Current genetic diversity metrics that can be specified with `stat` include:
+#' - `"pi"` for nucleotide diversity (default)
+#' - `"Ho"` for average observed heterozygosity across all sites,
+#' - `"allelic_richness"` for average number of alleles across all sites
+#' - `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+#'
 #' @return SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
 #'
