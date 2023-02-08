@@ -63,8 +63,9 @@ SpatRaster that includes a raster layer of genetic diversity and a raster layer 
 Generate a continuous raster map of genetic diversity using moving windows
 }
 \details{
-Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
-As such, longitude-latitude systems should be transformed before using window_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+Coordinates and rasters should be in a coordinate system such that cell width and height are equal distances (e.g., UTM, equal area).
+As such, longitude-latitude systems should be transformed before using window_gd.
+Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 }
 \examples{
 
