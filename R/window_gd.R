@@ -22,7 +22,7 @@
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
 #' @details
-#' Coordinates and rasters should be in a coordinate system such that raster cell width and height are equal distances (e.g., UTM, equal area).
+#' Coordinates and rasters should be in a coordinate system such that cell width and height are equal distances (e.g., UTM, equal area).
 #' As such, longitude-latitude systems should be transformed before using window_gd.
 #' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
