@@ -30,7 +30,7 @@ window_gd(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
+\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"}))}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
@@ -63,8 +63,9 @@ SpatRaster that includes a raster layer of genetic diversity and a raster layer 
 Generate a continuous raster map of genetic diversity using moving windows
 }
 \details{
-Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
-As such, longitude-latitude systems should be transformed before using window_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+Coordinates and rasters should be in a coordinate system such that cell width and height are equal distances (e.g., UTM, equal area).
+As such, longitude-latitude systems should be transformed before using window_gd.
+Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 }
 \examples{
 
