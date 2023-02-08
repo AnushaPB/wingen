@@ -30,7 +30,8 @@ window_gd(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
 
-\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
+\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites,
+\code{"allelic_richness"} for average number of alleles across all sites, \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option faster than \code{"allelic_richness"}))}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
@@ -57,7 +58,7 @@ window_gd(
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 }
 \value{
-SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
+SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
 Generate a continuous raster map of genetic diversity using moving windows
@@ -66,6 +67,18 @@ Generate a continuous raster map of genetic diversity using moving windows
 Coordinates and rasters should be in a coordinate system such that cell width and height are equal distances (e.g., UTM, equal area).
 As such, longitude-latitude systems should be transformed before using window_gd.
 Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+
+Current genetic diversity metrics that can be specified with \code{stat} include:
+\itemize{
+\item \code{"pi"} for nucleotide diversity (default) calculated using \link[hierfstat]{pi.dosage}
+\item \code{"Ho"} for average observed heterozygosity across all sites,
+\item \code{"allelic_richness"} for average number of alleles across all sites
+\item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})-
+\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \link[pegas]{hw.test} at the 0.05 level
+\item \code{"basic_stats"} for a series of statistics produced by \link[hierfstat]{basic.stats} including
+mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
+}
 }
 \examples{
 

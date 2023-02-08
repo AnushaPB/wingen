@@ -27,10 +27,14 @@
 #' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
 #' Current genetic diversity metrics that can be specified with `stat` include:
-#' - `"pi"` for nucleotide diversity (default)
+#' - `"pi"` for nucleotide diversity (default) calculated using `hierfstat` \link[hierfstat]{pi.dosage}
 #' - `"Ho"` for average observed heterozygosity across all sites,
 #' - `"allelic_richness"` for average number of alleles across all sites
-#' - `"biallelic_richness"` to get average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+#' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using`pegas` \link[pegas]{hw.test} at the 0.05 level
+#' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
+#' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+#' Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
 #'
 #' @return SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
