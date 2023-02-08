@@ -220,7 +220,7 @@ walk(dif100, ~ map(.x, test_simex_dif_plot, legend = FALSE))
 
 ``` r
 par(oma = rep(1,4))
-test_simex_dif_plot(dif200[[1]][[1]], legend.only = TRUE, legend = TRUE,
+test_simex_dif_plot(dif200[[1]][[1]], legend.only = TRUE, legend = TRUE, 
                     legend.width = 1, legend.shrink = 0.75, axis.args = list(cex.axis = 1.5))
 ```
 
