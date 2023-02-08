@@ -79,10 +79,26 @@ wg <- window_gd(subvcf,
                 rarify_n = 2, 
                 rarify_nit = 5, 
                 parallel = FALSE)
+```
 
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+``` r
 # krig results
 kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
 ```
+
+    ## Warning in crs_check_krig(r = r, grd = grd, coords = coords): No CRS found for
+    ## the provided raster (r). Make sure that r and grd have the same projection.
+
+    ## Warning in crs_check_krig(r = r, grd = grd, coords = coords): No CRS found for
+    ## the provided raster (grd). Make sure that r and grd have the same projection.
 
     ## [using ordinary kriging]
 
