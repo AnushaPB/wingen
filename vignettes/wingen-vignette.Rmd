@@ -527,60 +527,6 @@ plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
 plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
 ```
 
-# Other genetic data input file types in wingen
-
-Although the default input data type for wingen is a VCF file, which is
-a standard file type to encode genomic data, a user's input data can be
-converted quite easily such that wingen can be run.
-
-For example, genepop (.gen) is a typical file format for encoding
-microsatellite data, in which each allele within a locus is coded using
-a two- or three-digit system (i.e., in a diploid organism, in a
-two-digit system, each locus would be assigned four digits specifying
-each of two alleles. In a three-digit system in the same organism, each
-locus would be assigned six digits encoding those same two alleles).
-
-The `genomic_converter()` function within the radiator package
-(available on Github
-[here](https://github.com/thierrygosselin/radiator/)) is particularly
-useful, as it can convert between most genotype or genomic data file
-types to a VCF. It can also check if your input data are biallelic using
-the `detect_biallelic_problems()` function.
-
-*Note:* Keep in mind that in some cases, microsatellite data may not be
-biallelic, and may contain more than one observed allele at a given
-locus. wingen currently only accepts biallelic data for calculating pi
-and biallelic richness.
-
-An example of converting from a genepop file to a VCF, assuming a user
-has a genepop file named "test.gen", is as follows:
-
-``` r
-# Install dependencies and load libraries
-library(devtools)
-devtools::install_github("thierrygosselin/radiator")
-library(radiator)
-
-# You can verify the file type of your input data if you wish:
-radiator::detect_genomic_format(data = "test.gen")
-
-# Now, convert from genepop file to vcf; outputted vcf will be saved as "test.vcf" in the working directory
-genomic_converter(data = "test.gen", output = "vcf", filename = "test")
-```
-
-There are some nuances to converting from genepop to VCF to be aware of.
-Notably, in the example above, `radiator` will arbitrarily assign
-alleles numerically (i.e., 0001 is A, 0002 is C, and so on).
-Additionally, the specification of reference and alternate alleles is
-somewhat arbitrary (although this should not impact wingen's
-functionality). Users should carefully consider their data and examine
-the outputted VCF before proceeding. In the case of genepop files, users
-should consult with the genepop documentation available
-[here](https://genepop.curtin.edu.au/help_input.html).
-
-wingen can subsequently be run by specifying the path to the outputted
-VCF file with no further modification.
-
 # General moving window
 
 We provide a `window_general` function that can be used to make moving
@@ -635,4 +581,51 @@ we <- window_general(vals,
 )
 
 plot_gd(we, bkg = lotr_range, main = "Mean raster value")
+```
+
+# Other genetic data input file types in wingen
+
+Although the default input data type for wingen is a VCF file, which is
+a standard file type to encode genomic data, wingen can accept a genind
+object as input to calculate allelic richness using `window_general()`.
+Given that some wingen functionality can be feasible using a genind object,
+users could easily convert various other genetic data file types to then
+run wingen.
+
+For example, genepop (.gen) is a typical file format for encoding
+microsatellite data, in which each allele within a locus is coded using
+a two- or three-digit system (i.e., in a diploid organism, in a
+two-digit system, each locus would be assigned four digits specifying
+each of two alleles. In a three-digit system in the same organism, each
+locus would be assigned six digits encoding those same two alleles).
+Users can convert a genepop file into a genind object using the 
+`read.genepop()` function in the adegenet package, which automatically
+reads in a .gen file as a genind object. In many cases, microsatellite
+data may not be biallelic, and may contain more than one observed allele 
+at a given locus; in such cases, running `window_general()` with a genind 
+object is still feasible.
+
+An example of how one could use a genind object as input into
+`window_general()` is as follows:
+
+``` r
+# Load dependencies
+# We use the vcfR package to convert vcf to genind for our example
+library(vcfR) 
+
+# Convert existing vcf example file into genind object:
+genind <- vcfR2genind(lotr_vcf)
+
+# Run window_general with no rarefaction
+we_gi <- window_general(genind,
+                     coords = lotr_coords,
+                     lyr = lotr_lyr,
+                     stat = "allelic_richness",
+                     wdim = 7,
+                     fact = 3,
+                     na.rm = TRUE
+)
+
+# Plot results
+plot_gd(we_gi, bkg = lotr_range, main = "Allelic richness")
 ```
