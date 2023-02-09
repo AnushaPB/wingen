@@ -610,10 +610,11 @@ An example of how one could use a genind object as input into
 
 ``` r
 # Load dependencies
-library(vcfR) # to convert vcf to genind for our example
+# We use the vcfR package to convert vcf to genind for our example
+library(vcfR) 
 
 # Convert existing vcf example file into genind object:
-genind <- vcfR::vcfR2genind(lotr_vcf)
+genind <- vcfR2genind(lotr_vcf)
 
 # Run window_general with no rarefaction
 we_gi <- window_general(genind,
