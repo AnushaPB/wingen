@@ -9,6 +9,7 @@
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the Raster plot (defaults to FALSE)
 #' @param range numeric. minimum and maximum values to be used for the continuous legend
+#' @param legend whether to include legend
 #'
 #' @inheritParams terra::plot
 #'
@@ -19,7 +20,7 @@
 #' data("mini_lyr")
 #' plot_gd(mini_lyr)
 #'
-plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, ...) {
+plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
 
@@ -29,13 +30,14 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
-      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, range = range, ...)
+      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, range = range, legend = legend, ...)
     } else {
       plt <- terra::plot(x[[index]],
         col = col,
         axes = FALSE,
         box = box,
         range = range,
+        legend = legend,
         ...
       )
       graphics::title(main = list(main, font = 1), adj = 0)
@@ -50,7 +52,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @inheritParams plot_gd
 #'
 #' @noRd
-plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, ...) {
+plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     # calculate extent
@@ -68,6 +70,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 10
       axes = FALSE,
       box = box,
       range = range,
+      legend = legend
     )
 
     terra::plot(bkg,
