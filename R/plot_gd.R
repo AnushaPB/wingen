@@ -62,13 +62,12 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 10
     ymax <- max(max(extx)[2], max(extb)[2])
 
     terra::plot(x[[index]],
-      col = "white",
+      col = col,
       xlim = c(xmin, xmax),
       ylim = c(ymin, ymax),
       axes = FALSE,
       box = box,
       range = range,
-      legend = FALSE
     )
 
     terra::plot(bkg,
@@ -88,6 +87,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 10
       axes = FALSE,
       box = FALSE,
       range = range,
+      legend = FALSE,
       ...
     )
   })
