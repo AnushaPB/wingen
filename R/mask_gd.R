@@ -40,7 +40,7 @@ mask_gd <- function(x, y, resample = "y", minval = NULL, maxval = NULL) {
     if (!terra::compareGeom(x, y, stopOnError = FALSE)) {
       if (resample == "y") y <- terra::resample(y, x)
       if (resample == "x") x <- terra::resample(x, y)
-      if (resample != "x" & resample != "y") stop("invalid arugment provided for resample (must be \"x\" or \"y\")")
+      if (resample != "x" & resample != "y") stop("invalid argument provided for resample (must be \"x\" or \"y\")")
     }
   }
 
