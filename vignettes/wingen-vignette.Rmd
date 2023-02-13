@@ -431,7 +431,8 @@ the SpatialKDE package:
 
 ```{r mask results 3, fig.width = 5, fig.height = 5, results = FALSE, message = FALSE, warning = FALSE}
 # Spatial KDE requires an sf data.frame containing only POINTS that is projected
-# The simulated coordinates are not projected, but for the purpose of this example we pretend they are projected under the Goode Homolosine projection, but this should not be done for real data (see above example for how to properly project coordinates)
+# The simulated coordinates are not projected, but for the purpose of this example we pretend they are projected under the Goode Homolosine projection, 
+# This kind of arbitrary setting of crs should not be done for real data (see above example for how to properly project coordinates)
 lotr_sf <- st_as_sf(lotr_coords, coords = c("x", "y")) %>% st_set_crs("+proj=goode")
 
 # The grid layer must also be a RasterLayer for SpatialKDE
