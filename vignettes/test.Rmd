@@ -1,0 +1,85 @@
+---
+title: "test"
+output: html_document
+date: "2023-02-13"
+---
+---
+title: "wingen-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{wingen-vignette}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, warning = FALSE, message = FALSE}
+library(wingen)
+library(terra)
+library(raster)
+library(viridis)
+library(sf)
+library(SpatialKDE)
+```
+
+## Background
+
+wingen uses a moving window approach to create maps of genetic
+diversity. The method and its rationale are described in Bishop et al.
+(in review).
+
+## Example
+
+To demonstrate how wingen works, we will use a subset of the data from
+the Bishop et al. (in review) simulation example. These simulations were
+created using Geonomics ([Terasaki Hart et al.,
+2022](https://doi.org/10.1093/molbev/msab175)) to generate a realistic
+landscape genomic dataset. In this simulation, spatial variation in
+genetic diversity is produced by varying population size and gene flow
+across the landscape via heterogeneous carrying capacity and conductance
+surfaces. These surfaces are based on an example digital elevation model
+of Tolkien's Middle Earth produced by the Center for Geospatial Analysis
+at William & Mary ([Robert,
+2020](https://scholarworks.wm.edu/asoer/3/)).
+
+### Load Middle Earth example
+
+The small Middle Earth example dataset used here contains four objects
+which are loaded by `load_middle_earth_ex()`:
+
+1.  `lotr_vcf` - a vcfR object containing the genetic data
+
+2.  `lotr_coords` - a dataframe object containing sample coordinates
+
+3.  `lotr_lyr` - a raster object of the landscape (higher values
+    indicate greater connectivity/carrying capacity)
+
+4.  `lotr_range` - a polygon outlining the "range" of the simulated
+    species
+
+```{r load example data, fig.width = 5, fig.height = 5}
+load_middle_earth_ex()
+
+# Genetic data
+lotr_vcf
+
+# Coordinates
+head(lotr_coords)
+
+# Raster data
+lotr_lyr
+lotr_lyr <- system.file("extdata", "lotr_lyr", package = "wingen")
+
+# Map of data
+plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
+points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
+```
