@@ -410,9 +410,8 @@ exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
 test <- rast(lotr_lyr)
-plot(test)
-mgd <- mask_gd(kgd, mask = test, minval = 0.01)
-
+#mgd <- mask_gd(kgd, mask = test, minval = 0.01)
+mgd <- mask(kgd, test)
 par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
 ```
