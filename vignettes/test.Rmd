@@ -346,7 +346,6 @@ raster stack of the kriged input layers.
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
 
-
 par(pty = "s")
 plot_gd(kgd, main = "Kriged pi")
 ```
@@ -409,8 +408,11 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-test <- rast(lotr_lyr)
-mgd <- mask_gd(kgd, test, minval = 0.01)
+r <- rast(ncols=100, nrows=100)
+values(r) <- 1:100
+ext(r) <- ext(kgd)
+
+mgd <- mask_gd(kgd, r, minval = 0.01)
 par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
 ```
