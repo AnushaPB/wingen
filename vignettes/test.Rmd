@@ -82,3 +82,10 @@ lotr_lyr
 plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
 points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```
+
+```{r, fig.width = 5, fig.height = 5}
+ex_raster1 <- coords_to_raster(lotr_coords, buffer = 1, plot = TRUE)
+ex_raster2 <- coords_to_raster(lotr_coords, buffer = 1, agg = 2, plot = TRUE)
+ex_raster3 <- coords_to_raster(lotr_coords, buffer = 1, disagg = 4, plot = TRUE)
+ex_raster4 <- coords_to_raster(lotr_coords, buffer = 1, res = 10, plot = TRUE)
+```
