@@ -408,7 +408,7 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-r <- rast(ncols=100, nrows=100)
+r <- rast(ncols=200, nrows=200)
 values(r) <- 1:100
 ext(r) <- ext(kgd)
 
