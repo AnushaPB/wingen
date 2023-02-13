@@ -238,7 +238,7 @@ coords_longlat <- st_as_sf(coords_df, coords = c("x", "y"), crs = "+proj=longlat
 coords_eq <- st_transform(coords_longlat, crs = "+proj=goode")
 lyr_eq <- project(lyr_longlat, "+proj=goode")
 
-# Coordinates can be switched back to latitude-longitude the same way by replacing "eqearth" with "longlat"
+# Coordinates can be switched back to latitude-longitude the same way by replacing "goode" with "longlat"
 ```
 
 Before running `window_gd()`, users can preview the moving window and
