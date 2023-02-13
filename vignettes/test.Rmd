@@ -412,6 +412,7 @@ r <- rast(ncols=200, nrows=200)
 values(r) <- 1:100
 ext(r) <- ext(kgd)
 
+r <- disagg(lotr_lyr, 2)
 mgd <- mask_gd(kgd, r, minval = 0.01)
 par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
