@@ -409,7 +409,8 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-mgd <- mask_gd(kgd, kgd, minval = 0.01)
+load_middle_earth_ex()
+mgd <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
