@@ -13,6 +13,7 @@ plot_gd(
   main = NULL,
   box = FALSE,
   range = NULL,
+  legend = TRUE,
   ...
 )
 }
@@ -32,6 +33,8 @@ plot_gd(
 \item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
 
 \item{range}{numeric. minimum and maximum values to be used for the continuous legend}
+
+\item{legend}{whether to include legend}
 
 \item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }

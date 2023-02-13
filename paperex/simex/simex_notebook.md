@@ -125,7 +125,7 @@ plot_gd(kg, zlim = c(0, 0.31))
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->
 
 ``` r
-plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
+plot_gd(mg, bkg, zlim = c(0, 0.31), legend = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
@@ -136,9 +136,83 @@ plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
 params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
 
 stk <- purrr::map(params, test_params_simex, subvcf, subcoords, lyr)
+```
 
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided
+    ## coordinates. Make sure the coordinates and the raster have the same projection.
+    ## Assuming a Euclidean system (see function details or wingen vignette)
+
+    ## Warning in crs_check_window(lyr, coords): No CRS found for the provided raster.
+    ## Make sure the coordinates and the raster have the same projection. Assuming a
+    ## Euclidean system (see function details or wingen vignette)
+
+``` r
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-purrr::walk(stk, test_simex_plot, bkg = bkg)
+purrr::walk(stk, test_simex_plot, bkg = bkg, polyx = 85, polyy = -100)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
@@ -162,14 +236,14 @@ stk200 <- map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk100, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk100, test_simex_plot, legend = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk200, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk200, test_simex_plot, legend = FALSE)
 ```
 
 ![](simex_notebook_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_notebook_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->
