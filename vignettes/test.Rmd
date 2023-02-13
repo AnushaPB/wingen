@@ -411,28 +411,3 @@ par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
 ```
 
-**Method 2:** Mask the layer using a species range map (in this case, an
-sf polygon) to exclude areas falling outside the species range.
-
-```{r mask results 2, fig.width = 5, fig.height = 5, warning = FALSE}
-mgd <- mask_gd(kgd, lotr_range)
-
-par(pty = "s")
-plot_gd(mgd, main = "Kriged & range masked pi")
-```
-
-**Method 3:** Mask the layer using a spatial Kernel Density Estimation
-(KDE) of sample density to exclude areas with low sampling density using
-the SpatialKDE package:
-
-
-Another nice visualization option is to add a "background" to your plots
-in the form of a raster or other sp or sf object (e.g., a country or
-range boundary) which can help provide geographic context:
-
-```{r range map background, fig.width = 5, fig.height = 5, warning = FALSE}
-par(pty = "s")
-plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
-```
-
-
