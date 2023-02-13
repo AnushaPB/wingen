@@ -408,7 +408,7 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-# rescale lotr_lyr to sampe resolution as kgd before masking
+# disaggregate lotr_lyr to make it the same resolution as kgd before masking
 mask_lyr <- disagg(rast(lotr_lyr), 2)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.01)
 par(pty = "s")
