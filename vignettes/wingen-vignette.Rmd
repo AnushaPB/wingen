@@ -217,27 +217,26 @@ The main arguments to `window_gd()` are:
 ------------------------------------------------------------------------
 
 *Note:* Coordinates and rasters used in wingen should be in a Euclidean
-coordinate system (i.e., UTM coordinates) such that raster cell width
-and height are equal distances. Therefore, longitude-latitude systems
+coordinate system or use an equal area projection such that raster cell 
+width and height are equal. Therefore, longitude-latitude systems
 should be transformed. An example of how this can be accomplished is
 shown below. If no CRS is provided, a warning will be given and wingen
-will assume the data are provided in a Euclidean system.
+will assume the data are provided in a Euclidean system. 
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
 
-## The simulated coordinates and rasters are actually already Euclidean, but for the sake of this example, let's assume they are latitude-longitude coordinates
+## Example raster:
+lyr_longlat <- rast(ncols = 40, nrows = 40, xmin = -110, xmax = -90, ymin = 40, ymax = 60, 
+                    crs = "+proj=longlat +datum=WGS84")
 
-## Convert coords data.frame to sf points
-coords_longlat <- st_as_sf(lotr_coords, coords = c("x", "y"), crs = "+proj=longlat")
+## Example coordinates:
+coords_df <- data.frame(x = c(-110, -90), y = c(40, 60))
+coords_longlat <- st_as_sf(coords_df, coords = c("x", "y"), crs = "+proj=longlat")
 
-## Convert RasterLayer to SpatRaster if it is not in this format already and assign a projection to it
-lyr_longlat <- rast(lotr_lyr)
-crs(lyr_longlat) <- "+proj=longlat"
-
-# Next, the coordinates and raster can be projected to Equal Earth projection:
-coords_eq <- st_transform(coords_longlat, crs = "+proj=eqearth")
-lyr_eq <- project(lyr_longlat, "+proj=eqearth")
+# Next, the coordinates and raster can be projected to an equal area projection, in this case the Goode Homolosine projection (https://proj.org/operations/projections/goode.html):
+coords_eq <- st_transform(coords_longlat, crs = "+proj=goode")
+lyr_eq <- project(lyr_longlat, "+proj=goode")
 
 # Coordinates can be switched back to latitude-longitude the same way by replacing "eqearth" with "longlat"
 ```
