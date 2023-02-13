@@ -77,7 +77,6 @@ head(lotr_coords)
 
 # Raster data
 lotr_lyr
-lotr_lyr <- system.file("extdata", "lotr_lyr", package = "wingen")
 
 # Map of data
 plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
