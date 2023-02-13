@@ -5,9 +5,9 @@ test_that("krig_gd returns expected output", {
   expect_s4_class(kpi, "SpatRaster")
   expect_equal(terra::nlyr(kpi), 1)
 
-  capture_warnings(expect_warning(kpi <- krig_gd(raster::stack(mini_lyr, mini_lyr), index = 1:2, mini_lyr)))
+  capture_warnings(expect_warning(kpi <- krig_gd(c(mini_lyr, mini_lyr), index = 1:2, mini_lyr)))
   expect_s4_class(kpi, "SpatRaster")
-  expect_equal(raster::nlayers(mini_lyr), 1)
+  expect_equal(terra::nlyr(mini_lyr), 1)
 })
 
 test_that("krig_gd returns warning when not provided grd", {
