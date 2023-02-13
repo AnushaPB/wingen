@@ -251,7 +251,7 @@ used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
 to `rarify_n` if rarefaction is used).
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
   wdim = 7,
@@ -277,7 +277,7 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r moving window, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -341,7 +341,7 @@ layer by a factor of two to get a smoother output surface (users should
 play around with this parameter). The output of this function is a
 raster stack of the kriged input layers.
 
-```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r krige results, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 # Note: this step can take a little while
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
@@ -367,7 +367,7 @@ kriging, we recommend these articles:
 -   [Kriging
     interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
 
-```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r universal krige results, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 kgd_ordinary <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
 
 par(pty = "s")
@@ -376,7 +376,7 @@ plot_gd(kgd_ordinary, main = "Kriged pi")
 
 Users can optionally get the full output from `autoKrige()`
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_output = TRUE)
 
 summary(kgd_autoKrige)
@@ -495,7 +495,7 @@ In addition to pi, users can calculate observed heterozygosity (`"Ho"`),
 allelic richness (either using `"biallelic_richness"` [faster but only
 works on biallelic data] or `"allelic_richness"`):
 
-```{r, cache = TRUE, warning = FALSE}
+```{r, cache = FALSE, warning = FALSE}
 pi_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -573,7 +573,7 @@ As an example, let's create a moving window map of our raster layer
 values (e.g., carrying capacity and conductance, in this case) at the
 sample coordinates:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 
 # First, we extract the raster values at those coordinates
 vals <- extract(lotr_lyr, lotr_coords)
@@ -621,7 +621,7 @@ object is still feasible.
 An example of how one could use a genind object as input into
 `window_general()` is as follows:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
 # We use the vcfR package to convert vcf to genind for our example
 library(vcfR) 
 
