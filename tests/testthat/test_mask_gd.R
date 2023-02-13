@@ -25,7 +25,7 @@ test_that("resampling occurs correctly", {
   mask <- terra::aggregate(mini_lyr, 2)
 
   # resample to mask to match x
-  msm <- mask_gd(x, mask, resample = "mask")
+  msm <- mask_gd(x, mask, resample = "y")
   expect_true(terra::compareGeom(msm, terra::rast(x)))
 
   # resample x to match mask
