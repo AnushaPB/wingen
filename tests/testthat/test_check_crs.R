@@ -4,10 +4,11 @@ test_that("CRS are handled correctly by window_gd", {
   load_mini_ex(quiet = TRUE)
 
   # NO CRS
-  nocrs_lyr <- crs_lyr <- mini_lyr
+  nocrs_lyr <- mini_lyr
   nocrs_coords <- mini_coords
 
   # CRS
+  crs_lyr <- terra::rast(mini_lyr)
   terra::crs(crs_lyr) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
   crs_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
   sf::st_crs(crs_coords) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
@@ -40,9 +41,10 @@ test_that("CRS are handled correctly by window_gd", {
 test_that("CRS are handled correctly by krig_gd (coords vs r)", {
   capture_warnings(library(raster))
   load_mini_ex(quiet = TRUE)
+  mini_lyr <- terra::rast(mini_lyr)
 
   # NO CRS
-  nocrs_lyr <- crs_lyr <- mini_lyr
+  nocrs_lyr <- mini_lyr
   nocrs_coords <- mini_coords
 
   # CRS
@@ -80,6 +82,7 @@ test_that("CRS are handled correctly by krig_gd (coords vs r)", {
 test_that("CRS are handled correctly by krig_gd (r vs grd)", {
   capture_warnings(library(raster))
   load_mini_ex(quiet = TRUE)
+  mini_lyr <- terra::rast(mini_lyr)
 
   # NO CRS
   nocrs_lyr <- mini_lyr

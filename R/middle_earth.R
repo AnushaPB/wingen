@@ -1,10 +1,10 @@
 #' Middle earth example
 #'
-#' Loads middle earth example data and converts `lotr_lyr` from a RasterLayer to a SpatRaster
+#' Loads middle earth example data
 #'
 #' @param quiet whether to hide message (defaults to FALSE)
 #'
-#' @return three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyr)
+#' @return three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
 #' @export
 #'
 #' @examples
@@ -12,9 +12,6 @@
 load_middle_earth_ex <- function(quiet = FALSE) {
   # load all data
   utils::data(list = c("lotr_vcf", "lotr_lyr", "lotr_coords", "lotr_range"))
-
-  # convert
-  list2env(list(lotr_lyr = terra::rast(lotr_lyr)), envir = .GlobalEnv)
 
   if (!quiet) {
     # give message with information about objects
@@ -33,7 +30,7 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 
 #' Mini middle earth example
 #'
-#' Loads mini middle earth example data and converts `mini_lyr` from a RasterLayer to a SpatRaster
+#' Loads mini middle earth example data
 #'
 #' @param quiet whether to hide message (defaults to FALSE)
 #'
@@ -45,9 +42,6 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 load_mini_ex <- function(quiet = FALSE) {
   # load all data
   utils::data(list = c("mini_vcf", "mini_vcf_NA", "mini_coords", "mini_lyr"))
-
-  # convert
-  list2env(list(mini_lyr = terra::rast(mini_lyr)), envir = .GlobalEnv)
 
   # give message with information about objects
   if (!quiet) {
