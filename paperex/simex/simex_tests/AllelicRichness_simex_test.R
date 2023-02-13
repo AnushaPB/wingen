@@ -13,7 +13,7 @@ subvcf <- subdata[["vcf"]]
 subcoords <- subdata[["coords"]]
 
 # run test
-run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 20, file.name = "AR", stats = "allelic_richness")
+run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 30, file.name = "AR_rr", stats = "allelic_richness")
 
 ## WGS TEST -----------------------------------------------------------------------------------------------
 
@@ -23,4 +23,4 @@ subvcf <- subdata[["vcf"]]
 subcoords <- subdata[["coords"]]
 
 # run test
-run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 30, file.name = "AR", stats = "allelic_richness")
+run_default_time_test(subvcf, subcoords, lyr, rarify = TRUE, parallel = TRUE, ncores = 30, file.name = "AR_WGS", stats = "allelic_richness")

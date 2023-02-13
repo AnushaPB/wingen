@@ -342,7 +342,7 @@ test_datasets_simex <- function(params, nsamp, msk_lyr){
 #' @param bkg background plot
 #' @param legend whether to plot legend
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
-test_simex_plot <- function(r, bkg = NULL, legend = FALSE, zlim = NULL, polyx = 83, polyy = -100,...){
+test_simex_plot <- function(r, bkg = NULL, legend = FALSE, zlim = NULL, polyx = 99, polyy = -99,...){
   stat <- names(r)[1]
 
   if(is.null(zlim)){
@@ -366,11 +366,13 @@ test_simex_plot <- function(r, bkg = NULL, legend = FALSE, zlim = NULL, polyx = 
 #' @param bkg background plot
 #' @param legend whether to plot legend
 #' @param ... Graphical parameters. Any argument that can be passed to image.plot and to base plot, such as axes=FALSE, main='title', ylab='latitude'
-test_simex_dif_plot <- function(r, bkg = NULL, legend = FALSE, ...){
+test_simex_dif_plot <- function(r, bkg = NULL, legend = FALSE, polyx = 99, polyy = -99, ...){
 
   coldiv <- colorRampPalette(c("#0056A4", "#008DBC", "#00CCD3", 'gray96', "#FAAB36", "#F78104", "#FD5901"))
 
-  raster_plot_gd(r, bkg = bkg, col = coldiv(100), zlim = c(-0.48, 0.48), legend = legend, breaks = 100, box = TRUE, ...)
+  raster_plot_gd(r, bkg = bkg, col = coldiv(100), zlim = c(-0.48, 0.48), legend = legend, breaks = 100, box = FALSE, ...)
+  polygon(x = c(0, 0, polyx, polyx), y = c(polyy, 0, 0, polyy), border = "black")
+
   return(NULL)
 }
 

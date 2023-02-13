@@ -128,7 +128,7 @@ stk <- map(params, test_params_simex, subvcf, subcoords, lyr)
 ``` r
 pdf(here(wdir, "plots", "figure_2.1.pdf"), width = 5, height = 5)
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-walk(stk, test_simex_plot, bkg = bkg, polyx = 86, polyy = -102)
+walk(stk, test_simex_plot, bkg = bkg, polyx = 85, polyy = -100)
 dev.off()
 ```
 
@@ -295,14 +295,14 @@ stk200 <- map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk100, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk100, test_simex_plot, legend = FALSE)
 ```
 
 ![](simex_figures_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](simex_figures_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](simex_figures_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk200, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk200, test_simex_plot, legend = FALSE)
 ```
 
 ![](simex_figures_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->![](simex_figures_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->

@@ -81,7 +81,7 @@ par(mar = rep(0,4))
 plot_gd(wg, bkg, zlim = c(0, 0.31))
 plot_count(wg, zlim = c(0,30), horizontal = TRUE)
 plot_gd(kg, zlim = c(0, 0.31))
-plot_gd(mg, bkg,zlim = c(0, 0.31), legend = FALSE)
+plot_gd(mg, bkg, zlim = c(0, 0.31), legend = FALSE)
 ```
 
 ### **Figure 2:** Window vs Aggregation Factor
@@ -92,7 +92,7 @@ params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
 stk <- purrr::map(params, test_params_simex, subvcf, subcoords, lyr)
 
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-purrr::walk(stk, test_simex_plot, bkg = bkg)
+purrr::walk(stk, test_simex_plot, bkg = bkg, polyx = 85, polyy = -100)
 ```
 
 ## Figure S1, S2, S3, and S4: Comparison of datasets, statistics, and sample sizes
@@ -114,10 +114,10 @@ stk200 <- map(params, test_datasets_simex, nsamp = 200, msk_lyr = msk_lyr200)
 
 # Plot results (note: legends are fixed to the same scale)
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk100, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk100, test_simex_plot, legend = FALSE)
 
 par(mfrow = c(2, 3), mar = c(1, 0, 1, 0), oma = rep(0, 4))
-walk(stk200, test_simex_plot, legend = FALSE, polyx = 102, polyy = -102)
+walk(stk200, test_simex_plot, legend = FALSE)
 
 # Figure legends:
 par(oma = rep(1,4))
