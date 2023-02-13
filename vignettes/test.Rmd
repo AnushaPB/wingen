@@ -403,6 +403,17 @@ set `lower_bound = 0` and `upper_bound = 1`).
 Next, we mask the resulting kriged layers. Masking can be performed
 using a variety of methods.
 
+**Method 1:** Mask using the carrying capacity layer to exclude any
+areas where the carrying capacity is lower than 0.01. Alternatively, one
+could use a species distribution model or habitat suitability model to
+exclude areas where the probability of presence is very low:
+
+```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
+mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
+
+par(pty = "s")
+plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
+```
 
 **Method 2:** Mask the layer using a species range map (in this case, an
 sf polygon) to exclude areas falling outside the species range.
