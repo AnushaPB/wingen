@@ -1,9 +1,4 @@
 ---
-title: "test"
-output: html_document
-date: "2023-02-13"
----
----
 title: "wingen-vignette"
 output: rmarkdown::html_vignette
 vignette: >
@@ -82,6 +77,15 @@ lotr_lyr
 plot(lotr_lyr, col = magma(100), axes = FALSE, box = FALSE)
 points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 ```
+
+If users don't have a raster layer of their landscape, they can generate
+one using their sample coordinates with the `coords_to_raster()`
+function. The resolution of this raster can be either tuned with the
+`agg` (to aggregate) or `disagg` (to disaggregate) arguments, or defined
+using the `res` argument. The `res` argument can either be a single
+value (e.g., 0.00833) or a vector of two values with the x and y
+resolutions. The `buffer` argument can be used to add an edge to the
+raster (i.e., buffer away from the coordinates).
 
 ```{r, fig.width = 5, fig.height = 5}
 ex_raster1 <- coords_to_raster(lotr_coords, buffer = 1, plot = TRUE)
@@ -247,7 +251,7 @@ used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
 to `rarify_n` if rarefaction is used).
 
-```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
   wdim = 7,
@@ -273,7 +277,7 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -337,7 +341,7 @@ layer by a factor of two to get a smoother output surface (users should
 play around with this parameter). The output of this function is a
 raster stack of the kriged input layers.
 
-```{r krige results, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
+```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # Note: this step can take a little while
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
@@ -363,7 +367,7 @@ kriging, we recommend these articles:
 -   [Kriging
     interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
 
-```{r universal krige results, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
+```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_ordinary <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, krig_method = "ordinary")
 
 par(pty = "s")
@@ -372,7 +376,7 @@ plot_gd(kgd_ordinary, main = "Kriged pi")
 
 Users can optionally get the full output from `autoKrige()`
 
-```{r, fig.width = 5, fig.height = 5, cache = FALSE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_autoKrige <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2, autoKrige_output = TRUE)
 
 summary(kgd_autoKrige)
@@ -398,11 +402,6 @@ set `lower_bound = 0` and `upper_bound = 1`).
 
 Next, we mask the resulting kriged layers. Masking can be performed
 using a variety of methods.
-
-**Method 1:** Mask using the carrying capacity layer to exclude any
-areas where the carrying capacity is lower than 0.01. Alternatively, one
-could use a species distribution model or habitat suitability model to
-exclude areas where the probability of presence is very low:
 
 
 **Method 2:** Mask the layer using a species range map (in this case, an
