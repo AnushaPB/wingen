@@ -409,7 +409,7 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-load_middle_earth_ex()
+data(lotr_range)
 mgd <- mask_gd(kgd, lotr_range, minval = 0.01)
 
 par(pty = "s")
