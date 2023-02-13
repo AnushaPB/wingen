@@ -409,6 +409,7 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
+data(lotr_lyr)
 mgd <- mask_gd(kgd, lotr_lyr, minval = 0.01)
 
 par(pty = "s")
