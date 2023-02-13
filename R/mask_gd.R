@@ -35,7 +35,6 @@ mask_gd <- function(x, y, minval = NULL, maxval = NULL) {
     if (!is.null(maxval)) {
       y[y > maxval] <- NA
     }
-
   }
 
   # if not a raster convert to a spat vector
