@@ -128,7 +128,7 @@ stk <- map(params, test_params_simex, subvcf, subcoords, lyr)
 ``` r
 pdf(here(wdir, "plots", "figure_2.1.pdf"), width = 5, height = 5)
 par(mfrow = c(3, 3), mar = rep(0, 4), oma = rep(0, 4), pty = "s")
-walk(stk, test_simex_plot, bkg = bkg, polyx = 85, polyy = -100)
+walk(stk, test_simex_plot, bkg = bkg, polyx = 83, polyy = -100)
 dev.off()
 ```
 
@@ -227,7 +227,7 @@ kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
 
 ``` r
 # mask areas 
-mg <- mask_gd(kg, bkg)
+mg <- mask_gd(kg, disaggregate(bkg, 2))
 
 par(mar = rep(0,4))
 
