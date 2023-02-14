@@ -18,22 +18,14 @@ test_that("mask_gd returns expected output", {
   expect_true(all(terra::values(is.na(mpi)) == terra::values(mini_lyr > 2)))
 })
 
-test_that("resampling occurs correctly", {
+test_that("sclae mismatch produces error", {
   load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
   mask <- terra::aggregate(mini_lyr, 2)
 
-  # resample to mask to match x
-  msm <- mask_gd(x, mask, resample = "y")
-  expect_true(terra::compareGeom(msm, terra::rast(x)))
-
-  # resample x to match mask
-  expect_error(msx <- mask_gd(x, mask, resample = "x"), NA)
-  expect_true(terra::compareGeom(msx, terra::rast(mask)))
-
   # check for error if invalid resample arg is supplied
-  expect_error(mse <- mask_gd(x, mask, resample = "grid"))
+  expect_error(mse <- mask_gd(x, mask))
 })
 
 test_that("different objects can be used for masking", {
