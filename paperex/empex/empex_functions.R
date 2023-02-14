@@ -84,7 +84,7 @@ empex_krig_mask <- function(x, lyr, mask){
 
   mx <-
     terra::project(kx, terra::crs(mask)) %>%
-    mask(mask) %>%
+    terra::mask(mask) %>%
     trim()
 
   return(mx)
