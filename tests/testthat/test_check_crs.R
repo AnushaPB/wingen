@@ -15,16 +15,16 @@ test_that("CRS are handled correctly by window_gd", {
 
   # no CRS lyr and coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, nocrs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
-  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection (see function details or wingen vignette)"))
 
   # no CRS lyr and CRS coords
   cw <- capture_warnings(window_gd(mini_vcf, crs_coords, nocrs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided raster. Make sure the coordinates and the raster have the same projection (see function details or wingen vignette)"))
 
   # CRS lyr and no CRS coords
   cw <- capture_warnings(window_gd(mini_vcf, nocrs_coords, crs_lyr, rarify = FALSE))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection. Assuming a Euclidean system (see function details or wingen vignette)"))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the raster have the same projection (see function details or wingen vignette)"))
 
   # CRS lyr and CRS coords (no warnings expected)
   wg <- window_gd(mini_vcf, crs_coords, crs_lyr, rarify = FALSE)
@@ -56,7 +56,7 @@ test_that("CRS are handled correctly by krig_gd (coords vs r)", {
   # no CRS lyr and coords
   cw <- capture_warnings(krig_gd(r = nocrs_lyr, coords = nocrs_coords))
   expect_true(any(cw == "No CRS found for the provided raster (r). Make sure that r and coords have the same projection."))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the rasters have the same projection. Assuming euclidean coordinates."))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the rasters have the same projection"))
 
   # no CRS lyr and CRS coords
   cw <- capture_warnings(krig_gd(r = nocrs_lyr, coords = crs_coords))
@@ -64,7 +64,7 @@ test_that("CRS are handled correctly by krig_gd (coords vs r)", {
 
   # CRS lyr and no CRS coords
   cw <- capture_warnings(krig_gd(r = crs_lyr, coords = nocrs_coords))
-  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the rasters have the same projection. Assuming euclidean coordinates."))
+  expect_true(any(cw == "No CRS found for the provided coordinates. Make sure the coordinates and the rasters have the same projection"))
 
   # CRS lyr and CRS coords (no warnings expected)
   capture_warnings(kg <- krig_gd(r = crs_lyr, coords = crs_coords))
