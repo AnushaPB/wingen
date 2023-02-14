@@ -187,7 +187,7 @@ run_default_time_test <- function(vcf, coords, lyr, rarify, rarify_alleles = TRU
 
   results <- purrr::map(stats,
                         default_time_test,
-                        gen = vcf,
+                        vcf = vcf,
                         coords = coords,
                         lyr = lyr,
                         rarify = rarify,
