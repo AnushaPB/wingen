@@ -104,7 +104,7 @@ kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
 
 ``` r
 # mask areas with less than one count
-mg <- mask_gd(kg, bkg)
+mg <- mask_gd(kg, disaggregate(bkg, 2))
 
 par(mar = rep(0,4))
 plot_gd(wg, bkg, zlim = c(0, 0.31))

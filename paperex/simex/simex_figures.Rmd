@@ -102,7 +102,7 @@ wg <- window_gd(subvcf,
 kg <- krig_gd(wg, lyr, index = 1, disagg_grd = 2)
 
 # mask areas 
-mg <- mask_gd(kg, bkg)
+mg <- mask_gd(kg, disaggregate(bkg, 2))
 
 par(mar = rep(0,4))
 

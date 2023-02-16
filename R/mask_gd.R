@@ -5,7 +5,6 @@
 #'
 #' @param x Raster object to mask
 #' @param y Raster object or Spatial object to use as mask
-#' @param resample if x and y are non-matching rasters, which layer to resample to match them (defaults to y)
 #' @param minval if y is a Raster object, value of y below which to mask
 #' @param maxval if y is a Raster object, value of y above which to mask
 #'
@@ -19,7 +18,7 @@
 #' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
-mask_gd <- function(x, y, resample = "y", minval = NULL, maxval = NULL) {
+mask_gd <- function(x, y, minval = NULL, maxval = NULL) {
   # make sure x is a SpatRaster
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
@@ -35,12 +34,6 @@ mask_gd <- function(x, y, resample = "y", minval = NULL, maxval = NULL) {
 
     if (!is.null(maxval)) {
       y[y > maxval] <- NA
-    }
-
-    if (!terra::compareGeom(x, y, stopOnError = FALSE)) {
-      if (resample == "y") y <- terra::resample(y, x)
-      if (resample == "x") x <- terra::resample(x, y)
-      if (resample != "x" & resample != "y") stop("invalid argument provided for resample (must be \"x\" or \"y\")")
     }
   }
 
