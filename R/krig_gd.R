@@ -148,7 +148,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
   # Get kriged spdf
   krig_spdf <- krig_res$krige_output
 
-  # turn spdf into raster (automatically just uses the first variable)
+  # turn spdf into raster
   krig_r <- terra::rast(krig_spdf, type = "xyz", crs = terra::crs(krig_grid))
 
   # perform bounding
