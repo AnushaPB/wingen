@@ -9,6 +9,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                     fun = mean, L = "nvariants", rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
 
+
   # run moving window
   result <-
     purrr::map(stat,
@@ -100,6 +101,12 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
   # Modify dist matrix
   distmat[distmat > maxdist] <- NA
 
+  # set L if pi is being calculated
+  if (stat == "pi") if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
+
+  # Get function to calculate the desired statistic
+  stat_function <- return_stat(stat, ...)
+
   # run sliding window calculations
   if (parallel) {
 
@@ -113,7 +120,7 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
 
     rast_vals <- furrr::future_map(1:terra::ncell(lyr), dist_helper,
                                    lyr = lyr, x = x, distmat = distmat,
-                                   stat = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                                   stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                                    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
                                    .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
