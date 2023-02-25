@@ -279,10 +279,14 @@ layer_coords_check <- function(lyr, coords) {
 vals_to_lyr <- function(lyr, rast_vals, stat) {
   # bind rows to get vector per layer
   # note: an important repair will happen here to fill in NAs where there are no genetic diversity values
-  df <- rast_vals %>% dplyr::bind_rows() %>% dplyr::relocate(sample_count, .after = last_col())
+  ls <-
+    rast_vals %>%
+    dplyr::bind_rows() %>%
+    dplyr::relocate(sample_count, .after = last_col()) %>%
+    as.list()
 
   # assign vector values to rasters
-  rast_list <- purrr::map(df, ~terra::setValues(lyr, .x))
+  rast_list <- purrr::map(ls, ~terra::setValues(lyr, .x))
 
   # convert from list to raster stack
   rast_stack <- terra::rast(rast_list)
