@@ -20,7 +20,8 @@ window_gd(
   rarify_alleles = TRUE,
   parallel = FALSE,
   ncores = NULL,
-  crop_edges = FALSE
+  crop_edges = FALSE,
+  ...
 )
 }
 \arguments{
@@ -30,7 +31,7 @@ window_gd(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{stat}{genetic diversity statistic to calculate (see Details defaults to \code{"pi"})}
+\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics.}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
@@ -42,7 +43,7 @@ window_gd(
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
-\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)}
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
@@ -55,6 +56,8 @@ window_gd(
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
+
+\item{...}{additional arguments to pass to the \code{stat} function (e.g. if \code{stat = hwe}, users may want to set \code{sig} to a different value)}
 }
 \value{
 SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell

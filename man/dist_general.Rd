@@ -2,7 +2,8 @@
 % Please edit documentation in R/dist_gd.R
 \name{dist_general}
 \alias{dist_general}
-\title{General function for dist_gd}
+\title{General function for dist_gd
+TODO: CREATE GENERAL CIRCLE GD AND RESIST GD}
 \usage{
 dist_general(
   x,
@@ -11,7 +12,6 @@ dist_general(
   stat,
   maxdist,
   distmat,
-  fact = 0,
   rarify = FALSE,
   rarify_n = 2,
   rarify_nit = 5,
@@ -37,4 +37,5 @@ SpatRaster that includes a raster layer of genetic diversity and a raster layer 
 }
 \description{
 General function for dist_gd
+TODO: CREATE GENERAL CIRCLE GD AND RESIST GD
 }

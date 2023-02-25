@@ -9,7 +9,7 @@ resist_gd(
   coords,
   lyr,
   maxdist,
-  cond_lyr = NULL,
+  con_lyr = NULL,
   distmat = NULL,
   stat = "pi",
   fact = 0,
@@ -33,11 +33,11 @@ resist_gd(
 
 \item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)}
 
-\item{cond_lyr}{conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, \code{lyr} will be used.}
+\item{con_lyr}{conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, \code{lyr} will be used.}
 
 \item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
 
-\item{stat}{genetic diversity statistic to calculate (see Details defaults to \code{"pi"})}
+\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -47,7 +47,7 @@ resist_gd(
 
 \item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
-\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; equal to rarify_n if rarify = TRUE, otherwise defaults to 2)}
+\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)}
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
