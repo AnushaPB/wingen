@@ -158,8 +158,10 @@ dist_helper <- function(i, lyr, x, distmat, stat_function,
   if (rarify) min_n <- rarify_n
 
   # skip if raster value is NA
-  if (all(is.na(distmat[i,]))) {
-    return(data.frame(gd = NA, ns = NA))
+  # note: need to provide ns to give some output so the cell is counted
+  # don't need to provide gd as this is repaired later
+  if (is.na(lyr[i])) {
+    return(c(sample_count = NA))
   }
 
   # get sample indices in window
