@@ -168,6 +168,10 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # note: list2env adds the new, corrected x and coords back to the environment
   list2env(check_data(x, coords), envir = environment())
 
+  # check that any stats will be calculated
+  counts <- preview_gd(lyr = lyr, coords = coords, wdim = wdim, fact = fact, sample_count = TRUE, min_n = min_n)
+  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
+
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
 
@@ -261,4 +265,76 @@ window_helper <- function(i, lyr, x, coord_cells, nmat, stat_function,
   if (all(is.na(gd))) return(c(sample_count = ns)) else return(c(gd, sample_count = ns))
 
 }
+
+
+#' Rarefaction helper function
+#'
+#' @inheritParams window_general
+#'
+#' @noRd
+#'
+#' @return genetic diversity statistic for a rarified subsample
+#'
+#' @noRd
+rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
+                          fun = mean, L = "nvariants", rarify_alleles = TRUE) {
+
+  # if number of samples is less than rarify_n, assign the value NA
+  if (length(sub) < rarify_n) {
+    gd <- NA
+  }
+
+  # if number of samples is greater than rarify_n, rarify
+  if (length(sub) > rarify_n) {
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  # if the number of samples is equal to rarify_n, calculate stat
+  if (length(sub) == rarify_n) {
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  return(gd)
+}
+
+
+#' Helper function to rarify subsample and calculate genetic diversity
+#'
+#' @inheritParams window_general
+#'
+#' @return rarified genetic diversity statistic
+#'
+#' @noRd
+rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
+                      fun, L = "nvariants", rarify_alleles = TRUE) {
+  # check to make sure sub is greater than rarify_n
+  if (!(length(sub) > rarify_n)) {
+    stop("rarify_n is less than the number of samples provided")
+  }
+
+  # define subsample to rarify
+  if (rarify_nit == "all") {
+    cmb <- utils::combn(sub, rarify_n)
+  } else if (choose(length(sub), rarify_n) < rarify_nit) {
+    # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- utils::combn(sub, rarify_n)
+  } else {
+    # randomly sample subsets of size rarify_nit (transpose so rows are unique combos)
+    # note: replace is set to FALSE so the same individual cannot be drawn multiple times within the same sample
+    # however, individuals can be drawn multiple times across different samples
+    cmb <- replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE)
+  }
+
+  # get all possible combos (rows are unique combos)
+  # for each of the possible combos get gendiv stat
+  cmb_ls <- as.list(data.frame(cmb))
+  gdrar <- purrr::map(cmb_ls, \(sub) sample_gd(x = x, sub = sub, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles))
+
+  # summarize rarefaction results
+  gd <- purrr::list_transpose(gdrar) %>% purrr::map_dbl(fun, na.rm = TRUE)
+
+  return(gd)
+}
+
 
