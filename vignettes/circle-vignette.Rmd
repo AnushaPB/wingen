@@ -1,5 +1,5 @@
 ---
-title: "circle-vignette"
+title: "dist-vignette"
 output: html_document
 date: "2023-01-21"
 ---
@@ -21,18 +21,20 @@ distmat <- get_resdist(mini_coords, cond.r = mini_lyr)
 ```
 
 ```{r}
-cg <- circle_gd(mini_vcf, sf_coords, mini_lyr, radius = 50)
+cg <- dist_gd(mini_vcf, sf_coords, mini_lyr, radius = 50)
 plot_gd(cg)
 
-cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, radius = 250)
+cgr <- dist_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, radius = 250)
 plot_gd(cgr)
 ```
+
 ```{r}
 load_middle_earth_ex()
 ```
 
 ```{r, warnings = FALSE}
-distmat <- get_resdist(lotr_coords, cond.r = aggregate(lotr_lyr, 3))
+lyr <- raster::aggregate(lotr_lyr, 3)
+distmat <- get_resdist(lotr_coords, cond.r = lyr)
 ```
 
 ```{r}
@@ -40,10 +42,12 @@ sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
 
 wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
 
-cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+cg <- dist_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
 
-cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
+cgr <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
                  radius = quantile(distmat, 0.05, na.rm = TRUE), min_n = 1)
+
+
 ```
 
 ```{r, fig.height = 3, fig.width = 12}
@@ -71,7 +75,6 @@ pred <- predict(lotr_lyr, mod)
 plot(pred)
 ```
 
-
 ```{r, warnings = FALSE}
 distmatsdm <- get_resdist(lotr_coords, cond.r = aggregate(pred, 3))
 ```
@@ -81,9 +84,9 @@ sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
 
 wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
 
-cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+cg <- dist_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
 
-cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = distmatsdm, 
+cgr <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmatsdm, 
                  radius = quantile(distmatsdm, 0.05, na.rm = TRUE))
 ```
 
@@ -98,3 +101,13 @@ plot_gd(cg, bkg = lotr_range, main = "Circle")
 plot_gd(cgr, bkg = lotr_range, main = "Resistance")
 
 ```
+
+```{r}
+
+distmat <- get_resdist(lotr_coords, cond.r = lyr, ncores= 25)
+
+cgr_hwe2 <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
+                 radius = quantile(distmat, 0.01, na.rm = TRUE), min_n = 1, stat = "hwe",
+                 parallel = TRUE, ncores = 25)
+```
+
