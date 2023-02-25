@@ -5,6 +5,11 @@ test_that("window_gd returns expected output", {
   capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
   expect_s4_class(wpi, "SpatRaster")
   expect_equal(terra::nlyr(wpi), 2)
+
+  # check against expected values
+  vals <- terra::global(wpi, fun = "mean", na.rm = TRUE)
+  expect_equal(0.2675758, vals["pi",], tolerance = 0.000001)
+  expect_equal(0.87, vals["sample_count",])
 })
 
 test_that("all stats and parallel works", {
@@ -293,8 +298,6 @@ test_that("raref works", {
   expect_equal(raref(allele.counts, min.n = 2), 1.5)
 })
 
-
-
 test_that("countgen works", {
   all_possible_combos <- t(expand.grid(c(0:2, NA), c(0:2, NA)))
   actual <- apply(all_possible_combos, 2, countgen)
@@ -442,4 +445,9 @@ test_that("edge cropping is performed correctly", {
 
   expect_true((dim(mini_lyr)[1] - dim(wg)[1]) / 2 == (wdim[2] - 1) / 2)
   expect_true((dim(mini_lyr)[2] - dim(wg)[2]) / 2 == (wdim[1] - 1) / 2)
+})
+
+test_that("informative error for large min_n", {
+  load_mini_ex(quiet = TRUE)
+  capture_warnings(expect_error(wg <- window_gd(mini_vcf, mini_coords, mini_lyr, min_n = 100)))
 })
