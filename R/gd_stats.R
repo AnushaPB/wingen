@@ -194,9 +194,9 @@ countgen <- function(x) {
 calc_prop_hwe <- function(genind, sig = 0.05){
   hwe <- pegas::hw.test(genind)
   prop <- mean(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
+  names(prop) <- "hwe"
   return(prop)
 }
-
 
 #' Calculate basic stats using \link[hierfstat]{basic.stats}
 #'
