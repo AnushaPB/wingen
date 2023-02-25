@@ -17,6 +17,7 @@ TODO:
 - replace ... with sig?
 - check SpatRaster conversion for window_gd() in main...
 - make resist gd work in non-parallel
+- replace con_lyr with just lyr (why would you provide to diff things, they have to be the same spatial extent)
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -313,9 +314,9 @@ wgd <- window_gd(lotr_vcf,
 
 par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
-plot_gd(wgd, main = "Moving window pi")
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
 # The plot_count function plots the sample count layer
-plot_count(wgd, main = "Moving window sample counts")
+plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts")
 ```
 
 ### Run moving window calculations with `circle_gd()`
@@ -346,7 +347,7 @@ cgd <- circle_gd(lotr_vcf,
 
 par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
-plot_gd(cgd, main = "Circle moving window pi")
+plot_gd(cgd, bkg = lotr_range, main = "Circle moving window pi")
 # The plot_count function plots the sample count layer
 plot_count(cgd, main = "Circle moving window sample counts")
 ```
@@ -356,21 +357,19 @@ plot_count(cgd, main = "Circle moving window sample counts")
 To create a moving window map with a resistance distances use `resist_gd()`. 
 The main additional arguments to `resist_gd()` are:
 
-1.  `maxdist` - maximum geographic distance used to define neighborhood; 
-    any samples further than this distance will not be included (this can
-    be thought of as the neighborhood radius) Similarly to `wdim` We encourage 
+1.  `maxdist` - maximum cost distance used to define neighborhood; any samples 
+    further than this cost distance will not be included (this can be thought of as 
+    the neighborhood radius, but in terms of cost distance). As stated before, we encourage 
     users to experiment with different values of `maxist` to determine the 
-    sensitivity of their results to this parameter and ideally set it with 
-    some knowledge of the study system in mind (e.g., the dispersal patterns 
-    and/or neighborhood size of the study organism). 
+    sensitivity of their results to this parameter. 
     
-2.  `cond_lyr` - conductivity layer used to calculate resistance distances
+2.  `con_lyr` - conductivity layer used to calculate resistance distances
     (higher values should mean greater conductivity). If one is not provided, the raster
     provided for `lyr` will be assumed to be the conductivity layer.
 
 2.  `distmat` - optional distance matrix output from `get_resdist()`
 
-`resist_gd()` takes a longer time to wrong and we recommend taking advantage of parallelization, in particular for the calculation of the distance matrix with `get_resdist()`. We also recommend first calculating the distance matrix with `get_resdist()` and then providing it to `resist_gd()` as this allows for `resist_gd()` to be run quickly multiple times (i.e., to test different parameters) by avoiding repeating the costly distance calculations. 
+`resist_gd()` takes a longer time to wrong and we recommend taking advantage of parallelization, in particular for the calculation of the distance matrix with `get_resdist()`. We also recommend first calculating the distance matrix with `get_resdist()` and then providing it to `resist_gd()` as this allows for `resist_gd()` to be run quickly multiple times (i.e., to test different parameters) by avoiding repeating the costly distance calculations. Note that `con_lyr` and `lyr` must have the same spatial scale (e.g. same resolution and extent).
 
 We don't evaluate this chunk because it would take a while, but we provide the code and resulting plot. 
 
@@ -384,7 +383,7 @@ rgd <- resist_gd(lotr_vcf,
   distmat = distmat,
   con_lyr = lotr_lyr,
   stat = "pi",
-  maxdist = 100,
+  maxdist = 600,
   fact = 5,
   rarify = FALSE,
   L = 100
@@ -392,7 +391,7 @@ rgd <- resist_gd(lotr_vcf,
 
 par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
-plot_gd(rgd, main = "Resistance moving window pi")
+plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
 # The plot_count function plots the sample count layer
 plot_count(rgd, main = "Resistance moving window sample counts")
 ```
