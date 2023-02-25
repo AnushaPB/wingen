@@ -3,13 +3,17 @@
 #'
 #' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
 #'
-#' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @param plot whether to plot results (default = TRUE)
 #' @inheritParams window_gd
+#' @details
 #'
-#' @return SpatRaster of sample counts (if sample_count = TRUE)
+#' Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
+#' Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
+#' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+#'
+#' @return SpatRaster with sample counts layer (if sample_count = TRUE)
 #' @export
 #'
 #' @examples
@@ -54,7 +58,7 @@ preview_window <- function(lyr, nmat, coords = NULL) {
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
-  # suppress annoying and irrelevant plot warnings
+  # suppress irrelevant plot warnings
   suppressWarnings({
     terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
