@@ -6,17 +6,12 @@
 #' @return mean allelic richness of a subsample
 #'
 #' @noRd
-sample_gd <- function(x, sub, stat_function, L = "nvariants", rarify_alleles = TRUE) {
-  if (identical(stat_function, calc_mean_biar)) {
-    gd <- stat_function(x[sub, ], rarify_alleles)
-  } else if (is.null(L) | isFALSE(all.equal(stat_function, calc_pi))) {
-    gd <- stat_function(x[sub, ])
-  } else {
-    gd <- stat_function(x[sub, ], L)
-  }
-
-  return(gd)
+sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
+  if (isTRUE(all.equal(stat_function, calc_mean_biar))) return(stat_function(x[sub, ], rarify_alleles))
+  if (isTRUE(all.equal(stat_function, calc_pi))) return(stat_function(x[sub, ], L))
+  return(stat_function(x[sub, ]))
 }
+
 
 #' Helper function to get adjacent cells to a given cell index
 #'
