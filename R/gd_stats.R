@@ -60,7 +60,7 @@ calc_mean_het <- function(hetmat) {
 #' Wrapper for \link[hierfstat]{pi.dosage} function
 #'
 #' @param dos a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP
-#' @param L length of the sequence (*note:* defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)
+#' @param L length of the sequence (*note:* defaults to NULL which returns the sum over SNPs of nucleotide diversity)
 #'
 #' @return nucleotide diversity (pi)
 #'
