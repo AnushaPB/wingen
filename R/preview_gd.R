@@ -6,15 +6,16 @@
 #' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
 #' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
+#' @param plot whether to plot results (default = TRUE)
 #' @inheritParams window_gd
 #'
-#' @return RasterStack with example window layer and sample counts (if sample_count = TRUE)
+#' @return SpatRaster of sample counts (if sample_count = TRUE)
 #' @export
 #'
 #' @examples
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
-preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0) {
+preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE) {
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
@@ -23,11 +24,11 @@ preview_gd <- function(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n =
   nmat <- wdim_to_mat(wdim)
 
   # plot window preview
-  preview_window(lyr, nmat, coords)
+  if (plot) preview_window(lyr, nmat, coords)
 
   # plot count preview and return count raster
   if (sample_count) {
-    lyrc <- preview_count(lyr, coords, nmat, min_n)
+    lyrc <- preview_count(lyr, coords, nmat, min_n, plot)
     return(lyrc)
   }
 }
@@ -64,6 +65,7 @@ preview_window <- function(lyr, nmat, coords = NULL) {
       if (inherits(coords, "sf") | inherits(coords, "SpatVector")) terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
     }
   })
+
 }
 
 #' Get center cell of a raster
@@ -83,9 +85,10 @@ get_center <- function(x) {
 #' @param lyr RasterLayer
 #' @param coords coordinates
 #' @param nmat neighborhood matrix
+#' @param plot whether to plot resuls
 #'
 #' @noRd
-preview_count <- function(lyr, coords, nmat, min_n) {
+preview_count <- function(lyr, coords, nmat, min_n, plot = TRUE) {
   # get coord cells
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
@@ -105,8 +108,10 @@ preview_count <- function(lyr, coords, nmat, min_n) {
   names(lyrc) <- "sample_count"
 
   # plot results
-  suppressWarnings(terra::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE))
-  graphics::title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
+  if (plot) {
+    suppressWarnings(terra::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE))
+    graphics::title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
+  }
 
   return(lyrc)
 }
