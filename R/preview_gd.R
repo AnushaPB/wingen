@@ -57,7 +57,7 @@ preview_window <- function(lyr, nmat, coords = NULL) {
   lyrw[adjci] <- 1
   lyrw[center] <- 2
 
-  # suppress annoying and irrelevant plot warnings
+  # suppress irrelevant plot warnings
   suppressWarnings({
     terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
