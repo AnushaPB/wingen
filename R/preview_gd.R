@@ -12,7 +12,7 @@
 #' Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
 #' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
-#' @return RasterStack with example window layer and sample counts (if sample_count = TRUE)
+#' @return SpatRaster with sample counts layer (if sample_count = TRUE)
 #' @export
 #'
 #' @examples
