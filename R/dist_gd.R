@@ -6,7 +6,7 @@
 #' @noRd
 dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                    fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                    fun = mean, L = NULL, rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
 
 
@@ -48,7 +48,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
 #' @noRd
 dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                           rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
-                          fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                          fun = mean, L = NULL, rarify_alleles = TRUE,
                           parallel = FALSE, ncores = NULL, crop_edges = FALSE){
 
   # check that the input file is a vcfR or a path to a vcf object
@@ -95,7 +95,7 @@ dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
 #' @export
 dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                         fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                         fun = mean, L = NULL, rarify_alleles = TRUE,
                          parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
 
   # Modify dist matrix
@@ -118,9 +118,10 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
     # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
     lyr <- raster::raster(lyr)
 
-    rast_vals <- furrr::future_map(1:terra::ncell(lyr), dist_helper,
+    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
                                    lyr = lyr, x = x, distmat = distmat,
-                                   stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                                   stat_function = stat_function,
+                                   rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                                    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
                                    .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
@@ -129,9 +130,10 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
     lyr <- terra::rast(lyr)
   } else {
 
-    rast_vals <- purrr::map(1:terra::ncell(lyr), dist_helper,
+    rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
                             lyr = lyr, x = x, distmat = distmat,
-                            stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                            stat_function = stat_function,
+                            rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                             min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
@@ -145,53 +147,4 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
   return(result)
 }
 
-#' Helper function for window calculations
-#'
-#' @param i cell index
-#' @param lyr SpatRaster
-#' @param x genetic data
-#' @param distmat distance matrix
-#'
-#' @inheritParams dist_general
-#'
-#' @return genetic diversity and counts for a single cell
-#'
-#' @noRd
-dist_helper <- function(i, lyr, x, distmat, stat_function,
-                        rarify, rarify_n, rarify_nit, min_n,
-                        fun, L = "nvariants", rarify_alleles = TRUE){
-
-  # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
-  if (rarify) min_n <- rarify_n
-
-  # skip if raster value is NA
-  # note: need to provide ns to give some output so the cell is counted
-  # don't need to provide gd as this is repaired later
-  if (is.na(lyr[i])) {
-    return(c(sample_count = NA))
-  }
-
-  # get sample indices in window
-  sub <- get_coord_index(i, distmat)
-
-  # if there are too few samples in that window assign the cell value NA
-  if (length(sub) < min_n) {
-    gd <- NA
-  } else if (rarify) {
-    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat_function, fun, L = L, rarify_alleles = rarify_alleles)
-  } else {
-    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
-  }
-
-  # count the number of samples in the window
-  ns <- length(sub)
-
-  # if gd has no name give call it custom
-  if (is.null(names(gd))) names(gd) <- "custom"
-
-  # return vector
-  if (all(is.na(gd))) return(c(sample_count = ns)) else return(c(gd, sample_count = ns))
-}
-
-
-get_coord_index <- function(i, distmat) which(!is.na(distmat[i,]))
+get_dist_index <- function(i, distmat) which(!is.na(distmat[i,]))
