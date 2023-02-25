@@ -9,19 +9,15 @@ test_that("window_gd returns expected output", {
 
 test_that("all stats and parallel works", {
   load_mini_ex(quiet = TRUE)
-  capture_warnings(wp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
-  capture_warnings(wh <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
-  capture_warnings(wb <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = FALSE))
-  capture_warnings(wbr <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = TRUE))
-  capture_warnings(wa <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
+
+  stat <- c("pi", "Ho", "biallelic_richness", "allelic_richness", "basic_stats", "hwe")
+
+  capture_warnings(wg <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE))
 
   # check parallel
-  capture_warnings(wpp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "pi", rarify = FALSE, parallel = TRUE, ncores = 2))
-  capture_warnings(whp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE, parallel = TRUE, ncores = 2))
-  capture_warnings(wbp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
-  capture_warnings(wap <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
+  capture_warnings(wgp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE, parallel = TRUE, ncores = 2))
 
-  expect_true(terra::all.equal(wpp, wp))
+  expect_true(terra::all.equal(wg, wgp))
 })
 
 test_that("rarifaction works for all options", {
@@ -124,7 +120,7 @@ test_that("biallelic richness is calculated correctly for all possible combos (i
 
   ar_vals <- apply(all_possible_combos, 2, helper_calc_biar, rarify_alleles = FALSE)
   expect_equal(ar_vals, expected)
-  expect_equal(calc_mean_biar(all_possible_combos, rarify_alleles = FALSE), mean(expected, na.rm = TRUE))
+  expect_true(calc_mean_biar(all_possible_combos, rarify_alleles = FALSE) == mean(expected, na.rm = TRUE))
 
   expect_error(calc_mean_biar(matrix(c(0:4), nrow = 1)), "to calculate biallelic richness, all values in genetic matrix must be NA, 0, 1 or 2")
 

@@ -18,7 +18,8 @@ plot_count(
 \arguments{
 \item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
 
-\item{index}{if a raster stack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
+\item{index}{if a raster stack is provided, index of the sample count layer to plot
+(assumes this is a stacked output from window_gd and defaults to plotting the last layer (which should be sample counts))}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 

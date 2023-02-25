@@ -26,11 +26,11 @@ window_gd(
 \arguments{
 \item{gen}{genetic data either as an object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
 
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
+\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across. Should be in a Euclidean system (i.e., not longitude latitude) or the window cell height and width will not be equal (see details).}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{stat}{genetic diversity statistic to calculate (can either be \code{"pi"} for nucleotide diversity (default), \code{"Ho"} for average observed heterozygosity across all sites, \code{"allelic_richness"} for average number of alleles across all sites, or \code{"biallelic_richness"} to get average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"}))}
+\item{stat}{genetic diversity statistic to calculate (see Details defaults to \code{"pi"})}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
@@ -57,15 +57,27 @@ window_gd(
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 }
 \value{
-SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
+SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
 Generate a continuous raster map of genetic diversity using moving windows
 }
 \details{
-Coordinates and rasters should be in a coordinate system such that cell width and height are equal distances (e.g., UTM, equal area).
-As such, longitude-latitude systems should be transformed before using window_gd.
+Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
+Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
 Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+
+Current genetic diversity metrics that can be specified with \code{stat} include:
+\itemize{
+\item \code{"pi"} for nucleotide diversity (default) calculated using \code{hierfstat} \link[hierfstat]{pi.dosage}
+\item \code{"Ho"} for average observed heterozygosity across all sites,
+\item \code{"allelic_richness"} for average number of alleles across all sites
+\item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
+\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using\code{pegas} \link[pegas]{hw.test} at the 0.05 level
+\item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
+mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
+}
 }
 \examples{
 

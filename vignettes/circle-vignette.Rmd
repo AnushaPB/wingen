@@ -1,0 +1,100 @@
+---
+title: "circle-vignette"
+output: html_document
+date: "2023-01-21"
+---
+```{r}
+library(terra)
+library(sf)
+library(wingen)
+library(raster)
+```
+
+
+```{r}
+load_mini_ex()
+sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
+```
+
+```{r}
+distmat <- get_resdist(mini_coords, cond.r = mini_lyr)
+```
+
+```{r}
+cg <- circle_gd(mini_vcf, sf_coords, mini_lyr, radius = 50)
+plot_gd(cg)
+
+cgr <- circle_gd(mini_vcf, sf_coords, mini_lyr, distmat = distmat, radius = 250)
+plot_gd(cgr)
+```
+```{r}
+load_middle_earth_ex()
+```
+
+```{r, warnings = FALSE}
+distmat <- get_resdist(lotr_coords, cond.r = aggregate(lotr_lyr, 3))
+```
+
+```{r}
+sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+
+wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
+
+cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+
+cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
+                 radius = quantile(distmat, 0.05, na.rm = TRUE), min_n = 1)
+```
+
+```{r, fig.height = 3, fig.width = 12}
+
+par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+
+plot_gd(raster(trSurface))
+plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
+
+plot_gd(wg, bkg = lotr_range, main = "Rectangle")
+plot_gd(cg, bkg = lotr_range, main = "Circle")
+plot_gd(cgr, bkg = lotr_range, main = "Resistance")
+
+```
+
+```{r}
+library(randomForest)
+
+abs <- data.frame(layer = sampleRandom(lotr_lyr, 100), pa = 0)
+pres <- data.frame(layer = raster::extract(lotr_lyr, lotr_coords), pa = 1)
+df <- rbind(pres, abs)
+
+mod <- randomForest(pa ~ layer, df, mtry = 1)
+pred <- predict(lotr_lyr, mod)
+plot(pred)
+```
+
+
+```{r, warnings = FALSE}
+distmatsdm <- get_resdist(lotr_coords, cond.r = aggregate(pred, 3))
+```
+
+```{r}
+sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+
+wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
+
+cg <- circle_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
+
+cgr <- circle_gd(lotr_vcf, sf_coords, lyr, distmat = distmatsdm, 
+                 radius = quantile(distmatsdm, 0.05, na.rm = TRUE))
+```
+
+```{r, fig.height = 3, fig.width = 12}
+par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+
+plot_gd((raster(trSurface)))
+plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
+
+plot_gd(wg, bkg = lotr_range, main = "Rectangle")
+plot_gd(cg, bkg = lotr_range, main = "Circle")
+plot_gd(cgr, bkg = lotr_range, main = "Resistance")
+
+```
