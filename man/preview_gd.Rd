@@ -4,7 +4,15 @@
 \alias{preview_gd}
 \title{Preview moving window and sample counts}
 \usage{
-preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
+preview_gd(
+  lyr,
+  coords,
+  wdim,
+  fact = 0,
+  sample_count = TRUE,
+  min_n = 0,
+  plot = TRUE
+)
 }
 \arguments{
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
@@ -18,6 +26,8 @@ preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
 \item{sample_count}{whether to create plot of sample counts for each cell (defaults to TRUE)}
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
+
+\item{plot}{whether to plot results (default = TRUE)}
 }
 \value{
 SpatRaster with sample counts layer (if sample_count = TRUE)
