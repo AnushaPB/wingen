@@ -1,7 +1,121 @@
+#' Helper function for window calculations
+#'
+#' Provide nmat for `window_gd()` and distmat for `circle_gd()`/`resist_gd()`/`dist_gd()`
+#' @return genetic diversity and counts for a single cell
+#'
+#' @noRd
+window_helper <- function(i, x, lyr, coord_cells, nmat = NULL, distmat = NULL, stat_function,
+                          rarify, rarify_n, rarify_nit, min_n,
+                          fun, L = NULL, rarify_alleles = TRUE) {
 
-#' Helper function to calculate genetic diversity of a sample
+  # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
+  if (is.null(rarify_n)) rarify_n <- min_n
+
+  # skip if raster value is NA
+  # note: need to provide ns to give some output so the cell is counted
+  # don't need to provide gd as this is repaired later
+  if (is.na(lyr[i])) {
+    return(c(sample_count = NA))
+  }
+
+  # get sample indices in neighborhood rectangle if nmat is provided (window_gd)
+  if (!is.null(nmat)) sub <- get_adj(i, lyr, nmat, coord_cells)
+
+  # get sample indices based on distance (circle_gd/resist_gd/dist_gd)
+  if (!is.null(distmat)) sub <- get_dist_index(i, distmat)
+
+  # if there are too few samples in that window assign the cell value NA
+  if (length(sub) < min_n) {
+    gd <- NA
+  } else if (rarify) {
+    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat_function, fun, L = L, rarify_alleles = rarify_alleles)
+  } else {
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  # count the number of samples in the window
+  ns <- length(sub)
+
+  # if gd has no name give call it custom
+  if (is.null(names(gd))) names(gd) <- "custom"
+
+  # return vector
+  if (all(is.na(gd))) return(c(sample_count = ns)) else return(c(gd, sample_count = ns))
+
+}
+
+#' Rarefaction helper function
 #'
 #' @inheritParams window_general
+#'
+#' @noRd
+#'
+#' @return genetic diversity statistic for a rarified subsample
+#'
+#' @noRd
+rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
+                          fun = mean, L = "nvariants", rarify_alleles = TRUE) {
+
+  # if number of samples is less than rarify_n, assign the value NA
+  if (length(sub) < rarify_n) {
+    gd <- NA
+  }
+
+  # if number of samples is greater than rarify_n, rarify
+  if (length(sub) > rarify_n) {
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  # if the number of samples is equal to rarify_n, calculate stat
+  if (length(sub) == rarify_n) {
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  return(gd)
+}
+
+
+#' Helper function to rarify subsample and calculate genetic diversity
+#'
+#' @inheritParams window_general
+#'
+#' @return rarified genetic diversity statistic
+#'
+#' @noRd
+rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
+                      fun, L = "nvariants", rarify_alleles = TRUE) {
+  # check to make sure sub is greater than rarify_n
+  if (!(length(sub) > rarify_n)) {
+    stop("rarify_n is less than the number of samples provided")
+  }
+
+  # define subsample to rarify
+  if (rarify_nit == "all") {
+    cmb <- utils::combn(sub, rarify_n)
+  } else if (choose(length(sub), rarify_n) < rarify_nit) {
+    # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- utils::combn(sub, rarify_n)
+  } else {
+    # randomly sample subsets of size rarify_nit (transpose so rows are unique combos)
+    # note: replace is set to FALSE so the same individual cannot be drawn multiple times within the same sample
+    # however, individuals can be drawn multiple times across different samples
+    cmb <- replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE)
+  }
+
+  # get all possible combos (rows are unique combos)
+  # for each of the possible combos get gendiv stat
+  cmb_ls <- as.list(data.frame(cmb))
+  gdrar <- purrr::map(cmb_ls, \(sub) sample_gd(x = x, sub = sub, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles))
+
+  # summarize rarefaction results
+  gd <- purrr::list_transpose(gdrar) %>% purrr::map_dbl(fun, na.rm = TRUE)
+
+  return(gd)
+}
+
+
+#' Helper function to calculate genetic diversity of a sample
 #'
 #' @return mean allelic richness of a subsample
 #'
