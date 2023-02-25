@@ -98,7 +98,6 @@ get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress =
   return(distmat)
 }
 
-
 run_gdist <- function(x, y, trSurface, lyr_coords, coords_df){
   # Make spatial points
   # TODO: Figure out if CRS is needed here
