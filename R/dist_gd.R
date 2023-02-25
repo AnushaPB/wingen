@@ -38,7 +38,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
   # remove any duplicated sample count layers
   r <- rm_duplicate_sample_count(r)
 
-  return(result)
+  return(r)
 }
 
 
@@ -152,7 +152,7 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
 #' @noRd
 dist_helper <- function(i, lyr, x, distmat, stat_function,
                         rarify, rarify_n, rarify_nit, min_n,
-                        fun, L = NULL, rarify_alleles = TRUE){
+                        fun, L = "nvariants", rarify_alleles = TRUE){
 
   # if rarify = TRUE, min_n = rarify_n (i.e. minimum defaults to rarify_n)
   if (rarify) min_n <- rarify_n
