@@ -24,11 +24,17 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL){
 
+  # convert lyr to SpatRaster
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
+
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
+  # make aggregated raster
+  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
+
   # make distmat
-  if (!is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
@@ -38,7 +44,6 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
             maxdist = maxdist,
             distmat = distmat,
             stat = stat,
-            fact = fact,
             rarify = rarify,
             rarify_n = rarify_n,
             rarify_nit = rarify_nit,
