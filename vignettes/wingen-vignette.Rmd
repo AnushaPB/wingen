@@ -14,6 +14,9 @@ TODO:
 - preview_gd() update for circle_gd()
 - fix error if min_n is set too high to make it more informative
 - Think through min_n behavior (right now rarify_n defaults to min_n, and min_n defaults to 2, but what if a user sets rarify_n = 1? then they also need to set min_n = 1 for it to work...which is why originally I had min_n default to rarify_n if rarify_n was provided...ugh need to discuss with EAC and IJW). SHould min_n default be 1? or maybe you should get a warning if min_n is greater than rarify_n?
+- replace ... with sig?
+- check SpatRaster conversion for window_gd() in main...
+- make resist gd work in non-parallel
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -237,6 +240,7 @@ lyr_eq <- project(lyr_longlat, "+proj=goode")
 
 ### Run moving window calculations with `window_gd()`
 
+To create a moving window map with a rectangular window use `window_gd()`. 
 The main additional arguments to `window_gd()` are:
 
 1.  `wdim` - Used to create the neighborhood matrix for the moving
@@ -314,7 +318,84 @@ plot_gd(wgd, main = "Moving window pi")
 plot_count(wgd, main = "Moving window sample counts")
 ```
 
+### Run moving window calculations with `circle_gd()`
 
+To create a moving window map with a circular window use `circle_gd()`. 
+The main additional arguments to `circle_gd()` are:
+
+1.  `maxdist` - maximum geographic distance used to define neighborhood; 
+    any samples further than this distance will not be included (this can
+    be thought of as the neighborhood radius) Similarly to `wdim` We encourage 
+    users to experiment with different values of `maxist` to determine the 
+    sensitivity of their results to this parameter and ideally set it with 
+    some knowledge of the study system in mind (e.g., the dispersal patterns 
+    and/or neighborhood size of the study organism). 
+
+2.  `distmat` - optional distance matrix output from `get_geodist()`
+
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+cgd <- circle_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  maxdist = 10,
+  fact = 3,
+  rarify = FALSE,
+  L = 100
+)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(cgd, main = "Circle moving window pi")
+# The plot_count function plots the sample count layer
+plot_count(cgd, main = "Circle moving window sample counts")
+```
+
+### Run moving window calculations with `resist_gd()`
+
+To create a moving window map with a resistance distances use `resist_gd()`. 
+The main additional arguments to `resist_gd()` are:
+
+1.  `maxdist` - maximum geographic distance used to define neighborhood; 
+    any samples further than this distance will not be included (this can
+    be thought of as the neighborhood radius) Similarly to `wdim` We encourage 
+    users to experiment with different values of `maxist` to determine the 
+    sensitivity of their results to this parameter and ideally set it with 
+    some knowledge of the study system in mind (e.g., the dispersal patterns 
+    and/or neighborhood size of the study organism). 
+    
+2.  `cond_lyr` - conductivity layer used to calculate resistance distances
+    (higher values should mean greater conductivity). If one is not provided, the raster
+    provided for `lyr` will be assumed to be the conductivity layer.
+
+2.  `distmat` - optional distance matrix output from `get_resdist()`
+
+`resist_gd()` takes a longer time to wrong and we recommend taking advantage of parallelization, in particular for the calculation of the distance matrix with `get_resdist()`. We also recommend first calculating the distance matrix with `get_resdist()` and then providing it to `resist_gd()` as this allows for `resist_gd()` to be run quickly multiple times (i.e., to test different parameters) by avoiding repeating the costly distance calculations. 
+
+We don't evaluate this chunk because it would take a while, but we provide the code and resulting plot. 
+
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+
+distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), ncores = 3)
+
+rgd <- resist_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  distmat = distmat,
+  con_lyr = lotr_lyr,
+  stat = "pi",
+  maxdist = 100,
+  fact = 5,
+  rarify = FALSE,
+  L = 100
+)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(rgd, main = "Resistance moving window pi")
+# The plot_count function plots the sample count layer
+plot_count(rgd, main = "Resistance moving window sample counts")
+```
 ## Transforming the moving window maps
 
 ### Krige results
@@ -530,11 +611,10 @@ Current genetic diversity metrics that can be specified with `stat` include:
  Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
 
 ```{r, cache = TRUE, warning = FALSE}
-# this may take a little while to run
 multistat_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  stat = c("basic_stats"),
+  stat = c("pi", "Ho", "biallelic_richness"),
   wdim = 7,
   fact = 3,
   rarify = FALSE,
@@ -544,7 +624,42 @@ multistat_wgd <- window_gd(lotr_vcf,
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s")
-plot_gd(pi_wgd, bkg = lotr_range)
+plot_gd(multistat_wgd, index = 1:3, bkg = lotr_range)
+```
+`"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we change some parameters and reduce dataset for the purpose of the example: 
+
+```{r}
+
+hwe_wgd <- window_gd(lotr_vcf[1:10,],
+  lotr_coords,
+  lotr_lyr,
+  stat = c("hwe"),
+  wdim = 3,
+  fact = 5,
+  rarify = FALSE,
+  L = 100,
+  sig = 0.10
+)
+
+bs_wgd <- window_gd(lotr_vcf[1:10,],
+  lotr_coords,
+  lotr_lyr,
+  stat = c("basic_stats"),
+  wdim = 3,
+  fact = 5,
+  rarify = FALSE,
+  L = 100
+)
+
+```
+```{r, fig.width = 5, fig.height = 5, warning = FALSE}
+par(pty = "s")
+plot_gd(hwe_wgd, bkg = lotr_range)
+```
+
+```{r, fig.width = 5, fig.height = 5, warning = FALSE}
+par(pty = "s")
+plot_gd(bs_wgd, index = 1:10, bkg = lotr_range)
 ```
 
 # General moving window
