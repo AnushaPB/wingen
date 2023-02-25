@@ -20,6 +20,7 @@
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
+#' @param ... additional arguments to pass to the `stat` function (e.g. if `stat = hwe`, users may want to set `sig` to a different value)
 #' @details
 #'
 #' Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
@@ -49,7 +50,10 @@
 window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
+                      parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+
+  # convert lyr to SpatRaster
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   # run moving window
   result <-
@@ -70,7 +74,8 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                 rarify_alleles = rarify_alleles,
                 parallel = parallel,
                 ncores = ncores,
-                crop_edges = crop_edges
+                crop_edges = crop_edges,
+                ...
               ))
 
   # convert to raster stack
@@ -87,7 +92,7 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                             rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                             fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                            parallel = FALSE, ncores = NULL, crop_edges = FALSE){
+                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...){
 
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
@@ -115,7 +120,8 @@ window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                  rarify_alleles = rarify_alleles,
                  parallel = parallel,
                  ncores = ncores,
-                 crop_edges = crop_edges
+                 crop_edges = crop_edges,
+                 ...
                )
 
   return(results)
