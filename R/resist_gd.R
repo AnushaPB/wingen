@@ -5,6 +5,7 @@
 #' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)
 #' @param cond_lyr conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, `lyr` will be used.
 #' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
+#' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 #' As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
@@ -18,7 +19,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-resist_gd <- function(vcf, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
+resist_gd <- function(gen, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
                    rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                    fun = mean, L = "nvariants", rarify_alleles = TRUE,
                    parallel = FALSE, ncores = NULL){
@@ -32,7 +33,7 @@ resist_gd <- function(vcf, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL
 
   # run dist_gd
   results <-
-    dist_gd(vcf = vcf,
+    dist_gd(gen = gen,
             coords = coords,
             lyr = lyr,
             maxdist = maxdist,

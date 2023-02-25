@@ -5,6 +5,7 @@
 #'
 #' @param maxdist maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius)
 #' @param distmat distance matrix output from \link[wingen]{get_geodist} (optional; can be used to save time on distance calculations)
+#' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 #' As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
@@ -18,7 +19,7 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-circle_gd <- function(vcf, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
+circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL){
@@ -27,11 +28,11 @@ circle_gd <- function(vcf, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
   # make distmat
-  if(!is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
+  if (!is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
-    dist_gd(vcf = vcf,
+    dist_gd(gen = gen,
             coords = coords,
             lyr = lyr,
             maxdist = maxdist,

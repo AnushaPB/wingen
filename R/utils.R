@@ -1,0 +1,340 @@
+
+#' Rarefaction helper function
+#'
+#' @inheritParams window_general
+#'
+#' @noRd
+#'
+#' @return genetic diversity statistic for a rarified subsample
+#'
+#' @noRd
+rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
+                          fun = mean, L = NULL, rarify_alleles = TRUE) {
+
+  # if number of samples is less than rarify_n, assign the value NA
+  if (length(sub) < rarify_n) {
+    gd <- NA
+  }
+
+  # if number of samples is greater than rarify_n, rarify
+  if (length(sub) > rarify_n) {
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  # if the number of samples is equal to rarify_n, calculate stat
+  if (length(sub) == rarify_n) {
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+  }
+
+  return(gd)
+}
+
+
+#' Helper function to rarify subsample and calculate genetic diversity
+#'
+#' @inheritParams window_general
+#'
+#' @return rarified genetic diversity statistic
+#'
+#' @noRd
+rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
+                      fun, L = NULL, rarify_alleles = TRUE) {
+  # check to make sure sub is greater than rarify_n
+  if (!(length(sub) > rarify_n)) {
+    stop("rarify_n is less than the number of samples provided")
+  }
+
+  # define subsample to rarify
+  if (rarify_nit == "all") {
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- t(utils::combn(sub, rarify_n))
+  } else if (choose(length(sub), rarify_n) < rarify_nit) {
+    # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
+    # get all possible combos (transpose so rows are unique combos)
+    cmb <- t(utils::combn(sub, rarify_n))
+  } else {
+    # randomly sample subsets of size rarify_nit (transpose so rows are unique combos)
+    # note: replace is set to FALSE so the same individual cannot be drawn multiple times within the same sample
+    # however, individuals can be drawn multiple times across different samples
+    cmb <- t(replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE))
+  }
+
+  # for each of the possible combos get gendiv stat
+  gdrar <- apply(cmb, 1, sample_gd, x = x, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles)
+
+  # summarize rarefaction results
+  if (is.null(dim(gdrar))) gd <- fun(gdrar, na.rm = TRUE) else gd <- apply(gdrar, 1, fun, na.rm = TRUE)
+
+  return(gd)
+}
+
+
+#' Helper function to calculate genetic diversity of a sample
+#'
+#' @inheritParams window_general
+#'
+#' @return mean allelic richness of a subsample
+#'
+#' @noRd
+sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
+  if (identical(stat_function, calc_mean_biar)) {
+    gd <- stat_function(x[sub, ], rarify_alleles)
+  } else if (is.null(L) | !identical(stat_function, calc_pi)) {
+    gd <- stat_function(x[sub, ])
+  } else {
+    gd <- stat_function(x[sub, ], L)
+  }
+  return(gd)
+}
+
+#' Helper function to get adjacent cells to a given cell index
+#'
+#' @param i cell index
+#' @param r SpatRast
+#' @param n neighborhood matrix
+#' @param coord_cells cell numbers of coordinates
+#'
+#' @return indices of coordinates that are adjacent to the given cell
+#'
+#' @noRd
+get_adj <- function(i, r, n, coord_cells) {
+  # get adjacent cells to cell i
+  adjc <- terra::adjacent(r, i, directions = n, include = TRUE)
+
+  # get indices of adjacent cells
+  adjci <- purrr::map_dbl(adjc, 1, ~ seq(.x[1], .x[2]))
+
+  # remove NA values from indices
+  ## note: if NA values are not removed, coord_cells with NA values will be included
+  adjci_nona <- adjci[!is.na(adjci)]
+
+  # get vector of indices of coords in that set of cells
+  sub <- which(coord_cells %in% adjci_nona)
+
+  return(sub)
+}
+
+#' Check coordinate and genetic data
+#'
+#' Check that the number of individuals in each data set align
+#'
+#' @param x moving window data
+#' @param coords coordinates
+#'
+#' @noRd
+#'
+check_data <- function(x, coords = NULL) {
+  # if x is a vector, convert to a dataframe
+  if (is.vector(x)) x <- data.frame(x)
+
+  # check and format coords
+  if (!is.null(coords)) {
+    if (nrow(coords) == 1) stop("cannot run window_gd with only one individual")
+  }
+
+  # check number of samples
+  if (inherits(x, "genind")) nind <- nrow(x$tab)
+
+  if (inherits(x, "vcfR")) nind <- (ncol(x@gt) - 1)
+
+  if (inherits(x, "data.frame") | inherits(x, "matrix")) nind <- nrow(x)
+
+  # check coords
+  if (!is.null(coords)) {
+    if (nind != nrow(coords)) {
+      stop("number of samples in coords data and number of samples in gen data are not equal")
+    }
+  }
+
+  # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
+  if (inherits(x, "vcfR")) {
+    return(check_vcf_NA(x, coords))
+  } else {
+    return(list(x = x, coords = coords))
+  }
+}
+
+#' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
+#'
+#' @param vcf vcfR
+#' @param coords coordinates
+#'
+#' @noRd
+check_vcf_NA <- function(vcf, coords = NULL) {
+  # check for mismatch before indexing
+  if (!is.null(coords)) {
+    if ((ncol(vcf@gt) - 1) != nrow(coords)) {
+      stop("number of samples in coords data and number of samples in vcf are not equal")
+    }
+  }
+
+  if (nrow(vcf@fix) == 1) {
+    NA_col <- get_allNA(vcf@gt[-1])
+    NA_row <- FALSE
+  } else {
+    NA_col <- get_allNA(vcf@gt[, -1], MARGIN = 2)
+    NA_row <- get_allNA(vcf@gt[, -1], MARGIN = 1)
+  }
+
+  if (any(NA_row)) {
+    warning("Markers with no scored alleles have been removed")
+    vcf <- vcf[!NA_row, ]
+  }
+
+  if (any(NA_col)) {
+    warning("Individuals with no scored loci have been removed")
+    vcf <- vcf[, c(TRUE, !NA_col)]
+  }
+
+  # check for invariant sites
+  if (any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
+
+  # make results
+  if (is.null(coords)) {
+    result <- vcf
+  } else {
+    coords <- coords[!NA_col, ]
+    result <- list(vcf = vcf, coords = coords)
+  }
+
+  return(result)
+}
+
+#' Helper function to get NA values
+#'
+#' @inheritParams base::array
+#'
+#' @noRd
+get_allNA <- function(x, MARGIN = NULL) {
+  if (is.null(dim(x))) allNA <- is.na(x)
+  if (!is.null(dim(x))) {
+    allNA <- apply(x, MARGIN, function(x) {
+      all(is.na(x))
+    })
+  }
+  return(allNA)
+}
+
+#' Convert vcf to correct format based on stat
+#'
+#' @param vcf vcfR
+#' @param stat genetic diversity statistic
+#'
+#' @noRd
+convert_vcf <- function(vcf, stat) {
+  if (stat == "allelic_richness" | stat == "hwe") {
+    return(vcfR::vcfR2genind(vcf))
+  }
+
+  if (stat == "Ho") {
+    return(vcf_to_het(vcf))
+  }
+
+  if (stat == "pi" | stat == "biallelic_richness") {
+    return(vcf_to_dosage(vcf))
+  }
+
+  if (stat == "basic_stats") {
+    return(hierfstat::genind2hierfstat(vcfR::vcfR2genind(vcf), pop = 1))
+  }
+
+  stop(paste0(stat, " is an invalid arugment for stat"))
+}
+
+
+#' Helper function to check lyr and coords
+#'
+#' @param lyr RasterLayer or SpatRaster
+#' @param coords sf points, data frame, or matrix representing coordinates
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+layer_coords_check <- function(lyr, coords) {
+  # check coords and lyr
+  crs_check_window(lyr, coords)
+
+  # convert to terra
+  if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
+
+  # check number of layers
+  nlayers <- terra::nlyr(lyr)
+  if (nlayers > 1) {
+    warning(paste0(nlayers, " provided, but only one is need. Defaults to using the first layer."))
+    lyr <- lyr[[1]]
+  }
+
+  return(lyr)
+}
+
+#' Convert values into new raster layers
+#'
+#' @param lyr SpatRaster
+#' @param rast_vals dataframe of gd and ns
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+vals_to_lyr <- function(lyr, rast_vals, stat) {
+  # bind rows to get vector per layer
+  # note: an important repair will happen here to fill in NAs where there are no genetic diversity values
+  df <- rast_vals %>% dplyr::bind_rows() %>% dplyr::relocate(sample_count, .after = last_col())
+
+  # assign vector values to rasters
+  rast_list <- purrr::map(df, ~terra::setValues(lyr, .x))
+
+  # convert from list to raster stack
+  rast_stack <- terra::rast(rast_list)
+
+  return(rast_stack)
+}
+
+
+#' Crop edge off raster
+#'
+#' @param x SpatRaster
+#' @param wdim window dimensions
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+edge_crop <- function(x, wdim) {
+  if (length(wdim) == 1) wdim <- c(wdim, wdim)
+
+  # get extent
+  x_ext <- terra::ext(x)
+
+  # calculate x edge buffer
+  x_edge_size <- terra::res(x)[1] * ((wdim[1] - 1) / 2)
+  xmin <- x_ext$xmin + x_edge_size
+  xmax <- x_ext$xmax - x_edge_size
+
+  # calculate y edge buffer
+  y_edge_size <- terra::res(x)[2] * ((wdim[2] - 1) / 2)
+  ymin <- x_ext$ymin + y_edge_size
+  ymax <- x_ext$ymax - y_edge_size
+
+  # crop raster
+  x_crop <- terra::crop(x, terra::ext(xmin, xmax, ymin, ymax))
+
+  return(x_crop)
+}
+
+#' Remove duplicate sample count layers
+#'
+#' @param r SpatRaster
+#'
+#' @return SpatRaster
+#'
+#' @noRd
+rm_duplicate_sample_count <- function(r){
+  # subset one sample_count layer
+  sample_count <- r[[which(names(r) == "sample_count")]][[1]]
+
+  # subset genetic diversity layers
+  gd <- r[[which(names(r) != "sample_count")]]
+
+  # recombine
+  r <- c(gd, sample_count)
+  return(r)
+}

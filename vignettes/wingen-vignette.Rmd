@@ -9,6 +9,10 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+TODO: 
+- crop edges update for resist_gd() and circle_gd()?
+- preview_gd() update for circle_gd()
+- fix error if min_n is set too high to make it more informative
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -98,16 +102,24 @@ ex_raster4 <- coords_to_raster(lotr_coords, buffer = 1, res = 10, plot = TRUE)
 
 The workflow of wingen uses three main functions:
 
-1.  `window_gd()` to generate moving window maps of genetic diversity
+1.  `window_gd()`, `circle_gd()`, or `resist_gd()` to generate moving window maps of genetic diversity
 
 2.  `krig_gd()` to use kriging to interpolate the moving window maps
 
 3.  `mask_gd()` to mask areas of the maps from (1) and (2) (e.g., to
     exclude areas outside the study region)
 
-### Run moving window calculations
+## Different moving window calculations
 
-The main arguments to `window_gd()` are:
+There are three functions that can be used to generate moving window maps:
+
+1. `window_gd()` uses a simple rectangular window with user-specified dimensions (the original method described in Bishop et al.)
+
+2. `circle_gd()` uses a circular window with a user-specified radius
+
+3. `resist_gd()` uses a resistance distance-based window with a user-specified max distance (this can be thought of as a circular window with a varying radius depending on the resistance of the landscape around it)
+
+The main arguments that all three functions have in common are: 
 
 1.  `gen` - An object of type vcfR or a path to a vcf file with genotype
     data. The order of this file matters! The coordinate and genetic
@@ -151,19 +163,7 @@ The main arguments to `window_gd()` are:
     covered by the neighborhood matrix could otherwise increase
     substantially.
 
-6.  `wdim` - Used to create the neighborhood matrix for the moving
-    window based on the dimensions provided. This argument can either be
-    set to one value (e.g., 3) which will create a square window (e.g.,
-    3 x 3), or two values, which will create a rectangular window (e.g.,
-    3 x 5). We encourage users to experiment with different values of
-    `wdim` to determine the sensitivity of their results to this
-    parameter. Ideally, `wdim` would be set with some knowledge of the
-    study system in mind (e.g., the dispersal patterns and/or
-    neighborhood size of the study organism). A preview of the window
-    size relative to the landscape can be obtained using the
-    `preview_gd()` function.
-
-7.  `rarify` - Users have the option to perform rarefaction by setting
+6.  `rarify` - Users have the option to perform rarefaction by setting
     the `rarify` argument to `TRUE.` If `rarify = TRUE`, users then
     define `rarify_n` as the number of samples to rarify to and
     `rarify_nit` as the number of iterations for rarefaction (e.g., if
@@ -201,18 +201,12 @@ The main arguments to `window_gd()` are:
     are confident that there is no effect of rarefaction after
     performing your analysis with and without rarefaction.
 
-8.  `parallel` - In order to increase computational efficiency, we
+7.  `parallel` - In order to increase computational efficiency, we
     provide the option for parallelization by setting the `parallel`
     argument to `TRUE`. Parallelization is performed using the furrr
     package. Use the `ncores` argument to set the number of cores to use
     for parallelization.
 
-9.  `crop_edges` - Whether to crop out the cells along the edge of the
-    raster that are not surrounded by a full window. Users may want to
-    do so to avoid "edge effects" caused by incomplete windows along the
-    borders of the raster. As wingen is relatively insensitive to sample
-    size, edge effects are not likely to have a very strong effect on
-    diversity estimates, so by default `crop_edges = FALSE`.
 
 ------------------------------------------------------------------------
 
@@ -239,6 +233,29 @@ lyr_eq <- project(lyr_longlat, "+proj=goode")
 
 # Coordinates can be switched back to latitude-longitude the same way by replacing "goode" with "longlat"
 ```
+
+### Run moving window calculations with `window_gd()`
+
+The main additional arguments to `window_gd()` are:
+
+1.  `wdim` - Used to create the neighborhood matrix for the moving
+    window based on the dimensions provided. This argument can either be
+    set to one value (e.g., 3) which will create a square window (e.g.,
+    3 x 3), or two values, which will create a rectangular window (e.g.,
+    3 x 5). We encourage users to experiment with different values of
+    `wdim` to determine the sensitivity of their results to this
+    parameter. Ideally, `wdim` would be set with some knowledge of the
+    study system in mind (e.g., the dispersal patterns and/or
+    neighborhood size of the study organism). A preview of the window
+    size relative to the landscape can be obtained using the
+    `preview_gd()` function.
+
+2.  `crop_edges` - Whether to crop out the cells along the edge of the
+    raster that are not surrounded by a full window. Users may want to
+    do so to avoid "edge effects" caused by incomplete windows along the
+    borders of the raster. As wingen is relatively insensitive to sample
+    size, edge effects are not likely to have a very strong effect on
+    diversity estimates, so by default `crop_edges = FALSE`.
 
 Before running `window_gd()`, users can preview the moving window and
 the counts within each cell of the raster to get a sense of how big the
@@ -289,7 +306,6 @@ wgd <- window_gd(lotr_vcf,
   L = 100
 )
 
-
 par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
 plot_gd(wgd, main = "Moving window pi")
@@ -297,14 +313,17 @@ plot_gd(wgd, main = "Moving window pi")
 plot_count(wgd, main = "Moving window sample counts")
 ```
 
+
+## Transforming the moving window maps
+
 ### Krige results
 
 To produce smoother maps of genetic diversity, we provide the function
 `krig_gd()` which creates a spatially interpolated raster from the
-moving window raster produced by `window_gd()`. This function uses the
+moving window raster produced by the moving window functions. This function uses the
 `autoKrige()` function from the R package automap to perform kriging on
 the moving window raster using an automatically generated variogram.
-Note that the raster stack from `window_gd()`, including both the
+Note that the moving window raster stack, including both the
 genetic diversity layer and the sample count layer, can be used to
 generate kriged maps of both genetic diversity and sample count.
 
@@ -333,8 +352,8 @@ increases the number of coordinates being used for kriging. This is also
 the case for increasing the resolution of the grid layer, though to a
 lesser extent.
 
-To run this function, we provide the raster stack output from
-`window_gd()`, the indices of the layers we want to krige, and the
+To run this function, we provide the moving window raster stack output, 
+the indices of the layers we want to krige, and the
 raster layer to interpolate across. We also disaggregate the original
 layer by a factor of two to get a smoother output surface (users should
 play around with this parameter). The output of this function is a
@@ -471,7 +490,7 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed, users can perform the `window_gd()`
+To increase computational speed, users can perform the any of the moving window functions
 calculations with parallelization by setting `parallel = TRUE` and
 `ncores` to the number of cores to use:
 
@@ -493,15 +512,28 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-In addition to pi, users can calculate observed heterozygosity (`"Ho"`),
-allelic richness (either using `"biallelic_richness"` [faster but only
-works on biallelic data] or `"allelic_richness"`):
+Current genetic diversity metrics that can be specified with `stat` include:
+
+- `"pi"` for nucleotide diversity (default) calculated using hierfstat `pi.dosage()`
+
+- `"Ho"` for average observed heterozygosity across all sites
+
+- `"allelic_richness"` for average number of alleles across all sites
+
+- `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+
+- `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using pegas `hw.test()` at the 0.05 level (other alpha levels can be specified using the sig argument; e.g., `sig = 0.10`)
+
+- `"basic_stats"` for a series of statistics produced by hierfstat `basic.stats()` including
+ mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+ Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
 
 ```{r, cache = TRUE, warning = FALSE}
-pi_wgd <- window_gd(lotr_vcf,
+# this may take a little while to run
+multistat_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  stat = "pi",
+  stat = c("pi", "Ho", "allelic_richness", "biallelic_richness", "hwe", "basic_stats"),
   wdim = 7,
   fact = 3,
   rarify_n = 2,
@@ -509,35 +541,11 @@ pi_wgd <- window_gd(lotr_vcf,
   rarify = TRUE,
   L = 100
 )
-
-het_wgd <- window_gd(lotr_vcf,
-  lotr_coords,
-  lotr_lyr,
-  stat = "Ho",
-  wdim = 7,
-  fact = 3,
-  rarify_n = 2,
-  rarify_nit = 5,
-  rarify = TRUE
-)
-
-AR_wgd <- window_gd(lotr_vcf,
-  lotr_coords,
-  lotr_lyr,
-  stat = "biallelic_richness",
-  wdim = 7,
-  fact = 3,
-  rarify_n = 2,
-  rarify_nit = 5,
-  rarify = TRUE
-)
 ```
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s")
-plot_gd(pi_wgd, bkg = lotr_range, main = "Pi")
-plot_gd(het_wgd, bkg = lotr_range, main = "Heterozygosity")
-plot_gd(AR_wgd, bkg = lotr_range, main = "Allelic Richness")
+plot_gd(pi_wgd, bkg = lotr_range)
 ```
 
 # General moving window
