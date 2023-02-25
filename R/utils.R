@@ -46,24 +46,25 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
 
   # define subsample to rarify
   if (rarify_nit == "all") {
-    # get all possible combos (transpose so rows are unique combos)
-    cmb <- t(utils::combn(sub, rarify_n))
+    cmb <- utils::combn(sub, rarify_n)
   } else if (choose(length(sub), rarify_n) < rarify_nit) {
     # (note: this combo step is done so when the number of unique combos < rarify_nit, extra calcs aren't performed)
     # get all possible combos (transpose so rows are unique combos)
-    cmb <- t(utils::combn(sub, rarify_n))
+    cmb <- utils::combn(sub, rarify_n)
   } else {
     # randomly sample subsets of size rarify_nit (transpose so rows are unique combos)
     # note: replace is set to FALSE so the same individual cannot be drawn multiple times within the same sample
     # however, individuals can be drawn multiple times across different samples
-    cmb <- t(replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE))
+    cmb <- replicate(rarify_nit, sample(sub, rarify_n, replace = FALSE), simplify = TRUE)
   }
 
+  # get all possible combos (rows are unique combos)
   # for each of the possible combos get gendiv stat
-  gdrar <- apply(cmb, 1, sample_gd, x = x, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles)
+  cmb_ls <- as.list(data.frame(cmb))
+  gdrar <- purrr::map(cmb_ls, \(sub) sample_gd(x = x, sub = sub, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles))
 
   # summarize rarefaction results
-  if (is.null(dim(gdrar))) gd <- fun(gdrar, na.rm = TRUE) else gd <- apply(gdrar, 1, fun, na.rm = TRUE)
+  gd <- purrr::list_transpose(gdrar) %>% purrr::map_dbl(fun, na.rm = TRUE)
 
   return(gd)
 }

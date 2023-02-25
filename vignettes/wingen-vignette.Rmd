@@ -13,6 +13,7 @@ TODO:
 - crop edges update for resist_gd() and circle_gd()?
 - preview_gd() update for circle_gd()
 - fix error if min_n is set too high to make it more informative
+- Think through min_n behavior (right now rarify_n defaults to min_n, and min_n defaults to 2, but what if a user sets rarify_n = 1? then they also need to set min_n = 1 for it to work...which is why originally I had min_n default to rarify_n if rarify_n was provided...ugh need to discuss with EAC and IJW). SHould min_n default be 1? or maybe you should get a warning if min_n is greater than rarify_n?
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -533,12 +534,10 @@ Current genetic diversity metrics that can be specified with `stat` include:
 multistat_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  stat = c("pi", "Ho", "allelic_richness", "biallelic_richness", "hwe", "basic_stats"),
+  stat = c("basic_stats"),
   wdim = 7,
   fact = 3,
-  rarify_n = 2,
-  rarify_nit = 5,
-  rarify = TRUE,
+  rarify = FALSE,
   L = 100
 )
 ```
