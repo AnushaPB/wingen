@@ -277,14 +277,9 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
 #'
 #' @noRd
 sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
-  if (identical(stat_function, calc_mean_biar)) {
-    gd <- stat_function(x[sub, ], rarify_alleles)
-  } else if (is.null(L) | !identical(stat_function, calc_pi)) {
-    gd <- stat_function(x[sub, ])
-  } else {
-    gd <- stat_function(x[sub, ], L)
-  }
-  return(gd)
+  if (isTRUE(all.equal(stat_function, calc_mean_biar))) return(stat_function(x[sub, ], rarify_alleles))
+  if (isTRUE(all.equal(stat_function, calc_pi))) return(stat_function(x[sub, ], L))
+  return(stat_function(x[sub, ]))
 }
 
 
@@ -348,7 +343,7 @@ calc_mean_het <- function(hetmat) {
 #' Wrapper for \link[hierfstat]{pi.dosage} function
 #'
 #' @param dos a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP
-#' @param L length of the sequence (*note:* defaults to number of loci in the provided dosage matrix; TODO: COME BACK AND FIX THIS)
+#' @param L length of the sequence (note: defaults to NULL which returns the sum over SNPs of nucleotide diversity)
 #'
 #' @return nucleotide diversity (pi)
 #'
