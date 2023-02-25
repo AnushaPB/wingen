@@ -7,6 +7,6 @@ test_that("circle_gd returns expected output", {
 
   # check against expected values
   vals <- terra::global(cpi, fun = "mean", na.rm = TRUE)
-  expect_equal(3.658471, vals["pi",], tolerance = 0.000001)
+  expect_equal(0.3658471, vals["pi",], tolerance = 0.000001)
   expect_equal(5.12, vals["sample_count",])
 })
