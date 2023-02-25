@@ -3,7 +3,7 @@
 #' Generate a continuous raster map of genetic diversity using resistance distances calculated with a conductivity surface
 #'
 #' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)
-#' @param cond_lyr conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, `lyr` will be used.
+#' @param con_lyr conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, `lyr` will be used.
 #' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
@@ -19,17 +19,26 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-resist_gd <- function(gen, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
+resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
                    rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                    fun = mean, L = "nvariants", rarify_alleles = TRUE,
                    parallel = FALSE, ncores = NULL){
 
+  # check that either con_lyr or distmat are provided
+  if (is.null(con_lyr) & is.null(distmat)) stop("Either con_lyr or distmat must be provided")
+
+  # convert lyr to SpatRaster
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
+
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
+  # make aggregated raster
+  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
+
   # make distmat
   if(!is.null(con_lyr)) con_lyr <- lyr
-  if(!is.null(distmat)) distmat <- get_resdist(coords, cond.r = cond_layer, parallel = parallel, ncores = ncores)
+  if(is.null(distmat)) distmat <- get_resdist(coords, con_lyr = con_lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
@@ -39,7 +48,6 @@ resist_gd <- function(gen, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL
             maxdist = maxdist,
             distmat = distmat,
             stat = stat,
-            fact = fact,
             rarify = rarify,
             rarify_n = rarify_n,
             rarify_nit = rarify_nit,
@@ -55,22 +63,20 @@ resist_gd <- function(gen, coords, lyr, maxdist, cond_lyr = NULL, distmat = NULL
 
 
 
-get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = TRUE){
+get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress = TRUE){
 
-  # convert cond.r to raster
-  if(!inherits(cond.r, "RasterLayer")) cond.r <- raster::raster(cond.r)
+  # convert con_lyr to raster
+  if(!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
 
-  # get crs
-  if (inherits(coords, "sf")) crs <- sp::proj4string(sf::as_Spatial(coords)) else crs <- NULL
   # convert coords to dataframe and rename
-  coords <- coords_to_df(coords)
+  coords_df <- coords_to_df(coords)
 
   # Create transition surface
-  trSurface <- gdistance::transition(cond.r, transitionFunction = mean, directions = 8)
+  trSurface <- gdistance::transition(con_lyr, transitionFunction = mean, directions = 8)
   trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
   # get layer coordinates
-  lyr_coords <- terra::as.data.frame(cond.r, xy = TRUE, na.rm = FALSE)[,1:2]
+  lyr_coords <- terra::as.data.frame(con_lyr, xy = TRUE, na.rm = FALSE)[,1:2]
 
   # get all combinations of layer and sample coordinate indices
   params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
@@ -79,7 +85,7 @@ get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = 
   future::plan(future::multisession, workers = ncores)
 
   suppressWarnings({
-    distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords, crs, .progress = progress)
+    distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
   })
 
   # convert from vector to matrix
@@ -93,9 +99,10 @@ get_resdist <- function(coords, cond.r, ncores = 1, parallel = TRUE, progress = 
 }
 
 
-run_gdist <- function(x, y, trSurface, lyr_coords, coords, crs){
+run_gdist <- function(x, y, trSurface, lyr_coords, coords_df){
   # Make spatial points
-  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], coords[y,]), proj4string = crs)
+  # TODO: Figure out if CRS is needed here
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], coords_df[y,]))
 
   # Calculate circuit distances
   distmat <- possible_gdist(trSurface, sp)
