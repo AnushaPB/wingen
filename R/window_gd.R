@@ -159,7 +159,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   wdim <- wdim_check(wdim)
 
   # set L if pi is being calculated
-  if (stat == "pi") if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
+  if (is.character(stat)) if(stat == "pi" & L == "nvariants") L <- ncol(x)
 
   # Get function to calculate the desired statistic
   stat_function <- return_stat(stat, ...)
