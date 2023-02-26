@@ -105,17 +105,16 @@ test_that("error gets returned for mismatch vcf and coords", {
 
 test_that("L argument works", {
   load_mini_ex(quiet = TRUE)
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = "nvariants"))
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = 100))
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = NULL))
+  capture_warnings(wpi_Lnv <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = "nvariants"))
+  capture_warnings(wpi_L1k <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = 1000))
+  capture_warnings(wpi_LNULL <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE, L = NULL))
 
+  mean_Lnv <- mean(terra::values(wpi_Lnv[[1]]), na.rm = TRUE)
+  mean_L1k <- mean(terra::values(wpi_L1k[[1]]), na.rm = TRUE)
+  mean_LNULL <- mean(terra::values(wpi_LNULL[[1]]), na.rm = TRUE)
 
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, L = "nvariants"))
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, L = 100))
-  capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, L = NULL))
-
-  # test doesn't matter, just checking if above lines don't error
-  expect_true(TRUE)
+  expect_equal(mean_Lnv, mean_L1k*100)
+  expect_equal(mean_Lnv, mean_LNULL/10)
 })
 
 
