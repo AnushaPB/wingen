@@ -1,4 +1,3 @@
-
 #' Calculate mean allelic richness
 #'
 #' @param genind genind
@@ -191,7 +190,7 @@ countgen <- function(x) {
 #' @return proportion of snps out of HWE
 #'
 #' @noRd
-calc_prop_hwe <- function(genind, sig = 0.05){
+calc_prop_hwe <- function(genind, sig = 0.05) {
   hwe <- pegas::hw.test(genind)
   prop <- mean(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
   names(prop) <- "hwe"
@@ -205,7 +204,7 @@ calc_prop_hwe <- function(genind, sig = 0.05){
 #' @return vector of overall stats produced by \link[hierfstat]{basic.stats}
 #'
 #' @noRd
-calc_mean_basic_stats <- function(hf){
+calc_mean_basic_stats <- function(hf) {
   hfstat <- hierfstat::basic.stats(hf)
   mean_stats <- hfstat$overall
   names(mean_stats) <- paste0(names(mean_stats), "_hierfstat")
@@ -251,5 +250,3 @@ return_stat <- function(stat, ...) {
 
   stop(paste(stat, "is an invalid argument for stat"))
 }
-
-

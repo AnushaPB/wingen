@@ -1,4 +1,3 @@
-
 test_that("check vcf check throws correct errors and return correct object", {
   data("mini_vcf_NA")
 
@@ -99,4 +98,3 @@ test_that("check that vcf to het conversion is correct", {
   expected <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, NA, NA, FALSE)
   expect_equal(obs, expected)
 })
-

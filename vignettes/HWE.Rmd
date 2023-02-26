@@ -12,7 +12,7 @@ load_middle_earth_ex()
 
 genind <- vcfR::vcfR2genind(mini_vcf)
 
-prop_hwe_test <- function(genind, sig = 0.05){
+prop_hwe_test <- function(genind, sig = 0.05) {
   hwe <- pegas::hw.test(genind)
   prop <- sum(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
   return(prop)
@@ -25,7 +25,7 @@ plot_gd(res)
 ```{r}
 genind <- vcfR::vcfR2genind(lotr_vcf)
 
-prop_hwe_test <- function(genind, sig = 0.05){
+prop_hwe_test <- function(genind, sig = 0.05) {
   hwe <- pegas::hw.test(genind)
   prop <- sum(hwe[, "Pr.exact"] < sig, na.rm = TRUE)
   return(prop)
@@ -46,10 +46,10 @@ hwe <- window_general(genind,
 
 hf <- hierfstat::genind2hierfstat(genind, pop = 1)
 
-fis_test <- function(hf){
+fis_test <- function(hf) {
   hfstat <- hierfstat::basic.stats(hf)
   # check why this is different from overall when NA values are present
-  #Fis <- mean(hfstat$Fis[,1], na.rm = TRUE)
+  # Fis <- mean(hfstat$Fis[,1], na.rm = TRUE)
   Fis <- hfstat$overall["Fis"]
   return(Fis)
 }
@@ -84,6 +84,5 @@ fis5 <- window_general(hf,
   parallel = TRUE,
   ncores = 25
 )
-
 ```
 

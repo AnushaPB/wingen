@@ -1,4 +1,3 @@
-
 #' Krige moving window maps
 #'
 #' Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}

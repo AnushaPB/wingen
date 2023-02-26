@@ -1,4 +1,3 @@
-
 #' Create a moving window map of genetic diversity using a circle window
 #'
 #' Generate a continuous raster map of genetic diversity using circle moving windows
@@ -22,8 +21,7 @@
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL){
-
+                      parallel = FALSE, ncores = NULL) {
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
@@ -38,36 +36,39 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 
   # run dist_gd
   results <-
-    dist_gd(gen = gen,
-            coords = coords,
-            lyr = lyr,
-            maxdist = maxdist,
-            distmat = distmat,
-            stat = stat,
-            rarify = rarify,
-            rarify_n = rarify_n,
-            rarify_nit = rarify_nit,
-            min_n = min_n,
-            fun = fun,
-            L = L,
-            rarify_alleles = rarify_alleles,
-            parallel = parallel,
-            ncores = ncores)
+    dist_gd(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      maxdist = maxdist,
+      distmat = distmat,
+      stat = stat,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      L = L,
+      rarify_alleles = rarify_alleles,
+      parallel = parallel,
+      ncores = ncores
+    )
 
   return(results)
 }
 
 
-get_geodist <- function(coords, lyr, parallel = FALSE, ncores = NULL){
+get_geodist <- function(coords, lyr, parallel = FALSE, ncores = NULL) {
   lyr_df <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)
   lyr_sf <- sf::st_as_sf(lyr_df, coords = c("x", "y"), crs = terra::crs(lyr))
 
-  if (parallel){
+  if (parallel) {
     if (is.null(ncores)) ncores <- future::availableCores() - 1
-    distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x,], coords), lyr_sf,
-                                .options = furrr::furrr_options(seed = TRUE, packages = c("sf")))
+    distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf,
+      .options = furrr::furrr_options(seed = TRUE, packages = c("sf"))
+    )
   } else {
-    distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x,], coords), lyr_sf)
+    distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf)
   }
 
 

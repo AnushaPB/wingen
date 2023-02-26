@@ -20,10 +20,9 @@
 #' plot_count(wpi)
 #'
 resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
-                   rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                   fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                   parallel = FALSE, ncores = NULL){
-
+                      rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                      parallel = FALSE, ncores = NULL) {
   # check that either con_lyr or distmat are provided
   if (is.null(con_lyr) & is.null(distmat)) stop("Either con_lyr or distmat must be provided")
 
@@ -37,36 +36,37 @@ resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL,
   if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
 
   # make distmat
-  if(!is.null(con_lyr)) con_lyr <- lyr
-  if(is.null(distmat)) distmat <- get_resdist(coords, con_lyr = con_lyr, parallel = parallel, ncores = ncores)
+  if (!is.null(con_lyr)) con_lyr <- lyr
+  if (is.null(distmat)) distmat <- get_resdist(coords, con_lyr = con_lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
-    dist_gd(gen = gen,
-            coords = coords,
-            lyr = lyr,
-            maxdist = maxdist,
-            distmat = distmat,
-            stat = stat,
-            rarify = rarify,
-            rarify_n = rarify_n,
-            rarify_nit = rarify_nit,
-            min_n = min_n,
-            fun = fun,
-            L = L,
-            rarify_alleles = rarify_alleles,
-            parallel = parallel,
-            ncores = ncores)
+    dist_gd(
+      gen = gen,
+      coords = coords,
+      lyr = lyr,
+      maxdist = maxdist,
+      distmat = distmat,
+      stat = stat,
+      rarify = rarify,
+      rarify_n = rarify_n,
+      rarify_nit = rarify_nit,
+      min_n = min_n,
+      fun = fun,
+      L = L,
+      rarify_alleles = rarify_alleles,
+      parallel = parallel,
+      ncores = ncores
+    )
 
   return(results)
 }
 
 
 
-get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress = TRUE){
-
+get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress = TRUE) {
   # convert con_lyr to raster
-  if(!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
+  if (!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
 
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)
@@ -76,7 +76,7 @@ get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress =
   trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
   # get layer coordinates
-  lyr_coords <- terra::as.data.frame(con_lyr, xy = TRUE, na.rm = FALSE)[,1:2]
+  lyr_coords <- terra::as.data.frame(con_lyr, xy = TRUE, na.rm = FALSE)[, 1:2]
 
   # get all combinations of layer and sample coordinate indices
   params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
@@ -98,25 +98,25 @@ get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress =
   return(distmat)
 }
 
-run_gdist <- function(x, y, trSurface, lyr_coords, coords_df){
+run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
   # Make spatial points
   # TODO: Figure out if CRS is needed here
-  sp <- sp::SpatialPoints(rbind(lyr_coords[x,], coords_df[y,]))
+  sp <- sp::SpatialPoints(rbind(lyr_coords[x, ], coords_df[y, ]))
 
   # Calculate circuit distances
   distmat <- possible_gdist(trSurface, sp)
 
   # Get distance
-  if(!all(is.na(distmat))) distmat <- distmat[1,2]
+  if (!all(is.na(distmat))) distmat <- distmat[1, 2]
 
   return(distmat)
 }
 
 possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
 
-coords_to_df <- function(coords){
-  if(is.matrix(coords)) coords <- data.frame(coords)
-  if(inherits(coords, "sf")) coords <- as.data.frame(sf::as_Spatial(coords))
+coords_to_df <- function(coords) {
+  if (is.matrix(coords)) coords <- data.frame(coords)
+  if (inherits(coords, "sf")) coords <- as.data.frame(sf::as_Spatial(coords))
   colnames(coords) <- c("x", "y")
   return(coords)
 }

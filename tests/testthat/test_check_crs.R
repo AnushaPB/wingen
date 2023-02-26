@@ -1,4 +1,3 @@
-
 test_that("CRS are handled correctly by window_gd", {
   capture_warnings(library(raster))
   load_mini_ex(quiet = TRUE)

@@ -1,4 +1,3 @@
-
 #' Run distance based moving window calculations
 #'
 #' Function used by both circle_gd and resist_gd
@@ -7,30 +6,29 @@
 dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE,
-                    parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
-
-
+                    parallel = FALSE, ncores = NULL) {
   # run moving window
   result <-
-    purrr::map(stat,
-               ~dist_gd_stats(
-                 gen = gen,
-                 coords = coords,
-                 lyr = lyr,
-                 stat = .x,
-                 maxdist = maxdist,
-                 distmat = distmat,
-                 rarify = rarify,
-                 rarify_n = rarify_n,
-                 rarify_nit = rarify_nit,
-                 min_n = min_n,
-                 fun = fun,
-                 L = L,
-                 rarify_alleles = rarify_alleles,
-                 parallel = parallel,
-                 ncores = ncores,
-                 crop_edges = crop_edges
-               ))
+    purrr::map(
+      stat,
+      ~ dist_gd_stats(
+        gen = gen,
+        coords = coords,
+        lyr = lyr,
+        stat = .x,
+        maxdist = maxdist,
+        distmat = distmat,
+        rarify = rarify,
+        rarify_n = rarify_n,
+        rarify_nit = rarify_nit,
+        min_n = min_n,
+        fun = fun,
+        L = L,
+        rarify_alleles = rarify_alleles,
+        parallel = parallel,
+        ncores = ncores,
+      )
+    )
 
 
   # convert to raster stack
@@ -49,8 +47,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
 dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                           rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                           fun = mean, L = NULL, rarify_alleles = TRUE,
-                          parallel = FALSE, ncores = NULL, crop_edges = FALSE){
-
+                          parallel = FALSE, ncores = NULL) {
   # check that the input file is a vcfR or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -77,11 +74,9 @@ dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
     rarify_alleles = rarify_alleles,
     parallel = parallel,
     ncores = ncores,
-    crop_edges = crop_edges
   )
 
   return(results)
-
 }
 
 #' General function for dist_gd
@@ -96,8 +91,7 @@ dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
 dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                          fun = mean, L = NULL, rarify_alleles = TRUE,
-                         parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-
+                         parallel = FALSE, ncores = NULL, ...) {
   # Modify dist matrix
   distmat[distmat > maxdist] <- NA
 
@@ -109,7 +103,6 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
 
   # run sliding window calculations
   if (parallel) {
-
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
     future::plan(future::multisession, workers = ncores)
@@ -119,32 +112,28 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
     lyr <- raster::raster(lyr)
 
     rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
-                                   lyr = lyr, x = x, distmat = distmat,
-                                   stat_function = stat_function,
-                                   rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                                   min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-                                   .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
+      lyr = lyr, x = x, distmat = distmat,
+      stat_function = stat_function,
+      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
-
     rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
-                            lyr = lyr, x = x, distmat = distmat,
-                            stat_function = stat_function,
-                            rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                            min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+      lyr = lyr, x = x, distmat = distmat,
+      stat_function = stat_function,
+      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
 
   # format resulting raster values
   result <- vals_to_lyr(lyr, rast_vals, stat)
 
-  # crop resulting raster
-  if (crop_edges) result <- edge_crop(result, wdim)
-
   return(result)
 }
 
-get_dist_index <- function(i, distmat) which(!is.na(distmat[i,]))
+get_dist_index <- function(i, distmat) which(!is.na(distmat[i, ]))

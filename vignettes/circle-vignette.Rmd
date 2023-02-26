@@ -38,21 +38,20 @@ distmat <- get_resdist(lotr_coords, cond.r = lyr)
 ```
 
 ```{r}
-sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+sf_coords <- st_as_sf(lotr_coords, coords = c("x", "y"))
 
 wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
 
 cg <- dist_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
 
-cgr <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
-                 radius = quantile(distmat, 0.05, na.rm = TRUE), min_n = 1)
-
-
+cgr <- dist_gd(lotr_vcf, sf_coords, lyr,
+  distmat = distmat,
+  radius = quantile(distmat, 0.05, na.rm = TRUE), min_n = 1
+)
 ```
 
 ```{r, fig.height = 3, fig.width = 12}
-
-par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+par(mfrow = c(1, 4), mar = rep(0, 4), oma = rep(1, 4), pty = "s")
 
 plot_gd(raster(trSurface))
 plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
@@ -60,7 +59,6 @@ plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
 plot_gd(wg, bkg = lotr_range, main = "Rectangle")
 plot_gd(cg, bkg = lotr_range, main = "Circle")
 plot_gd(cgr, bkg = lotr_range, main = "Resistance")
-
 ```
 
 ```{r}
@@ -80,18 +78,20 @@ distmatsdm <- get_resdist(lotr_coords, cond.r = aggregate(pred, 3))
 ```
 
 ```{r}
-sf_coords <- st_as_sf(lotr_coords, coords = c("x","y"))
+sf_coords <- st_as_sf(lotr_coords, coords = c("x", "y"))
 
 wg <- window_gd(lotr_vcf, sf_coords, lyr, wdim = 7, min_n = 1)
 
 cg <- dist_gd(lotr_vcf, sf_coords, lyr, radius = 10, min_n = 1)
 
-cgr <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmatsdm, 
-                 radius = quantile(distmatsdm, 0.05, na.rm = TRUE))
+cgr <- dist_gd(lotr_vcf, sf_coords, lyr,
+  distmat = distmatsdm,
+  radius = quantile(distmatsdm, 0.05, na.rm = TRUE)
+)
 ```
 
 ```{r, fig.height = 3, fig.width = 12}
-par(mfrow = c(1,4), mar = rep(0,4), oma = rep(1,4), pty = "s")
+par(mfrow = c(1, 4), mar = rep(0, 4), oma = rep(1, 4), pty = "s")
 
 plot_gd((raster(trSurface)))
 plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
@@ -99,15 +99,15 @@ plot(sf_coords, col = "cyan", add = TRUE, pch = 3)
 plot_gd(wg, bkg = lotr_range, main = "Rectangle")
 plot_gd(cg, bkg = lotr_range, main = "Circle")
 plot_gd(cgr, bkg = lotr_range, main = "Resistance")
-
 ```
 
 ```{r}
+distmat <- get_resdist(lotr_coords, cond.r = lyr, ncores = 25)
 
-distmat <- get_resdist(lotr_coords, cond.r = lyr, ncores= 25)
-
-cgr_hwe2 <- dist_gd(lotr_vcf, sf_coords, lyr, distmat = distmat, 
-                 radius = quantile(distmat, 0.01, na.rm = TRUE), min_n = 1, stat = "hwe",
-                 parallel = TRUE, ncores = 25)
+cgr_hwe2 <- dist_gd(lotr_vcf, sf_coords, lyr,
+  distmat = distmat,
+  radius = quantile(distmat, 0.01, na.rm = TRUE), min_n = 1, stat = "hwe",
+  parallel = TRUE, ncores = 25
+)
 ```
 

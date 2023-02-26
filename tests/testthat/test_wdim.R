@@ -1,5 +1,3 @@
-
-
 test_that("wdim_check fixes wdim", {
   expect_error(wdim_check(1))
   expect_error(wdim_check(c(2, 3)))

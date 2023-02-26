@@ -1,5 +1,3 @@
-
-
 test_that("window_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
   capture_warnings(wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = FALSE))
@@ -8,8 +6,8 @@ test_that("window_gd returns expected output", {
 
   # check against expected values
   vals <- terra::global(wpi, fun = "mean", na.rm = TRUE)
-  expect_equal(0.2675758, vals["pi",], tolerance = 0.000001)
-  expect_equal(0.87, vals["sample_count",])
+  expect_equal(0.2675758, vals["pi", ], tolerance = 0.000001)
+  expect_equal(0.87, vals["sample_count", ])
 })
 
 test_that("all stats and parallel works", {
@@ -113,8 +111,8 @@ test_that("L argument works", {
   mean_L1k <- mean(terra::values(wpi_L1k[[1]]), na.rm = TRUE)
   mean_LNULL <- mean(terra::values(wpi_LNULL[[1]]), na.rm = TRUE)
 
-  expect_equal(mean_Lnv, mean_L1k*100)
-  expect_equal(mean_Lnv, mean_LNULL/10)
+  expect_equal(mean_Lnv, mean_L1k * 100)
+  expect_equal(mean_Lnv, mean_LNULL / 10)
 })
 
 

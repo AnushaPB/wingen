@@ -7,7 +7,6 @@
 window_helper <- function(i, x, lyr, coord_cells, nmat = NULL, distmat = NULL, stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
-
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
   if (is.null(rarify_n)) rarify_n <- min_n
 
@@ -40,8 +39,11 @@ window_helper <- function(i, x, lyr, coord_cells, nmat = NULL, distmat = NULL, s
   if (is.null(names(gd))) names(gd) <- "custom"
 
   # return vector
-  if (all(is.na(gd))) return(c(sample_count = ns)) else return(c(gd, sample_count = ns))
-
+  if (all(is.na(gd))) {
+    return(c(sample_count = ns))
+  } else {
+    return(c(gd, sample_count = ns))
+  }
 }
 
 #' Rarefaction helper function
@@ -55,7 +57,6 @@ window_helper <- function(i, x, lyr, coord_cells, nmat = NULL, distmat = NULL, s
 #' @noRd
 rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
                           fun = mean, L = "nvariants", rarify_alleles = TRUE) {
-
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
     gd <- NA
@@ -121,8 +122,12 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
 #'
 #' @noRd
 sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
-  if (isTRUE(all.equal(stat_function, calc_mean_biar))) return(stat_function(x[sub, ], rarify_alleles))
-  if (isTRUE(all.equal(stat_function, calc_pi))) return(stat_function(x[sub, ], L))
+  if (isTRUE(all.equal(stat_function, calc_mean_biar))) {
+    return(stat_function(x[sub, ], rarify_alleles))
+  }
+  if (isTRUE(all.equal(stat_function, calc_pi))) {
+    return(stat_function(x[sub, ], L))
+  }
   return(stat_function(x[sub, ]))
 }
 
@@ -325,7 +330,7 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
     as.list()
 
   # assign vector values to rasters
-  rast_list <- purrr::map(ls, ~terra::setValues(lyr, .x))
+  rast_list <- purrr::map(ls, ~ terra::setValues(lyr, .x))
 
   # convert from list to raster stack
   rast_stack <- terra::rast(rast_list)
@@ -371,7 +376,7 @@ edge_crop <- function(x, wdim) {
 #' @return SpatRaster
 #'
 #' @noRd
-rm_duplicate_sample_count <- function(r){
+rm_duplicate_sample_count <- function(r) {
   # subset one sample_count layer
   sample_count <- r[[which(names(r) == "sample_count")]][[1]]
 

@@ -1,4 +1,3 @@
-
 #' Preview moving window and sample counts
 #'
 #' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
@@ -69,7 +68,6 @@ preview_window <- function(lyr, nmat, coords = NULL) {
       if (inherits(coords, "sf") | inherits(coords, "SpatVector")) terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
     }
   })
-
 }
 
 #' Get center cell of a raster

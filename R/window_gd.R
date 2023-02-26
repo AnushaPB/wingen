@@ -1,5 +1,3 @@
-
-
 #' Create a moving window map of genetic diversity
 #'
 #' Generate a continuous raster map of genetic diversity using moving windows
@@ -51,32 +49,33 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   # run moving window
   result <-
-    purrr::map(stat,
-               ~window_gd_stats(
-                gen = gen,
-                coords = coords,
-                lyr = lyr,
-                stat = .x,
-                wdim = wdim,
-                fact = fact,
-                rarify = rarify,
-                rarify_n = rarify_n,
-                rarify_nit = rarify_nit,
-                min_n = min_n,
-                fun = fun,
-                L = L,
-                rarify_alleles = rarify_alleles,
-                parallel = parallel,
-                ncores = ncores,
-                crop_edges = crop_edges,
-                ...
-              ))
+    purrr::map(
+      stat,
+      ~ window_gd_stats(
+        gen = gen,
+        coords = coords,
+        lyr = lyr,
+        stat = .x,
+        wdim = wdim,
+        fact = fact,
+        rarify = rarify,
+        rarify_n = rarify_n,
+        rarify_nit = rarify_nit,
+        min_n = min_n,
+        fun = fun,
+        L = L,
+        rarify_alleles = rarify_alleles,
+        parallel = parallel,
+        ncores = ncores,
+        crop_edges = crop_edges,
+        ...
+      )
+    )
 
   # convert to raster stack
   r <- terra::rast(result)
@@ -92,8 +91,7 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                             rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                             fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...){
-
+                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -105,27 +103,26 @@ window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
   x <- convert_vcf(vcf, stat)
 
   results <- window_general(
-                 x = x,
-                 coords = coords,
-                 lyr = lyr,
-                 stat = stat,
-                 wdim = wdim,
-                 fact = fact,
-                 rarify = rarify,
-                 rarify_n = rarify_n,
-                 rarify_nit = rarify_nit,
-                 min_n = min_n,
-                 fun = fun,
-                 L = L,
-                 rarify_alleles = rarify_alleles,
-                 parallel = parallel,
-                 ncores = ncores,
-                 crop_edges = crop_edges,
-                 ...
-               )
+    x = x,
+    coords = coords,
+    lyr = lyr,
+    stat = stat,
+    wdim = wdim,
+    fact = fact,
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    parallel = parallel,
+    ncores = ncores,
+    crop_edges = crop_edges,
+    ...
+  )
 
   return(results)
-
 }
 
 #' General function for making moving window maps
@@ -151,7 +148,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-
   # check layers and coords (only lyr is modified and returned)
   lyr <- layer_coords_check(lyr, coords)
 
@@ -159,7 +155,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   wdim <- wdim_check(wdim)
 
   # set L if pi is being calculated
-  if (is.character(stat) & !is.null(L)) if(stat == "pi" & L == "nvariants") L <- ncol(x)
+  if (is.character(stat) & !is.null(L)) if (stat == "pi" & L == "nvariants") L <- ncol(x)
 
   # Get function to calculate the desired statistic
   stat_function <- return_stat(stat, ...)
@@ -203,10 +199,10 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   } else {
     rast_vals <-
       purrr::map(1:terra::ncell(lyr), window_helper,
-      lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
-    )
+        lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
+        stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+      )
   }
 
   # format resulting raster values
@@ -217,5 +213,3 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
   return(result)
 }
-
-
