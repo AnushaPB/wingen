@@ -3,7 +3,7 @@
 #' Generate a continuous raster map of genetic diversity using resistance distances calculated with a conductivity surface
 #'
 #' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)
-#' @param con_lyr conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, `lyr` will be used.
+#' @param lyr conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.
 #' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
@@ -19,12 +19,12 @@
 #' plot_gd(wpi, main = "Window pi")
 #' plot_count(wpi)
 #'
-resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL, stat = "pi", fact = 0,
+resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL) {
   # check that either con_lyr or distmat are provided
-  if (is.null(con_lyr) & is.null(distmat)) stop("Either con_lyr or distmat must be provided")
+  if (is.null(lyr) & is.null(distmat)) stop("Either lyr or distmat must be provided")
 
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
@@ -33,11 +33,10 @@ resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL,
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
   # make aggregated raster
-  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # make distmat
-  if (!is.null(con_lyr)) con_lyr <- lyr
-  if (is.null(distmat)) distmat <- get_resdist(coords, con_lyr = con_lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_resdist(coords, con_lyr = lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
@@ -64,9 +63,12 @@ resist_gd <- function(gen, coords, lyr, maxdist, con_lyr = NULL, distmat = NULL,
 
 
 
-get_resdist <- function(coords, con_lyr, ncores = 1, parallel = TRUE, progress = TRUE) {
+get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, progress = TRUE) {
   # convert con_lyr to raster
   if (!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
+
+  # aggregate raster
+  if (fact != 0) con_lyr <- terra::aggregate(con_lyr, fact, fun = mean)
 
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)

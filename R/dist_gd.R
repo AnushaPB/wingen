@@ -7,6 +7,11 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL) {
+
+  # check lyr and distmat
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
+  if (terra::ncell(lyr) != nrow(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
+
   # run moving window
   result <-
     purrr::map(
@@ -26,7 +31,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
         L = L,
         rarify_alleles = rarify_alleles,
         parallel = parallel,
-        ncores = ncores,
+        ncores = ncores
       )
     )
 

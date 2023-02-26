@@ -29,7 +29,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
   # make aggregated raster
-  if (fact == 0) lyr <- lyr * 0 else lyr <- terra::aggregate(lyr, fact, fun = mean) * 0
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # make distmat
   if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
@@ -58,7 +58,15 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 }
 
 
-get_geodist <- function(coords, lyr, parallel = FALSE, ncores = NULL) {
+get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) {
+
+  # convert coords if not in sf
+  if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
+
+  # aggregate raster
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
+
+  # make into df
   lyr_df <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)
   lyr_sf <- sf::st_as_sf(lyr_df, coords = c("x", "y"), crs = terra::crs(lyr))
 
@@ -71,7 +79,7 @@ get_geodist <- function(coords, lyr, parallel = FALSE, ncores = NULL) {
     distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf)
   }
 
-
+  # convert into matrix
   distmat <- matrix(unlist(distls), ncol = length(distls[[1]]), byrow = TRUE)
 
   return(distmat)
