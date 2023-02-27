@@ -63,12 +63,22 @@ window_general(
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
-Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,
-\code{window_general} can be used to make moving window maps from different data inputs. Unlike \code{window_gd}, \code{window_general} will not convert your data into
-the correct format for calculations of different diversity metrics. To calculate \code{pi} or \code{biallelic_richness}, \code{x} must be a dosage matrix with values of 0, 1, or 2. To calculate
-\code{Ho}, \code{x} must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate \code{allelic_richness}, \code{x} must be a \code{genind} type object.
-Users can set \code{x} to a vector and create moving window maps with any function that can be applied to a vector (e.g., \code{stat = mean}, \code{var}, \code{sum}, etc.).
-\code{x} can also be a matrix or data frame (where rows are individuals), and then \code{stat} can be any function that takes a matrix or data frame and outputs a
-single numeric value (e.g., a function that produces a custom diversity index); however, this should be attempted with caution since this functionality has
+Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is
+built specifically for making moving window maps of genetic diversity from vcfs,
+\code{window_general} can be used to make moving window maps from different data inputs.
+See details for how to format data inputs for different statistics.
+}
+\details{
+To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
+\itemize{
+\item for \code{"pi"} or  \code{"biallelic_richness"}, \code{x} must be a dosage matrix with values of 0, 1, or 2
+\item for \code{"Ho"}, \code{x} must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity
+\item for \code{"allelic_richness"} or \verb{"hwe}, \code{x} must be a \code{genind} type object
+\item for \code{"basic_stats"}, \code{x} must be a \code{hierfstat} type object
+}
+
+Otherwise, \code{stat} can be any function that takes a matrix or data frame and outputs a
+single numeric value (e.g., a function that produces a custom diversity index);
+however, this should be attempted with caution since this functionality has
 not have been tested extensively and may produce errors.
 }

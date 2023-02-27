@@ -63,7 +63,7 @@ window_gd(
 SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
-Generate a continuous raster map of genetic diversity using moving windows
+Generate a continuous raster map of genetic diversity using moving windows.
 }
 \details{
 Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.

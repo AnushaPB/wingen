@@ -9,7 +9,6 @@ resist_gd(
   coords,
   lyr,
   maxdist,
-  con_lyr = NULL,
   distmat = NULL,
   stat = "pi",
   fact = 0,
@@ -29,11 +28,9 @@ resist_gd(
 
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
+\item{lyr}{conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.}
 
 \item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)}
-
-\item{con_lyr}{conductivity layer (higher values should mean greater conductivity). Can be either a SpatRaster or RasterLayer. If not provided, \code{lyr} will be used.}
 
 \item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
 
