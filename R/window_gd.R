@@ -672,7 +672,7 @@ layer_coords_check <- function(lyr, coords) {
   crs_check_window(lyr, coords)
 
   # convert to terra
-  if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   # check number of layers
   nlayers <- terra::nlyr(lyr)
