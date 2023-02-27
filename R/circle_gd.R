@@ -14,9 +14,9 @@
 #' @examples
 #'
 #' load_mini_ex()
-#' wpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
-#' plot_gd(wpi, main = "Window pi")
-#' plot_count(wpi)
+#' cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
+#' plot_gd(cpi, main = "Circle pi")
+#' plot_count(cpi)
 #'
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
@@ -87,12 +87,11 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
-#' @noRd
+#' @export
 circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL, ...){
-
+                           parallel = FALSE, ncores = NULL, ...) {
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -119,11 +118,25 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
   )
 
   return(results)
-
 }
-
+#' Get a matrix of geographic distances for \link[wingen]{circle_gd}
+#'
+#' Create a distance matrix based on coordinates and a raster layer.
+#' The output is a distance matrix where rows represent cells on the landscape
+#' and columns represent individual locations on the landscape. Each value is
+#' the geographic distance between each individual and each cell calculed
+#' using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
+#'
+#' @inheritParams resist_gd
+#'
+#' @return a distance matrix used by \link[wingen]{circle_gd}
+#' @export
+#'
+#' @examples
+#' load_mini_ex()
+#' distmat <- get_geodist(mini_coords, mini_lyr)
+#'
 get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) {
-
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
