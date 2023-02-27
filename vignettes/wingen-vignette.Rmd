@@ -9,16 +9,23 @@ editor_options:
   markdown: 
     wrap: 72
 ---
+
 TODO: 
-- return stop if circle_gd doesn't have eonugh samples (nbased on preview_gd)
-- preview_gd() update for circle_gd() and resist_gd()?
-- fix error if min_n is set too high to make it more informative
-- Think through min_n behavior (right now rarify_n defaults to min_n, and min_n defaults to 2, but what if a user sets rarify_n = 1? then they also need to set min_n = 1 for it to properly work...which is why originally I had min_n default to rarify_n if rarify_n was provided...ugh need to discuss with EAC and IJW). Should min_n default be 1? or maybe you should get a warning if min_n is greater than rarify_n? - i think the warning is a good idea beacuse i think min_n should default to 2
-- replace ... with sig?
-- check SpatRaster conversion for window_gd() in main...
-- make resist gd work in non-parallel
-- replace con_lyr with just lyr (why would you provide to diff things, they have to be the same spatial extent)
-- seperate out sample count (add check so if all NA counts it doesn't run)
+
+- return stop if circle_gd/resist_gd doesn't have enough samples (based on preview_gd) 
+
+- Think through min_n behavior (right now rarify_n defaults to min_n, and min_n
+defaults to 2, but what if a user sets rarify_n = 1? then they also need
+to set min_n = 1 for it to properly work...which is why originally I had
+min_n default to rarify_n if rarify_n was provided...ugh need to discuss
+with EAC and IJW). Should min_n default be 1? or maybe you should get a
+warning if min_n is greater than rarify_n? 
+
+- replace ... with sig? 
+
+- check SpatRaster conversion for window_gd() in main... 
+
+- make a circle_general() and a resist_general()
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -34,6 +41,7 @@ library(raster)
 library(viridis)
 library(sf)
 library(SpatialKDE)
+devtools::load_all()
 ```
 
 ## Background
@@ -108,7 +116,8 @@ ex_raster4 <- coords_to_raster(lotr_coords, buffer = 1, res = 10, plot = TRUE)
 
 The workflow of wingen uses three main functions:
 
-1.  `window_gd()`, `circle_gd()`, or `resist_gd()` to generate moving window maps of genetic diversity
+1.  `window_gd()`, `circle_gd()`, or `resist_gd()` to generate moving
+    window maps of genetic diversity
 
 2.  `krig_gd()` to use kriging to interpolate the moving window maps
 
@@ -117,15 +126,20 @@ The workflow of wingen uses three main functions:
 
 ## Different moving window calculations
 
-There are three functions that can be used to generate moving window maps:
+There are three functions that can be used to generate moving window
+maps:
 
-1. `window_gd()` uses a simple rectangular window with user-specified dimensions (the original method described in Bishop et al.)
+1.  `window_gd()` uses a simple rectangular window with user-specified
+    dimensions (the original method described in Bishop et al.)
 
-2. `circle_gd()` uses a circular window with a user-specified radius
+2.  `circle_gd()` uses a circular window with a user-specified radius
 
-3. `resist_gd()` uses a resistance distance-based window with a user-specified max distance (this can be thought of as a circular window with a varying radius depending on the resistance of the landscape around it)
+3.  `resist_gd()` uses a resistance distance-based window with a
+    user-specified max distance (this can be thought of as a circular
+    window with a varying radius depending on the resistance of the
+    landscape around it)
 
-The main arguments that all three functions have in common are: 
+The main arguments that all three functions have in common are:
 
 1.  `gen` - An object of type vcfR or a path to a vcf file with genotype
     data. The order of this file matters! The coordinate and genetic
@@ -188,13 +202,19 @@ The main arguments that all three functions have in common are:
     rarefaction is implemented and that set of samples is subsampled
     `rarify_nit` times to a size of `rarify_n` and the mean (or another
     summary statistic set using `fun`) of those `rarify_nit` iterations
-    is used.
+    is used. Note that if the number of samples is lower than `min_n`,
+    a raster value of NA will always be assigned, even if the number 
+    of samples isn't less than `rarify_n` (i.e., if `min = 2` and `rarify_n = 1`
+    and the sample size is 1 in the window, then an NA value will be assigned; 
+    to change this behavior so the genetic diversity is calculated, set `min_n = 1`)
 
     We suggest that users select `rarify_n` and `rarify_nit` such that
     the number of possible ways to choose `rarify_n` from a sample of
     size `rarify_n` plus one is greater than `rarify_nit` in order for
     there to always be `rarify_nit` number of unique combinations of
-    size `rarify_n`. If `rarify = FALSE`, rarefaction is not performed
+    size `rarify_n`. 
+    
+    If `rarify = FALSE`, rarefaction is not performed
     and only steps (1) and (2) occur such that: (1) if the number of
     samples in the window is less than the `min_n` argument, genetic
     diversity is not calculated and a raster value of `NA` is assigned,
@@ -213,14 +233,15 @@ The main arguments that all three functions have in common are:
     package. Use the `ncores` argument to set the number of cores to use
     for parallelization.
 
-
 ------------------------------------------------------------------------
 
-*Note:* Coordinates and rasters used in wingen should be in a projected (planar)
-coordinate system such that raster cells are of equal sizes. Therefore, spherical systems
-(including latitute-longitude coordinate systems) should be projected prior to use. 
-An example of how this can be accomplished is shown below. If no CRS is provided, 
-a warning will be given and wingen will assume the data are provided in a projected system. 
+*Note:* Coordinates and rasters used in wingen should be in a projected
+(planar) coordinate system such that raster cells are of equal sizes.
+Therefore, spherical systems (including latitute-longitude coordinate
+systems) should be projected prior to use. An example of how this can be
+accomplished is shown below. If no CRS is provided, a warning will be
+given and wingen will assume the data are provided in a projected
+system.
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
@@ -244,8 +265,8 @@ lyr_eq <- project(lyr_longlat, "+proj=goode")
 
 ### Run moving window calculations with `window_gd()`
 
-To create a moving window map with a rectangular window use `window_gd()`. 
-The main additional arguments to `window_gd()` are:
+To create a moving window map with a rectangular window use
+`window_gd()`. The main additional arguments to `window_gd()` are:
 
 1.  `wdim` - Used to create the neighborhood matrix for the moving
     window based on the dimensions provided. This argument can either be
@@ -274,11 +295,14 @@ coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
-to `rarify_n` if rarefaction is used).
+to `rarify_n` if rarefaction is used). We specofy `method = window` for
+a preview of `window_gd()`, we will diiscuss other methods (i.e.,
+`circle` and `resist` later)
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
+  method = "window",
   wdim = 7,
   fact = 3,
   sample_count = TRUE,
@@ -302,7 +326,7 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -324,20 +348,37 @@ plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts")
 
 ### Run moving window calculations with `circle_gd()`
 
-To create a moving window map with a circular window use `circle_gd()`. 
+To create a moving window map with a circular window use `circle_gd()`.
 The main additional arguments to `circle_gd()` are:
 
-1.  `maxdist` - maximum geographic distance used to define neighborhood; 
-    any samples further than this distance will not be included (this can
-    be thought of as the neighborhood radius) Similarly to `wdim` We encourage 
-    users to experiment with different values of `maxist` to determine the 
-    sensitivity of their results to this parameter and ideally set it with 
-    some knowledge of the study system in mind (e.g., the dispersal patterns 
-    and/or neighborhood size of the study organism). 
+1.  `maxdist` - maximum geographic distance used to define neighborhood;
+    any samples further than this distance will not be included (this
+    can be thought of as the neighborhood radius) Similarly to `wdim` We
+    encourage users to experiment with different values of `maxist` to
+    determine the sensitivity of their results to this parameter and
+    ideally set it with some knowledge of the study system in mind
+    (e.g., the dispersal patterns and/or neighborhood size of the study
+    organism).
 
 2.  `distmat` - optional distance matrix output from `get_geodist()`
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+Like before, we can use the `preview_gd()` function to preview parameter
+settings. This time we specify `method = "circle"` and provide
+`maxdist`.
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+preview_gd(lotr_lyr,
+  lotr_coords,
+  method = "circle",
+  maxdist = 10,
+  sample_count = TRUE,
+  min_n = 2
+)
+```
+
+Then, we can run `circle_gd()`:
+
+```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 cgd <- circle_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -357,35 +398,64 @@ plot_count(cgd, main = "Circle moving window sample counts")
 
 ### Run moving window calculations with `resist_gd()`
 
-To create a moving window map with a resistance distances use `resist_gd()`. 
-The main additional arguments to `resist_gd()` are:
+To create a moving window map with a resistance distances use
+`resist_gd()`. The main additional arguments to `resist_gd()` are:
 
-1.  `maxdist` - maximum cost distance used to define neighborhood; any samples 
-    further than this cost distance will not be included (this can be thought of as 
-    the neighborhood radius, but in terms of cost distance). As stated before, we encourage 
-    users to experiment with different values of `maxist` to determine the 
-    sensitivity of their results to this parameter. 
-    
-2.  `con_lyr` - conductivity layer used to calculate resistance distances
-    (higher values should mean greater conductivity). If one is not provided, the raster
-    provided for `lyr` will be assumed to be the conductivity layer.
+1.  `maxdist` - maximum cost distance used to define neighborhood; any
+    samples further than this cost distance will not be included (this
+    can be thought of as the neighborhood radius, but in terms of cost
+    distance). As stated before, we encourage users to experiment with
+    different values of `maxist` to determine the sensitivity of their
+    results to this parameter.
 
-2.  `distmat` - optional distance matrix output from `get_resdist()`
+2.  `lyr` - in addition to being the raster layer the window moves
+    across, this will also serve as the conductivity layer used to
+    calculate resistance distances (higher values should mean greater
+    conductivity).
 
-`resist_gd()` takes a longer time to wrong and we recommend taking advantage of parallelization, in particular for the calculation of the distance matrix with `get_resdist()`. We also recommend first calculating the distance matrix with `get_resdist()` and then providing it to `resist_gd()` as this allows for `resist_gd()` to be run quickly multiple times (i.e., to test different parameters) by avoiding repeating the costly distance calculations. Note that `con_lyr` and `lyr` must have the same spatial scale (e.g. same resolution and extent).
+3.  `distmat` - optional distance matrix output from `get_resdist()`
 
-We don't evaluate this chunk because it would take a while, but we provide the code and resulting plot. 
+`resist_gd()` takes a longer time to wrong and we recommend taking
+advantage of parallelization, in particular for the calculation of the
+distance matrix with `get_resdist()`. We also recommend first
+calculating the distance matrix with `get_resdist()` and then providing
+it to `resist_gd()` as this allows for `resist_gd()` to be run quickly
+multiple times (i.e., to test different parameters) by avoiding
+repeating the costly distance calculations. Note that `con_lyr` and
+`lyr` must have the same spatial scale (e.g. same resolution and
+extent).
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+We don't evaluate these chunks because it would take a while and should
+be run in parallele, but we provide the code and resulting plot.
+
+Again, we can use the `preview_gd()` function to preview parameter
+settings. Here, we specify `method = "resist"` and provide `maxdist`. We
+also generate a distance matrix separately to save time since this can
+be used both in `preview_gd()` and `resist_gd()`.
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), ncores = 3)
 
+preview_gd(lotr_lyr,
+  lotr_coords,
+  method = "resist",
+  maxdist = 900,
+  distmat = distmat,
+  fact = 5,
+  sample_count = TRUE,
+  min_n = 2
+)
+```
+
+![output from preview_gd()](resist_plots/resist_preview.png)
+
+```{r resist, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 rgd <- resist_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
   distmat = distmat,
-  con_lyr = lotr_lyr,
   stat = "pi",
-  maxdist = 600,
+  maxdist = 800,
   fact = 5,
   rarify = FALSE,
   L = 100
@@ -398,18 +468,21 @@ plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
 plot_count(rgd, main = "Resistance moving window sample counts")
 ```
 
+![genetic diversity output from resist_gd()](resist_plots/resist_pi.png)
+![sample count output from resist_gd()](resist_plots/resist_samplecount.png)
+
 ## Transforming the moving window maps
 
 ### Krige results
 
 To produce smoother maps of genetic diversity, we provide the function
 `krig_gd()` which creates a spatially interpolated raster from the
-moving window raster produced by the moving window functions. This function uses the
-`autoKrige()` function from the R package automap to perform kriging on
-the moving window raster using an automatically generated variogram.
-Note that the moving window raster stack, including both the
-genetic diversity layer and the sample count layer, can be used to
-generate kriged maps of both genetic diversity and sample count.
+moving window raster produced by the moving window functions. This
+function uses the `autoKrige()` function from the R package automap to
+perform kriging on the moving window raster using an automatically
+generated variogram. Note that the moving window raster stack, including
+both the genetic diversity layer and the sample count layer, can be used
+to generate kriged maps of both genetic diversity and sample count.
 
 Kriging is performed by first transforming the moving window layer into
 a set of coordinates with corresponding genetic diversity (or sample
@@ -436,18 +509,17 @@ increases the number of coordinates being used for kriging. This is also
 the case for increasing the resolution of the grid layer, though to a
 lesser extent.
 
-To run this function, we provide the moving window raster stack output, 
-the indices of the layers we want to krige, and the
-raster layer to interpolate across. We also disaggregate the original
-layer by a factor of two to get a smoother output surface (users should
-play around with this parameter). The output of this function is a
-raster stack of the kriged input layers.
+To run this function, we provide the moving window raster stack output,
+the indices of the layers we want to krige, and the raster layer to
+interpolate across. We also disaggregate the original layer by a factor
+of two to get a smoother output surface (users should play around with
+this parameter). The output of this function is a raster stack of the
+kriged input layers.
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # Note: this step can take a little while
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, lotr_lyr, disagg_grd = 2)
-
 
 par(pty = "s")
 plot_gd(kgd, main = "Kriged pi")
@@ -574,9 +646,9 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed, users can perform the any of the moving window functions
-calculations with parallelization by setting `parallel = TRUE` and
-`ncores` to the number of cores to use:
+To increase computational speed, users can perform the any of the moving
+window functions calculations with parallelization by setting
+`parallel = TRUE` and `ncores` to the number of cores to use:
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
@@ -596,21 +668,30 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-Current genetic diversity metrics that can be specified with `stat` include:
+Current genetic diversity metrics that can be specified with `stat`
+include:
 
-- `"pi"` for nucleotide diversity (default) calculated using hierfstat `pi.dosage()`
+-   `"pi"` for nucleotide diversity (default) calculated using hierfstat
+    `pi.dosage()`
 
-- `"Ho"` for average observed heterozygosity across all sites
+-   `"Ho"` for average observed heterozygosity across all sites
 
-- `"allelic_richness"` for average number of alleles across all sites
+-   `"allelic_richness"` for average number of alleles across all sites
 
-- `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+-   `"biallelic_richness"` for average allelic richness across all sites
+    for a biallelic dataset (this option is faster than
+    `"allelic_richness"`)
 
-- `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using pegas `hw.test()` at the 0.05 level (other alpha levels can be specified using the sig argument; e.g., `sig = 0.10`)
+-   `"hwe"` for the proportion of sites that are not in Hardy--Weinberg
+    equilibrium, calculated using pegas `hw.test()` at the 0.05 level
+    (other alpha levels can be specified using the sig argument; e.g.,
+    `sig = 0.10`)
 
-- `"basic_stats"` for a series of statistics produced by hierfstat `basic.stats()` including
- mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
- Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
+-   `"basic_stats"` for a series of statistics produced by hierfstat
+    `basic.stats()` including mean observed heterozygosity (same as Ho),
+    mean gene diversities within population (Hs), Gene diversities
+    overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following
+    Nei (1987)
 
 ```{r, cache = TRUE, warning = FALSE}
 multistat_wgd <- window_gd(lotr_vcf,
@@ -628,7 +709,10 @@ multistat_wgd <- window_gd(lotr_vcf,
 par(pty = "s")
 plot_gd(multistat_wgd, index = 1:3, bkg = lotr_range)
 ```
-`"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we change some parameters and reduce dataset for the purpose of the example: 
+
+`"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we
+change some parameters and reduce dataset for the purpose of the
+example:
 
 ```{r}
 hwe_wgd <- window_gd(lotr_vcf[1:10, ],
@@ -652,6 +736,7 @@ bs_wgd <- window_gd(lotr_vcf[1:10, ],
   L = 100
 )
 ```
+
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s")
 plot_gd(hwe_wgd, bkg = lotr_range)
@@ -678,8 +763,8 @@ For the standard genetic diversity statistics:
     with values of 0, 1, or 2.
 
 -   If `stat = het`, `x` must be a heterozygosity matrix where values of
-    0 = homozygosity and values of 1 = heterozygosity. 
-    
+    0 = homozygosity and values of 1 = heterozygosity.
+
 -   If `stat =  allelic_richness`, `x` must be a `genind` type object.
 
 For other statistics:
@@ -724,9 +809,9 @@ plot_gd(we, main = "Mean raster value")
 Although the default input data type for wingen is a VCF file, which is
 a standard file type to encode genomic data, wingen can accept a genind
 object as input to calculate allelic richness using `window_general()`.
-Given that some wingen functionality can be feasible using a genind object,
-users could easily convert various other genetic data file types to then
-run wingen.
+Given that some wingen functionality can be feasible using a genind
+object, users could easily convert various other genetic data file types
+to then run wingen.
 
 For example, genepop (.gen) is a typical file format for encoding
 microsatellite data, in which each allele within a locus is coded using
@@ -734,12 +819,12 @@ a two- or three-digit system (i.e., in a diploid organism, in a
 two-digit system, each locus would be assigned four digits specifying
 each of two alleles. In a three-digit system in the same organism, each
 locus would be assigned six digits encoding those same two alleles).
-Users can convert a genepop file into a genind object using the 
+Users can convert a genepop file into a genind object using the
 `read.genepop()` function in the adegenet package, which automatically
 reads in a .gen file as a genind object. In many cases, microsatellite
-data may not be biallelic, and may contain more than one observed allele 
-at a given locus; in such cases, running `window_general()` with a genind 
-object is still feasible.
+data may not be biallelic, and may contain more than one observed allele
+at a given locus; in such cases, running `window_general()` with a
+genind object is still feasible.
 
 An example of how one could use a genind object as input into
 `window_general()` is as follows:
@@ -765,4 +850,3 @@ we_gi <- window_general(genind,
 par(pty = "s")
 plot_gd(we_gi, main = "Allelic richness")
 ```
-
