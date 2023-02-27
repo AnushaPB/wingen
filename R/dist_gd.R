@@ -97,8 +97,12 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                          fun = mean, L = NULL, rarify_alleles = TRUE,
                          parallel = FALSE, ncores = NULL, ...) {
-  # Modify dist matrix
+  # modify dist matrix
   distmat[distmat > maxdist] <- NA
+
+  # check that any stats will be calculated
+  counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, min_n = min_n, plot = FALSE)
+  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
 
   # set L if pi is being calculated
   if (stat == "pi") if (!is.null(L) & !is.numeric(L)) if (L == "nvariants") L <- ncol(x)
