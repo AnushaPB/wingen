@@ -58,6 +58,70 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 }
 
 
+#' General function for making resistance based maps
+#'
+#' Generate a continuous raster map using resistance distances.
+#' While \link[wingen]{resist_gd} is built specifically for making maps
+#' of genetic diversity from vcfs,`resist_general` can be used to make maps
+#' from different data inputs. Unlike `resist_gd`, `resist_general`
+#' will not convert your data into the correct format for calculations of different
+#' diversity metrics. See details for how to format data inputs for different statistics.
+#'
+#' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
+#' @param stat moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
+#' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
+#' @inheritParams window_general
+#' @inheritParams resist_gd
+#'
+#' @details
+#' To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
+#' - for `"pi"` or  `"biallelic_richness"`, `x` must be a dosage matrix with values of 0, 1, or 2
+#' - for `"Ho"`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity
+#' - for `"allelic_richness"` or `"hwe`, `x` must be a `genind` type object
+#' - for `"basic_stats"`, `x` must be a `hierfstat` type object
+#'
+#' Otherwise, `stat` can be any function that takes a matrix or data frame and outputs a
+#' single numeric value (e.g., a function that produces a custom diversity index);
+#' however, this should be attempted with caution since this functionality has
+#' not have been tested extensively and may produce errors.
+#'
+#' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
+#'
+#' @noRd
+circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
+                           rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
+                           fun = mean, L = NULL, rarify_alleles = TRUE,
+                           parallel = FALSE, ncores = NULL, ...){
+
+  # check and aggregate layer and coords  (only lyr is returned)
+  lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
+
+  # make distmat
+  if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
+
+  # run general resist
+  results <- dist_general(
+    x = x,
+    coords = coords,
+    lyr = lyr,
+    stat = stat,
+    maxdist = maxdist,
+    distmat = distmat,
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    parallel = parallel,
+    ncores = ncores,
+  )
+
+  return(results)
+
+}
+
 get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) {
 
   # convert coords if not in sf
