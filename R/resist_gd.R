@@ -84,11 +84,18 @@ get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, 
   params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
 
   # make vector of distances
-  future::plan(future::multisession, workers = ncores)
+  if (parallel){
+    future::plan(future::multisession, workers = ncores)
 
-  suppressWarnings({
-    distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
-  })
+    suppressWarnings({
+      distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
+    })
+  } else {
+    suppressWarnings({
+      distvec <- purrr::map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
+    })
+  }
+
 
   # convert from vector to matrix
   distmat <-
