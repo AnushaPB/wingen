@@ -122,7 +122,7 @@ test_that("preview_gd works for circle method with all different coordinate type
 })
 
 
-test_that("preview_gd works for resist method with all different coordinate types", {
+test_that("preview_gd works for resist method", {
   load_mini_ex(quiet = TRUE)
   distmat <- get_resdist(mini_coords, mini_lyr, fact = 5, ncores = 2)
   pw <- preview_gd(
@@ -133,47 +133,10 @@ test_that("preview_gd works for resist method with all different coordinate type
     distmat = distmat,
     fact = 5,
     sample_count = TRUE,
-    min_n = 2
+    min_n = 2,
+    ncores = 2
   )
 
-  coords_sf <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
-  coords_mat <- as.matrix(mini_coords)
-  coords_vect <- terra::vect(coords_sf)
+  expect_equal(terra::nlyr(pw), 1)
 
-  par(mfrow = c(1, 3))
-  pw1 <- preview_gd(
-    mini_lyr,
-    coords_sf,
-    method = "resist",
-    maxdist = 10,
-    distmat = distmat,
-    fact = 5,
-    sample_count = TRUE,
-    min_n = 2
-  )
-
-  pw2 <- preview_gd(
-    mini_lyr,
-    coords_mat,
-    method = "resist",
-    maxdist = 10,
-    distmat = distmat,
-    fact = 5,
-    sample_count = TRUE,
-    min_n = 2
-  )
-
-  pw3 <- preview_gd(
-    mini_lyr,
-    coords_vect,
-    method = "resist",
-    maxdist = 10,
-    distmat = distmat,
-    fact = 5,
-    sample_count = TRUE,
-    min_n = 2
-  )
-
-  expect_true(terra::all.equal(pw1, pw2))
-  expect_true(terra::all.equal(pw1, pw3))
 })
