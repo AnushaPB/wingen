@@ -1,6 +1,6 @@
 #' Create a moving window map of genetic diversity
 #'
-#' Generate a continuous raster map of genetic diversity using moving windows
+#' Generate a continuous raster map of genetic diversity using moving windows.
 #'
 #' @param gen genetic data either as an object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
 #' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)
