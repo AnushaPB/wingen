@@ -26,7 +26,7 @@ plot_gd(
 
 \item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
-\item{breaks}{number of breaks to use in color scale (defaults to 10)}
+\item{breaks}{number of breaks to use in color scale (defaults to 100)}
 
 \item{main}{character. Main plot titles (one for each layer to be plotted)}
 
