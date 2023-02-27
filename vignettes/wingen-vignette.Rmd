@@ -11,9 +11,6 @@ editor_options:
 ---
 
 TODO: 
-
-- return stop if circle_gd/resist_gd doesn't have enough samples (based on preview_gd) 
-
 - Think through min_n behavior (right now rarify_n defaults to min_n, and min_n
 defaults to 2, but what if a user sets rarify_n = 1? then they also need
 to set min_n = 1 for it to properly work...which is why originally I had
@@ -22,10 +19,6 @@ with EAC and IJW). Should min_n default be 1? or maybe you should get a
 warning if min_n is greater than rarify_n? 
 
 - replace ... with sig? 
-
-- check SpatRaster conversion for window_gd() in main... 
-
-- make a circle_general() and a resist_general()
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
