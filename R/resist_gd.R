@@ -13,17 +13,16 @@
 #' @export
 #'
 #' @examples
-#'
+#' \dontrun{
 #' load_mini_ex()
-#' wpi <- resist_gd(mini_vcf, mini_coords, mini_lyr)
-#' plot_gd(wpi, main = "Window pi")
-#' plot_count(wpi)
-#'
+#' rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 500)
+#' plot_gd(rpi, main = "Resist pi")
+#' plot_count(rpi)
+#' }
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -82,12 +81,11 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
-#' @noRd
+#' @export
 resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL, ...){
-
+                           parallel = FALSE, ncores = NULL, ...) {
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -114,10 +112,27 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
   )
 
   return(results)
-
 }
 
 
+#' Get a matrix of resistance distances for \link[wingen]{resist_gd}
+#'
+#' Create a distance matrix based on coordinates and a connectivity layer.
+#' The output is a distance matrix where rows represent cells on the landscape
+#' and columns represent individual locations on the landscape. Each value is
+#' the resistance distance between each individual and each cell calculated
+#' using the gdistance package. This matrix is used by \link[wingen]{resist_gd}.
+#'
+#' @inheritParams resist_gd
+#'
+#' @return a distance matrix used by \link[wingen]{resist_gd}
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' load_mini_ex()
+#' distmat <- get_resdist(mini_coords, mini_lyr)
+#' }
 get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, progress = TRUE) {
   # convert con_lyr to raster
   if (!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
@@ -139,7 +154,7 @@ get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, 
   params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
 
   # make vector of distances
-  if (parallel){
+  if (parallel) {
     future::plan(future::multisession, workers = ncores)
 
     suppressWarnings({
@@ -162,23 +177,50 @@ get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, 
   return(distmat)
 }
 
+#' Run gdistance
+#'
+#' @param x index for lyr_coords
+#' @param y index for coords_df
+#' @param trSurface transition surface
+#' @param lyr_coords raster coordinates
+#' @param coords_df individual coordinates
+#'
+#' @return single resistance distance value
+#'
+#' @noRd
 run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
   # Make spatial points
   # TODO: Figure out if CRS is needed here
   sp <- sp::SpatialPoints(rbind(lyr_coords[x, ], coords_df[y, ]))
 
   # Calculate circuit distances
-  distmat <- possible_gdist(trSurface, sp)
+  d <- possible_gdist(trSurface, sp)
 
   # Get distance
-  if (!all(is.na(distmat))) distmat <- distmat[1, 2]
+  if (!all(is.na(d))) d <- d[1, 2]
 
-  return(distmat)
+  return(d)
 }
 
+#' Possibly wrapper for gdistance to return NA instead of error
+#'
+#' @param sp pair of coordinates
+#' @param trSurface transition surface
+#'
+#' @return distance matrix
+#'
+#' @noRd
 possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
 
+#' Convert coordinatres to dataframe
+#'
+#' @param coords coordinates
+#'
+#' @return dataframe of coordinates
+#'
+#' @noRd
 coords_to_df <- function(coords) {
+  if (inherits(coords, "SpatVector")) coords <- sf::st_as_sf(coords)
   if (is.matrix(coords)) coords <- data.frame(coords)
   if (inherits(coords, "sf")) coords <- as.data.frame(sf::as_Spatial(coords))
   colnames(coords) <- c("x", "y")

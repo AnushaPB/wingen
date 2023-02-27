@@ -49,7 +49,6 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-
   # run moving window
   result <-
     purrr::map(
@@ -155,7 +154,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-
   # check and aggregate layer and coords (only lyr is returned)
   lyr <- layer_coords_check(lyr, coords)
 
@@ -169,12 +167,14 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # run general moving window
-  result <- run_general(x = x, lyr = lyr, coords = coords,
-                        coord_cells = coord_cells, nmat = nmat,
-                        stat = stat,
-                        rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-                        parallel = parallel, ncores = ncores)
+  result <- run_general(
+    x = x, lyr = lyr, coords = coords,
+    coord_cells = coord_cells, nmat = nmat,
+    stat = stat,
+    rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+    parallel = parallel, ncores = ncores
+  )
 
   # crop resulting raster
   if (crop_edges) result <- edge_crop(result, wdim)

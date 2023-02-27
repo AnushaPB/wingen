@@ -30,7 +30,6 @@
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
 preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL,
                        fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE, parallel = FALSE, ncores = NULL) {
-
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
@@ -39,7 +38,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
   # convert wdim to matrix if provided or set as NULL
   if (!is.null(wdim)) nmat <- wdim_to_mat(wdim) else nmat <- NULL
 
-  if (method == "window"){
+  if (method == "window") {
     # plot window preview
     if (plot) preview_window(lyr = lyr, nmat = nmat, coords = coords)
   } else {
@@ -76,7 +75,6 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 #'
 #' @noRd
 preview_window <- function(lyr, nmat, coords = NULL) {
-
   # get center of raster
   center <- get_center(lyr)
 
@@ -126,9 +124,9 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
 
   # suppress irrelevant plot warnings
   suppressWarnings({
-    terra::plot(lyrw, col = viridis::mako(3, direction = -1)[c(1,3)], legend = FALSE, axes = FALSE, box = FALSE)
+    terra::plot(lyrw, col = viridis::mako(3, direction = -1)[c(1, 3)], legend = FALSE, axes = FALSE, box = FALSE)
     # draw the circle
-    lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y,  col = viridis::mako(3, direction = -1)[2], lwd = 2)
+    lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
     # add center point
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
     if (!is.null(coords)) {
@@ -155,7 +153,7 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   center_dist <- get_resdist(matrix(center_xy, ncol = 2), lyr, parallel = parallel, ncores = ncores)
 
   # fill in window
-  lyrw <- lyr*0
+  lyrw <- lyr * 0
   # note: distmat is masked with distmat > maxdist <- NA, so this is the opposite
   lyrw[center_dist <= maxdist] <- 1
   lyrw[center_i] <- 2
@@ -183,7 +181,9 @@ get_center <- function(x, xy = FALSE) {
   center <- terra::cellFromXY(x, xy = matrix(c, ncol = 2))
   # because cell and xy will not perfectly align
   # you have to convert back from cell to get the xy center of the cell
-  if (xy) return(terra::xyFromCell(x, center))
+  if (xy) {
+    return(terra::xyFromCell(x, center))
+  }
   return(center)
 }
 

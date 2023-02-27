@@ -1,4 +1,3 @@
-
 #' Core function used by \link[wingen]{window_gd}, \link[wingen]{circle_gd}, and \link[wingen]{resist_gd}
 #'
 #' @return SpatRaster of genetic diversity and sample counts
@@ -9,8 +8,7 @@ run_general <- function(x, lyr, coords,
                         distmat = NULL,
                         stat,
                         rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
-                        parallel = parallel, ncores = ncores, ...){
-
+                        parallel = parallel, ncores = ncores, ...) {
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
@@ -36,25 +34,25 @@ run_general <- function(x, lyr, coords,
     lyr <- raster::raster(lyr)
 
     rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
-                                   lyr = lyr, x = x,
-                                   coord_cells = coord_cells, nmat = nmat,
-                                   distmat = distmat,
-                                   stat_function = stat_function,
-                                   rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                                   min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-                                   .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
+      lyr = lyr, x = x,
+      coord_cells = coord_cells, nmat = nmat,
+      distmat = distmat,
+      stat_function = stat_function,
+      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
     rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
-                            lyr = lyr, x = x,
-                            coord_cells = coord_cells, nmat = nmat,
-                            distmat = distmat,
-                            stat_function = stat_function,
-                            rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-                            min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+      lyr = lyr, x = x,
+      coord_cells = coord_cells, nmat = nmat,
+      distmat = distmat,
+      stat_function = stat_function,
+      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
     )
   }
 
@@ -313,7 +311,7 @@ check_vcf_NA <- function(vcf, coords = NULL, distmat = NULL) {
   if (any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
 
   # make results
-  if (!is.null(coords))  coords <- coords[!NA_ind, ]
+  if (!is.null(coords)) coords <- coords[!NA_ind, ]
   if (!is.null(distmat)) distmat <- distmat[, !NA_ind]
 
   results <- list(vcf = vcf, coords = coords, distmat = distmat) %>% purrr::discard(is.null)

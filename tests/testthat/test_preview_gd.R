@@ -118,7 +118,6 @@ test_that("preview_gd works for circle method with all different coordinate type
 
   expect_true(terra::all.equal(pw1, pw2))
   expect_true(terra::all.equal(pw1, pw3))
-
 })
 
 
@@ -138,5 +137,4 @@ test_that("preview_gd works for resist method", {
   )
 
   expect_equal(terra::nlyr(pw), 1)
-
 })
