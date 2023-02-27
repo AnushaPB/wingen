@@ -49,8 +49,6 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-  # convert lyr to SpatRaster
-  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   # run moving window
   result <-
@@ -127,14 +125,10 @@ window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 
 #' General function for making moving window maps
 #'
-#' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is built specifically for making moving window maps of genetic diversity from vcfs,
-#' `window_general` can be used to make moving window maps from different data inputs. Unlike `window_gd`, `window_general` will not convert your data into
-#' the correct format for calculations of different diversity metrics. To calculate `pi` or `biallelic_richness`, `x` must be a dosage matrix with values of 0, 1, or 2. To calculate
-#' `Ho`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity. To calculate `allelic_richness`, `x` must be a `genind` type object.
-#' Users can set `x` to a vector and create moving window maps with any function that can be applied to a vector (e.g., `stat = mean`, `var`, `sum`, etc.).
-#' `x` can also be a matrix or data frame (where rows are individuals), and then `stat` can be any function that takes a matrix or data frame and outputs a
-#' single numeric value (e.g., a function that produces a custom diversity index); however, this should be attempted with caution since this functionality has
-#'  not have been tested extensively and may produce errors.
+#' Generate a continuous raster map using moving windows. While \link[wingen]{window_gd} is
+#' built specifically for making moving window maps of genetic diversity from vcfs,
+#' `window_general` can be used to make moving window maps from different data inputs.
+#' See details for how to format data inputs for different statistics.
 #'
 #' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
 #' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `Ho` for average observed heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic_richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix). `stat` can also be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
@@ -143,12 +137,26 @@ window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
+#' @details
+#'
+#' To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
+#' - for `"pi"` or  `"biallelic_richness"`, `x` must be a dosage matrix with values of 0, 1, or 2
+#' - for `"Ho"`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity
+#' - for `"allelic_richness"` or `"hwe`, `x` must be a `genind` type object
+#' - for `"basic_stats"`, `x` must be a `hierfstat` type object
+#'
+#' Otherwise, `stat` can be any function that takes a matrix or data frame and outputs a
+#' single numeric value (e.g., a function that produces a custom diversity index);
+#' however, this should be attempted with caution since this functionality has
+#' not have been tested extensively and may produce errors.
+#'
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
-  # check layers and coords (only lyr is modified and returned)
+
+  # check and aggregate layer and coords (only lyr is returned)
   lyr <- layer_coords_check(lyr, coords)
 
   # check wdim
@@ -160,53 +168,19 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # Get function to calculate the desired statistic
   stat_function <- return_stat(stat, ...)
 
-  # check that coords and x align and reformat data, if necessary
-  # note: list2env adds the new, corrected x and coords back to the environment
-  list2env(check_data(x, coords), envir = environment())
-
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
-
-  # make aggregated raster
-  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
-
-  # check that any stats will be calculated
-  counts <- preview_count(lyr = lyr, coords = coords, wdim = wdim, min_n = min_n, plot = FALSE)
-  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
 
   # get cell index for each coordinate
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
-  # run sliding window calculations
-  if (parallel) {
-    # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
-    # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
-    lyr <- raster::raster(lyr)
-
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
-
-    future::plan(future::multisession, workers = ncores)
-
-    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
-      lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-      stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
-    )
-
-    # convert back to SpatRast
-    lyr <- terra::rast(lyr)
-  } else {
-    rast_vals <-
-      purrr::map(1:terra::ncell(lyr), window_helper,
-        lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
-        stat_function = stat_function, rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
-      )
-  }
-
-  # format resulting raster values
-  result <- vals_to_lyr(lyr, rast_vals, stat)
+  # run general moving window
+  result <- run_general(x = x, lyr = lyr, coords = coords,
+                        coord_cells = coord_cells, nmat = nmat,
+                        stat_function = stat_function,
+                        rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                        min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+                        parallel = parallel, ncores = ncores)
 
   # crop resulting raster
   if (crop_edges) result <- edge_crop(result, wdim)

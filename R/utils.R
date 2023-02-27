@@ -1,10 +1,73 @@
+
+#' Core function used by \link[wingen]{window_gd}, \link[wingen]{circle_gd}, and \link[wingen]{resist_gd}
+#'
+#' @return SpatRaster of genetic diversity and sample counts
+#'
+#' @noRd
+run_general <- function(x, lyr, coords, coord_cells = NULL, nmat = NULL, distmat = NULL, stat_function,
+                        rarify, rarify_n, rarify_nit, min_n, fun, L = NULL, rarify_alleles = TRUE,
+                        parallel = parallel, ncores = ncores){
+
+  # check that any stats will be calculated
+  counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
+  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
+
+  # set L if pi is being calculated
+  if (is.character(stat) & !is.null(L)) if (stat == "pi" & L == "nvariants") L <- ncol(x)
+
+  # Get function to calculate the desired statistic
+  stat_function <- return_stat(stat, ...)
+
+  # check that coords and x align and reformat data, if necessary
+  # note: list2env adds the new, corrected x and coords back to the environment
+  list2env(check_data(x, coords), envir = environment())
+
+  # run sliding window calculations
+  if (parallel) {
+    if (is.null(ncores)) ncores <- future::availableCores() - 1
+
+    future::plan(future::multisession, workers = ncores)
+
+    # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
+    # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
+    lyr <- raster::raster(lyr)
+
+    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
+                                   lyr = lyr, x = x,
+                                   coord_cells = coord_cells, nmat = nmat,
+                                   distmat = distmat,
+                                   stat_function = stat_function,
+                                   rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                                   min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
+                                   .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
+    )
+
+    # convert back to SpatRast
+    lyr <- terra::rast(lyr)
+  } else {
+    rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
+                            lyr = lyr, x = x,
+                            coord_cells = coord_cells, nmat = nmat,
+                            distmat = distmat,
+                            stat_function = stat_function,
+                            rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
+                            min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+    )
+  }
+
+  # format resulting raster values
+  result <- vals_to_lyr(lyr, rast_vals, stat)
+
+  return(result)
+}
+
 #' Helper function for window calculations
 #'
 #' Provide nmat for `window_gd()` and distmat for `circle_gd()`/`resist_gd()`/`dist_gd()`
 #' @return genetic diversity and counts for a single cell
 #'
 #' @noRd
-window_helper <- function(i, x, lyr, coord_cells, nmat = NULL, distmat = NULL, stat_function,
+window_helper <- function(i, x, lyr, coord_cells = NULL, nmat = NULL, distmat = NULL, stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L = NULL, rarify_alleles = TRUE) {
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
@@ -287,20 +350,21 @@ convert_vcf <- function(vcf, stat) {
 }
 
 
-#' Helper function to check lyr and coords
+#' Helper function to check and convert lyr and coords
 #'
 #' @param lyr RasterLayer or SpatRaster
 #' @param coords sf points, data frame, or matrix representing coordinates
+#' @param fact factor of aggregation
 #'
 #' @return SpatRaster
 #'
 #' @noRd
-layer_coords_check <- function(lyr, coords) {
+layer_coords_check <- function(lyr, coords, fact = 0) {
   # check coords and lyr
   crs_check_window(lyr, coords)
 
   # convert to terra
-  if (inherits(lyr, "RasterLayer") | inherits(lyr, "RasterStack")) lyr <- terra::rast(lyr)
+  if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
   # check number of layers
   nlayers <- terra::nlyr(lyr)
@@ -308,6 +372,8 @@ layer_coords_check <- function(lyr, coords) {
     warning(paste0(nlayers, " provided, but only one is need. Defaults to using the first layer."))
     lyr <- lyr[[1]]
   }
+  # make aggregated raster
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   return(lyr)
 }
