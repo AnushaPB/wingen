@@ -1,6 +1,11 @@
 #' Preview moving window and sample counts
 #'
-#' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
+#' Generate a preview of moving window size and sample counts based on the coordinates and
+#' parameters to be supplied to \link[wingen]{window_gd}, \link[wingen]{circle_gd}, or  \link[wingen]{resist_gd}.
+#' The method to be used should be specified with `method = window`, `circle`, or `resist`. For `method = window`,
+#' `wdim` must be specified. For `method = circle` or `resist`, `maxdist` must be specified and
+#' `distmat` can also optionally be specified.
+#'
 #' @param lyr SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For `method = "resist"` this should also be the conductivity layer (see \link[wingen]{resist_gd()})
 #' @param method which method to use to create preview (`"window"` for \link[wingen]{window_gd()}, `"circle"` for \link[wingen]{circle_gd()}, or `"resist"` for \link[wingen]{resist_gd()}; defaults to `"window"`)
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
@@ -17,13 +22,15 @@
 #' Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
 #' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 #'
-#' @return SpatRaster with sample counts layer (if sample_count = TRUE)
+#' @return Plots preview of window and returns SpatRaster with sample counts layer (if sample_count = TRUE)
 #' @export
 #'
 #' @examples
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
-preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL, fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE, parallel = FALSE, ncores = NULL) {
+preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL,
+                       fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE, parallel = FALSE, ncores = NULL) {
+
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
@@ -44,6 +51,10 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 
     # Modify dist matrix
     distmat[distmat > maxdist] <- NA
+
+    # plot preview
+    if (method == "circle") preview_circle(lyr, maxdist, coords = coords)
+    if (method == "resist") preview_resist(lyr, maxdist, coords = coords, parallel = parallel, ncores = ncores)
   }
 
   # plot count preview and return count raster
@@ -82,10 +93,78 @@ preview_window <- function(lyr, wdim, coords = NULL) {
     terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
     if (!is.null(coords)) {
-      if (is.matrix(coords)) coords <- data.frame(coords)
-      # note: sf coords also inherit "data.frame" so second condition is needed
-      if (inherits(coords, "data.frame") & !inherits(coords, "sf")) terra::points(coords, pch = 3, col = viridis::magma(1, begin = 0.7))
-      if (inherits(coords, "sf") | inherits(coords, "SpatVector")) terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+      coords <- coords_to_sf(coords)
+      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+    }
+  })
+}
+
+
+#' Plot preview of circle moving window
+#'
+#' @param lyr RasterLayer
+#' @param maxdist maximum distance
+#' @param coords coordinates
+#'
+#' @noRd
+preview_circle <- function(lyr, maxdist, coords = NULL) {
+  # get center of raster
+  center_xy <- get_center(lyr, xy = TRUE)
+  center_i <- get_center(lyr, xy = FALSE)
+
+  # make circle
+  center_x <- center_xy[1]
+  center_y <- center_xy[2]
+  # angles for drawing points around the circle
+  theta <- seq(0, 2 * pi, length = 200)
+
+  # fill in window
+  lyrw <- lyr * 0
+  lyrw[center_i] <- 1
+
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+    terra::plot(lyrw, col = viridis::mako(3, direction = -1)[c(1,3)], legend = FALSE, axes = FALSE, box = FALSE)
+    # draw the circle
+    lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y,  col = viridis::mako(3, direction = -1)[2], lwd = 2)
+    # add center point
+    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
+    if (!is.null(coords)) {
+      coords <- coords_to_sf(coords)
+      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+    }
+  })
+}
+
+
+#' Plot preview of circle moving window
+#'
+#' @param lyr RasterLayer
+#' @param maxdist maximum distance
+#' @param coords coordinates
+#'
+#' @noRd
+preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores = NULL) {
+  # get center of raster
+  center_xy <- get_center(lyr, xy = TRUE)
+  center_i <- get_center(lyr, xy = FALSE)
+
+  # get resdist from center
+  center_dist <- get_resdist(matrix(center_xy, ncol = 2), lyr, parallel = parallel, ncores = ncores)
+
+  # fill in window
+  lyrw <- lyr*0
+  # note: distmat is masked with distmat > maxdist <- NA, so this is the opposite
+  lyrw[center_dist <= maxdist] <- 1
+  lyrw[center_i] <- 2
+
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+    terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = TRUE, axes = FALSE, box = FALSE)
+    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+    if (!is.null(coords)) {
+      coords <- coords_to_sf(coords)
+      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
     }
   })
 }
@@ -93,12 +172,16 @@ preview_window <- function(lyr, wdim, coords = NULL) {
 #' Get center cell of a raster
 #'
 #' @param x raster
+#' @param xy whether to return as xy coordinates
 #'
 #' @noRd
-get_center <- function(x) {
+get_center <- function(x, xy = FALSE) {
   e <- as.vector(terra::ext(x))
   c <- c(mean(e[c(1, 2)]), mean(e[c(3, 4)]))
   center <- terra::cellFromXY(x, xy = matrix(c, ncol = 2))
+  # because cell and xy will not perfectly align
+  # you have to convert back from cell to get the xy center of the cell
+  if (xy) return(terra::xyFromCell(x, center))
   return(center)
 }
 
@@ -110,7 +193,7 @@ get_center <- function(x) {
 #' @param plot whether to plot resuls
 #'
 #' @noRd
-preview_count <- function(lyr, coords, wdim, distmat, min_n, plot = TRUE) {
+preview_count <- function(lyr, coords, wdim = NULL, distmat = NULL, min_n, plot = TRUE) {
   # get coord cells
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
