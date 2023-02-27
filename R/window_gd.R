@@ -164,15 +164,15 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # note: list2env adds the new, corrected x and coords back to the environment
   list2env(check_data(x, coords), envir = environment())
 
-  # check that any stats will be calculated
-  counts <- preview_gd(method = "window", lyr = lyr, coords = coords, wdim = wdim, fact = fact, sample_count = TRUE, min_n = min_n, plot = FALSE)
-  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
-
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
 
   # make aggregated raster
   if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
+
+  # check that any stats will be calculated
+  counts <- preview_count(lyr = lyr, coords = coords, wdim = wdim, min_n = min_n, plot = FALSE)
+  if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
 
   # get cell index for each coordinate
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
