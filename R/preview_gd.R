@@ -36,8 +36,11 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
   if (method == "window"){
+    # convert wdim to matrix
+    nmat <- wdim_to_mat(wdim)
+
     # plot window preview
-    if (plot) preview_window(lyr, wdim, coords)
+    if (plot) preview_window(lyr, nmat, coords)
   } else {
     # convert coords if not in sf
     if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
@@ -59,7 +62,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 
   # plot count preview and return count raster
   if (sample_count) {
-    lyrc <- preview_count(lyr = lyr, coords = coords, wdim = wdim, distmat = distmat, min_n = min_n, plot = plot)
+    lyrc <- preview_count(lyr = lyr, coords = coords, nmat = nmat, distmat = distmat, min_n = min_n, plot = plot)
     return(lyrc)
   }
 }
@@ -67,13 +70,11 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 #' Plot preview of moving window
 #'
 #' @param lyr RasterLayer
-#' @param wdim window dimensions
+#' @param nmat neighborhood matrix
 #' @param coords coordinates
 #'
 #' @noRd
 preview_window <- function(lyr, wdim, coords = NULL) {
-  # convert wdim to matrix
-  nmat <- wdim_to_mat(wdim)
 
   # get center of raster
   center <- get_center(lyr)
@@ -189,11 +190,11 @@ get_center <- function(x, xy = FALSE) {
 #'
 #' @param lyr RasterLayer
 #' @param coords coordinates
-#' @param wdim window dimensions
+#' @param nmat neighborhood matrix
 #' @param plot whether to plot resuls
 #'
 #' @noRd
-preview_count <- function(lyr, coords, wdim = NULL, distmat = NULL, min_n, plot = TRUE) {
+preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, min_n, plot = TRUE) {
   # get coord cells
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
@@ -201,7 +202,7 @@ preview_count <- function(lyr, coords, wdim = NULL, distmat = NULL, min_n, plot 
   lyrc <- lyr
 
   # get counts for each raster cell
-  if (!is.null(wdim)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_wdim, lyr, wdim_to_mat(wdim), coord_cells)
+  if (!is.null(nmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_wdim, lyr, nmat, coord_cells)
   if (!is.null(distmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_dist, distmat)
 
   # assign values to raster
