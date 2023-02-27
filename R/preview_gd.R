@@ -35,12 +35,13 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
-  if (method == "window"){
-    # convert wdim to matrix
-    nmat <- wdim_to_mat(wdim)
 
+  # convert wdim to matrix if provided or set as NULL
+  if (!is.null(wdim)) nmat <- wdim_to_mat(wdim) else nmat <- NULL
+
+  if (method == "window"){
     # plot window preview
-    if (plot) preview_window(lyr, nmat, coords)
+    if (plot) preview_window(lyr = lyr, nmat = nmat, coords = coords)
   } else {
     # convert coords if not in sf
     if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
@@ -74,7 +75,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 #' @param coords coordinates
 #'
 #' @noRd
-preview_window <- function(lyr, wdim, coords = NULL) {
+preview_window <- function(lyr, nmat, coords = NULL) {
 
   # get center of raster
   center <- get_center(lyr)

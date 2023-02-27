@@ -86,10 +86,10 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 
 #' Helper function for mapping over stats
 #' @noRd
-window_gd_stats <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
-                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
-                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
+                            rarify, rarify_n, rarify_nit, min_n,
+                            fun, L, rarify_alleles,
+                            parallel, ncores, crop_edges, ...) {
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -162,12 +162,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # check wdim
   wdim <- wdim_check(wdim)
 
-  # set L if pi is being calculated
-  if (is.character(stat) & !is.null(L)) if (stat == "pi" & L == "nvariants") L <- ncol(x)
-
-  # Get function to calculate the desired statistic
-  stat_function <- return_stat(stat, ...)
-
   # make neighbor matrix
   nmat <- wdim_to_mat(wdim)
 
@@ -177,7 +171,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   # run general moving window
   result <- run_general(x = x, lyr = lyr, coords = coords,
                         coord_cells = coord_cells, nmat = nmat,
-                        stat_function = stat_function,
+                        stat = stat,
                         rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                         min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
                         parallel = parallel, ncores = ncores)

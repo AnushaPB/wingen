@@ -45,16 +45,16 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
 #' Helper function for mapping over stats
 #'
 #' @noRd
-dist_gd_stats <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
-                          rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
-                          fun = mean, L = NULL, rarify_alleles = TRUE,
-                          parallel = FALSE, ncores = NULL) {
+dist_gd_stats <- function(gen, coords, lyr, stat, maxdist, distmat,
+                          rarify, rarify_n, rarify_nit, min_n,
+                          fun, L, rarify_alleles,
+                          parallel, ncores) {
   # check that the input file is a vcfR or a path to a vcf object
   vcf <- vcf_check(gen)
 
   # check that coords and gen align and reformat data, if necessary
   # note: list2env adds the new, corrected gen and coords back to the environment
-  list2env(check_data(vcf, coords), envir = environment())
+  list2env(check_data(vcf, coords = coords, distmat = distmat), envir = environment())
 
   # convert gen based on statistic being calculated
   x <- convert_vcf(vcf, stat)
@@ -105,7 +105,7 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
   # run general moving window
   result <- run_general(x = x, lyr = lyr, coords = coords,
                         distmat = distmat,
-                        stat_function = stat_function,
+                        stat = stat,
                         rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
                         min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
                         parallel = parallel, ncores = ncores)

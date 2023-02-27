@@ -6,14 +6,15 @@ test_that("circle_gd returns expected output", {
 
   # check against expected values
   vals <- terra::global(cpi, fun = "mean", na.rm = TRUE)
-  expect_equal(0.3658471, vals["pi", ], tolerance = 0.000001)
-  expect_equal(5.12, vals["sample_count", ])
+  expect_equal(0.3733736, vals["pi", ], tolerance = 0.000001)
+  expect_equal(4.44, vals["sample_count", ])
 
   # test general functions
-  distmat <- get_geodist(mini_coords, mini_lyr)
+  load_mini_ex(quiet = TRUE)
   expect_warning(expect_warning(data <- check_data(mini_vcf_NA, mini_coords)))
   mini_vcf_NA <- data$vcf
   mini_coords <- data$coords
+  distmat <- get_geodist(mini_coords, mini_lyr)
   capture_warnings(wp <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
   capture_warnings(wh <- circle_general(vcf_to_het(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
   capture_warnings(wb <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = FALSE))

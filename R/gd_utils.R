@@ -4,9 +4,12 @@
 #' @return SpatRaster of genetic diversity and sample counts
 #'
 #' @noRd
-run_general <- function(x, lyr, coords, coord_cells = NULL, nmat = NULL, distmat = NULL, stat_function,
-                        rarify, rarify_n, rarify_nit, min_n, fun, L = NULL, rarify_alleles = TRUE,
-                        parallel = parallel, ncores = ncores){
+run_general <- function(x, lyr, coords,
+                        coord_cells = NULL, nmat = NULL,
+                        distmat = NULL,
+                        stat,
+                        rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
+                        parallel = parallel, ncores = ncores, ...){
 
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
@@ -20,7 +23,7 @@ run_general <- function(x, lyr, coords, coord_cells = NULL, nmat = NULL, distmat
 
   # check that coords and x align and reformat data, if necessary
   # note: list2env adds the new, corrected x and coords back to the environment
-  list2env(check_data(x, coords), envir = environment())
+  list2env(check_data(x, coords = coords, distmat = distmat), envir = environment())
 
   # run sliding window calculations
   if (parallel) {
@@ -67,9 +70,12 @@ run_general <- function(x, lyr, coords, coord_cells = NULL, nmat = NULL, distmat
 #' @return genetic diversity and counts for a single cell
 #'
 #' @noRd
-window_helper <- function(i, x, lyr, coord_cells = NULL, nmat = NULL, distmat = NULL, stat_function,
+window_helper <- function(i, x, lyr,
+                          coord_cells = NULL, nmat = NULL,
+                          distmat = NULL,
+                          stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
-                          fun, L = NULL, rarify_alleles = TRUE) {
+                          fun, L, rarify_alleles) {
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
   if (is.null(rarify_n)) rarify_n <- min_n
 
@@ -119,7 +125,7 @@ window_helper <- function(i, x, lyr, coord_cells = NULL, nmat = NULL, distmat = 
 #'
 #' @noRd
 rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
-                          fun = mean, L = "nvariants", rarify_alleles = TRUE) {
+                          fun, L, rarify_alleles) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
     gd <- NA
@@ -146,8 +152,8 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
 #' @return rarified genetic diversity statistic
 #'
 #' @noRd
-rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
-                      fun, L = "nvariants", rarify_alleles = TRUE) {
+rarify_gd <- function(x, sub, rarify_nit, rarify_n, stat_function,
+                      fun, L, rarify_alleles) {
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
     stop("rarify_n is less than the number of samples provided")
@@ -184,7 +190,7 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
 #' @return mean allelic richness of a subsample
 #'
 #' @noRd
-sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
+sample_gd <- function(x, sub, stat_function, L, rarify_alleles) {
   if (isTRUE(all.equal(stat_function, calc_mean_biar))) {
     return(stat_function(x[sub, ], rarify_alleles))
   }
@@ -228,10 +234,11 @@ get_adj <- function(i, r, n, coord_cells) {
 #'
 #' @param x moving window data
 #' @param coords coordinates
+#' @param distmat distance matrix
 #'
 #' @noRd
 #'
-check_data <- function(x, coords = NULL) {
+check_data <- function(x, coords = NULL, distmat = NULL) {
   # if x is a vector, convert to a dataframe
   if (is.vector(x)) x <- data.frame(x)
 
@@ -254,11 +261,18 @@ check_data <- function(x, coords = NULL) {
     }
   }
 
+  # check distmat
+  if (!is.null(distmat)) {
+    if (nind != ncol(distmat)) {
+      stop("number of samples in distmat data and number of samples in gen data are not equal")
+    }
+  }
+
   # check for rows or columns with missing data in a vcf and give warning if there are invariant sites
   if (inherits(x, "vcfR")) {
-    return(check_vcf_NA(x, coords))
+    return(check_vcf_NA(vcf = x, coords = coords, distmat = distmat))
   } else {
-    return(list(x = x, coords = coords))
+    return(list(x = x, coords = coords, distmat = distmat))
   }
 }
 
@@ -266,9 +280,10 @@ check_data <- function(x, coords = NULL) {
 #'
 #' @param vcf vcfR
 #' @param coords coordinates
+#' @param distmat distance matrix
 #'
 #' @noRd
-check_vcf_NA <- function(vcf, coords = NULL) {
+check_vcf_NA <- function(vcf, coords = NULL, distmat = NULL) {
   # check for mismatch before indexing
   if (!is.null(coords)) {
     if ((ncol(vcf@gt) - 1) != nrow(coords)) {
@@ -277,10 +292,10 @@ check_vcf_NA <- function(vcf, coords = NULL) {
   }
 
   if (nrow(vcf@fix) == 1) {
-    NA_col <- get_allNA(vcf@gt[-1])
+    NA_ind <- get_allNA(vcf@gt[-1])
     NA_row <- FALSE
   } else {
-    NA_col <- get_allNA(vcf@gt[, -1], MARGIN = 2)
+    NA_ind <- get_allNA(vcf@gt[, -1], MARGIN = 2)
     NA_row <- get_allNA(vcf@gt[, -1], MARGIN = 1)
   }
 
@@ -289,23 +304,20 @@ check_vcf_NA <- function(vcf, coords = NULL) {
     vcf <- vcf[!NA_row, ]
   }
 
-  if (any(NA_col)) {
+  if (any(NA_ind)) {
     warning("Individuals with no scored loci have been removed")
-    vcf <- vcf[, c(TRUE, !NA_col)]
+    vcf <- vcf[, c(TRUE, !NA_ind)]
   }
 
   # check for invariant sites
   if (any(!vcfR::is.polymorphic(vcf, na.omit = TRUE))) warning("invariant sites found in vcf")
 
   # make results
-  if (is.null(coords)) {
-    result <- vcf
-  } else {
-    coords <- coords[!NA_col, ]
-    result <- list(vcf = vcf, coords = coords)
-  }
+  if (!is.null(coords))  coords <- coords[!NA_ind, ]
+  if (!is.null(distmat)) distmat <- distmat[, !NA_ind]
 
-  return(result)
+  results <- list(vcf = vcf, coords = coords, distmat = distmat) %>% purrr::discard(is.null)
+  return(results)
 }
 
 #' Helper function to get NA values
