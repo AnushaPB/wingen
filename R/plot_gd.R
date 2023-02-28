@@ -5,7 +5,7 @@
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (SpatRaster where first layer is genetic diversity)
 #' @param index if a raster stack is provided, index of the sample count layer to plot (defaults to plotting first layer)
 #' @param bkg optional SpatRaster or other spatial object that will be plotted as the "background" in gray
-#' @param col color palette to use for plotting (defaults to viridis::magma palette)
+#' @param col color palette to use for plotting (defaults to \link[viridis]{magma} palette)
 #' @param breaks number of breaks to use in color scale (defaults to 100)
 #' @param box whether to include a box around the Raster plot (defaults to FALSE)
 #' @param range numeric. minimum and maximum values to be used for the continuous legend
