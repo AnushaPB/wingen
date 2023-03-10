@@ -21,7 +21,7 @@ wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1){
   vals <- x_df[,3]
   # get weighted mean of raster values based on cell
   wmean <- purrr::map_dbl(1:nrow(x_df), ~get_wmean(.x, vals, idw))
-  x[] <- wmean
+  wmean_rast <- terra::setValues(x, wmean)
 
   return(wmean_rast)
 }
