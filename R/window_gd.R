@@ -155,7 +155,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
   # check and aggregate layer and coords (only lyr is returned)
-  lyr <- layer_coords_check(lyr, coords)
+  lyr <- layer_coords_check(lyr, coords, fact)
 
   # check wdim
   wdim <- wdim_check(wdim)
