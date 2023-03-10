@@ -18,7 +18,7 @@ test_that("mask_gd returns expected output", {
   expect_true(all(terra::values(is.na(mpi)) == terra::values(mini_lyr > 2)))
 })
 
-test_that("sclae mismatch produces error", {
+test_that("scale mismatch produces error", {
   load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
