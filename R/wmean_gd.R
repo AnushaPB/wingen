@@ -1,5 +1,5 @@
 
-wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1){
+wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1, beta = 1){
   # make df from raster
   x_df <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
 
@@ -16,14 +16,14 @@ wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1){
   # TODO: think about this:
   idw[is.infinite(idw)] <- max(idw[!is.infinite(idw)], na.rm = TRUE)
   idw[is.na(idw)] <- 0
+  idw <- idw^beta
 
   # get raster values
   vals <- x_df[,3]
   # get weighted mean of raster values based on cell
-  wmean <- purrr::map_dbl(1:nrow(x_df), ~get_wmean(.x, vals, idw))
-  wmean_rast <- terra::setValues(x, wmean)
+  x[] <- purrr::map_dbl(1:nrow(x_df), ~get_wmean(.x, vals, idw))
 
-  return(wmean_rast)
+  return(x)
 }
 
 get_wmean <- function(i, vals, idw){
