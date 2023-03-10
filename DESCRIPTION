@@ -27,6 +27,7 @@ Imports:
     purrr,
     raster,
     Rcpp,
+    Rfast,
     sp,
     SpatialKDE,
     sf,
