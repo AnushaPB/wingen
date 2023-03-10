@@ -843,3 +843,11 @@ we_gi <- window_general(genind,
 par(pty = "s")
 plot_gd(we_gi, main = "Allelic richness")
 ```
+
+# IN PROGRESS -------------------------------------------------------------------------------------
+# Weighted mean transformation
+```{r}
+wmean1 <- wmean_gd(wgd)
+plot_gd(wmean1)
+```
+
