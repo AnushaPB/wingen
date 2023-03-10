@@ -53,6 +53,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords, con_lyr = lyr, parallel = parallel, ncores = ncores)
 
     # Modify dist matrix
+    # TODO: make work for custom maxdist
     distmat[distmat > maxdist] <- NA
 
     # plot preview
@@ -62,7 +63,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 
   # plot count preview and return count raster
   if (sample_count) {
-    lyrc <- preview_count(lyr = lyr, coords = coords, nmat = nmat, distmat = distmat, min_n = min_n, plot = plot)
+    lyrc <- preview_count(lyr = lyr, coords = coords, nmat = nmat, distmat = distmat, maxdist = maxdist, min_n = min_n, plot = plot)
     return(lyrc)
   }
 }
@@ -195,7 +196,7 @@ get_center <- function(x, xy = FALSE) {
 #' @param plot whether to plot resuls
 #'
 #' @noRd
-preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, min_n, plot = TRUE) {
+preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NULL, min_n, plot = TRUE) {
   # get coord cells
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
@@ -204,7 +205,7 @@ preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, min_n, plot 
 
   # get counts for each raster cell
   if (!is.null(nmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_wdim, lyr, nmat, coord_cells)
-  if (!is.null(distmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_dist, distmat)
+  if (!is.null(distmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_dist, distmat, maxdist)
 
   # assign values to raster
   lyrc <- terra::setValues(lyr, nc)
@@ -226,24 +227,24 @@ preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, min_n, plot 
 
 #' Count samples in rectangular window around focal cell
 #'
-#' @param x focal cell index
+#' @param i focal cell index
 #' @param lyr raster layer
 #' @param nmat neighborhood matrix
 #' @param coord_cells cell indexes of coordinates
 #'
 #' @noRd
-sample_count_wdim <- function(x, lyr, nmat, coord_cells) {
-  sub <- get_adj(x, lyr, nmat, coord_cells)
+sample_count_wdim <- function(i, lyr, nmat, coord_cells) {
+  sub <- get_adj(i, lyr, nmat, coord_cells)
   return(length(sub))
 }
 
 #' Count samples in circle or resistance window around focal cell
 #'
-#' @param x focal cell index
+#' @param i focal cell index
 #' @param distmat distance matrix
 #'
 #' @noRd
-sample_count_dist <- function(x, distmat) {
-  sub <- get_dist_index(x, distmat)
+sample_count_dist <- function(i, distmat, maxdist) {
+  sub <- get_dist_index(i, distmat, maxdist)
   return(length(sub))
 }

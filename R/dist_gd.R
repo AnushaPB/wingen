@@ -7,6 +7,13 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL) {
+
+  # convert maxdist to SpatRaster
+  if (!is.numeric(maxdist) & !inherits(maxdist, "SpatRaster")) {
+    maxdist <- terra::rast(maxdist)
+    maxdist <- terra::aggregate(maxdist, fact, fun = mean)
+  }
+
   # run moving window
   result <-
     purrr::map(
@@ -97,13 +104,10 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
   lyr <- layer_coords_check(lyr, coords)
   if (terra::ncell(lyr) != nrow(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
 
-  # modify dist matrix
-  distmat[distmat > maxdist] <- NA
-
   # run general moving window
   result <- run_general(
     x = x, lyr = lyr, coords = coords,
-    distmat = distmat,
+    distmat = distmat, maxdist = maxdist,
     stat = stat,
     rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
     min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
@@ -113,4 +117,12 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
   return(result)
 }
 
-get_dist_index <- function(i, distmat) which(!is.na(distmat[i, ]))
+get_dist_index <- function(i, distmat, maxdist) {
+  # get maxdist
+  if (!is.numeric(maxdist)) md <- maxdist[i] else md <- maxdist
+
+  # modify dist matrix
+  distmat[distmat > md] <- NA
+
+  return(which(!is.na(distmat[i, ])))
+}

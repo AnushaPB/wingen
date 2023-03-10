@@ -5,7 +5,7 @@
 #' @noRd
 run_general <- function(x, lyr, coords,
                         coord_cells = NULL, nmat = NULL,
-                        distmat = NULL,
+                        distmat = NULL, maxdist = NULL,
                         stat,
                         rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
                         parallel = parallel, ncores = ncores, ...) {
@@ -36,7 +36,7 @@ run_general <- function(x, lyr, coords,
     rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x,
       coord_cells = coord_cells, nmat = nmat,
-      distmat = distmat,
+      distmat = distmat, maxdist = maxdist,
       stat_function = stat_function,
       rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
@@ -49,7 +49,7 @@ run_general <- function(x, lyr, coords,
     rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x,
       coord_cells = coord_cells, nmat = nmat,
-      distmat = distmat,
+      distmat = distmat, maxdist = maxdist,
       stat_function = stat_function,
       rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
@@ -70,7 +70,7 @@ run_general <- function(x, lyr, coords,
 #' @noRd
 window_helper <- function(i, x, lyr,
                           coord_cells = NULL, nmat = NULL,
-                          distmat = NULL,
+                          distmat = NULL, maxdist = NULL,
                           stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L, rarify_alleles) {
@@ -88,7 +88,7 @@ window_helper <- function(i, x, lyr,
   if (!is.null(nmat)) sub <- get_adj(i, lyr, nmat, coord_cells)
 
   # get sample indices based on distance (circle_gd/resist_gd/dist_gd)
-  if (!is.null(distmat)) sub <- get_dist_index(i, distmat)
+  if (!is.null(distmat)) sub <- get_dist_index(i, distmat, maxdist)
 
   # if there are too few samples in that window assign the cell value NA
   if (length(sub) < min_n) {

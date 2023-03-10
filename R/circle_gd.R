@@ -3,6 +3,7 @@
 #' Generate a continuous raster map of genetic diversity using circle moving windows
 #'
 #' @param maxdist maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius)
+#' Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as `lyr`).
 #' @param distmat distance matrix output from \link[wingen]{get_geodist} (optional; can be used to save time on distance calculations)
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.

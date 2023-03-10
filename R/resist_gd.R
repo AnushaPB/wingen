@@ -2,7 +2,8 @@
 #'
 #' Generate a continuous raster map of genetic diversity using resistance distances calculated with a conductivity surface
 #'
-#' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)
+#' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
+#' Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as `lyr`).
 #' @param lyr conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.
 #' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
 #' @inheritParams window_gd
@@ -23,6 +24,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL) {
+
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
