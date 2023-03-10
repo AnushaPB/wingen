@@ -234,7 +234,7 @@ make_krige_grid <- function(r = NULL, grd = NULL) {
 #'
 #' @noRd
 raster_to_grid <- function(x) {
-  grd <- terra::as.data.frame(x, xy = TRUE)
+  grd <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
   sp::coordinates(grd) <- ~ x + y
   sp::gridded(grd) <- TRUE
   return(grd)
