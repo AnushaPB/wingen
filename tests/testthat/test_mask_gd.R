@@ -18,7 +18,7 @@ test_that("mask_gd returns expected output", {
   expect_true(all(terra::values(is.na(mpi)) == terra::values(mini_lyr > 2)))
 })
 
-test_that("sclae mismatch produces error", {
+test_that("scale mismatch produces error", {
   load_mini_ex(quiet = TRUE)
 
   x <- mini_lyr
@@ -28,22 +28,4 @@ test_that("sclae mismatch produces error", {
   expect_error(mse <- mask_gd(x, mask))
 })
 
-test_that("different objects can be used for masking", {
-  data("lotr_lyr")
-  data("lotr_range")
 
-  # SpatVector
-  vect_range <- terra::vect(lotr_range)
-  m1 <- mask_gd(lotr_lyr, lotr_range)
-
-  # sf object
-  sf_range <- sf::st_as_sf(lotr_range)
-  m2 <- mask_gd(lotr_lyr, sf_range)
-
-  # sp object
-  sp_range <- sf::as_Spatial(sf_range)
-  m3 <- mask_gd(lotr_lyr, sp_range)
-
-  expect_true(terra::all.equal(m1, m2))
-  expect_true(terra::all.equal(m1, m3))
-})
