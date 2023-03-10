@@ -847,7 +847,13 @@ plot_gd(we_gi, main = "Allelic richness")
 # IN PROGRESS -------------------------------------------------------------------------------------
 # Weighted mean transformation
 ```{r}
+wgd <- window_gd(lotr_vcf, lotr_coords, lotr_lyr, wdim = 7, fact = 3, rarify = TRUE)
+plot_gd(wgd)
+
 wmean1 <- wmean_gd(wgd)
 plot_gd(wmean1)
+
+wmean2 <- map(seq(2, 10, 2), ~wmean_gd(wgd, beta = .x))
+walk(wmean2, plot_gd)
 ```
 
