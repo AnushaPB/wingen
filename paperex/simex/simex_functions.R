@@ -6,7 +6,6 @@ get_exdir <- function(){
   return(here::here("paperex", "simex"))
 }
 
-
 #' Load middle earth data
 #' @param subset if TRUE, subsets data
 #' @param quiet if TRUE, no message is printed
@@ -301,9 +300,7 @@ test_params_simex <- function(params, vcf, coords, lyr, stat = "pi"){
                    fact = fact,
                    rarify = TRUE,
                    rarify_n = 2,
-                   rarify_nit = 5,
-                   parallel = TRUE,
-                   ncores = 4)
+                   rarify_nit = 5)
   return(res)
 }
 
