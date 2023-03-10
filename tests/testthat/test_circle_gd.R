@@ -21,6 +21,11 @@ test_that("circle_gd returns expected output", {
   capture_warnings(wbr <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = TRUE))
   capture_warnings(wa <- circle_general(vcfR::vcfR2genind(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
 
+  # test with custom maxdist
+  mini_lyr[] <- 40
+  mini_lyr[1:50] <- 0
+  capture_warnings(wp <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = mini_lyr, distmat = distmat, mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
+
   # examples with custom functions
   toy <- vcf_to_dosage(mini_vcf_NA)
   # test on vector
