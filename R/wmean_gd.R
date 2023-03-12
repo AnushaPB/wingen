@@ -1,5 +1,5 @@
 
-wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1, beta = 1){
+wmean_gd <- function(x, lyr = NULL, parallel = TRUE, maxdist = NULL, ncores = 1, beta = 1){
   # make df from raster
   x_df <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
 
@@ -11,10 +11,12 @@ wmean_gd <- function(x, lyr = NULL, parallel = TRUE, ncores = 1, beta = 1){
     distmat <- get_resdist(lyr_df[, c("x", "y")], lyr, parallel = parallel, ncores = ncores)
   }
 
+  if (!is.null(maxdist)) distmat[distmat > maxdist] <- NA
   # make inverse distance weighted matrix
   idw <- 1/distmat
   # TODO: think about this:
-  idw[is.infinite(idw)] <- max(idw[!is.infinite(idw)], na.rm = TRUE)
+  #idw[is.infinite(idw)] <- max(idw[!is.infinite(idw)], na.rm = TRUE)
+  idw[is.infinite(idw)] <- NA
   idw[is.na(idw)] <- 0
   idw <- idw^beta
 
