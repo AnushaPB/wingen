@@ -24,11 +24,11 @@ plot_gd(
 
 \item{index}{if a raster stack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
 
-\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
+\item{col}{color palette to use for plotting (defaults to \link[viridis]{magma} palette)}
 
-\item{breaks}{number of breaks to use in color scale (defaults to 10)}
+\item{breaks}{number of breaks to use in color scale (defaults to 100)}
 
-\item{main}{character. Main plot titles (one for each layer to be plotted)}
+\item{main}{character. Main plot titles (one for each layer to be plotted). You can use arguments \code{cex.main}, \code{font.main}, \code{col.main} to change the appearance; and \code{loc.main} to change the location of the main title (either two coordinates, or a character value such as "topleft")}
 
 \item{box}{whether to include a box around the Raster plot (defaults to FALSE)}
 

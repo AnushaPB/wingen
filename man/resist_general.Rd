@@ -31,7 +31,8 @@ resist_general(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance)}
+\item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
+Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as \code{lyr}).}
 
 \item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
 

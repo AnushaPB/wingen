@@ -30,7 +30,8 @@ circle_gd(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{maxdist}{maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius)}
+\item{maxdist}{maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius)
+Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as \code{lyr}).}
 
 \item{distmat}{distance matrix output from \link[wingen]{get_geodist} (optional; can be used to save time on distance calculations)}
 
