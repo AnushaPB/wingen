@@ -346,12 +346,14 @@ The main additional arguments to `circle_gd()` are:
 
 1.  `maxdist` - maximum geographic distance used to define neighborhood;
     any samples further than this distance will not be included (this
-    can be thought of as the neighborhood radius) Similarly to `wdim` We
-    encourage users to experiment with different values of `maxist` to
-    determine the sensitivity of their results to this parameter and
-    ideally set it with some knowledge of the study system in mind
-    (e.g., the dispersal patterns and/or neighborhood size of the study
-    organism).
+    can be thought of as the neighborhood radius). Can be provided as either
+    (1) a single numeric value or (2) a SpatRaster where each pixel is the 
+    maximum distance to be used for that cell on the landscape (must be the 
+    same spatial scale as `lyr`). Similarly to `wdim` We encourage users to 
+    experiment with different values of `maxist` to determine the sensitivity 
+    of their results to this parameter and ideally set it with some knowledge
+    of the study system in mind (e.g., the dispersal patterns and/or neighborhood 
+    size of the study organism). 
 
 2.  `distmat` - optional distance matrix output from `get_geodist()`
 
@@ -397,9 +399,11 @@ To create a moving window map with a resistance distances use
 1.  `maxdist` - maximum cost distance used to define neighborhood; any
     samples further than this cost distance will not be included (this
     can be thought of as the neighborhood radius, but in terms of cost
-    distance). As stated before, we encourage users to experiment with
-    different values of `maxist` to determine the sensitivity of their
-    results to this parameter.
+    distance). Can be provided as either (1) a single numeric value or
+    (2) a SpatRaster where each pixel is the maximum distance to be used 
+    for that cell on the landscape (must be the same spatial scale as `lyr`).
+    As stated before, we encourage users to experiment with different values 
+    of `maxist` to determine the sensitivity of their results to this parameter.
 
 2.  `lyr` - in addition to being the raster layer the window moves
     across, this will also serve as the conductivity layer used to
@@ -845,15 +849,30 @@ plot_gd(we_gi, main = "Allelic richness")
 ```
 
 # IN PROGRESS -------------------------------------------------------------------------------------
+# Fis and HWE
+# Polygon or category
 # Weighted mean transformation
+- add diff distance calculations into new make_distmat function
 ```{r}
 wgd <- window_gd(lotr_vcf, lotr_coords, lotr_lyr, wdim = 7, fact = 3, rarify = TRUE)
 plot_gd(wgd)
 
-wmean1 <- wmean_gd(wgd)
+wmean1 <- wmean_gd(wgd, maxdist = 10)
 plot_gd(wmean1)
 
-wmean2 <- map(seq(2, 10, 2), ~wmean_gd(wgd, beta = .x))
-walk(wmean2, plot_gd)
+wmean2 <- purrr::map(seq(2, 8, 2), ~wmean_gd(wgd, beta = .x))
+purrr::walk(wmean2, plot_gd)
+
 ```
+```{r}
+lyr1 <- wgd
+lyr1[1:578] <- 0
+lyr1[579:1156] <- 1
+
+# ADD MAXDIST VALUE
+wmean3 <- wmean_gd(lyr1, maxdist = 20)
+plot_gd(lyr1)
+plot_gd(wmean3)
+```
+
 
