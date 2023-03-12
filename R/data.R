@@ -54,7 +54,7 @@
 #' A Variant Call Format data set
 #'
 #' @format Object of class vcfR with 10 individuals and 10 loci
-#' @source created from simulations in Bishop et al. (in review)
+#' @source created from simulations in Bishop et al. (2023)
 "mini_vcf"
 
 #' Mini middle earth example vcf with NA values
@@ -62,7 +62,7 @@
 #' A Variant Call Format data set with NA values
 #'
 #' @format Object of class vcfR with 10 individuals and 10 loci
-#' @source created from simulations in Bishop et al. (in review)
+#' @source created from simulations in Bishop et al. (2023)
 "mini_vcf_NA"
 
 #' Mini middle earth example raster
@@ -72,5 +72,5 @@
 #' ([Robert, 2020](https://scholarworks.wm.edu/asoer/3/)).
 #'
 #' @format A RasterLayer of middle earth
-#' @source created from simulations in Bishop et al. (in review)
+#' @source created from simulations in Bishop et al. (2023)
 "mini_lyr"

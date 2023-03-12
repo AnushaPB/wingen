@@ -29,21 +29,21 @@ library(SpatialKDE)
 ## Background
 
 wingen uses a moving window approach to create maps of genetic
-diversity. The method and its rationale are described in Bishop et al.
-(in review).
+diversity. The method and its rationale are described in [Bishop et al.
+(2023)](http://doi.org/10.1111/2041-210X.14090).
 
 ## Example
 
 To demonstrate how wingen works, we will use a subset of the data from
-the Bishop et al. (in review) simulation example. These simulations were
-created using Geonomics ([Terasaki Hart et al.,
-2022](https://doi.org/10.1093/molbev/msab175)) to generate a realistic
-landscape genomic dataset. In this simulation, spatial variation in
-genetic diversity is produced by varying population size and gene flow
-across the landscape via heterogeneous carrying capacity and conductance
-surfaces. These surfaces are based on an example digital elevation model
-of Tolkien's Middle Earth produced by the Center for Geospatial Analysis
-at William & Mary ([Robert,
+the [Bishop et al. (2023)](http://doi.org/10.1111/2041-210X.14090)
+simulation example. These simulations were created using Geonomics
+([Terasaki Hart et al., 2022](https://doi.org/10.1093/molbev/msab175))
+to generate a realistic landscape genomic dataset. In this simulation,
+spatial variation in genetic diversity is produced by varying population
+size and gene flow across the landscape via heterogeneous carrying
+capacity and conductance surfaces. These surfaces are based on an
+example digital elevation model of Tolkien's Middle Earth produced by
+the Center for Geospatial Analysis at William & Mary ([Robert,
 2020](https://scholarworks.wm.edu/asoer/3/)).
 
 ### Load Middle Earth example
@@ -216,11 +216,13 @@ The main arguments to `window_gd()` are:
 
 ------------------------------------------------------------------------
 
-*Note:* Coordinates and rasters used in wingen should be in a projected (planar)
-coordinate system such that raster cells are of equal sizes. Therefore, spherical systems
-(including latitute-longitude coordinate systems) should be projected prior to use. 
-An example of how this can be accomplished is shown below. If no CRS is provided, 
-a warning will be given and wingen will assume the data are provided in a projected system. 
+*Note:* Coordinates and rasters used in wingen should be in a projected
+(planar) coordinate system such that raster cells are of equal sizes.
+Therefore, spherical systems (including latitute-longitude coordinate
+systems) should be projected prior to use. An example of how this can be
+accomplished is shown below. If no CRS is provided, a warning will be
+given and wingen will assume the data are provided in a projected
+system.
 
 ```{r}
 # First, we create example latitude-longitude coordinates and rasters
@@ -556,8 +558,8 @@ For the standard genetic diversity statistics:
     with values of 0, 1, or 2.
 
 -   If `stat = het`, `x` must be a heterozygosity matrix where values of
-    0 = homozygosity and values of 1 = heterozygosity. 
-    
+    0 = homozygosity and values of 1 = heterozygosity.
+
 -   If `stat =  allelic_richness`, `x` must be a `genind` type object.
 
 For other statistics:
@@ -603,9 +605,9 @@ plot_gd(we, main = "Mean raster value")
 Although the default input data type for wingen is a VCF file, which is
 a standard file type to encode genomic data, wingen can accept a genind
 object as input to calculate allelic richness using `window_general()`.
-Given that some wingen functionality can be feasible using a genind object,
-users could easily convert various other genetic data file types to then
-run wingen.
+Given that some wingen functionality can be feasible using a genind
+object, users could easily convert various other genetic data file types
+to then run wingen.
 
 For example, genepop (.gen) is a typical file format for encoding
 microsatellite data, in which each allele within a locus is coded using
@@ -613,12 +615,12 @@ a two- or three-digit system (i.e., in a diploid organism, in a
 two-digit system, each locus would be assigned four digits specifying
 each of two alleles. In a three-digit system in the same organism, each
 locus would be assigned six digits encoding those same two alleles).
-Users can convert a genepop file into a genind object using the 
+Users can convert a genepop file into a genind object using the
 `read.genepop()` function in the adegenet package, which automatically
 reads in a .gen file as a genind object. In many cases, microsatellite
-data may not be biallelic, and may contain more than one observed allele 
-at a given locus; in such cases, running `window_general()` with a genind 
-object is still feasible.
+data may not be biallelic, and may contain more than one observed allele
+at a given locus; in such cases, running `window_general()` with a
+genind object is still feasible.
 
 An example of how one could use a genind object as input into
 `window_general()` is as follows:

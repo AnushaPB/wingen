@@ -1,5 +1,5 @@
 ---
-title: "Examples from Bishop et al. (submitted)"
+title: "Examples from Bishop et al. (2023)"
 output: github_document
 ---
 
@@ -70,6 +70,6 @@ The results and figures from the paper were created using the `empex_notebook.Rm
 
 ## Figures
 
-PDF versions of figures from Bishop et al. are provided in the `figures` directory. 
+PDF versions of figures from Bishop et al. (2023) are provided in the `figures` directory. 
 
 *\*Note: files with parallelized tasks are marked with an asterix*
