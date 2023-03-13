@@ -16,7 +16,7 @@ Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking ([Bishop et
 al. 2023](http://doi.org/10.1111/2041-210X.14090)).
 
-## ![](wingen.gif)
+![](wingen.gif)
 
 ## Installation
 
