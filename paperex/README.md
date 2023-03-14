@@ -1,4 +1,4 @@
-Examples from Bishop et al. (in review)
+Examples from Bishop et al. (2023)
 ================
 
 ## Simulation Example
@@ -67,7 +67,7 @@ The results and figures from the paper were created using the
 
 ## Figures
 
-PDF versions of figures from Bishop et al. are provided in the `figures`
-directory.
+PDF versions of figures from Bishop et al. (2023) are provided in the
+`figures` directory.
 
 *\*Note: files with parallelized tasks are marked with an asterix*

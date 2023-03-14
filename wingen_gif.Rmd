@@ -1,0 +1,142 @@
+---
+title: "wingen_gif"
+output: html_document
+date: "2022-08-26"
+editor_options: 
+  chunk_output_type: inline
+---
+```{r}
+library(vcfR)
+library(here)
+library(wingen)
+library(animation)
+devtools::load_all()
+```
+
+
+```{r, fig.width = 6, fig.height = 3}
+load_middle_earth_ex()
+
+lyr = lotr_lyr
+wdim = 7
+fact = 3
+rarify = FALSE
+min_n = 2
+
+L <- 100
+# replace stat with function to calculate diversity statistic
+stat <- return_stat("pi")
+# format coords
+coords <- lotr_coords
+# format gen
+gen <- vcf_to_dosage(lotr_vcf)
+# make neighbor matrix
+nmat <- wdim_to_mat(wdim)
+# make aggregated raster
+if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
+
+# get cell index for each coordinate
+coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cells"]
+
+ani.options(
+convert = shQuote('C:/Program Files (x86)/ImageMagick-6.8.1-Q16/convert.exe')
+)
+
+
+saveGIF(
+{
+# make raster lyr copy with all NA
+lyr <- terra::mask(lyr, lotr_range)
+lyrg <- lyr/0
+for(i in 1:999){
+  if(is.na(lyr[i])) next
+  # get adjacent cells to center cell
+  adjc <- raster::adjacent(lyr, i, directions = nmat)
+  # get list of indices of coords in that set of cells
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {
+    seq(x[1], x[2])
+  })
+  lyrw <- lyr * 0
+  lyrw[adjci] <- 1
+  lyrw[i] <- 2
+  
+  subc <- coords[get_adj(i, lyr, nmat, coord_cells),]
+  lyrg[i] <- window_helper(i = i, lyr = lyr, x = gen, 
+                           coord_cells = coord_cells,
+                           min_n = 2,
+                           nmat = nmat, 
+                           rarify = FALSE,
+                           stat_function = calc_pi, L = L,
+                           rarify_n = NULL, rarify_nit = NULL,
+                           fun = mean)$gd
+  
+  par(mfrow = c(1,2), mar = rep(0,4), oma = rep(0,4), bg = "white")
+  plot_gd(lyrw, col = viridis::mako(3, direction = 1), main = "Landscape", legend = FALSE)
+  points(coords, pch = 3, cex = 1, col = rgb(0.3,0.3,0.3))
+  points(subc, pch = 3, cex = 1, col = "orange")
+  plot_gd(lyrg, lyr, range = c(0, 0.32), breaks = 100, legend = FALSE, main = "Genetic Diversity")
+}
+},
+movie.name = "wingen.gif", 
+interval = 0.08, 
+ani.width = 600, 
+ani.height = 300,
+outdir = getwd()
+)  
+  
+  
+```
+
+```{r}
+
+ani.options(
+convert = shQuote('C:/Program Files (x86)/ImageMagick-6.8.1-Q16/convert.exe')
+)
+
+
+saveGIF(
+{
+# make raster lyr copy with all NA
+lyr <- terra::mask(lyr, lotr_range)
+lyrg <- lyr/0
+lyrNA <- lyr
+lyrNA[] <- NA
+for(i in 1:999){
+  if(is.na(lyr[i])) next
+  # get adjacent cells to center cell
+  adjc <- raster::adjacent(lyr, i, directions = nmat)
+  # get list of indices of coords in that set of cells
+  adjci <- purrr::map_dbl(adjc, 1, function(x) {
+    seq(x[1], x[2])
+  })
+  lyrw <- lyr
+  lyrw[] <- NA
+  lyrw[adjci] <- 1
+  lyrw[i] <- 2
+  
+  subc <- coords[get_adj(i, lyr, nmat, coord_cells),]
+  lyrNA[i] <- window_helper(i = i, lyr = lyr, x = gen, 
+                           coord_cells = coord_cells,
+                           min_n = 2,
+                           nmat = nmat, 
+                           rarify = FALSE,
+                           stat_function = calc_pi, L = L,
+                           rarify_n = NULL, rarify_nit = NULL,
+                           fun = mean)$gd
+  
+  par(mar = rep(0,4), oma = rep(0,4), bg = "white")
+  plot_gd(lyr, col = "black", legend = FALSE)
+  plot_gd(lyrNA, range = c(0, 0.32), breaks = 100, legend = FALSE, add = TRUE)
+  plot_gd(lyrw, col = c("#357BA2CC", "#DEF5E5FF"), legend = FALSE, add = TRUE)
+  points(coords, pch = 3, cex = 1, col = rgb(0.3,0.3,0.3, 0.8))
+  points(subc, pch = 3, cex = 1, col = "orange")
+}
+},
+movie.name = "wingen2.gif", 
+interval = 0.08, 
+ani.width = 500, 
+ani.height = 500,
+outdir = getwd()
+)  
+```
+

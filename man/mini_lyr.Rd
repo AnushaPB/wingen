@@ -8,7 +8,7 @@
 A RasterLayer of middle earth
 }
 \source{
-created from simulations in Bishop et al. (in review)
+created from simulations in Bishop et al. (2023)
 }
 \usage{
 mini_lyr

@@ -1,23 +1,22 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-![Caution: wingen is currently under review, we discourage use of wingen
-at this time](caution.png)
-
 # wingen <img src="man/figures/logo.png" align="right" height="150"/>
 
 <!-- badges: start -->
 <!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
 
-[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
-[![build](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)[![test-coverage](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg?branch=main)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
 [![license:
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 
 <!-- badges: end -->
 
 Generate continuous maps of genetic diversity using moving windows with
-options for rarefaction, interpolation, and masking.
+options for rarefaction, interpolation, and masking ([Bishop et
+al. 2023](http://doi.org/10.1111/2041-210X.14090)).
+
+![](wingen.gif)
 
 ## Installation
 
@@ -32,7 +31,8 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 The following example demonstrates the basic functionality of wingen
 using a **small subset (100 variant loci x 100 samples) of the simulated
-data from Bishop et al. (in review)**.
+data from [Bishop et
+al. (2023)](http://doi.org/10.1111/2041-210X.14090)**.
 
 ``` r
 library(wingen)
@@ -106,6 +106,7 @@ vignette("wingen-vignette")
 A pdf of the vignette can also be found
 [here](https://github.com/AnushaPB/wingen/blob/main/vignettes/wingen-vignette.pdf)
 
-Example analyses from Bishop et al. can be found in the
+Example analyses from [Bishop et
+al. (2023)](http://doi.org/10.1111/2041-210X.14090) can be found in the
 [paperex](https://github.com/AnushaPB/wingen/tree/main/paperex)
 directory.

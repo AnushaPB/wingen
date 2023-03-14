@@ -40,21 +40,21 @@ devtools::load_all()
 ## Background
 
 wingen uses a moving window approach to create maps of genetic
-diversity. The method and its rationale are described in Bishop et al.
-(in review).
+diversity. The method and its rationale are described in [Bishop et al.
+(2023)](http://doi.org/10.1111/2041-210X.14090).
 
 ## Example
 
 To demonstrate how wingen works, we will use a subset of the data from
-the Bishop et al. (in review) simulation example. These simulations were
-created using Geonomics ([Terasaki Hart et al.,
-2022](https://doi.org/10.1093/molbev/msab175)) to generate a realistic
-landscape genomic dataset. In this simulation, spatial variation in
-genetic diversity is produced by varying population size and gene flow
-across the landscape via heterogeneous carrying capacity and conductance
-surfaces. These surfaces are based on an example digital elevation model
-of Tolkien's Middle Earth produced by the Center for Geospatial Analysis
-at William & Mary ([Robert,
+the [Bishop et al. (2023)](http://doi.org/10.1111/2041-210X.14090)
+simulation example. These simulations were created using Geonomics
+([Terasaki Hart et al., 2022](https://doi.org/10.1093/molbev/msab175))
+to generate a realistic landscape genomic dataset. In this simulation,
+spatial variation in genetic diversity is produced by varying population
+size and gene flow across the landscape via heterogeneous carrying
+capacity and conductance surfaces. These surfaces are based on an
+example digital elevation model of Tolkien's Middle Earth produced by
+the Center for Geospatial Analysis at William & Mary ([Robert,
 2020](https://scholarworks.wm.edu/asoer/3/)).
 
 ### Load Middle Earth example

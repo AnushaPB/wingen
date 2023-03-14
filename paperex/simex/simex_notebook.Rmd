@@ -87,7 +87,7 @@ plot_gd(mg, bkg, zlim = c(0, 0.31), legend = FALSE)
 ### **Figure 2:** Window vs Aggregation Factor
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE}
-params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(2, 3, 4)))
+params <- df_to_ls(expand.grid(wdim = c(3, 5, 7), fact = c(4, 3, 2)))
 
 stk <- purrr::map(params, test_params_simex, subvcf, subcoords, lyr)
 
