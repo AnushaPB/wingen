@@ -1,4 +1,4 @@
-Examples from Bishop et al. 202X
+Examples from Bishop et al. (2023)
 ================
 
 ## Simulation Example
@@ -21,6 +21,7 @@ The results and figures from the paper were created using the
     │   simex_functions.R* - functions used for simulation example analysis
     |   create_middle_earth.R - used to create middle_earth.csv from DEM layers
     |   gnxsim.py - script to run geonomics simulations
+    |   create_datasets - script to create subsampled datasets
     |   runtime_notebook.Rmd - main notebook for runtime analyses and figures
     |   runtime_notebook.md - knitted runtime_notebook.Rmd 
     |   runtime_functions.R - functions used for runtime analysis
@@ -30,18 +31,16 @@ The results and figures from the paper were created using the
     │   │   middle_earth.csv - matrix used to create raster layer for simulations
     │   │   mod-sim_params_it-0_t-1000_spp-spp_0.csv - geospatial data from simulations
     |   |   mod-sim_params_it-0_t-1000_spp-spp_0.vcf - genomic data from simulations
-    |   |   samples_seed42.csv - samples used in analysis
+    |   |   
+    │   └───[middle_earth] - directory with original DEM raster layers from Robert 2020 (https://doi.org/10.21220/RKEZ-X707)
     │   │
-    │   └───[middle_earth] - directory with original DEM raster layers
+    │   └───[samples] - directory with samples used in analysis
     |
-    └───[time_tests]
-    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
-    │   │   FULL_time_test.R* - generates results for FULL dataset
-    │   │   rr_time_test.R* - generates results for rr dataset
-    │   │   WGS_time_test.R* - generates results for WGS dataset
-    │   │   AllelicRichness_time_test.R* - generates results for allelic.richness (WGS and rr dataset)
-    │   │   RarifyAlleles_time_test.R* - generates results for biallelic.richness with allele rarefaction 
-    │   │   (WGS and rr dataset)
+    └───[simex_tests]
+    │   │   AllelicRichness_simex_test.R* - generates results for allelic_richness (WGS and rr dataset)
+    │   │   FULL_simex_test.R* - generates results for FULL dataset
+    │   │   rr_simex_test.R* - generates results for rr dataset
+    │   │   WGS_simex_test.R* - generates results for WGS dataset
     │   
     └───[outputs] - directory for results from time tests
 
@@ -65,5 +64,10 @@ The results and figures from the paper were created using the
         │   populations_r20.haplotypes.filtered_m70_randomSNP.map - original map file from Bouzid et al. 2022
         |   populations_r20.haplotypes.filtered_m70_randomSNP.vcf - vcf file generated from ped and map files
         │   Scelop.coord - sample coordinates from Bouzid et al. 2022
+
+## Figures
+
+PDF versions of figures from Bishop et al. (2023) are provided in the
+`figures` directory.
 
 *\*Note: files with parallelized tasks are marked with an asterix*

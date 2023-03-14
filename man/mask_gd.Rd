@@ -4,18 +4,16 @@
 \alias{mask_gd}
 \title{Mask moving window maps}
 \usage{
-mask_gd(x, mask, resample = "mask", minval = NULL, maxval = NULL)
+mask_gd(x, y, minval = NULL, maxval = NULL)
 }
 \arguments{
 \item{x}{Raster object to mask}
 
-\item{mask}{Raster object or Spatial object to use as mask}
+\item{y}{Raster object or Spatial object to use as mask}
 
-\item{resample}{if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")}
+\item{minval}{if y is a Raster object, value of y below which to mask}
 
-\item{minval}{if mask is a Raster object, value of mask below which to mask}
-
-\item{maxval}{if mask is a Raster object, value of mask above which to mask}
+\item{maxval}{if y is a Raster object, value of y above which to mask}
 }
 \value{
 RasterLayer

@@ -7,26 +7,30 @@
 plot_count(
   x,
   index = NULL,
-  breaks = 10,
+  breaks = 100,
   col = viridis::mako(breaks),
   main = NULL,
   box = FALSE,
+  range = NULL,
   ...
 )
 }
 \arguments{
-\item{x}{RasterLayer of counts or RasterStack where indexed layer is sample counts}
+\item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
+\item{index}{if a raster stack is provided, index of the sample count layer to plot (assumes this is a stacked output from window_gd and defaults to plotting second layer)}
 
 \item{breaks}{number of breaks to use in color scale (defaults to 10)}
 
-\item{col}{color pallete to use for plotting (defaults to viridis::magma pallete)}
+\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
 
-\item{main}{character. Main plot title}
+\item{main}{character. Main plot titles (one for each layer to be plotted). You can use arguments \code{cex.main}, \code{font.main}, \code{col.main} to change the appearance; and \code{loc.main} to change the location of the main title (either two coordinates, or a character value such as "topleft")}
 
-\item{...}{Graphical parameters. Any argument that can be passed to \code{\link[fields]{image.plot}} and to base \code{plot}, 
-        such as axes=FALSE, main='title', ylab='latitude'}
+\item{box}{whether to include a box around the raster plot (defaults to FALSE)}
+
+\item{range}{numeric. minimum and maximum values to be used for the continuous legend}
+
+\item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }
 \value{
 plot of sample counts

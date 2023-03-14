@@ -13,32 +13,6 @@ test_that("check vcf check throws correct errors and return correct object", {
   expect_error(vcf_check(2), "Input is expected to be an object of class 'vcfR' or a path to a .vcf file")
 })
 
-test_that("conversion functions return correct object types and errors", {
-  data("mini_vcf")
-
-  expect_error(vcf_to_dosage("BAD/PATH"))
-  expect_error(vcf_to_dosage(1))
-  expect_type(vcf_to_dosage(mini_vcf), "integer")
-
-  expect_error(vcf_to_genind("BAD/PATH"))
-  expect_error(vcf_to_genind(1))
-  expect_s4_class(vcf_to_genind(mini_vcf), "genind")
-})
-
-test_that("pop warnings for genind are correct", {
-  data("mini_vcf")
-
-  # good cases
-  expect_s4_class(vcf_to_genind(mini_vcf, pops = FALSE), "genind")
-  expect_s4_class(vcf_to_genind(mini_vcf, pops = NULL), "genind")
-  expect_s4_class(vcf_to_genind(mini_vcf, pops = 1:10), "genind")
-  expect_s4_class(vcf_to_genind(mini_vcf, pops = rep(c("a", "b"), 5)), "genind")
-
-  # bad cases
-  expect_error(vcf_to_genind(mini_vcf, pops = 1:2), "length of pops does not match number of individuals in genind")
-  expect_error(vcf_to_genind(mini_vcf, pops = c("a", "b", "c")), "length of pops does not match number of individuals in genind")
-})
-
 test_that("check vcf to dosage matrix conversion is correct", {
   data("mini_vcf_NA")
   dos <- vcf_to_dosage(mini_vcf_NA)
@@ -67,7 +41,7 @@ test_that("check that vcf to genind conversion is correct", {
 
   expect_warning(expect_warning(mini_vcf_NA <- check_vcf_NA(mini_vcf_NA)))
 
-  genind <- vcf_to_genind(mini_vcf_NA)
+  genind <- vcfR::vcfR2genind(mini_vcf_NA)
   # get table and retain only unique columns (for genind objects each allele is a column,
   # so by removing every other you get basically a dosage matrix)
   alleles <- colnames(genind@tab)
@@ -113,7 +87,7 @@ test_that("check that vcf to het conversion is correct", {
   data("mini_vcf_NA")
   expect_error(genind <- vcf_to_het(mini_vcf_NA), NA)
 
-  # check for one locus
+  # check for one site
   obs <- as.vector(vcf_to_het(mini_vcf_NA[7, ]))
   # manually calculated:
   expected <- c(FALSE, TRUE, FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, NA, FALSE)
@@ -125,3 +99,4 @@ test_that("check that vcf to het conversion is correct", {
   expected <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, NA, NA, FALSE)
   expect_equal(obs, expected)
 })
+

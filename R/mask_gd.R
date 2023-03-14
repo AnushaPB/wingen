@@ -4,10 +4,9 @@
 #' Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x Raster object to mask
-#' @param mask Raster object or Spatial object to use as mask
-#' @param resample if x and mask are non matching rasters, which layer to resample to match them (defaults to "mask")
-#' @param minval if mask is a Raster object, value of mask below which to mask
-#' @param maxval if mask is a Raster object, value of mask above which to mask
+#' @param y Raster object or Spatial object to use as mask
+#' @param minval if y is a Raster object, value of y below which to mask
+#' @param maxval if y is a Raster object, value of y above which to mask
 #'
 #' @return RasterLayer
 #' @export
@@ -19,29 +18,30 @@
 #' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
 #' plot_gd(mpi, main = "Kriged and Masked Pi")
 #'
-mask_gd <- function(x, mask, resample = "mask", minval = NULL, maxval = NULL) {
+mask_gd <- function(x, y, minval = NULL, maxval = NULL) {
+  # make sure x is a SpatRaster
+  if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   # match raster layers
-  if (class(mask) == "RasterLayer" | class(mask) == "RasterStack" | class(mask) == "RasterBrick") {
+  if (inherits(y, "RasterLayer") | inherits(y, "RasterStack") | inherits(y, "RasterBrick") | inherits(y, "SpatRaster")) {
+    # convert raster
+    if (!inherits(y, "SpatRaster")) y <- terra::rast(y)
 
-    # mask areas below min/max val if provided
+    # y areas below min/max val if provided
     if (!is.null(minval)) {
-      mask[mask < minval] <- NA
+      y[y < minval] <- NA
     }
 
     if (!is.null(maxval)) {
-      mask[mask > maxval] <- NA
-    }
-
-    if (!raster::compareRaster(x, mask, stopiffalse = FALSE)) {
-      if (resample == "mask") mask <- raster::resample(mask, x)
-      if (resample == "x") x <- raster::resample(x, mask)
-      if (resample != "x" & resample != "mask") stop("invalid arugment provided for resample (must be \"x\" or \"mask\")")
+      y[y > maxval] <- NA
     }
   }
 
+  # if not a raster convert to a spat vector
+  if (!inherits(y, "SpatRaster") & !inherits(y, "SpatVector")) y <- terra::vect(y)
+
   # mask
-  x <- raster::mask(x, mask)
+  x <- terra::mask(x, y)
 
   return(x)
 }

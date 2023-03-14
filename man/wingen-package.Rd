@@ -4,11 +4,11 @@
 \name{wingen-package}
 \alias{wingen}
 \alias{wingen-package}
-\title{wingen: Sliding Window Maps of Genetic Diversity}
+\title{wingen: Continuous mapping of genetic diversity in R}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Visualize genetic diversity across space using a sliding window approach with options for rarefaction and interpolation.
+Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
 }
 \author{
 \strong{Maintainer}: Anusha Bishop \email{anusha.bishop@berkeley.edu} (\href{https://orcid.org/0000-0003-1731-8683}{ORCID})

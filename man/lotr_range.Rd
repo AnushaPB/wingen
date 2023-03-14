@@ -5,15 +5,15 @@
 \alias{lotr_range}
 \title{Middle earth example range polygon}
 \format{
-SpatialPolygonsDataFrame
+sf
 }
 \source{
-created from simulations in Bishop et al., 202X
+created from simulations in Bishop et al. (in review)
 }
 \usage{
 lotr_range
 }
 \description{
-SpatialPolygonsDataFrame of range map
+sf polygon of range map
 }
 \keyword{datasets}

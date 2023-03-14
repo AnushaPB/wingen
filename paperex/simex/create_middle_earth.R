@@ -11,8 +11,7 @@ rescale <- function(x, x.min = NULL, x.max = NULL, new.min = 0, new.max = 1) {
   new.min + (x - x.min) * ((new.max - new.min) / (x.max - x.min))
 }
 
-#DATA SOURCE: https://scholarworks.wm.edu/asoer/3/
-
+#DATA SOURCE: Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 if(!file.exists(wdir, "data", "DEM_middle_earth.tif")){
   # load data
   e1 <- raster(wdir, here("data", "middle_earth", "DEM_50m_Quad1.tif"))

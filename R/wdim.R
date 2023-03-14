@@ -5,13 +5,8 @@
 #'
 #' @return neighborhood matrix
 #'
-#' @export
 #' @noRd
 wdim_to_mat <- function(wdim) {
-  if (any(wdim < 3)) {
-    stop("wdim cannot be less than 3")
-  }
-
   if (length(wdim) == 2) {
     n <- matrix(1, wdim[1], wdim[2])
     # focal cell (center of matrix) has to be zero
@@ -34,7 +29,6 @@ wdim_to_mat <- function(wdim) {
 #'
 #' @return corrected wdim
 #'
-#' @export
 #' @noRd
 wdim_check <- function(wdim) {
   if (any(wdim < 3)) {

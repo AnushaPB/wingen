@@ -3,7 +3,8 @@ title: "usethis_setup"
 output: html_document
 ---
 
-SHOULDN'T BE RUN AGAIN, BUT KEEPING FOR REFERENCE 
+# This file was used to create and strucuture the GitHub repo, but should NOT be run again, I only include it here for reference
+
 ```{r}
 library("here")
 library("usethis")
@@ -12,17 +13,14 @@ library("devtools")
 
 # Create package
 
-```{r}
-#create_package(here())
-#usethis::use_mit_license()
+```r
+create_package(here())
+usethis::use_mit_license()
 ```
 
 ```{r}
 # use dplyr pipe
 usethis::use_pipe(export = FALSE)
-
-# use foreach pipe (remove if not using foreach)
-# usethis::use_import_from('foreach', "%dopar%")
 
 # use logo
 usethis::use_logo("logo.png", geometry = "250x250", retina = TRUE)
@@ -43,7 +41,7 @@ usethis::use_build_ignore("paperex/simex")
 
 usethis::use_build_ignore("paperex/empex")
 
-# THINK ABOUT THIS: (currently the vcf files are large so if you don't ignore the external data it takes a while to install the package)
+# currently the vcf files are large so if you don't ignore the external data it takes a while to install the package
 usethis::use_build_ignore("inst/extdata/")
 usethis::use_build_ignore("data-raw")
 
@@ -53,8 +51,6 @@ usethis::use_build_ignore("vignettes/wingen-vignette_cache/")
 
 usethis::use_build_ignore("vignettes/wingen-vignette_files/")
 
-usethis::use_build_ignore("token")
-
 usethis::use_build_ignore(".gitignore")
 
 usethis::use_build_ignore(".github")
@@ -63,6 +59,7 @@ usethis::use_build_ignore(".github")
 
 #CI/GitHub actions
 https://github.com/r-lib/actions/tree/master/examples
+
 ## Quickstart CI workflow
 
 ```{r}
@@ -90,8 +87,10 @@ usethis::use_coverage(type = "codecov")
 use_github_action("test-coverage")
 
 ```
+
 ```{r}
 # run codecov and make badge
+# note: the cov_token.R file is not stored on github
 source("cov_token.R")
 covr::codecov(token = cov_token())
 ```
@@ -110,19 +109,11 @@ devtools::check()
 ```
 
 
-# Pkgdown site
-
-```{r}
-#usethis::use_pkgdown()
-pkgdown::build_site()
-pkgdown::build_home_index()
-```
 
 # Fix package style (!use with caution!)
 
 ```{r}
 styler::style_pkg() 
-
 ```
 
 # check package name

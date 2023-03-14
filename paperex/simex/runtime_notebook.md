@@ -3,7 +3,7 @@ Runtime Analysis
 
 ``` r
 library(wingen)
-library(raster)
+library(terra)
 library(ggplot2)
 library(viridis)
 library(dplyr)
@@ -17,24 +17,33 @@ source(here(wdir, "runtime_functions.R"))
 # Creating dataset
 
 ``` r
-# load middle earth example just to get a vcc to modify
+# load middle earth example just to get a vcf to modify
 load_middle_earth_ex(quiet = TRUE)
 
 # set dimensions of raster
 dim <- 50
 # create square raster
 m <- matrix(1, ncol = dim, nrow = dim)
-lyr <- raster(m)
+lyr <- rast(m)
 # make into coordinates for samples such that there is one sample per raster cell
-pts <- rasterToPoints(lyr)
+pts <- as.data.frame(lyr, xy = TRUE)
 coords <- data.frame(pts[,c("x","y")])
 
-# create simple vcf with number of individuals = number of coords and only one locus
+# create simple vcf with number of individuals = number of coords and only one site
 vcf <- lotr_vcf[rep(1, 1), c(1, rep(2, nrow(coords)))]
 
 # visualize even sampling
 par(pty = "s")
 plot(lyr, col = mako(1, begin = 0.6), axes = FALSE, box = FALSE, legend = FALSE)
+```
+
+    ## Warning in plot.window(...): "box" is not a graphical parameter
+
+    ## Warning in plot.xy(xy, type, ...): "box" is not a graphical parameter
+
+    ## Warning in title(...): "box" is not a graphical parameter
+
+``` r
 points(coords, cex = 0.5, pch = 3)
 ```
 
@@ -47,7 +56,7 @@ file.name <- here(wdir, "outputs", "runtime_wdim.csv")
 if(file.exists(file.name)){
   resw <- read.csv(file.name)
 } else {
-  resw <- purrr::map_dfr(1:10, time_eval_its, c(3, 5, 7, 9, 11), "wdim", vcf, coords, lyr)
+  resw <- purrr::map_dfr(1:10, time_eval_its, seq(3, 21, 2), "wdim", vcf, coords, lyr)
   write.csv(resw, file.name, row.names = FALSE)
 }
 
@@ -68,9 +77,9 @@ resw_mean <- resw %>%
         group_by(wsize) %>% 
         summarise(time = mean(time))
 
-plotw <- ggplot() +
+(plotw <- ggplot() +
   geom_line(data = resw, aes(x = wsize, y = time, group = it), 
-            col = mako(1, begin = 0.8), alpha = 0.15, lwd = 1) +
+            col = mako(1, begin = 0.8), alpha = 0.25, lwd = 1) +
   geom_line(data = resw_mean, aes(x = wsize, y = time), 
             col = mako(1, begin = 0.8), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 
@@ -80,8 +89,10 @@ plotw <- ggplot() +
         panel.grid.major.y = element_blank(),
         panel.grid.minor.x = element_blank(), 
         panel.grid.major.x = element_blank(),
-        aspect.ratio = 1)
+        aspect.ratio = 1))
 ```
+
+![](runtime_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 resf_mean <- resf %>% 
@@ -90,7 +101,7 @@ resf_mean <- resf %>%
 
 (plotf <- ggplot() +
   geom_line(data = resf, aes(x = ncell, y = time, group = it), 
-            col = mako(1, begin = 0.6), alpha = 0.1, lwd = 1) +
+            col = mako(1, begin = 0.6), alpha = 0.25, lwd = 1) +
   geom_line(data = resf_mean, aes(x = ncell, y = time),
             col = mako(1, begin = 0.6), alpha = 1, lwd = 1.1) +
   theme_bw(base_size = 16) + 
@@ -103,7 +114,8 @@ resf_mean <- resf %>%
         aspect.ratio = 1))
 ```
 
-![](runtime_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](runtime_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- --> \#
+Figure S8
 
 ``` r
 ggarrange(plotw, NULL, plotf, 

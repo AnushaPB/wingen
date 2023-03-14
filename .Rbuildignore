@@ -19,8 +19,8 @@
 ^vignettes/wingen-vignette_files$
 ^paperex$
 ^\.gitignore$
-^token$
-^git_token\.R$
-^token\.R$
 ^codecov\.yml$
-^default_params\.R$
+^cov_token\.R$
+^caution\.png$
+^vignettes/wingen-vignette\.pdf$
+^wingen_gif\.Rmd$

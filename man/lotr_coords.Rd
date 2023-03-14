@@ -12,7 +12,7 @@ A data frame with 100 rows and 2 columns
 }
 }
 \source{
-created from simulations in Bishop et al., 202X
+created from simulations in Bishop et al. (in review)
 }
 \usage{
 lotr_coords
