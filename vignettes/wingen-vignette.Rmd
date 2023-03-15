@@ -555,10 +555,10 @@ calculated.
 For the standard genetic diversity statistics:
 
 -   If `stat = pi` or `biallelic_richness`, `x` must be a dosage matrix
-    with values of 0, 1, or 2.
+    with values of 0, 1, or 2 (*note:* rows must be individuals).
 
--   If `stat = het`, `x` must be a heterozygosity matrix where values of
-    0 = homozygosity and values of 1 = heterozygosity.
+-   If `stat = Ho`, `x` must be a heterozygosity matrix where values of
+    0 = homozygosity and values of 1 = heterozygosity (*note:* rows must be individuals).
 
 -   If `stat =  allelic_richness`, `x` must be a `genind` type object.
 
