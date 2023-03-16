@@ -10,6 +10,7 @@ editor_options:
     wrap: 72
 ---
 
+<<<<<<< Updated upstream
 TODO: 
 - Think through min_n behavior (right now rarify_n defaults to min_n, and min_n
 defaults to 2, but what if a user sets rarify_n = 1? then they also need
@@ -19,6 +20,17 @@ with EAC and IJW). Should min_n default be 1? or maybe you should get a
 warning if min_n is greater than rarify_n? 
 
 - replace ... with sig? 
+=======
+TODO: - Think through min_n behavior (right now rarify_n defaults to
+min_n, and min_n defaults to 2, but what if a user sets rarify_n = 1?
+then they also need to set min_n = 1 for it to properly work...which is
+why originally I had min_n default to rarify_n if rarify_n was
+provided...ugh need to discuss with EAC and IJW). Should min_n default
+be 1? or maybe you should get a warning if min_n is greater than
+rarify_n?
+
+-   replace ... with sig?
+>>>>>>> Stashed changes
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -195,16 +207,26 @@ The main arguments that all three functions have in common are:
     rarefaction is implemented and that set of samples is subsampled
     `rarify_nit` times to a size of `rarify_n` and the mean (or another
     summary statistic set using `fun`) of those `rarify_nit` iterations
+<<<<<<< Updated upstream
     is used. Note that if the number of samples is lower than `min_n`,
     a raster value of NA will always be assigned, even if the number 
     of samples isn't less than `rarify_n` (i.e., if `min = 2` and `rarify_n = 1`
     and the sample size is 1 in the window, then an NA value will be assigned; 
     to change this behavior so the genetic diversity is calculated, set `min_n = 1`)
+=======
+    is used. Note that if the number of samples is lower than `min_n`, a
+    raster value of NA will always be assigned, even if the number of
+    samples isn't less than `rarify_n` (i.e., if `min = 2` and
+    `rarify_n = 1` and the sample size is 1 in the window, then an NA
+    value will be assigned; to change this behavior so the genetic
+    diversity is calculated, set `min_n = 1`)
+>>>>>>> Stashed changes
 
     We suggest that users select `rarify_n` and `rarify_nit` such that
     the number of possible ways to choose `rarify_n` from a sample of
     size `rarify_n` plus one is greater than `rarify_nit` in order for
     there to always be `rarify_nit` number of unique combinations of
+<<<<<<< Updated upstream
     size `rarify_n`. 
     
     If `rarify = FALSE`, rarefaction is not performed
@@ -220,6 +242,23 @@ The main arguments that all three functions have in common are:
     are confident that there is no effect of rarefaction after
     performing your analysis with and without rarefaction.
 
+=======
+    size `rarify_n`.
+
+    If `rarify = FALSE`, rarefaction is not performed and only steps (1)
+    and (2) occur such that: (1) if the number of samples in the window
+    is less than the `min_n` argument, genetic diversity is not
+    calculated and a raster value of `NA` is assigned, and (2) if the
+    number of samples is equal to or greater than `min_n`, the genetic
+    diversity statistic is calculated for those samples. We highly
+    encourage users to perform rarefaction as genetic diversity
+    statistics are sensitive to sample size. The main benefit of not
+    performing rarefaction is decreased computational time; however,
+    this is not worth the trade-off in inaccuracy unless you are
+    confident that there is no effect of rarefaction after performing
+    your analysis with and without rarefaction.
+
+>>>>>>> Stashed changes
 7.  `parallel` - In order to increase computational efficiency, we
     provide the option for parallelization by setting the `parallel`
     argument to `TRUE`. Parallelization is performed using the furrr
@@ -346,6 +385,7 @@ The main additional arguments to `circle_gd()` are:
 
 1.  `maxdist` - maximum geographic distance used to define neighborhood;
     any samples further than this distance will not be included (this
+<<<<<<< Updated upstream
     can be thought of as the neighborhood radius). Can be provided as either
     (1) a single numeric value or (2) a SpatRaster where each pixel is the 
     maximum distance to be used for that cell on the landscape (must be the 
@@ -355,6 +395,18 @@ The main additional arguments to `circle_gd()` are:
     of the study system in mind (e.g., the dispersal patterns and/or neighborhood 
     size of the study organism). 
 
+=======
+    can be thought of as the neighborhood radius). Can be provided as
+    either
+    (1) a single numeric value or (2) a SpatRaster where each pixel is
+        the maximum distance to be used for that cell on the landscape
+        (must be the same spatial scale as `lyr`). Similarly to `wdim`
+        We encourage users to experiment with different values of
+        `maxist` to determine the sensitivity of their results to this
+        parameter and ideally set it with some knowledge of the study
+        system in mind (e.g., the dispersal patterns and/or neighborhood
+        size of the study organism).
+>>>>>>> Stashed changes
 2.  `distmat` - optional distance matrix output from `get_geodist()`
 
 Like before, we can use the `preview_gd()` function to preview parameter
@@ -400,10 +452,19 @@ To create a moving window map with a resistance distances use
     samples further than this cost distance will not be included (this
     can be thought of as the neighborhood radius, but in terms of cost
     distance). Can be provided as either (1) a single numeric value or
+<<<<<<< Updated upstream
     (2) a SpatRaster where each pixel is the maximum distance to be used 
     for that cell on the landscape (must be the same spatial scale as `lyr`).
     As stated before, we encourage users to experiment with different values 
     of `maxist` to determine the sensitivity of their results to this parameter.
+=======
+
+    (2) a SpatRaster where each pixel is the maximum distance to be used
+        for that cell on the landscape (must be the same spatial scale
+        as `lyr`). As stated before, we encourage users to experiment
+        with different values of `maxist` to determine the sensitivity
+        of their results to this parameter.
+>>>>>>> Stashed changes
 
 2.  `lyr` - in addition to being the raster layer the window moves
     across, this will also serve as the conductivity layer used to
@@ -466,7 +527,12 @@ plot_count(rgd, main = "Resistance moving window sample counts")
 ```
 
 ![genetic diversity output from resist_gd()](resist_plots/resist_pi.png)
+<<<<<<< Updated upstream
 ![sample count output from resist_gd()](resist_plots/resist_samplecount.png)
+=======
+![sample count output from
+resist_gd()](resist_plots/resist_samplecount.png)
+>>>>>>> Stashed changes
 
 ## Transforming the moving window maps
 
@@ -849,10 +915,22 @@ plot_gd(we_gi, main = "Allelic richness")
 ```
 
 # IN PROGRESS -------------------------------------------------------------------------------------
+<<<<<<< Updated upstream
 # Fis and HWE
 # Polygon or category
 # Weighted mean transformation
 - add diff distance calculations into new make_distmat function
+=======
+
+# Fis and HWE
+
+# Polygon or category
+
+# Weighted mean transformation
+
+-   add diff distance calculations into new make_distmat function
+
+>>>>>>> Stashed changes
 ```{r}
 wgd <- window_gd(lotr_vcf, lotr_coords, lotr_lyr, wdim = 7, fact = 3, rarify = TRUE)
 plot_gd(wgd)
@@ -864,6 +942,10 @@ wmean2 <- purrr::map(seq(2, 8, 2), ~wmean_gd(wgd, beta = .x))
 purrr::walk(wmean2, plot_gd)
 
 ```
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 ```{r}
 lyr1 <- wgd
 lyr1[1:578] <- 0
@@ -875,4 +957,10 @@ plot_gd(lyr1)
 plot_gd(wmean3)
 ```
 
+<<<<<<< Updated upstream
 
+=======
+```{r}
+
+```
+>>>>>>> Stashed changes
