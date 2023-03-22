@@ -846,12 +846,6 @@ plot_gd(we_gi, main = "Allelic richness")
 ```
 
 # IN PROGRESS -------------------------------------------------------------------------------------
-<<<<<<< Updated upstream
-# Fis and HWE
-# Polygon or category
-# Weighted mean transformation
-- add diff distance calculations into new make_distmat function
-=======
 
 # Fis and HWE
 
@@ -896,20 +890,8 @@ library(sp)
 library(automap)
 ```
 ```{r}
-dos <- vcf_to_dosage(lotr_vcf)
-colnames(dos) <- paste0("X", colnames(dos))
-df <- data.frame(lotr_coords, dos)
-coordinates(df) = ~ x+y
-
-f <- as.formula(paste(paste0(colnames(dos), collapse = "+"), "~ 1"))
-variogram = autofitVariogram(f, df)
-plot(variogram)
-
-df$env <- extract(lotr_lyr, lotr_coords)
-f <- as.formula(paste(paste0(colnames(dos), collapse = "+"), "+ env ~ 1"))
-variogram = autofitVariogram(f, df)
-plot(variogram)
-variogram$var_model[2, "range"]
+library(automap)
+v <- vario_gd(lotr_vcf, lotr_coords)
 ```
 ```{r}
 dos <- vcf_to_dosage(lotr_vcf)
@@ -918,12 +900,12 @@ df <- data.frame(lotr_coords, dos)
 coordinates(df) = ~ x+y
 
 f <- as.formula(paste(paste0(colnames(dos), collapse = "+"), "~ 1"))
-variogram = autofitVariogram(f, df)
+variogram = automap::autofitVariogram(f, df)
 plot(variogram)
 
 df$env <- extract(lotr_lyr, lotr_coords)
 f <- as.formula(paste(paste0(colnames(dos), collapse = "+"), "+ env ~ 1"))
-variogram = autofitVariogram(f, df)
+variogram = automap::autofitVariogram(f, df)
 plot(variogram)
 variogram$var_model[2, "range"]
 ```
@@ -932,7 +914,7 @@ variogram$var_model[2, "range"]
 cgd <- circle_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  stat = "hwe",
+  stat = "basic_stats",
   maxdist = 17,
   fact = 3,
   rarify = FALSE,
@@ -940,5 +922,28 @@ cgd <- circle_gd(lotr_vcf,
 )
 
 plot_gd(cgd)
+```
+```{r}
+distmat <- get_geodist(lotr_coords, aggregate(lotr_lyr, 5))
+cgd17 <- circle_gd(lotr_vcf[1:100,],
+  lotr_coords,
+  lotr_lyr,
+  stat = "hwe",
+  maxdist = 17,
+  fact = 5,
+  rarify = FALSE,
+  distmat = distmat, 
+  parallel = TRUE,
+  ncores = 4
+)
+
+
+plot_gd(cgd17)
+
+```
+```{r}
+vdf <- v$variogram
+v$variogram$var_model
+plot(vdf$exp_var$dist, vdf$exp_var$gamma)
 ```
 
