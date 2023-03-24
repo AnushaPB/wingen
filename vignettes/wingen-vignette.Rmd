@@ -387,6 +387,27 @@ plot_gd(cgd, bkg = lotr_range, main = "Circle moving window pi")
 plot_count(cgd, main = "Circle moving window sample counts")
 ```
 
+You can also perform `circle_gd()` (and `resist_gd()`) with a raster that sets the maximum distance (i.e., the radius) for each cell. In this case, we use the carrying capacity/conductance map and multiply it by 100 so that the radius will range from 0 to 100 based on the value of the raster. 
+
+```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+
+vcgd <- circle_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  maxdist = lotr_lyr*100,
+  fact = 3,
+  rarify = FALSE,
+  L = 100
+)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(vcgd, bkg = lotr_range, main = "Circle moving window pi")
+# The plot_count function plots the sample count layer
+plot_count(vcgd, main = "Circle moving window sample counts")
+```
+
 ### Run moving window calculations with `resist_gd()`
 
 To create a moving window map with a resistance distances use

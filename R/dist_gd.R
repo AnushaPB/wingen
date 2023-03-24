@@ -3,7 +3,9 @@
 #' Function used by both circle_gd and resist_gd
 #'
 #' @noRd
-dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
+dist_gd <- function(gen, coords, lyr, stat = "pi",
+                    fact = fact,
+                    maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL) {
@@ -11,7 +13,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi", maxdist, distmat,
   # convert maxdist to SpatRaster
   if (!is.numeric(maxdist) & !inherits(maxdist, "SpatRaster")) {
     maxdist <- terra::rast(maxdist)
-    maxdist <- terra::aggregate(maxdist, fact, fun = mean)
+    if (fact > 0) maxdist <- terra::aggregate(maxdist, fact, fun = mean)
   }
 
   # run moving window
@@ -119,7 +121,7 @@ dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
 
 get_dist_index <- function(i, distmat, maxdist) {
   # get maxdist
-  if (!is.numeric(maxdist)) md <- maxdist[i] else md <- maxdist
+  if (!is.numeric(maxdist)) md <- as.numeric(maxdist[i]) else md <- maxdist
 
   # modify dist matrix
   distmat[distmat > md] <- NA

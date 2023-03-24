@@ -40,6 +40,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       maxdist = maxdist,
       distmat = distmat,
       stat = stat,
+      fact = fact,
       rarify = rarify,
       rarify_n = rarify_n,
       rarify_nit = rarify_nit,

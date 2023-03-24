@@ -30,7 +30,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
   # make aggregated raster
-  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
+  if (fact > 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # make distmat
   if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
@@ -44,6 +44,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       maxdist = maxdist,
       distmat = distmat,
       stat = stat,
+      fact = fact,
       rarify = rarify,
       rarify_n = rarify_n,
       rarify_nit = rarify_nit,
