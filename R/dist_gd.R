@@ -11,8 +11,8 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
                     parallel = FALSE, ncores = NULL) {
 
   # convert maxdist to SpatRaster
-  if (!is.numeric(maxdist) & !inherits(maxdist, "SpatRaster")) {
-    maxdist <- terra::rast(maxdist)
+  if (!is.numeric(maxdist)) {
+    if(!inherits(maxdist, "SpatRaster")) maxdist <- terra::rast(maxdist)
     if (fact > 0) maxdist <- terra::aggregate(maxdist, fact, fun = mean)
   }
 
