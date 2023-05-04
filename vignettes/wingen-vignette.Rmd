@@ -19,6 +19,7 @@ with EAC and IJW). Should min_n default be 1? or maybe you should get a
 warning if min_n is greater than rarify_n? 
 
 - replace ... with sig? 
+- make sure preview_gd won't cause any problems? deprecation?
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -283,8 +284,8 @@ coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
-to `rarify_n` if rarefaction is used). We specofy `method = window` for
-a preview of `window_gd()`, we will diiscuss other methods (i.e.,
+to `rarify_n` if rarefaction is used). We specify `method = window` for
+a preview of `window_gd()`, we will discuss other methods (i.e.,
 `circle` and `resist` later)
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
@@ -429,18 +430,18 @@ To create a moving window map with a resistance distances use
 
 3.  `distmat` - optional distance matrix output from `get_resdist()`
 
-`resist_gd()` takes a longer time to wrong and we recommend taking
+`resist_gd()` takes a longer time to run and we recommend taking
 advantage of parallelization, in particular for the calculation of the
 distance matrix with `get_resdist()`. We also recommend first
 calculating the distance matrix with `get_resdist()` and then providing
-it to `resist_gd()` as this allows for `resist_gd()` to be run quickly
-multiple times (i.e., to test different parameters) by avoiding
+it to `resist_gd()` using the `distmat` argument as this allows for `resist_gd()` to 
+be run quickly multiple times (i.e., to test different parameters) by avoiding
 repeating the costly distance calculations. Note that `con_lyr` and
 `lyr` must have the same spatial scale (e.g. same resolution and
 extent).
 
 We don't evaluate these chunks because it would take a while and should
-be run in parallele, but we provide the code and resulting plot.
+be run in parallel, but we provide the code and resulting plot.
 
 Again, we can use the `preview_gd()` function to preview parameter
 settings. Here, we specify `method = "resist"` and provide `maxdist`. We
@@ -866,11 +867,7 @@ par(pty = "s")
 plot_gd(we_gi, main = "Allelic richness")
 ```
 
-# IN PROGRESS -------------------------------------------------------------------------------------
 
-# Fis and HWE
-
-# Polygon or category
 
 
 
