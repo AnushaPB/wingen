@@ -62,3 +62,19 @@ plot_count(rgd, main = "", legend = FALSE)
 
 ```
 
+```{r}
+wgd <- window_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "hwe",
+  wdim = 7,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  L = 100,
+  parallel = TRUE,
+  ncores = 3
+)
+
+```
+
