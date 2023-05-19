@@ -134,7 +134,6 @@ hg_longlat <- terra::project(hg, "+proj=longlat")
 Sys.time() - st
 
 # krige and mask layers
-mpg <- empex_krig_mask(pg, lyr, NUS_longlat)
 mag <- empex_krig_mask(ag, lyr, NUS_longlat)
 mhg <- empex_krig_mask(hg, lyr, NUS_longlat)
 ```
@@ -231,26 +230,26 @@ write.csv(distmat, "distmat30.csv")
 ```{r, fig.width = 6, fig.height = 6}
 
 pred <- rast("data/SDM.tif")
-geodistmat <- make_distmat(coords_longlat, lyr = lyr, 
-                           parallel = TRUE, ncores = 3)
+lyr <-  aggregate(pred, 30)
+geodistmat <- get_geodist(coords_longlat, lyr = lyr, 
+                          parallel = TRUE, ncores = 3)
 distmat <- read.csv("distmat30.csv")
 distmat <- as.matrix(distmat)
-lyr <-  aggregate(pred, 30)
 
-cgd <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
-                 radius = quantile(distmat, 0.05, na.rm = TRUE))
+rg <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE))
 
-cgd_hwe <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
-                 radius = quantile(distmat, 0.05, na.rm = TRUE), stat = "hwe",
-                 parallel = TRUE, ncores = 25)
+rg_hwe <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE), stat = "hwe",
+                 parallel = TRUE, ncores = 3)
 
-cgd_fis <- circle_gd(vcf, coords, lyr = lyr, distmat = distmat, 
-                 radius = quantile(distmat, 0.05, na.rm = TRUE), stat = "Fis",
-                 parallel = TRUE, ncores = 25)
+rg_fis <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE), stat = "Fis",
+                 parallel = TRUE, ncores = 3)
 
 
 cg <- circle_gd(vcf, coords, lyr = lyr, distmat = geodistmat, 
-                radius = quantile(geodistmat, 0.015, na.rm = TRUE))
+                maxdist = quantile(geodistmat, 0.015, na.rm = TRUE))
 cg <- terra::mask(cg, rast(lyr))
 
 wg <- window_gd(vcf, coords_longlat, lyr = lyr, wdim = 5)
@@ -264,7 +263,7 @@ raster_plot_gd(wg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = 
         main = "Rectangle")
 raster_plot_gd(cg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
         main = "Circle")
-raster_plot_gd(cgd, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
+plot_gd(rg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
         main = "Resistance")
 ```
 
@@ -279,6 +278,10 @@ change resolution and see what distance differences are
 double the resolution and see if it changes
 convert to real world units by multiplying by real world units
 
+```{r}
+wg <- window_gd(vcf, coords_longlat, lyr = lyr, wdim = 5, stat = "hwe")
+wg <- terra::mask(wg, rast(lyr))
+```
 
 # PROJECTIONS
 ```{r}
