@@ -3,7 +3,7 @@
 #' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
 #' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (SpatRaster where first layer is genetic diversity)
-#' @param index if a raster stack is provided, index of the sample count layer to plot (defaults to plotting first layer)
+#' @param index if a raster stack is provided, index of the layer to plot (defaults to plotting all layers except layers named "sample_count")
 #' @param bkg optional SpatRaster or other spatial object that will be plotted as the "background" in gray
 #' @param col color palette to use for plotting (defaults to \link[viridis]{magma} palette)
 #' @param breaks number of breaks to use in color scale (defaults to 100)
@@ -24,8 +24,12 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
 
-  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting first layer (to change this behavior use the index argument)")
-  if (is.null(index)) index <- 1
+  # plot all layers except sample counts
+  if (is.null(index)) {
+    # drop sample count layer
+    if (any(names(x) == "sample_count")) x <- terra::subset(x, "sample_count", negate = TRUE)
+    index <- 1:terra::nlyr(x)
+  }
 
   # suppress irrelevant plot warnings
   suppressWarnings({
@@ -101,7 +105,7 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 10
 #'
 #' @param x single SpatRaster of counts or SpatRaster where indexed layer is sample counts
 #' @param index if a raster stack is provided, index of the sample count layer to plot
-#' (assumes this is a stacked output from window_gd and defaults to plotting the last layer (which should be sample counts))
+#' (defaults to plotting the layer named "sample_count" or the last layer of the stack)
 #' @param col color palette to use for plotting (defaults to viridis::magma palette)
 #' @param breaks number of breaks to use in color scale (defaults to 10)
 #' @param box whether to include a box around the raster plot (defaults to FALSE)
@@ -118,8 +122,10 @@ plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 10
 plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, range = NULL, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
-  if (is.null(index) & terra::nlyr(x) > 2) warning("More than two raster layers in stack provided, plotting second layer (to change this behavior use the index argument)")
-  if (is.null(index)) index <- terra::nlyr(x)
+  # plot sample count layer
+  if (is.null(index)) {
+    if (any(names(x) == "sample_count")) x <- terra::subset(x, "sample_count") else index <- terra::nlyr(x)
+  }
 
   # suppress irrelevant plot warnings
   suppressWarnings({

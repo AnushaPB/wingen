@@ -751,7 +751,7 @@ plot_gd(hwe_wgd, bkg = lotr_range)
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s")
-plot_gd(bs_wgd, index = 1:10, bkg = lotr_range)
+plot_gd(bs_wgd, bkg = lotr_range)
 ```
 
 # General moving window
