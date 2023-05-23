@@ -193,7 +193,6 @@ get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, 
 #' @noRd
 run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
   # Make spatial points
-  # TODO: Figure out if CRS is needed here
   sp <- sp::SpatialPoints(rbind(lyr_coords[x, ], coords_df[y, ]))
 
   # Calculate circuit distances
