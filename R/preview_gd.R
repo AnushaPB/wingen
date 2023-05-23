@@ -196,7 +196,7 @@ get_center <- function(x, xy = FALSE) {
 #' @param plot whether to plot resuls
 #'
 #' @noRd
-preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NULL, min_n, plot = TRUE) {
+preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NULL, min_n = 2, plot = TRUE) {
   # get coord cells
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 

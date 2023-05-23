@@ -689,7 +689,7 @@ include:
 
 -   `"hwe"` for the proportion of sites that are not in Hardy--Weinberg
     equilibrium, calculated using pegas `hw.test()` at the 0.05 level
-    (other alpha levels can be specified using the sig argument; e.g.,
+    (other alpha levels can be specified by adding the sig argument; e.g.,
     `sig = 0.10`)
 
 -   `"basic_stats"` for a series of statistics produced by hierfstat
@@ -773,6 +773,8 @@ For the standard genetic diversity statistics:
     0 = homozygosity and values of 1 = heterozygosity.
 
 -   If `stat =  allelic_richness`, `x` must be a `genind` type object.
+
+-   If `stat =  basic_stats`, `x` must be a `hierfstat` type object.
 
 For other statistics:
 
