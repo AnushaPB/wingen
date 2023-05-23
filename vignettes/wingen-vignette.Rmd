@@ -10,17 +10,6 @@ editor_options:
     wrap: 72
 ---
 
-TODO: 
-- Think through min_n behavior (right now rarify_n defaults to min_n, and min_n
-defaults to 2, but what if a user sets rarify_n = 1? then they also need
-to set min_n = 1 for it to properly work...which is why originally I had
-min_n default to rarify_n if rarify_n was provided...ugh need to discuss
-with EAC and IJW). Should min_n default be 1? or maybe you should get a
-warning if min_n is greater than rarify_n? 
-
-- replace ... with sig? 
-- make sure preview_gd won't cause any problems? deprecation?
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -708,6 +697,8 @@ include:
     mean gene diversities within population (Hs), Gene diversities
     overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following
     Nei (1987)
+    
+You can calculate multiple statistics as once by providing a vector of statstics names to `stat`.
 
 ```{r, cache = TRUE, warning = FALSE}
 multistat_wgd <- window_gd(lotr_vcf,
@@ -727,7 +718,7 @@ plot_gd(multistat_wgd, index = 1:3, bkg = lotr_range)
 ```
 
 `"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we
-change some parameters and reduce dataset for the purpose of the
+change some parameters and reduce the dataset for the purpose of the
 example:
 
 ```{r}
