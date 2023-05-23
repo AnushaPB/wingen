@@ -329,7 +329,7 @@ plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts")
 To create a moving window map with a circular window use `circle_gd()`.
 The main additional arguments to `circle_gd()` are:
 
-1.  `maxdist` - maximum geographic distance used to define neighborhood;
+1.  `maxdist` - maximum geographic distance used to define the neighborhood;
     any samples further than this distance will not be included (this
     can be thought of as the neighborhood radius). Can be provided as
     either (1) a single numeric value or (2) a SpatRaster where each pixel is
@@ -421,14 +421,14 @@ plot_count(vcgd, main = "Circle moving window sample counts")
 To create a moving window map with a resistance distances use
 `resist_gd()`. The main additional arguments to `resist_gd()` are:
 
-1.  `maxdist` - maximum cost distance used to define neighborhood; any
+1.  `maxdist` - maximum cost distance used to define the neighborhood; any
     samples further than this cost distance will not be included (this
     can be thought of as the neighborhood radius, but in terms of cost
     distance). Can be provided as either (1) a single numeric value or
     (2) a SpatRaster where each pixel is the maximum distance to be used 
     for that cell on the landscape (must be the same spatial scale as `lyr`).
     As stated before, we encourage users to experiment with different values 
-    of `maxist` to determine the sensitivity of their results to this parameter.
+    of `maxdist` to determine the sensitivity of their results to this parameter.
 
 2.  `lyr` - in addition to being the raster layer the window moves
     across, this will also serve as the conductivity layer used to
