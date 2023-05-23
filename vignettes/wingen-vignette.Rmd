@@ -344,14 +344,33 @@ The main additional arguments to `circle_gd()` are:
 2.  `distmat` - optional distance matrix output from `get_geodist()`
 
 Like before, we can use the `preview_gd()` function to preview parameter
-settings. This time we specify `method = "circle"` and provide
-`maxdist`.
+settings. This time we specify `method = "circle"` and provide `maxdist`.
+
+First, we calculate the distance matrix using `get_geodist()` which we can use
+in both `preview_gd()` and` circle_gd()` to save time. If `distmat` is not
+provided, it will be automatically calculated instead.
+
+`get_geodist()` produces a distance matrix where the rows represent the cells
+of the raster and the columns are the individuals. The values are the geographic
+distance between each cell and each individual. Note that the input layer for
+`get_geodist()` must have the same resolution as the input layer for
+`preview_gd()` and` circle_gd()`. For example, if you want to run `circle_gd()`
+with `fact = 3` and `lyr = lotr_lyr`, the input layer to `get_geodist()` must be
+`aggregate(lotr_lyr, 3)`. Alternatively, you can first create a new aggregated
+raster which you use for all functions, as we have done below.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-preview_gd(lotr_lyr,
+# first create a new aggregated raster
+lotr_lyr3 <- aggregate(lotr_lyr, 3)
+
+# then calculate the distance matrix
+distmat <- get_geodist(coords = lotr_coords, lyr = lotr_lyr3)
+
+preview_gd(lotr_lyr3,
   lotr_coords,
   method = "circle",
   maxdist = 10,
+  distmat = distmat,
   sample_count = TRUE,
   min_n = 2
 )
@@ -359,13 +378,13 @@ preview_gd(lotr_lyr,
 
 Then, we can run `circle_gd()`:
 
-```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 cgd <- circle_gd(lotr_vcf,
   lotr_coords,
-  lotr_lyr,
+  lotr_lyr3,
   stat = "pi",
   maxdist = 10,
-  fact = 3,
+  distmat = distmat,
   rarify = FALSE,
   L = 100
 )
@@ -379,14 +398,13 @@ plot_count(cgd, main = "Circle moving window sample counts")
 
 You can also perform `circle_gd()` (and `resist_gd()`) with a raster that sets the maximum distance (i.e., the radius) for each cell. In this case, we use the carrying capacity/conductance map and multiply it by 100 so that the radius will range from 0 to 100 based on the value of the raster. 
 
-```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-
+```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 vcgd <- circle_gd(lotr_vcf,
   lotr_coords,
-  lotr_lyr,
+  lotr_lyr3,
   stat = "pi",
-  maxdist = lotr_lyr*100,
-  fact = 3,
+  maxdist = lotr_lyr3*100,
+  distmat = distmat,
   rarify = FALSE,
   L = 100
 )
@@ -419,26 +437,26 @@ To create a moving window map with a resistance distances use
 
 3.  `distmat` - optional distance matrix output from `get_resdist()`
 
-`resist_gd()` takes a longer time to run and we recommend taking
-advantage of parallelization, in particular for the calculation of the
-distance matrix with `get_resdist()`. We also recommend first
-calculating the distance matrix with `get_resdist()` and then providing
-it to `resist_gd()` using the `distmat` argument as this allows for `resist_gd()` to 
-be run quickly multiple times (i.e., to test different parameters) by avoiding
-repeating the costly distance calculations. Note that `con_lyr` and
-`lyr` must have the same spatial scale (e.g. same resolution and
-extent).
+`resist_gd()` takes a longer time to run and we recommend taking advantage of
+parallelization, in particular for the calculation of the distance matrix with
+`get_resdist()`. We also recommend first calculating the distance matrix with
+`get_resdist()` and then providing it to `resist_gd()` using the `distmat`
+argument as this allows for `resist_gd()` to be run quickly multiple times
+(i.e., to test different parameters) by avoiding repeating the costly distance
+calculations. Note that `con_lyr` and `lyr` must have the same spatial scale
+(e.g. same resolution and extent).
 
-We don't evaluate these chunks because it would take a while and should
-be run in parallel, but we provide the code and resulting plot.
+As for `get_geodist()`, `get_resdist()` produces a distance matrix where the rows
+represent the cells of the raster and the columns are the individuals. The
+values are the resistance distance between each cell and each individual.
 
-Again, we can use the `preview_gd()` function to preview parameter
-settings. Here, we specify `method = "resist"` and provide `maxdist`. We
-also generate a distance matrix separately to save time since this can
-be used both in `preview_gd()` and `resist_gd()`.
+Again, we can use the `preview_gd()` function to preview parameter settings.
+Here, we specify `method = "resist"` and provide `maxdist`.
+We don't evaluate these chunks because it would take a while and should be run
+in parallel, but we provide the code and resulting plot.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
-distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), ncores = 3)
+distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
 
 preview_gd(lotr_lyr,
   lotr_coords,
