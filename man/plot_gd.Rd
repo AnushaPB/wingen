@@ -22,7 +22,7 @@ plot_gd(
 
 \item{bkg}{optional SpatRaster or other spatial object that will be plotted as the "background" in gray}
 
-\item{index}{if a raster stack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
+\item{index}{if a raster stack is provided, index of the layer to plot (defaults to plotting all layers except layers named "sample_count")}
 
 \item{col}{color palette to use for plotting (defaults to \link[viridis]{magma} palette)}
 

@@ -9,10 +9,9 @@ ggplot_count(x, index = NULL, breaks = 100, col = viridis::mako(breaks), ...)
 \arguments{
 \item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
 
-\item{index}{if a raster stack is provided, index of the sample count layer to plot
-(assumes this is a stacked output from window_gd and defaults to plotting the last layer (which should be sample counts))}
+\item{index}{index of raster layers to plot (defaults to plotting the one called "sample_count", if more than one layer is provided)}
 
-\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
+\item{col}{color palette to use for plotting (defaults to viridis::mako palette)}
 }
 \value{
 list of ggplots

@@ -714,7 +714,7 @@ multistat_wgd <- window_gd(lotr_vcf,
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 par(pty = "s")
-plot_gd(multistat_wgd, index = 1:3, bkg = lotr_range)
+plot_gd(multistat_wgd, bkg = lotr_range)
 ```
 
 `"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we

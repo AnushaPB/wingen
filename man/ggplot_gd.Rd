@@ -9,11 +9,11 @@ ggplot_gd(x, bkg = NULL, index = NULL, col = viridis::magma(100), ...)
 \arguments{
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}
 
-\item{bkg}{optional RasterLayer or sf polygon}
+\item{bkg}{optional raster or sf polygon}
 
-\item{index}{if RasterStack is provided, index of the sample count layer to plot (defaults to plotting first layer)}
+\item{index}{index of raster layers to plot (defaults to plotting all of the layers except the one called "sample_count", if more than one layer is provided)}
 
-\item{col}{color pallete to use for plotting (defaults to \link[viridis]{magma} pallete)}
+\item{col}{color palette to use for plotting (defaults to \link[viridis]{magma} palette)}
 }
 \value{
 list of ggplots
@@ -22,7 +22,8 @@ list of ggplots
 Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
-data("mini_lyr")
-plot_gd(mini_lyr)
+load_mini_ex()
+wgd <- window_gd(mini_vcf, mini_coords, mini_lyr)
+ggplot_gd(wgd)
 
 }
