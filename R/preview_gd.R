@@ -12,7 +12,7 @@
 #' @param wdim if `method = "window"`, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
 #' @param distmat if `method = "circle"` or `method = "resist"`, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()}, respectively. If not provided, one will be automatically calculated.
 #' @param maxdist if `method = "circle"` or `method = "resist`, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()})
-#' @param min_n min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
+#' @param min_n minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @param plot whether to plot results (default = TRUE)
 #' @param parallel whether to use parallelization for calculating the distance matrices for `method = "circle"` or `method = "resist` (defaults to `FALSE`).
 #' @inheritParams window_gd
@@ -49,8 +49,8 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (!is.null(distmat)) if (terra::ncell(lyr) != nrow(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
 
     # make distmat
-    if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
-    if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords, con_lyr = lyr, parallel = parallel, ncores = ncores)
+    if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
+    if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
 
     # Modify dist matrix
     # TODO: make work for custom maxdist
@@ -100,7 +100,6 @@ preview_window <- function(lyr, nmat, coords = NULL) {
   })
 }
 
-
 #' Plot preview of circle moving window
 #'
 #' @param lyr RasterLayer
@@ -136,7 +135,6 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
     }
   })
 }
-
 
 #' Plot preview of circle moving window
 #'

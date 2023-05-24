@@ -36,7 +36,7 @@ preview_gd(
 
 \item{sample_count}{whether to create plot of sample counts for each cell (defaults to TRUE)}
 
-\item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
+\item{min_n}{minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
 
 \item{plot}{whether to plot results (default = TRUE)}
 
