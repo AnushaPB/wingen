@@ -27,9 +27,6 @@ and columns represent individual locations on the landscape. Each value is
 the geographic distance between each individual and each cell calculated
 using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
 }
-\details{
-TODO lyr shouldn't be conductivity only, should it?
-}
 \examples{
 load_mini_ex()
 distmat <- get_geodist(mini_coords, mini_lyr)
