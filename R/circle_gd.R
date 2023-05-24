@@ -60,8 +60,6 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 }
 
 
-# TODO change header of this function and description
-
 #' General function for making circular moving window maps
 #'
 #' Generate a continuous raster map using circular moving windows.
@@ -133,7 +131,6 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' the geographic distance between each individual and each cell calculated
 #' using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
 #'
-#' TODO lyr shouldn't be conductivity only, should it?
 #' @inheritParams circle_gd
 #'
 #' @return a distance matrix used by \link[wingen]{circle_gd}

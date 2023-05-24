@@ -214,7 +214,7 @@ run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
 #' @noRd
 possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
 
-#' Convert coordinatres to dataframe
+#' Convert coordinates to dataframe
 #'
 #' @param coords coordinates
 #'
