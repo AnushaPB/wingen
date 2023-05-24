@@ -28,9 +28,9 @@ preview_gd(
 
 \item{wdim}{if \code{method = "window"}, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
-\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resistdist()})}
+\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()})}
 
-\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resistdist()}, respectively. If not provided, one will be automatically calculated.}
+\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()}, respectively. If not provided, one will be automatically calculated.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -50,8 +50,8 @@ Plots preview of window and returns SpatRaster with sample counts layer (if samp
 \description{
 Generate a preview of moving window size and sample counts based on the coordinates and
 parameters to be supplied to \link[wingen]{window_gd}, \link[wingen]{circle_gd}, or  \link[wingen]{resist_gd}.
-The method to be used should be specified with \code{method = window}, \code{circle}, or \code{resist}. For \code{method = window},
-\code{wdim} must be specified. For \code{method = circle} or \code{resist}, \code{maxdist} must be specified and
+The method to be used should be specified with \code{method = "window"}, \code{"circle"}, or \code{"resist"}. For \code{method = "window"},
+\code{wdim} must be specified. For \code{method = "circle"} or \code{"resist"}, \code{maxdist} must be specified and
 \code{distmat} can also optionally be specified.
 }
 \details{
