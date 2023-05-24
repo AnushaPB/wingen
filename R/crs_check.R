@@ -1,4 +1,3 @@
-
 #' Check CRS of coords and layer for window_gd
 #'
 #' @param lyr RasterLayer or SpatRaster

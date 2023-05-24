@@ -1,4 +1,3 @@
-
 test_that("check vcf check throws correct errors and return correct object", {
   data("mini_vcf_NA")
 
@@ -39,7 +38,7 @@ test_that("check vcf to dosage matrix conversion is correct", {
 test_that("check that vcf to genind conversion is correct", {
   data("mini_vcf_NA")
 
-  expect_warning(expect_warning(mini_vcf_NA <- check_vcf_NA(mini_vcf_NA)))
+  expect_warning(expect_warning(mini_vcf_NA <- check_vcf_NA(mini_vcf_NA)$vcf))
 
   genind <- vcfR::vcfR2genind(mini_vcf_NA)
   # get table and retain only unique columns (for genind objects each allele is a column,
@@ -99,4 +98,3 @@ test_that("check that vcf to het conversion is correct", {
   expected <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, NA, NA, FALSE)
   expect_equal(obs, expected)
 })
-

@@ -1,4 +1,3 @@
-
 test_that("middle earth is loaded succesfully", {
   expect_message(load_middle_earth_ex())
   expect_message(load_middle_earth_ex(quiet = TRUE), NA)

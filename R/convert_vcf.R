@@ -1,4 +1,3 @@
-
 #' Convert a vcf to a dosage matrix
 #'
 #' @param x can either be an object of class 'vcfR' or a path to a .vcf file
@@ -7,7 +6,6 @@
 #'
 #' @export
 vcf_to_dosage <- function(x) {
-
   # convert to genlight
   genlight <- vcfR::vcfR2genlight(x)
 
@@ -26,7 +24,6 @@ vcf_to_dosage <- function(x) {
 #'
 #' @noRd
 vcf_to_het <- function(x) {
-
   het <- vcfR::is.het(vcfR::extract.gt(x), na_is_false = FALSE)
 
   # IMPORTANT: transform matrix so that rows are individuals and cols are loci

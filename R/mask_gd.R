@@ -1,4 +1,3 @@
-
 #' Mask moving window maps
 #'
 #' Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}

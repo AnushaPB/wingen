@@ -1,4 +1,3 @@
-
 #' Helper function to convert wdim object to neighbor matrix
 #'
 #' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created

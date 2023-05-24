@@ -4,26 +4,55 @@
 \alias{preview_gd}
 \title{Preview moving window and sample counts}
 \usage{
-preview_gd(lyr, coords, wdim, fact = 0, sample_count = TRUE, min_n = 0)
+preview_gd(
+  lyr,
+  coords,
+  method = "window",
+  wdim = NULL,
+  maxdist = NULL,
+  distmat = NULL,
+  fact = 0,
+  sample_count = TRUE,
+  min_n = 0,
+  plot = TRUE,
+  parallel = FALSE,
+  ncores = NULL
+)
 }
 \arguments{
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For \code{method = "resist"} this should also be the conductivity layer (see \link[wingen]{resist_gd()})}
 
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
+\item{method}{which method to use to create preview (\code{"window"} for \link[wingen]{window_gd()}, \code{"circle"} for \link[wingen]{circle_gd()}, or \code{"resist"} for \link[wingen]{resist_gd()}; defaults to \code{"window"})}
+
+\item{wdim}{if \code{method = "window"}, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
+
+\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resistdist()})}
+
+\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resistdist()}, respectively. If not provided, one will be automatically calculated.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
 \item{sample_count}{whether to create plot of sample counts for each cell (defaults to TRUE)}
 
 \item{min_n}{min number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
+
+\item{plot}{whether to plot results (default = TRUE)}
+
+\item{parallel}{whether to use parallelization for calculating the distance matrices for \code{method = "circle"} or \verb{method = "resist} (defaults to \code{FALSE}).}
+
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 }
 \value{
-SpatRaster with sample counts layer (if sample_count = TRUE)
+Plots preview of window and returns SpatRaster with sample counts layer (if sample_count = TRUE)
 }
 \description{
-Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
+Generate a preview of moving window size and sample counts based on the coordinates and
+parameters to be supplied to \link[wingen]{window_gd}, \link[wingen]{circle_gd}, or  \link[wingen]{resist_gd}.
+The method to be used should be specified with \code{method = window}, \code{circle}, or \code{resist}. For \code{method = window},
+\code{wdim} must be specified. For \code{method = circle} or \code{resist}, \code{maxdist} must be specified and
+\code{distmat} can also optionally be specified.
 }
 \details{
 Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
