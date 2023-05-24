@@ -6,7 +6,7 @@
 \usage{
 get_resdist(
   coords,
-  con_lyr,
+  lyr,
   fact = 0,
   ncores = 1,
   parallel = TRUE,
@@ -15,6 +15,8 @@ get_resdist(
 }
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+
+\item{lyr}{conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 

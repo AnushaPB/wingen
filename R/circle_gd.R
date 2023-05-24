@@ -60,11 +60,13 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 }
 
 
-#' General function for making resistance based maps
+# TODO change header of this function and description
+
+#' General function for making circular moving window maps
 #'
-#' Generate a continuous raster map using resistance distances.
+#' Generate a continuous raster map using circular moving windows.
 #' While \link[wingen]{resist_gd} is built specifically for making maps
-#' of genetic diversity from vcfs,`resist_general` can be used to make maps
+#' of genetic diversity from vcfs,`circle_general` can be used to make maps
 #' from different data inputs. Unlike `resist_gd`, `resist_general`
 #' will not convert your data into the correct format for calculations of different
 #' diversity metrics. See details for how to format data inputs for different statistics.
@@ -73,7 +75,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @param stat moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
 #' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_general
-#' @inheritParams resist_gd
+#' @inheritParams window_gd
 #'
 #' @details
 #' To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
@@ -128,10 +130,11 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' Create a distance matrix based on coordinates and a raster layer.
 #' The output is a distance matrix where rows represent cells on the landscape
 #' and columns represent individual locations on the landscape. Each value is
-#' the geographic distance between each individual and each cell calculed
+#' the geographic distance between each individual and each cell calculated
 #' using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
 #'
-#' @inheritParams resist_gd
+#' TODO lyr shouldn't be conductivity only, should it?
+#' @inheritParams circle_gd
 #'
 #' @return a distance matrix used by \link[wingen]{circle_gd}
 #' @export

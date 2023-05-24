@@ -29,7 +29,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, con_lyr = lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
@@ -55,7 +55,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   return(results)
 }
 
-#' General function for making resistance based maps
+#' General function for making resistance-based maps
 #'
 #' Generate a continuous raster map using resistance distances.
 #' While \link[wingen]{resist_gd} is built specifically for making maps
@@ -93,7 +93,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, con_lyr = lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, parallel = parallel, ncores = ncores)
 
   # run general resist
   results <- dist_general(
@@ -136,22 +136,22 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, con_lyr, fact = 0, ncores = 1, parallel = TRUE, progress = TRUE) {
-  # convert con_lyr to raster
-  if (!inherits(con_lyr, "RasterLayer")) con_lyr <- raster::raster(con_lyr)
+get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE, progress = TRUE) {
+  # convert lyr to raster
+  if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
   # aggregate raster
-  if (fact != 0) con_lyr <- terra::aggregate(con_lyr, fact, fun = mean)
+  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)
 
   # Create transition surface
-  trSurface <- gdistance::transition(con_lyr, transitionFunction = mean, directions = 8)
+  trSurface <- gdistance::transition(lyr, transitionFunction = mean, directions = 8)
   trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
   # get layer coordinates
-  lyr_coords <- terra::as.data.frame(con_lyr, xy = TRUE, na.rm = FALSE)[, 1:2]
+  lyr_coords <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)[, 1:2]
 
   # get all combinations of layer and sample coordinate indices
   params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))

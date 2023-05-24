@@ -9,7 +9,7 @@ get_geodist(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL)
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{lyr}{conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -24,8 +24,11 @@ a distance matrix used by \link[wingen]{circle_gd}
 Create a distance matrix based on coordinates and a raster layer.
 The output is a distance matrix where rows represent cells on the landscape
 and columns represent individual locations on the landscape. Each value is
-the geographic distance between each individual and each cell calculed
+the geographic distance between each individual and each cell calculated
 using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
+}
+\details{
+TODO lyr shouldn't be conductivity only, should it?
 }
 \examples{
 load_mini_ex()

@@ -31,7 +31,7 @@ window_general(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{stat}{moving window statistic to calculate (can either be \code{pi} for nucleotide diversity (\code{x} must be a dosage matrix), \code{Ho} for average observed heterozygosity across all loci (\code{x} must be a heterozygosity matrix) , "allelic_richness" for average allelic richness across all loci (\code{x} must be a \code{genind} type object), "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (\code{x} must be a dosage matrix). \code{stat} can also be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
+\item{stat}{moving window statistic to calculate (can either be \code{"pi"} for nucleotide diversity (\code{x} must be a dosage matrix), \code{"Ho"} for average observed heterozygosity across all loci (\code{x} must be a heterozygosity matrix) , \code{"allelic_richness"} for average allelic richness across all loci (\code{x} must be a \code{genind} type object), \code{"biallelic_richness"} to get average allelic richness across all loci for a biallelic dataset (\code{x} must be a dosage matrix). \code{stat} can also be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 

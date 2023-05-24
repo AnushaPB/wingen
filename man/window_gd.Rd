@@ -73,10 +73,10 @@ Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \
 Current genetic diversity metrics that can be specified with \code{stat} include:
 \itemize{
 \item \code{"pi"} for nucleotide diversity (default) calculated using \code{hierfstat} \link[hierfstat]{pi.dosage}
-\item \code{"Ho"} for average observed heterozygosity across all sites,
+\item \code{"Ho"} for average observed heterozygosity across all sites
 \item \code{"allelic_richness"} for average number of alleles across all sites
 \item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
-\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using\code{pegas} \link[pegas]{hw.test} at the 0.05 level
+\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level
 \item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
 mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)

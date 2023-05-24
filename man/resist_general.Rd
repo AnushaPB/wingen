@@ -2,7 +2,7 @@
 % Please edit documentation in R/resist_gd.R
 \name{resist_general}
 \alias{resist_general}
-\title{General function for making resistance based maps}
+\title{General function for making resistance-based maps}
 \usage{
 resist_general(
   x,

@@ -27,10 +27,10 @@
 #'
 #' Current genetic diversity metrics that can be specified with `stat` include:
 #' - `"pi"` for nucleotide diversity (default) calculated using `hierfstat` \link[hierfstat]{pi.dosage}
-#' - `"Ho"` for average observed heterozygosity across all sites,
+#' - `"Ho"` for average observed heterozygosity across all sites
 #' - `"allelic_richness"` for average number of alleles across all sites
 #' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
-#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using`pegas` \link[pegas]{hw.test} at the 0.05 level
+#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level
 #' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
 #' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 #' Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
@@ -130,7 +130,7 @@ window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
 #' See details for how to format data inputs for different statistics.
 #'
 #' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
-#' @param stat moving window statistic to calculate (can either be `pi` for nucleotide diversity (`x` must be a dosage matrix), `Ho` for average observed heterozygosity across all loci (`x` must be a heterozygosity matrix) , "allelic_richness" for average allelic richness across all loci (`x` must be a `genind` type object), "biallelic_richness" to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix). `stat` can also be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
+#' @param stat moving window statistic to calculate (can either be `"pi"` for nucleotide diversity (`x` must be a dosage matrix), `"Ho"` for average observed heterozygosity across all loci (`x` must be a heterozygosity matrix) , `"allelic_richness"` for average allelic richness across all loci (`x` must be a `genind` type object), `"biallelic_richness"` to get average allelic richness across all loci for a biallelic dataset (`x` must be a dosage matrix). `stat` can also be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
 #' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_gd
 #'

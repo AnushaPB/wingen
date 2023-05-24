@@ -2,7 +2,7 @@
 % Please edit documentation in R/circle_gd.R
 \name{circle_general}
 \alias{circle_general}
-\title{General function for making resistance based maps}
+\title{General function for making circular moving window maps}
 \usage{
 circle_general(
   x,
@@ -30,11 +30,6 @@ circle_general(
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
-
-\item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
-Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as \code{lyr}).}
-
-\item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
 
 \item{stat}{moving window statistic to calculate (see details). \code{stat} can generally be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
 
@@ -64,9 +59,9 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 }
 \description{
-Generate a continuous raster map using resistance distances.
+Generate a continuous raster map using circular moving windows.
 While \link[wingen]{resist_gd} is built specifically for making maps
-of genetic diversity from vcfs,\code{resist_general} can be used to make maps
+of genetic diversity from vcfs,\code{circle_general} can be used to make maps
 from different data inputs. Unlike \code{resist_gd}, \code{resist_general}
 will not convert your data into the correct format for calculations of different
 diversity metrics. See details for how to format data inputs for different statistics.
