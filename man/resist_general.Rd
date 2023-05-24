@@ -74,7 +74,7 @@ diversity metrics. See details for how to format data inputs for different stati
 \details{
 To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
 \itemize{
-\item for \code{"pi"} or  \code{"biallelic_richness"}, \code{x} must be a dosage matrix with values of 0, 1, or 2
+\item for \code{"pi"} or \code{"biallelic_richness"}, \code{x} must be a dosage matrix with values of 0, 1, or 2
 \item for \code{"Ho"}, \code{x} must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity
 \item for \code{"allelic_richness"} or \verb{"hwe}, \code{x} must be a \code{genind} type object
 \item for \code{"basic_stats"}, \code{x} must be a \code{hierfstat} type object
