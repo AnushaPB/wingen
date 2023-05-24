@@ -468,7 +468,7 @@ don't evaluate these chunks because it would take a while and should be
 run in parallel, but we provide the code and resulting plot below.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
-distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
+distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
 
 preview_gd(lotr_lyr,
   lotr_coords,
