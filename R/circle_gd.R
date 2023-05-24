@@ -121,6 +121,8 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 
   return(results)
 }
+
+
 #' Get a matrix of geographic distances for \link[wingen]{circle_gd}
 #'
 #' Create a distance matrix based on coordinates and a raster layer.

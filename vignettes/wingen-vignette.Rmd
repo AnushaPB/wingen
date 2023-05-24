@@ -81,7 +81,7 @@ points(lotr_coords, col = mako(1, begin = 0.8), pch = 3, cex = 0.5)
 
 If users don't have a raster layer of their landscape, they can generate
 one using their sample coordinates with the `coords_to_raster()`
-function. The resolution of this raster can be either tuned with the
+function. The resolution of this raster can be tuned either with the
 `agg` (to aggregate) or `disagg` (to disaggregate) arguments, or defined
 using the `res` argument. The `res` argument can either be a single
 value (e.g., 0.00833) or a vector of two values with the x and y
@@ -113,14 +113,15 @@ There are three functions that can be used to generate moving window
 maps:
 
 1.  `window_gd()` uses a simple rectangular window with user-specified
-    dimensions (the original method described in Bishop et al.)
+    dimensions; this is the original method described in Bishop et al.
+    2023
 
 2.  `circle_gd()` uses a circular window with a user-specified radius
 
 3.  `resist_gd()` uses a resistance distance-based window with a
-    user-specified max distance (this can be thought of as a circular
-    window with a varying radius depending on the resistance of the
-    landscape around it)
+    user-specified maximum distance (this can be thought of as a
+    circular window with a radius that varies depending on the
+    resistance of the landscape around it)
 
 The main arguments that all three functions have in common are:
 
@@ -144,10 +145,10 @@ The main arguments that all three functions have in common are:
     across all sites (`stat = Ho`). Currently, the option to calculate
     nucleotide diversity only works for bi-allelic data. In addition,
     there are two functions for calculating allelic richness: (1)
-    `“allelic_richness”` which uses the `allelic.richness()` function
-    from the hierfstat package, and (2) `“biallelic_richness”`, which
+    `"allelic_richness"` which uses the `allelic.richness()` function
+    from the hierfstat package, and (2) `"biallelic_richness"`, which
     provides a much faster calculation of allelic richness, but only
-    works for bi-allelic data. When calculating `“biallelic_richness”`,
+    works for bi-allelic data. When calculating `"biallelic_richness"`,
     users can choose to rarify allele counts (as in
     `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE`
     (the default) or to use the raw allele counts by setting
@@ -179,31 +180,31 @@ The main arguments that all three functions have in common are:
     the landscape, three things can occur based on the number of samples
     in the window: (1) if the number of samples is lower than
     `rarify_n`, genetic diversity is not calculated and a raster value
-    of `NA` is assigned, (2) if the number of samples is equal to
-    `rarify_n` the genetic diversity statistic is calculated for those
+    of NA is assigned, (2) if the number of samples is equal to
+    `rarify_n`, the genetic diversity statistic is calculated for those
     samples, (3) if the number of samples is greater than `rarify_n`,
     rarefaction is implemented and that set of samples is subsampled
     `rarify_nit` times to a size of `rarify_n` and the mean (or another
     summary statistic set using `fun`) of those `rarify_nit` iterations
     is used. Note that if the number of samples is lower than `min_n`, a
     raster value of NA will always be assigned, even if the number of
-    samples isn't less than `rarify_n` (i.e., if `min = 2` and
+    samples is not less than `rarify_n` (i.e., if `min = 2` and
     `rarify_n = 1` and the sample size is 1 in the window, then an NA
-    value will be assigned; to change this behavior so the genetic
+    value will be assigned; to change this behavior so that genetic
     diversity is calculated, set `min_n = 1`)
-    
-    If `rarify = FALSE`, rarefaction is not performed
-    and only steps (1) and (2) occur such that: (1) if the number of
-    samples in the window is less than the `min_n` argument, genetic
-    diversity is not calculated and a raster value of `NA` is assigned,
-    and (2) if the number of samples is equal to or greater than
-    `min_n`, the genetic diversity statistic is calculated for those
-    samples. We highly encourage users to perform rarefaction as genetic
-    diversity statistics are sensitive to sample size. The main benefit
-    of not performing rarefaction is decreased computational time;
-    however, this is not worth the trade-off in inaccuracy unless you
-    are confident that there is no effect of rarefaction after
-    performing your analysis with and without rarefaction.
+
+    If `rarify = FALSE`, rarefaction is not performed and only steps (1)
+    and (2) from above occur such that: (1) if the number of samples in
+    the window is less than the `min_n` argument, genetic diversity is
+    not calculated and a raster value of NA is assigned, and (2) if the
+    number of samples is equal to or greater than `min_n`, the genetic
+    diversity statistic is calculated for those samples. We highly
+    encourage users to perform rarefaction as genetic diversity
+    statistics are sensitive to sample size. The main benefit of not
+    performing rarefaction is decreased computational time; however,
+    this is not worth the trade-off in inaccuracy unless you are
+    confident that there is no effect of rarefaction after performing
+    your analysis with and without rarefaction.
 
 7.  `parallel` - In order to increase computational efficiency, we
     provide the option for parallelization by setting the `parallel`
@@ -215,7 +216,7 @@ The main arguments that all three functions have in common are:
 
 *Note:* Coordinates and rasters used in wingen should be in a projected
 (planar) coordinate system such that raster cells are of equal sizes.
-Therefore, spherical systems (including latitute-longitude coordinate
+Therefore, spherical systems (including latitude-longitude coordinate
 systems) should be projected prior to use. An example of how this can be
 accomplished is shown below. If no CRS is provided, a warning will be
 given and wingen will assume the data are provided in a projected
@@ -243,8 +244,8 @@ lyr_eq <- project(lyr_longlat, "+proj=goode")
 
 ### Run moving window calculations with `window_gd()`
 
-To create a moving window map with a rectangular window use
-`window_gd()`. The main additional arguments to `window_gd()` are:
+To create a moving window map with a rectangular window, use
+`window_gd()`. The main **additional** arguments to `window_gd()` are:
 
 1.  `wdim` - Used to create the neighborhood matrix for the moving
     window based on the dimensions provided. This argument can either be
@@ -273,9 +274,9 @@ coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
 will be excluded due to low sample counts (*note:* `min_n` is equivalent
-to `rarify_n` if rarefaction is used). We specify `method = window` for
-a preview of `window_gd()`, we will discuss other methods (i.e.,
-`circle` and `resist` later)
+to `rarify_n` if rarefaction is used). We specify `method = "window"`
+for a preview of `window_gd()`; the other methods (i.e., `"circle"` and
+`"resist"`) are discussed later.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
@@ -289,8 +290,8 @@ preview_gd(lotr_lyr,
 ```
 
 Next, we run the moving window function with our vcf, coordinates, and
-raster layer. Here, we set the parameters to calculate pi, use a window
-size of 7 x 7, an aggregation factor of 3, and rarefaction with a
+raster layer. Here, we set the parameters to calculate pi, using a
+window size of 7 x 7, an aggregation factor of 3, and rarefaction with a
 rarefaction size of 2 (i.e., minimum sample size of 2), and 5
 iterations.
 
@@ -326,44 +327,46 @@ plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts")
 
 ### Run moving window calculations with `circle_gd()`
 
-To create a moving window map with a circular window use `circle_gd()`.
-The main additional arguments to `circle_gd()` are:
+To create a moving window map with a circular window, we can use
+`circle_gd()`. The main **additional** arguments to `circle_gd()` are:
 
-1.  `maxdist` - maximum geographic distance used to define the neighborhood;
-    any samples further than this distance will not be included (this
-    can be thought of as the neighborhood radius). Can be provided as
-    either (1) a single numeric value or (2) a SpatRaster where each pixel is
-    the maximum distance to be used for that cell on the landscape
-    (must be the same spatial scale as `lyr`). Similarly to `wdim`
-    We encourage users to experiment with different values of
-    `maxist` to determine the sensitivity of their results to this
-    parameter and ideally set it with some knowledge of the study
-    system in mind (e.g., the dispersal patterns and/or neighborhood
-    size of the study organism).
-        
-2.  `distmat` - optional distance matrix output from `get_geodist()`
+1.  `maxdist` - maximum geographic distance used to define the
+    neighborhood; any samples farther than this distance will not be
+    included (this can be thought of as the neighborhood radius). Can be
+    provided as either (1) a single numeric value or (2) a SpatRaster
+    where each pixel is the maximum distance to be used for that cell on
+    the landscape (must be the same spatial scale as `lyr`). Similarly
+    to `wdim`, we encourage users to experiment with different values of
+    `maxdist` to determine the sensitivity of their results to this
+    parameter and ideally set it with some knowledge of the study system
+    in mind (e.g., the dispersal patterns and/or neighborhood size of
+    the study organism).
+
+2.  `distmat` - optional distance matrix output from `get_geodist()`; if
+    not provided, `circle_gd()` will automatically use the
+    `get_geodist()` function to calculate the distance matrix instead.
 
 Like before, we can use the `preview_gd()` function to preview parameter
-settings. This time we specify `method = "circle"` and provide `maxdist`.
+settings. This time we specify `method = "circle"` and need to provide
+`maxdist`. Before doing so, we can calculate the distance matrix using
+`get_geodist()` which we can then use in both `preview_gd()` and
+`circle_gd()` to save time.
 
-First, we calculate the distance matrix using `get_geodist()` which we can use
-in both `preview_gd()` and` circle_gd()` to save time. If `distmat` is not
-provided, it will be automatically calculated instead.
-
-`get_geodist()` produces a distance matrix where the rows represent the cells
-of the raster and the columns are the individuals. The values are the geographic
-distance between each cell and each individual. Note that the input layer for
-`get_geodist()` must have the same resolution as the input layer for
-`preview_gd()` and` circle_gd()`. For example, if you want to run `circle_gd()`
-with `fact = 3` and `lyr = lotr_lyr`, the input layer to `get_geodist()` must be
-`aggregate(lotr_lyr, 3)`. Alternatively, you can first create a new aggregated
-raster which you use for all functions, as we have done below.
+`get_geodist()` produces a distance matrix where the rows represent the
+cells of the raster and the columns are the individuals. The values are
+the geographic distance between each cell and each individual. Note that
+the input layer for `get_geodist()` must have the same resolution as the
+input layer for `preview_gd()` and `circle_gd()`. For example, if you
+want to run `circle_gd()` with `fact = 3` and `lyr = lotr_lyr`, the
+input layer to `get_geodist()` must be `aggregate(lotr_lyr, 3)`.
+Alternatively, you can first create a new aggregated raster to be used
+for all functions, as we have done below.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-# first create a new aggregated raster
+# First, create a new aggregated raster
 lotr_lyr3 <- aggregate(lotr_lyr, 3)
 
-# then calculate the distance matrix
+# Then calculate the distance matrix
 distmat <- get_geodist(coords = lotr_coords, lyr = lotr_lyr3)
 
 preview_gd(lotr_lyr3,
@@ -396,7 +399,11 @@ plot_gd(cgd, bkg = lotr_range, main = "Circle moving window pi")
 plot_count(cgd, main = "Circle moving window sample counts")
 ```
 
-You can also perform `circle_gd()` (and `resist_gd()`) with a raster that sets the maximum distance (i.e., the radius) for each cell. In this case, we use the carrying capacity/conductance map and multiply it by 100 so that the radius will range from 0 to 100 based on the value of the raster. 
+For `circle_gd()` (and `resist_gd()`), you can also define `maxdist`
+with a raster to set the maximum distance (i.e., the radius) for each
+cell. In this case, we can use the carrying capacity/conductance map
+(`lotr_lyr3`) and multiply it by 100 so that the radius will range from
+0 to 100 based on the value of the raster.
 
 ```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 vcgd <- circle_gd(lotr_vcf,
@@ -418,42 +425,47 @@ plot_count(vcgd, main = "Circle moving window sample counts")
 
 ### Run moving window calculations with `resist_gd()`
 
-To create a moving window map with a resistance distances use
-`resist_gd()`. The main additional arguments to `resist_gd()` are:
+To create a moving window map with resistance distances, use
+`resist_gd()`. The main **additional** arguments to `resist_gd()` are:
 
-1.  `maxdist` - maximum cost distance used to define the neighborhood; any
-    samples further than this cost distance will not be included (this
-    can be thought of as the neighborhood radius, but in terms of cost
-    distance). Can be provided as either (1) a single numeric value or
-    (2) a SpatRaster where each pixel is the maximum distance to be used 
-    for that cell on the landscape (must be the same spatial scale as `lyr`).
-    As stated before, we encourage users to experiment with different values 
-    of `maxdist` to determine the sensitivity of their results to this parameter.
+1.  `maxdist` - maximum cost distance used to define the neighborhood;
+    any samples further than this cost distance will not be included
+    (this can be thought of as the neighborhood radius, but in terms of
+    cost distance). Can be provided as either (1) a single numeric value
+    or (2) a SpatRaster where each pixel is the maximum distance to be
+    used for that cell on the landscape (must be the same spatial scale
+    as `lyr`). As stated before, we encourage users to experiment with
+    different values of `maxdist` to determine the sensitivity of their
+    results to this parameter.
 
 2.  `lyr` - in addition to being the raster layer the window moves
     across, this will also serve as the conductivity layer used to
     calculate resistance distances (higher values should mean greater
     conductivity).
 
-3.  `distmat` - optional distance matrix output from `get_resdist()`
+3.  `distmat` - optional distance matrix output from `get_resdist()`; if
+    not provided, `resist_gd()` will automatically use the
+    `get_resdist()` function to calculate the distance matrix instead.
 
-`resist_gd()` takes a longer time to run and we recommend taking advantage of
-parallelization, in particular for the calculation of the distance matrix with
-`get_resdist()`. We also recommend first calculating the distance matrix with
-`get_resdist()` and then providing it to `resist_gd()` using the `distmat`
-argument as this allows for `resist_gd()` to be run quickly multiple times
-(i.e., to test different parameters) by avoiding repeating the costly distance
-calculations. Note that `con_lyr` and `lyr` must have the same spatial scale
-(e.g. same resolution and extent).
+`resist_gd()` takes a longer time to run and we recommend taking
+advantage of parallelization, in particular for the calculation of the
+distance matrix using `get_resdist()`. We also recommend first
+calculating the distance matrix with `get_resdist()` and then providing
+it to `resist_gd()` using the `distmat` argument as this allows for
+`resist_gd()` to be run quickly multiple times (i.e., to test different
+parameters) by avoiding repeating the costly distance calculations. Note
+that `lyr` in both `get_resdist()` and in `resist_gd()` must have the
+same spatial scale (e.g., the same resolution and extent).
 
-As for `get_geodist()`, `get_resdist()` produces a distance matrix where the rows
-represent the cells of the raster and the columns are the individuals. The
-values are the resistance distance between each cell and each individual.
+As with `get_geodist()`, `get_resdist()` produces a distance matrix
+where the rows represent the cells of the raster and the columns are the
+individuals. The values are the resistance distance between each cell
+and each individual.
 
-Again, we can use the `preview_gd()` function to preview parameter settings.
-Here, we specify `method = "resist"` and provide `maxdist`.
-We don't evaluate these chunks because it would take a while and should be run
-in parallel, but we provide the code and resulting plot.
+Again, we can use the `preview_gd()` function to preview parameter
+settings. Here, we specify `method = "resist"` and provide `maxdist`. We
+don't evaluate these chunks because it would take a while and should be
+run in parallel, but we provide the code and resulting plot below.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
 distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
@@ -492,7 +504,8 @@ plot_count(rgd, main = "Resistance moving window sample counts")
 
 ![genetic diversity output from resist_gd()](resist_plots/resist_pi.png)
 
-![sample count output from resist_gd()](resist_plots/resist_samplecount.png)
+![sample count output from
+resist_gd()](resist_plots/resist_samplecount.png)
 
 ## Transforming the moving window maps
 
@@ -549,7 +562,11 @@ plot_gd(kgd, main = "Kriged pi")
 ```
 
 *Note:* By default, the kriging method is set to
-`krig_method = "ordinary"` for ordinary/simple kriging (model formula: \~ 1) which assumes that the mean and variance are constant across space. Alternatively, `krig_method` can be set to `"universal"` for universal kriging (model formula: \~ x + y), which allows the mean to vary across locations, while variance is held constant.
+`krig_method = "ordinary"` for ordinary/simple kriging (model formula:
+\~ 1) which assumes that the mean and variance are constant across
+space. Alternatively, `krig_method` can be set to `"universal"` for
+universal kriging (model formula: \~ x + y), which allows the mean to
+vary across locations, while variance is held constant.
 
 For information on the differences between universal and ordinary
 kriging, we recommend these articles:
@@ -576,7 +593,7 @@ summary(kgd_autoKrige)
 ```
 
 *Note:* `autoKrige()` does not work for non-projected systems (i.e.,
-latitude-longitude) and will throw an error. See above example of how
+latitude-longitude) and will throw an error. See above example for how
 latitude-longitude coordinates and rasters can be transformed.
 
 *Note:* Kriging can produce values that fall outside the range of
@@ -597,15 +614,15 @@ Next, we mask the resulting kriged layers. Masking can be performed
 using a variety of methods.
 
 **Method 1:** Mask using the carrying capacity layer to exclude any
-areas where the carrying capacity is lower than 0.01. Alternatively, one
+areas where the carrying capacity is lower than 0.1. Alternatively, one
 could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
-# disaggregate lotr_lyr to make it the same resolution as kgd before masking
+# Disaggregate lotr_lyr to make it the same resolution as kgd before masking
 ## note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
 mask_lyr <- disagg(rast(lotr_lyr), 2)
-mgd <- mask_gd(kgd, mask_lyr, minval = 0.01)
+mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
 par(pty = "s")
 plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
@@ -626,8 +643,8 @@ plot_gd(mgd, main = "Kriged & range masked pi")
 the SpatialKDE package:
 
 ```{r mask results 3, fig.width = 5, fig.height = 5, results = FALSE, message = FALSE, warning = FALSE}
-# Spatial KDE requires an sf data.frame containing only POINTS that is in a projected coordinate system.
-# The simulated coordinates are not projected, but for the purpose of this example we pretend they are projected under the Goode Homolosine projection,
+# Spatial KDE requires an sf data.frame containing only POINTS that is in a projected coordinate system
+# The simulated coordinates are not projected, but for the purpose of this example, we'll pretend they are projected under the Goode Homolosine projection
 # This kind of arbitrary setting of crs should not be done for real data (see above example for how to properly project coordinates)
 lotr_sf <- st_as_sf(lotr_coords, coords = c("x", "y")) %>% st_set_crs("+proj=goode")
 
@@ -703,16 +720,17 @@ include:
 
 -   `"hwe"` for the proportion of sites that are not in Hardy--Weinberg
     equilibrium, calculated using pegas `hw.test()` at the 0.05 level
-    (other alpha levels can be specified by adding the sig argument; e.g.,
-    `sig = 0.10`)
+    (other alpha levels can be specified by adding the sig argument;
+    e.g., `sig = 0.10`)
 
 -   `"basic_stats"` for a series of statistics produced by hierfstat
     `basic.stats()` including mean observed heterozygosity (same as Ho),
-    mean gene diversities within population (Hs), Gene diversities
-    overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following
-    Nei (1987)
-    
-You can calculate multiple statistics as once by providing a vector of statstics names to `stat`.
+    mean gene diversities within a population (Hs), overall gene
+    diversities (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis
+    following Nei (1987)
+
+You can also calculate multiple statistics at once by providing a vector
+of statistic names to `stat`.
 
 ```{r, cache = TRUE, warning = FALSE}
 multistat_wgd <- window_gd(lotr_vcf,
@@ -731,15 +749,15 @@ par(pty = "s")
 plot_gd(multistat_wgd, bkg = lotr_range)
 ```
 
-`"hwe"` and "`basic_stats`" take a bit longer to calculate, so here we
+`"hwe"` and `"basic_stats"` take a bit longer to calculate, so here we
 change some parameters and reduce the dataset for the purpose of the
 example:
 
-```{r}
+```{r, warning = FALSE}
 hwe_wgd <- window_gd(lotr_vcf[1:10, ],
   lotr_coords,
   lotr_lyr,
-  stat = c("hwe"),
+  stat = "hwe",
   wdim = 3,
   fact = 5,
   rarify = FALSE,
@@ -750,7 +768,7 @@ hwe_wgd <- window_gd(lotr_vcf[1:10, ],
 bs_wgd <- window_gd(lotr_vcf[1:10, ],
   lotr_coords,
   lotr_lyr,
-  stat = c("basic_stats"),
+  stat = "basic_stats",
   wdim = 3,
   fact = 5,
   rarify = FALSE,
@@ -772,23 +790,23 @@ plot_gd(bs_wgd, bkg = lotr_range)
 
 We provide a `window_general` function that can be used to make moving
 window maps for other types of data inputs and functions. Unlike
-`window_gd`, `window_general` does not require a `vcfR` or a path to a
-vcf file as input.
+`window_gd`, `window_general` does not require a `vcfR` object or a path
+to a vcf file as input.
 
 The required input (`x`) depends on the statistic (`stat`) being
 calculated.
 
 For the standard genetic diversity statistics:
 
--   If `stat = 'pi'` or `'biallelic_richness'`, `x` must be a dosage matrix
-    with values of 0, 1, or 2.
+-   If `stat = "pi"` or `"biallelic_richness"`, `x` must be a dosage
+    matrix with values of 0, 1, or 2.
 
--   If `stat = 'het'`, `x` must be a heterozygosity matrix where values of
-    0 = homozygosity and values of 1 = heterozygosity.
+-   If `stat = "Ho"`, `x` must be a heterozygosity matrix where values
+    of 0 = homozygosity and values of 1 = heterozygosity.
 
--   If `stat =  'allelic_richness'`, `x` must be a `genind` type object.
+-   If `stat = "allelic_richness"`, `x` must be a `genind` type object.
 
--   If `stat =  'basic_stats'`, `x` must be a `hierfstat` type object.
+-   If `stat = "basic_stats"`, `x` must be a `hierfstat` type object.
 
 For other statistics:
 
@@ -798,8 +816,9 @@ For other statistics:
 -   If `x` is a matrix or data frame (*note:* rows must be individuals),
     `stat` can be any function that takes a matrix or data frame and
     outputs a single numeric value (e.g., a function that produces a
-    custom diversity index) *(note: this functionality has not have been
-    tested extensively and may produce errors, so use with caution)*.
+    custom diversity index). *(Note: this functionality has not have
+    been tested extensively and may produce errors, so use with
+    caution)*.
 
 As an example, let's create a moving window map of our raster layer
 values (e.g., carrying capacity and conductance, in this case) at the
@@ -873,8 +892,3 @@ we_gi <- window_general(genind,
 par(pty = "s")
 plot_gd(we_gi, main = "Allelic richness")
 ```
-
-
-
-
-
