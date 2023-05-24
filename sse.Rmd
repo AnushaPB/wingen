@@ -27,7 +27,7 @@ wgd <- window_gd(lotr_vcf,
   L = 100
 )
 
-distmat <- get_resdist(coords = lotr_coords, con_lyr = aggregate(lotr_lyr, 3), ncores = 3)
+distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3), ncores = 3)
 rgd <- resist_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
