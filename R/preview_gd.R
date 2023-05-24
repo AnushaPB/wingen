@@ -53,7 +53,6 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
 
     # Modify dist matrix
-    # TODO: make work for custom maxdist
     distmat[distmat > maxdist] <- NA
 
     # plot preview

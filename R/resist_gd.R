@@ -72,7 +72,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #'
 #' @details
 #' To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:
-#' - for `"pi"` or  `"biallelic_richness"`, `x` must be a dosage matrix with values of 0, 1, or 2
+#' - for `"pi"` or `"biallelic_richness"`, `x` must be a dosage matrix with values of 0, 1, or 2
 #' - for `"Ho"`, `x` must be a heterozygosity matrix where values of 0 = homozygosity and values of 1 = heterozygosity
 #' - for `"allelic_richness"` or `"hwe`, `x` must be a `genind` type object
 #' - for `"basic_stats"`, `x` must be a `hierfstat` type object
