@@ -519,10 +519,10 @@ grid-like artifacts during kriging.
 To deal with this issue, users can either (1) resample their moving
 window raster layers and grid layers to the same resolution using the
 `resample` argument, or (2) manually disaggregate or aggregate either
-the moving window or grid layers using the `r_agg`, `r_disagg`,
-`grd_agg`, or `grd_disagg` arguments. Generally, if users want a
+the moving window or grid layers using the `agg_r`, `disagg_r`,
+`agg_grd`, or `disagg_grd` arguments. Generally, if users want a
 smoother resulting surface, a higher resolution grid layer should be
-used (this can be accomplished by using the `grd_disagg` argument to
+used (this can be accomplished by using the `disagg_grd` argument to
 disaggregate the grid layer). The resampling, aggregation, and
 disaggregation options currently only work if the object provided to
 create the grid is a raster layer. Keep in mind that increasing the
@@ -549,11 +549,7 @@ plot_gd(kgd, main = "Kriged pi")
 ```
 
 *Note:* By default, the kriging method is set to
-`krig_method = "universal"` for universal kriging (model formula: \~ x +
-y), which allows the mean to vary across locations, while variance is
-held constant. Alternatively, `krig_method` can be set to `"ordinary"`
-for ordinary/simple kriging (model formula: \~ 1) which assumes that the
-mean and variance are constant across space.
+`krig_method = "ordinary"` for ordinary/simple kriging (model formula: \~ 1) which assumes that the mean and variance are constant across space. Alternatively, `krig_method` can be set to `"universal"` for universal kriging (model formula: \~ x + y), which allows the mean to vary across locations, while variance is held constant.
 
 For information on the differences between universal and ordinary
 kriging, we recommend these articles:
