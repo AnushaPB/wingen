@@ -140,11 +140,11 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
-    # end parallel session
-    future::plan("sequential")
-
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
+
+    # end parallel session
+    future::plan("sequential")
   } else {
     rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
