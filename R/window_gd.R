@@ -130,6 +130,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
     if (is.null(ncores)) ncores <- future::availableCores() - 1
 
+    # start parallel session
     future::plan(future::multisession, workers = ncores)
 
     rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
@@ -138,6 +139,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
       min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
+
+    # end parallel session
+    future::plan("sequential")
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
