@@ -20,8 +20,8 @@ test_that("all stats and parallel works", {
   # check parallel
   capture_warnings(wgp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE, parallel = TRUE, ncores = 2))
 
-  # expect_true(terra::all.equal(wpp, wp))
-  expect_equal(terra::values(wpp), terra::values(wp))
+  # expect_true(terra::all.equal(wgp, wg))
+  expect_equal(terra::values(wgp), terra::values(wg))
 })
 
 test_that("rarifaction works for all options", {
