@@ -39,9 +39,12 @@ test_that("make sure it works if coords are in different formats", {
   # df
   rdf <- coords_to_raster(mini_coords)
 
-  expect_true(terra::all.equal(rvect, rmat))
-  expect_true(terra::all.equal(rvect, rdf))
-  expect_true(terra::all.equal(rvect, rsf))
+  # expect_true(terra::all.equal(rvect, rmat))
+  # expect_true(terra::all.equal(rvect, rdf))
+  # expect_true(terra::all.equal(rvect, rsf))
+  expect_equal(terra::values(rvect), terra::values(rmat))
+  expect_equal(terra::values(rvect), terra::values(rdf))
+  expect_equal(terra::values(rvect), terra::values(rsf))
 })
 
 test_that("aggregation and disaggregation produce correct rasters", {

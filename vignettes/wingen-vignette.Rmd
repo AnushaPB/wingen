@@ -273,10 +273,9 @@ landscape. Here, we provide the raster layer (`lotr_lyr`), the
 coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
-will be excluded due to low sample counts (*note:* `min_n` is equivalent
-to `rarify_n` if rarefaction is used). We specify `method = "window"`
-for a preview of `window_gd()`; the other methods (i.e., `"circle"` and
-`"resist"`) are discussed later.
+will be excluded due to low sample count. We specify `method = window` for
+a preview of `window_gd()`, we will discuss other methods (i.e.,
+`circle` and `resist` later).
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
@@ -305,7 +304,9 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-```{r window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+*Note: you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning*
+
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -799,10 +800,10 @@ calculated.
 For the standard genetic diversity statistics:
 
 -   If `stat = "pi"` or `"biallelic_richness"`, `x` must be a dosage
-    matrix with values of 0, 1, or 2.
+    matrix with values of 0, 1, or 2 (*note:* rows must be individuals).
 
 -   If `stat = "Ho"`, `x` must be a heterozygosity matrix where values
-    of 0 = homozygosity and values of 1 = heterozygosity.
+    of 0 = homozygosity and values of 1 = heterozygosity (*note:* rows must be individuals).
 
 -   If `stat = "allelic_richness"`, `x` must be a `genind` type object.
 
