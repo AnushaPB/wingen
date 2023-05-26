@@ -25,7 +25,7 @@ test_that("coord kriging works", {
   capture_warnings(kpi2 <- krig_gd(mini_lyr, grd = mini_lyr, coords = sf_coords))
 
   #expect_true(terra::all.equal(kpi1, kpi2))
-  expect_equal(terra::values(kpi1, kpi2))
+  expect_equal(terra::values(kpi1), terra::values(kpi2))
 })
 
 test_that("grd kriging works", {
@@ -74,7 +74,7 @@ test_that("raster_transform transformations are correct", {
   #expect_true(terra::all.equal(agg_r[[1]], raster::aggregate(r, 2)))
   #expect_true(terra::all.equal(agg_r[[2]], grd))
   expect_equal(terra::values(agg_r[[1]]), terra::values(raster::aggregate(r, 2)))
-  expect_equal(terra::values(agg_r[[2]]), terra::values((grd)))
+  expect_equal(terra::values(agg_r[[2]]), terra::values(grd))
 
   # test dissaggregation of r
   disagg_r <- raster_transform(r, grd, disagg_r = 2)
