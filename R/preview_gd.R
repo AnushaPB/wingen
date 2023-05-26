@@ -1,4 +1,3 @@
-
 #' Preview moving window and sample counts
 #'
 #' Generate preview of moving window size and sample counts based on the coordinates and parameters to be supplied to \link[wingen]{window_gd}
