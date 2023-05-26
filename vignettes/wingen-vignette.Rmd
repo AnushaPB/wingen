@@ -215,7 +215,7 @@ The main arguments that all three functions have in common are:
 
 *Note:* Coordinates and rasters used in wingen should be in a projected
 (planar) coordinate system such that raster cells are of equal sizes.
-Therefore, spherical systems (including latitute-longitude coordinate
+Therefore, spherical systems (including latitude-longitude coordinate
 systems) should be projected prior to use. An example of how this can be
 accomplished is shown below. If no CRS is provided, a warning will be
 given and wingen will assume the data are provided in a projected
@@ -272,8 +272,7 @@ landscape. Here, we provide the raster layer (`lotr_lyr`), the
 coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
-will be excluded due to low sample counts (*note:* `min_n` is equivalent
-to `rarify_n` if rarefaction is used). We specify `method = window` for
+will be excluded due to low sample count. We specify `method = window` for
 a preview of `window_gd()`, we will discuss other methods (i.e.,
 `circle` and `resist` later)
 
@@ -304,7 +303,9 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-```{r window, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+*Note: you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning*
+
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -519,10 +520,10 @@ grid-like artifacts during kriging.
 To deal with this issue, users can either (1) resample their moving
 window raster layers and grid layers to the same resolution using the
 `resample` argument, or (2) manually disaggregate or aggregate either
-the moving window or grid layers using the `r_agg`, `r_disagg`,
-`grd_agg`, or `grd_disagg` arguments. Generally, if users want a
+the moving window or grid layers using the `agg_r`, `disagg_r`,
+`agg_grd`, or `disagg_grd` arguments. Generally, if users want a
 smoother resulting surface, a higher resolution grid layer should be
-used (this can be accomplished by using the `grd_disagg` argument to
+used (this can be accomplished by using the `disagg_grd` argument to
 disaggregate the grid layer). The resampling, aggregation, and
 disaggregation options currently only work if the object provided to
 create the grid is a raster layer. Keep in mind that increasing the
@@ -549,11 +550,11 @@ plot_gd(kgd, main = "Kriged pi")
 ```
 
 *Note:* By default, the kriging method is set to
-`krig_method = "universal"` for universal kriging (model formula: \~ x +
-y), which allows the mean to vary across locations, while variance is
-held constant. Alternatively, `krig_method` can be set to `"ordinary"`
-for ordinary/simple kriging (model formula: \~ 1) which assumes that the
-mean and variance are constant across space.
+`krig_method = "ordinary"` for ordinary/simple kriging (model formula:
+ \~ 1) which assumes that the mean and variance are constant across
+ space. Alternatively, `krig_method` can be set to `"universal"` for
+ universal kriging (model formula: \~ x + y), which allows the mean 
+ to vary across locations, while variance is held constant.
 
 For information on the differences between universal and ordinary
 kriging, we recommend these articles:
@@ -784,11 +785,11 @@ calculated.
 
 For the standard genetic diversity statistics:
 
--   If `stat = 'pi'` or `'biallelic_richness'`, `x` must be a dosage matrix
-    with values of 0, 1, or 2.
+-   If `stat = pi` or `biallelic_richness`, `x` must be a dosage matrix
+    with values of 0, 1, or 2 (*note:* rows must be individuals).
 
--   If `stat = 'het'`, `x` must be a heterozygosity matrix where values of
-    0 = homozygosity and values of 1 = heterozygosity.
+-   If `stat = Ho`, `x` must be a heterozygosity matrix where values of
+    0 = homozygosity and values of 1 = heterozygosity (*note:* rows must be individuals).
 
 -   If `stat =  'allelic_richness'`, `x` must be a `genind` type object.
 
