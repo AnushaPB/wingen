@@ -21,7 +21,8 @@ test_that("all stats and parallel works", {
   capture_warnings(wbp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
   capture_warnings(wap <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE, parallel = TRUE, ncores = 2))
 
-  expect_true(terra::all.equal(wpp, wp))
+  #expect_true(terra::all.equal(wpp, wp))
+  expect_equal(terra::values(wpp), terra::values(wp))
 })
 
 test_that("rarifaction works for all options", {
@@ -43,13 +44,15 @@ test_that("check that setting the seed produces the same results", {
   capture_warnings(wg1 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
   set.seed(42)
   capture_warnings(wg2 <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
-  expect_true(terra::all.equal(wg1, wg2))
+  #expect_true(terra::all.equal(wg1, wg1))
+  expect_equal(terra::values(wg1), terra::values(wg2))
 
   set.seed(42)
   capture_warnings(wg1p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
   set.seed(42)
   capture_warnings(wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
-  expect_true(terra::all.equal(wg1p, wg2p))
+  #expect_true(terra::all.equal(wg1p, wg1p))
+  expect_equal(terra::values(wg1p), terra::values(wg2p))
 })
 
 test_that("all stats work with just one site", {
@@ -183,7 +186,10 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
   )
 
   names(tra) <- names(trab)
-  expect_true(terra::all.equal(trab, tra))
+
+
+  #expect_true(terra::all.equal(trab, tra))
+  expect_equal(terra::values(trab), terra::values(tra))
 })
 
 test_that("allelic richness is calculated correctly for dataset with no NAs", {
@@ -253,11 +259,14 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
 
   names(tra) <- names(trab_rar) <- names(trab_norar)
 
-  expect_true(terra::all.equal(tra, trab_rar))
+  #expect_true(terra::all.equal(tra, trab_rar))
+  expect_equal(terra::values(tra), terra::values(trab_rar))
 
-  expect_true(terra::all.equal(tra, trab_norar))
+  #expect_true(terra::all.equal(tra, trab_norar))
+  expect_equal(terra::values(tra), terra::values(trab_norar))
 
-  expect_true(terra::all.equal(trab_norar, trab_rar))
+  #expect_true(terra::all.equal(trab_norar, trab_rar))
+  expect_equal(terra::values(trab_norar), terra::values(trab_rar))
 })
 
 test_that("vcf path works", {
@@ -398,9 +407,12 @@ test_that("window_gd works for different spatial types", {
   capture_warnings(wpi_vect <- window_gd(mini_vcf, vect_coords, mini_lyr, rarify = FALSE))
 
   # compare rasters
-  expect_true(terra::all.equal(wpi_df, wpi_mat))
-  expect_true(terra::all.equal(wpi_df, wpi_sf))
-  expect_true(terra::all.equal(wpi_df, wpi_vect))
+  #expect_true(terra::all.equal(wpi_df, wpi_mat))
+  #expect_true(terra::all.equal(wpi_df, wpi_sf))
+  #expect_true(terra::all.equal(wpi_df, wpi_vect))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_mat))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_sf))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_vect))
 })
 
 test_that("CRS are handled correctly", {

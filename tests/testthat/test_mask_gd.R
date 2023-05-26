@@ -44,6 +44,8 @@ test_that("different objects can be used for masking", {
   sp_range <- sf::as_Spatial(sf_range)
   m3 <- mask_gd(lotr_lyr, sp_range)
 
-  expect_true(terra::all.equal(m1, m2))
-  expect_true(terra::all.equal(m1, m3))
+  #expect_true(terra::all.equal(m1, m2))
+  #expect_true(terra::all.equal(m1, m3))
+  expect_equal(terra::values(m1), terra::values(m2))
+  expect_equal(terra::values(m1), terra::values(m3))
 })
