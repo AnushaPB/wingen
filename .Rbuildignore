@@ -25,3 +25,4 @@
 ^vignettes/wingen-vignette\.pdf$
 ^wingen_gif\.Rmd$
 ^sse\.Rmd$
+^.*\.gif$

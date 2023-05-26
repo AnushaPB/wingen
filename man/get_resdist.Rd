@@ -4,14 +4,7 @@
 \alias{get_resdist}
 \title{Get a matrix of resistance distances for \link[wingen]{resist_gd}}
 \usage{
-get_resdist(
-  coords,
-  lyr,
-  fact = 0,
-  ncores = 1,
-  parallel = TRUE,
-  progress = TRUE
-)
+get_resdist(coords, lyr, fact = 0, ncores = 1, parallel = TRUE)
 }
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}

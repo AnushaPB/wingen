@@ -136,7 +136,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE, progress = TRUE) {
+get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE) {
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
@@ -161,11 +161,11 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE, prog
     future::plan(future::multisession, workers = ncores)
 
     suppressWarnings({
-      distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
+      distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)
     })
   } else {
     suppressWarnings({
-      distvec <- purrr::map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = progress)
+      distvec <- purrr::map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)
     })
   }
 
@@ -173,7 +173,7 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE, prog
   # convert from vector to matrix
   distmat <-
     data.frame(params, dist = distvec) %>%
-    tidyr::pivot_wider(names_from = coords, values_from = dist) %>%
+    tidyr::pivot_wider(names_from = "coords", values_from = "dist") %>%
     dplyr::select(-1) %>%
     as.matrix()
 

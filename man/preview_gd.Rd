@@ -20,17 +20,17 @@ preview_gd(
 )
 }
 \arguments{
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For \code{method = "resist"} this should also be the conductivity layer (see \link[wingen]{resist_gd()})}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For \code{method = "resist"} this should also be the conductivity layer (see \link[wingen]{resist_gd})}
 
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{method}{which method to use to create preview (\code{"window"} for \link[wingen]{window_gd()}, \code{"circle"} for \link[wingen]{circle_gd()}, or \code{"resist"} for \link[wingen]{resist_gd()}; defaults to \code{"window"})}
+\item{method}{which method to use to create preview (\code{"window"} for \link[wingen]{window_gd}, \code{"circle"} for \link[wingen]{circle_gd}, or \code{"resist"} for \link[wingen]{resist_gd}; defaults to \code{"window"})}
 
 \item{wdim}{if \code{method = "window"}, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
-\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()})}
+\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist} or \link[wingen]{get_resdist})}
 
-\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()}, respectively. If not provided, one will be automatically calculated.}
+\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist} or \link[wingen]{get_resdist}, respectively. If not provided, one will be automatically calculated.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 

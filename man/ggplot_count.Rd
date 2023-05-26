@@ -4,7 +4,7 @@
 \alias{ggplot_count}
 \title{Plot moving window map of sample counts}
 \usage{
-ggplot_count(x, index = NULL, breaks = 100, col = viridis::mako(breaks), ...)
+ggplot_count(x, index = NULL, col = viridis::mako(100))
 }
 \arguments{
 \item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}

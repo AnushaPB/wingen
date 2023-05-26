@@ -404,7 +404,7 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
   ls <-
     rast_vals %>%
     dplyr::bind_rows() %>%
-    dplyr::relocate(sample_count, .after = last_col()) %>%
+    dplyr::relocate("sample_count", .after = tidyselect::last_col()) %>%
     as.list()
 
   # assign vector values to rasters

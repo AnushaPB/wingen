@@ -15,7 +15,7 @@
 #' wgd <- window_gd(mini_vcf, mini_coords, mini_lyr)
 #' ggplot_gd(wgd)
 #'
-ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100), ...) {
+ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
 
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!is.null(index)) x <- x[[index]]
@@ -31,7 +31,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100), ..
   # plot results
   plts <-
     x_df  %>%
-    dplyr::select(-x, -y) %>%
+    dplyr::select(-"x", -"y") %>%
     purrr::imap(\(var, i) ggplot_helper(var = var, i = i, x_df = x_df, col = col, bkg = bkg))
 
   purrr::walk(plts, print)
@@ -54,7 +54,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100), ..
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-ggplot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), ...) {
+ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!is.null(index)) x <- x[[index]]
   if (is.null(index) & "sample_count" %in% names(x)) {
@@ -69,7 +69,7 @@ ggplot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(brea
   # plot results
   plts <-
     x_df  %>%
-    dplyr::select(-x, -y)
+    dplyr::select(-"x", -"y") %>%
     purrr::imap(\(var, i) ggplot_helper(var = var, i = i, x_df = x_df, col = col, bkg = NULL))
 
   purrr::walk(plts, print)
@@ -95,16 +95,16 @@ ggplot_helper <- function(var, i, x_df, col, bkg = NULL){
       bkg_df <- bkg %>%
         terra::as.data.frame(xy = TRUE) %>%
         tidyr::as_tibble()
-      gg <- gg + ggplot2::geom_tile(data = bkg_df, ggplot2::aes(x = x, y = y), fill = "lightgray")
+      gg <- gg + ggplot2::geom_tile(data = bkg_df, ggplot2::aes(x = "x", y = "y"), fill = "lightgray")
     }
 
   }
 
   # plot result
   gg <- gg +
-    ggplot2::geom_tile(data = x_df, ggplot2::aes(x = x, y = y, fill = {{var}})) +
+    ggplot2::geom_tile(data = x_df, ggplot2::aes(x = "x", y = "y", fill = {{var}})) +
     ggplot2::theme_bw() +
-    ggplot2::scale_fill_gradientn(colours = col, na.value = rgb(0,0,0,0)) +
+    ggplot2::scale_fill_gradientn(colours = col, na.value = grDevices::rgb(0,0,0,0)) +
     ggplot2::labs(fill = i) +
     ggplot2::theme(panel.grid = ggplot2::element_blank(),
                    axis.title = ggplot2::element_blank(),

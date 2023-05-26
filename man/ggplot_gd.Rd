@@ -4,7 +4,7 @@
 \alias{ggplot_gd}
 \title{Plot moving window map of genetic diversity}
 \usage{
-ggplot_gd(x, bkg = NULL, index = NULL, col = viridis::magma(100), ...)
+ggplot_gd(x, bkg = NULL, index = NULL, col = viridis::magma(100))
 }
 \arguments{
 \item{x}{output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)}

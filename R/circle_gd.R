@@ -13,12 +13,12 @@
 #' @export
 #'
 #' @examples
-#'
+#' \dontrun{
 #' load_mini_ex()
 #' cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
 #' plot_gd(cpi, main = "Circle pi")
 #' plot_count(cpi)
-#'
+#' }
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
@@ -73,7 +73,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @param stat moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
 #' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
 #' @inheritParams window_general
-#' @inheritParams window_gd
+#' @inheritParams circle_gd
 #'
 #' @details
 #' To calculate genetic diversity statistics with the built in wingen functions, data must be formatted as such:

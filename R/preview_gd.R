@@ -6,12 +6,12 @@
 #' `wdim` must be specified. For `method = "circle"` or `"resist"`, `maxdist` must be specified and
 #' `distmat` can also optionally be specified.
 #'
-#' @param lyr SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For `method = "resist"` this should also be the conductivity layer (see \link[wingen]{resist_gd()})
-#' @param method which method to use to create preview (`"window"` for \link[wingen]{window_gd()}, `"circle"` for \link[wingen]{circle_gd()}, or `"resist"` for \link[wingen]{resist_gd()}; defaults to `"window"`)
+#' @param lyr SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For `method = "resist"` this should also be the conductivity layer (see \link[wingen]{resist_gd})
+#' @param method which method to use to create preview (`"window"` for \link[wingen]{window_gd}, `"circle"` for \link[wingen]{circle_gd}, or `"resist"` for \link[wingen]{resist_gd}; defaults to `"window"`)
 #' @param sample_count whether to create plot of sample counts for each cell (defaults to TRUE)
 #' @param wdim if `method = "window"`, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
-#' @param distmat if `method = "circle"` or `method = "resist"`, an optional distance matrix to be used output from either \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()}, respectively. If not provided, one will be automatically calculated.
-#' @param maxdist if `method = "circle"` or `method = "resist`, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist()} or \link[wingen]{get_resdist()})
+#' @param distmat if `method = "circle"` or `method = "resist"`, an optional distance matrix to be used output from either \link[wingen]{get_geodist} or \link[wingen]{get_resdist}, respectively. If not provided, one will be automatically calculated.
+#' @param maxdist if `method = "circle"` or `method = "resist`, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist} or \link[wingen]{get_resdist})
 #' @param min_n minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @param plot whether to plot results (default = TRUE)
 #' @param parallel whether to use parallelization for calculating the distance matrices for `method = "circle"` or `method = "resist` (defaults to `FALSE`).
@@ -125,7 +125,7 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
   suppressWarnings({
     terra::plot(lyrw, col = viridis::mako(3, direction = -1)[c(1, 3)], legend = FALSE, axes = FALSE, box = FALSE)
     # draw the circle
-    lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
+    graphics::lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
     # add center point
     graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
     if (!is.null(coords)) {
