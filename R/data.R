@@ -1,5 +1,3 @@
-
-
 #' Middle earth example coordinates
 #'
 #' @format A data frame with 100 rows and 2 columns

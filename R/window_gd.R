@@ -1,5 +1,3 @@
-
-
 #' Create a moving window map of genetic diversity
 #'
 #' Generate a continuous raster map of genetic diversity using moving windows
@@ -40,7 +38,6 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE) {
-
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -104,7 +101,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   wdim <- wdim_check(wdim)
 
   # set L if pi is being calculated
-  if (is.character(stat) & !is.null(L)) if(stat == "pi" & L == "nvariants") L <- ncol(x)
+  if (is.character(stat) & !is.null(L)) if (stat == "pi" & L == "nvariants") L <- ncol(x)
 
   # Get function to calculate the desired statistic
   stat_function <- return_stat(stat, ...)
@@ -141,6 +138,9 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
+
+    # end parallel session
+    future::plan("sequential")
   } else {
     rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
       lyr = lyr, x = x, coord_cells = coord_cells, nmat = nmat,
@@ -277,8 +277,12 @@ rarify_gd <- function(x, sub, rarify_nit = 5, rarify_n = 4, stat_function,
 #'
 #' @noRd
 sample_gd <- function(x, sub, stat_function, L = NULL, rarify_alleles = TRUE) {
-  if (isTRUE(all.equal(stat_function, calc_mean_biar))) return(stat_function(x[sub, ], rarify_alleles))
-  if (isTRUE(all.equal(stat_function, calc_pi))) return(stat_function(x[sub, ], L))
+  if (isTRUE(all.equal(stat_function, calc_mean_biar))) {
+    return(stat_function(x[sub, ], rarify_alleles))
+  }
+  if (isTRUE(all.equal(stat_function, calc_pi))) {
+    return(stat_function(x[sub, ], L))
+  }
   return(stat_function(x[sub, ]))
 }
 
@@ -697,7 +701,7 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
   tls <- purrr::list_transpose(rast_vals)
 
   # assign vector values to rasters
-  rast_list <- purrr::map(tls, ~terra::setValues(lyr, .x))
+  rast_list <- purrr::map(tls, ~ terra::setValues(lyr, .x))
 
   # convert from list to raster stack
   rast_stack <- terra::rast(rast_list)

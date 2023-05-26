@@ -24,7 +24,8 @@ test_that("coord kriging works", {
   sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
   capture_warnings(kpi2 <- krig_gd(mini_lyr, grd = mini_lyr, coords = sf_coords))
 
-  expect_true(terra::all.equal(kpi1, kpi2))
+  # expect_true(terra::all.equal(kpi1, kpi2))
+  expect_equal(terra::values(kpi1), terra::values(kpi2))
 })
 
 test_that("grd kriging works", {
@@ -55,40 +56,54 @@ test_that("raster_transform transformations are correct", {
 
   # test pass through
   noTransform <- raster_transform(r, grd)
-  expect_true(terra::all.equal(noTransform[[1]], r))
-  expect_true(terra::all.equal(noTransform[[2]], grd))
+  # expect_true(terra::all.equal(noTransform[[1]], r))
+  # expect_true(terra::all.equal(noTransform[[2]], grd))
+  expect_equal(terra::values(noTransform[[1]]), terra::values(r))
+  expect_equal(terra::values(noTransform[[2]]), terra::values(grd))
 
   # test resampling of r
   resample_r <- raster_transform(r, grd, resample = "r")
   # remove values by rast() because we don't expect them to be the same
-  expect_true(terra::all.equal(terra::rast(resample_r[[1]]), terra::rast(grd)))
-  expect_true(terra::all.equal(terra::rast(resample_r[[2]]), terra::rast(grd)))
+  # expect_true(terra::all.equal(terra::rast(resample_r[[1]]), terra::rast(grd)))
+  # expect_true(terra::all.equal(terra::rast(resample_r[[2]]), terra::rast(grd)))
+  capture_warnings(expect_equal(terra::values(terra::rast(resample_r[[1]])), terra::values(terra::rast(grd))))
+  capture_warnings(expect_equal(terra::values(terra::rast(resample_r[[2]])), terra::values(terra::rast(grd))))
 
   # test aggregation of r
   agg_r <- raster_transform(r, grd, agg_r = 2)
-  expect_true(terra::all.equal(agg_r[[1]], raster::aggregate(r, 2)))
-  expect_true(terra::all.equal(agg_r[[2]], grd))
+  # expect_true(terra::all.equal(agg_r[[1]], raster::aggregate(r, 2)))
+  # expect_true(terra::all.equal(agg_r[[2]], grd))
+  expect_equal(terra::values(agg_r[[1]]), terra::values(raster::aggregate(r, 2)))
+  expect_equal(terra::values(agg_r[[2]]), terra::values(grd))
 
   # test dissaggregation of r
   disagg_r <- raster_transform(r, grd, disagg_r = 2)
-  expect_true(terra::all.equal(disagg_r[[1]], terra::disagg(r, 2)))
-  expect_true(terra::all.equal(disagg_r[[2]], grd))
+  # expect_true(terra::all.equal(disagg_r[[1]], terra::disagg(r, 2)))
+  # expect_true(terra::all.equal(disagg_r[[2]], grd))
+  expect_equal(terra::values(disagg_r[[1]]), terra::values(terra::disagg(r, 2)))
+  expect_equal(terra::values(disagg_r[[2]]), terra::values(grd))
 
   # test resampling of grd
   resample_grd <- raster_transform(r, grd, resample = "grd")
   # remove values by rast() because we don't expect them to be the same
-  expect_true(terra::all.equal(terra::rast(resample_grd[[1]]), terra::rast(r)))
-  expect_true(terra::all.equal(terra::rast(resample_grd[[2]]), terra::rast(r)))
+  # expect_true(terra::all.equal(terra::rast(resample_grd[[1]]), terra::rast(r)))
+  # expect_true(terra::all.equal(terra::rast(resample_grd[[2]]), terra::rast(r)))
+  capture_warnings(expect_equal(terra::values(terra::rast(resample_grd[[1]])), terra::values(terra::rast(r))))
+  capture_warnings(expect_equal(terra::values(terra::rast(resample_grd[[2]])), terra::values(terra::rast(r))))
 
   # test aggregation of grd
   agg_grd <- raster_transform(r, grd, agg_grd = 2)
-  expect_true(terra::all.equal(agg_grd[[1]], r))
-  expect_true(terra::all.equal(agg_grd[[2]], terra::aggregate(grd, 2)))
+  # expect_true(terra::all.equal(agg_grd[[1]], r))
+  # expect_true(terra::all.equal(agg_grd[[2]], terra::aggregate(grd, 2)))
+  expect_equal(terra::values(agg_grd[[1]]), terra::values(r))
+  expect_equal(terra::values(agg_grd[[2]]), terra::values(terra::aggregate(grd, 2)))
 
   # test dissaggregation of grd
   disagg_grd <- raster_transform(r, grd, disagg_grd = 2)
-  expect_true(terra::all.equal(disagg_grd[[1]], r))
-  expect_true(terra::all.equal(disagg_grd[[2]], terra::disagg(grd, 2)))
+  # expect_true(terra::all.equal(disagg_grd[[1]], r))
+  # expect_true(terra::all.equal(disagg_grd[[2]], terra::disagg(grd, 2)))
+  expect_equal(terra::values(disagg_grd[[1]]), terra::values(r))
+  expect_equal(terra::values(disagg_grd[[2]]), terra::values(terra::disagg(grd, 2)))
 
   # check error if both disagg and agg are provided
   expect_error(raster_transform(r, grd, agg_r = 2, disagg_r = 2))

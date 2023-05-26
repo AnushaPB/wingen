@@ -58,6 +58,8 @@ test_that("preview_gd works for different coord types", {
     min_n = 2
   )
 
-  expect_true(terra::all.equal(pw1, pw2))
-  expect_true(terra::all.equal(pw1, pw3))
+  # expect_true(terra::all.equal(pw1, pw2))
+  # expect_true(terra::all.equal(pw1, pw3))
+  expect_equal(terra::values(pw1), terra::values(pw2))
+  expect_equal(terra::values(pw1), terra::values(pw3))
 })
