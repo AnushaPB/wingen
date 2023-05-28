@@ -323,8 +323,15 @@ par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
 plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
 # The plot_count function plots the sample count layer
-plot_count(wgd, bkg = lotr_range, main = "Moving window sample counts")
+plot_count(wgd, main = "Moving window sample counts")
 ```
+
+You can also create ggplots of your results using `ggplot_gd()` and `ggplot_count()`
+```{r}
+ggplot_gd(wgd, bkg = lotr_range)
+ggplot_count(wgd)
+```
+
 
 ### Run moving window calculations with `circle_gd()`
 
