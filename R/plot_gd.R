@@ -22,7 +22,7 @@
 #'
 plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
-  if (!inherits(x, "SpatRaster")) bkg <- terra::rast(bkg)
+  if (inherits(bkg, "Raster")) bkg <- terra::rast(bkg)
 
   # plot all layers except sample counts
   if (is.null(index)) {
