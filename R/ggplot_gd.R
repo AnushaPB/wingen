@@ -17,7 +17,9 @@
 #'
 ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
 
+  # format rasters
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
+  if (inherits(bkg, "Raster")) bkg <- terra::rast(x)
   if (!is.null(index)) x <- x[[index]]
   if (is.null(index) & "sample_count" %in% names(x)) {
     x <- terra::subset(x, "sample_count", negate = TRUE)
@@ -29,12 +31,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
     tidyr::as_tibble()
 
   # plot results
-  plts <-
-    x_df  %>%
-    dplyr::select(-"x", -"y") %>%
-    purrr::imap(\(var, i) ggplot_helper(var = var, i = i, x_df = x_df, col = col, bkg = bkg))
-
-  purrr::walk(plts, print)
+  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
 
   return(plts)
 }
@@ -55,6 +52,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
 ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
+  # format rasters
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (!is.null(index)) x <- x[[index]]
   if (is.null(index) & "sample_count" %in% names(x)) {
@@ -67,12 +65,7 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
     tidyr::as_tibble()
 
   # plot results
-  plts <-
-    x_df  %>%
-    dplyr::select(-"x", -"y") %>%
-    purrr::imap(\(var, i) ggplot_helper(var = var, i = i, x_df = x_df, col = col, bkg = NULL))
-
-  purrr::walk(plts, print)
+  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
 
   return(plts)
 }
@@ -84,28 +77,27 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
 #' @param bkg background raster layer or sf objects
 #' @return ggplot
 #' @noRd
-ggplot_helper <- function(var, i, x_df, col, bkg = NULL){
+ggplot_helper <- function(var, x_df, col = viridis::magma(100), bkg = NULL){
   # create ggplot
   gg <- ggplot2::ggplot()
 
   # add background
   if (!is.null(bkg)) {
-    if (inherits(bkg, "sf")) gg <- gg + ggplot2::geom_sf(data = bkg, fill = "lightgray")
+    if (inherits(bkg, "sf")) gg <- gg + ggplot2::geom_sf(data = bkg, fill = "lightgray", col = "lightgray")
     if (inherits(bkg, "SpatRaster")) {
       bkg_df <- bkg %>%
         terra::as.data.frame(xy = TRUE) %>%
         tidyr::as_tibble()
-      gg <- gg + ggplot2::geom_tile(data = bkg_df, ggplot2::aes(x = "x", y = "y"), fill = "lightgray")
+      gg <- gg + ggplot2::geom_tile(data = bkg_df, ggplot2::aes(x = .data[["x"]], y = .data[["y"]]), fill = "lightgray", col = "lightgray")
     }
-
   }
 
   # plot result
   gg <- gg +
-    ggplot2::geom_tile(data = x_df, ggplot2::aes(x = "x", y = "y", fill = {{var}})) +
+    ggplot2::geom_tile(data = x_df, ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[[var]])) +
     ggplot2::theme_bw() +
-    ggplot2::scale_fill_gradientn(colours = col, na.value = grDevices::rgb(0,0,0,0)) +
-    ggplot2::labs(fill = i) +
+    ggplot2::scale_fill_gradientn(colours = col, na.value = grDevices::rgb(0, 0, 0, 0)) +
+    ggplot2::labs(fill = var) +
     ggplot2::theme(panel.grid = ggplot2::element_blank(),
                    axis.title = ggplot2::element_blank(),
                    axis.text = ggplot2::element_blank(),
