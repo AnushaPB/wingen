@@ -14,7 +14,8 @@ MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badg
 
 Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking ([Bishop et
-al. 2023](http://doi.org/10.1111/2041-210X.14090)).
+al. 2023](http://doi.org/10.1111/2041-210X.14090);
+[blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/)).
 
 ![](wingen.gif)
 
