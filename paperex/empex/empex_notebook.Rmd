@@ -202,7 +202,8 @@ par(mar = rep(0,4))
 raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
 
-#CIRCLE GD
+# wingen 2.0 additions (not included in Bishop et al. 2022)
+## CIRCLE GD
 ```{r}
 library(randomForest)
 
@@ -327,5 +328,84 @@ par(pty = "s", oma = rep(1,4), mfrow = c(1,3), mar = rep(0,4))
 plot_gd(pg, legend = FALSE)
 plot_gd(pg_longlat, bkg = NUS_longlat, legend = FALSE)
 plot_gd(pg_longlat2, bkg = NUS_longlat, legend = FALSE)
+```
+
+## Dist test
+```{r}
+library(ggplot2)
+mean_dist <- function(x) mean(dist(x), na.rm = TRUE)
+dos <- vcf_to_dosage(vcf)
+dg <- window_general(dos,
+                     coords_proj, 
+                     lyr,
+                     stat = mean_dist, 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)
+
+dg_rand <- map(1:100, ~window_general(dos,
+                     coords_proj[sample(nrow(dos)),], 
+                     lyr,
+                     stat = mean_dist, 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)[[1]])
+
+difr <- dg[[1]] - mean(terra::rast(dg_rand))
+difr <- difr - mean(values(difr), na.rm = TRUE)
+
+
+kdif <- empex_krig_mask(difr, lyr, NUS_longlat)
+dif <- terra::as.data.frame(kdif, xy = TRUE)
+
+ggplot(data = dif, aes(x = x, y = y, fill = pred)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#2066AC", mid="#F7F7F7", high = "#d79232", midpoint = 0, na.value = "white") +
+  theme_void() +
+  coord_equal()
+  
+``` 
+```{r}
+pg <- window_general(dos,
+                     coords_proj, 
+                     lyr,
+                     stat = "pi", 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)
+
+pg_rand <- map(1:10, ~window_general(dos,
+                     coords_proj[sample(nrow(dos)),], 
+                     lyr,
+                     stat = "pi", 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)[[1]])
+
+difr <- pg[[1]] - mean(terra::rast(pg_rand))
+
+dif <- terra::as.data.frame(difr, xy = TRUE)
+
+ggplot(data = dif, aes(x = x, y = y, fill = pi)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#2066AC", mid="#F7F7F7", high = "#d79232", midpoint = 0, na.value = "white") +
+  theme_void() +
+  coord_equal()
+```
+## Tess Test
+```{r}
+library(algatr)
+
+cdf <- coords_to_df(coords_proj)
+
+tess_result <- tess_do_everything(dos, coords = cdf, grid = lyr, K_selection = "auto", Kvals = 1:20)
+
+# Use purrr's pmap function to apply the function to each row of the dataframe
+pop <- apply(tess_result$Qmatrix, 1, which.max)
+
+hf <- hierfstat::genind2hierfstat(vcfR::vcfR2genind(vcf), pop = pop)
+bs <- window_general(hf[,1:100], coords = coords_proj, lyr = lyr, wdim = 7, fact = 0, stat = "basic_stats")
+bk <- empex_krig_mask(bs$Fst_hierfstat, lyr, NUS_longlat)
+plot_gd(bk$Fst_hierfstat, breaks = 10)
 ```
 
