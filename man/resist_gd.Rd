@@ -35,7 +35,7 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
 
-\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics.}
+\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -51,7 +51,7 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
-\item{rarify_alleles}{for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+\item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
 \item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
