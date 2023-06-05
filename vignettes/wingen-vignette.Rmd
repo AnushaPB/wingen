@@ -123,23 +123,22 @@ The main arguments to `window_gd()` are:
     form of a raster of the study area.
 
 4.  `stat` - The genetic diversity summary statistic to calculate. We
-    provide options for calculating nucleotide diversity (`stat = pi`),
-    average allelic richness across all sites (`stat = allelic_richness`
-    or `stat = biallelic_richness`), or average observed heterozygosity
-    across all sites (`stat = Ho`). Currently, the option to calculate
-    nucleotide diversity only works for bi-allelic data. In addition,
-    there are two functions for calculating allelic richness: (1)
-    `“allelic_richness”` which uses the `allelic.richness()` function
-    from the hierfstat package, and (2) `“biallelic_richness”`, which
-    provides a much faster calculation of allelic richness, but only
-    works for bi-allelic data. When calculating `“biallelic_richness”`,
-    users can choose to rarify allele counts (as in
-    `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE`
-    (the default) or to use the raw allele counts by setting
-    `rarify_alleles = FALSE`. We recommend performing allele count
-    rarefaction (`rarify_alleles = TRUE`) if there are missing values in
-    the genetic data, but for datasets with no missing data, it is
-    faster to use the raw counts (`rarify_alleles = FALSE`).
+    provide options for calculating nucleotide diversity (`stat = pi`), average
+    allelic richness across all sites (`stat = allelic_richness` or `stat =
+    biallelic_richness`), or average observed heterozygosity across all sites
+    (`stat = Ho`). Currently, the option to calculate nucleotide diversity uses
+    the `hierfstat::pi.dosage()` function which only works for bi-allelic data. In
+    addition, there are two functions for calculating allelic richness: (1)
+    `“allelic_richness”` which uses the `allelic.richness()` function from the
+    hierfstat package, and (2) `“biallelic_richness”`, which provides a much
+    faster calculation of allelic richness, but only works for bi-allelic data.
+    When calculating `“biallelic_richness”`, users can choose to rarify allele
+    counts (as in `hierfstat::allelic.richness()`) by setting `rarify_alleles =
+    TRUE` (the default) or to use the raw allele counts by setting
+    `rarify_alleles = FALSE`. We recommend performing allele count rarefaction
+    (`rarify_alleles = TRUE`) if there are missing values in the genetic data,
+    but for datasets with no missing data, it is faster to use the raw counts 
+    (`rarify_alleles = FALSE`).
 
 5.  `fact` - To decrease computational time, we provide the option to
     aggregate the input raster layer by some factor defined using the
