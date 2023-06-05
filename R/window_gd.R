@@ -5,7 +5,7 @@
 #' @param gen genetic data either as an object of type vcf or a path to a vcf file (*note:* order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)
 #' @param coords coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)
 #' @param lyr SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)
-#' @param stat genetic diversity statistic(s) to calculate (see Details, defaults to `"pi"`). Can be a single statistic or a vector of statistics.
+#' @param stat genetic diversity statistic(s) to calculate (see Details, defaults to `"pi"`). Can be a single statistic or a vector of statistics
 #' @param wdim dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)
 #' @param fact aggregation factor to apply to `lyr` (defaults to 0; *note:* increasing this value reduces computational time)
 #' @param rarify if rarify = TRUE, rarefaction is performed (defaults to FALSE)
@@ -14,7 +14,7 @@
 #' @param min_n minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
-#' @param rarify_alleles for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
+#' @param rarify_alleles for calculating `"biallelic_richness"`, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
 #' @param parallel whether to parallelize the function (defaults to FALSE)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
@@ -30,7 +30,7 @@
 #' - `"Ho"` for average observed heterozygosity across all sites
 #' - `"allelic_richness"` for average number of alleles across all sites
 #' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
-#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level
+#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
 #' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
 #' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 #' Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)

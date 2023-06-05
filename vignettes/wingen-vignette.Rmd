@@ -138,24 +138,37 @@ The main arguments that all three functions have in common are:
     across to create the final map. In most cases, this will take the
     form of a raster of the study area.
 
-4.  `stat` - The genetic diversity summary statistic to calculate. We
-    provide options for calculating nucleotide diversity (`stat = pi`),
-    average allelic richness across all sites (`stat = allelic_richness`
-    or `stat = biallelic_richness`), or average observed heterozygosity
-    across all sites (`stat = Ho`). Currently, the option to calculate
-    nucleotide diversity only works for bi-allelic data. In addition,
-    there are two functions for calculating allelic richness: (1)
-    `"allelic_richness"` which uses the `allelic.richness()` function
-    from the hierfstat package, and (2) `"biallelic_richness"`, which
-    provides a much faster calculation of allelic richness, but only
-    works for bi-allelic data. When calculating `"biallelic_richness"`,
-    users can choose to rarify allele counts (as in
-    `hierfstat::allelic.richness()`) by setting `rarify_alleles = TRUE`
-    (the default) or to use the raw allele counts by setting
-    `rarify_alleles = FALSE`. We recommend performing allele count
-    rarefaction (`rarify_alleles = TRUE`) if there are missing values in
-    the genetic data, but for datasets with no missing data, it is
-    faster to use the raw counts (`rarify_alleles = FALSE`).
+4.  `stat` - The genetic diversity summary statistic to calculate. 
+    Current genetic diversity metrics that can be specified with `stat` 
+    include:
+    
+    - `"pi"` for nucleotide diversity (default) calculated using 
+    `hierfstat::pi.dosage()` (only works for bi-allelic data).
+    
+    - `"Ho"` for average observed heterozygosity across all sites
+    
+    - `"allelic_richness"` for average number of alleles across all sites
+    
+    - `"biallelic_richness"` for average allelic richness across all sites
+    for a biallelic dataset (this option is faster than `"allelic_richness"`). 
+    When calculating `“biallelic_richness”`, users can choose to rarify 
+    allele counts (as in `hierfstat::allelic.richness()`) by setting 
+    `rarify_alleles = TRUE` (the default) or to use the raw allele counts 
+    by setting `rarify_alleles = FALSE`. We recommend performing allele 
+    count rarefaction (`rarify_alleles = TRUE`) if there are missing values 
+    in the genetic data, but for datasets with no missing data, it is faster 
+    to use the raw counts (`rarify_alleles = FALSE`).
+    
+    - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg 
+    equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 
+    level (other alpha levels  can be specified by adding the sig argument; 
+    e.g., `sig = 0.10`).
+    
+    - `"basic_stats"` for a series of statistics produced by 
+    `hierfstat::basic.stats()` including mean observed heterozygosity 
+    (same as Ho), mean gene diversities within population (Hs), G
+    ene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, 
+    and Fis following Nei (1987)
 
 5.  `fact` - To decrease computational time, we provide the option to
     aggregate the input raster layer by some factor defined using the
@@ -712,32 +725,7 @@ wgd <- window_gd(lotr_vcf,
 
 ## Other genetic diversity metrics
 
-Current genetic diversity metrics that can be specified with `stat`
-include:
-
--   `"pi"` for nucleotide diversity (default) calculated using hierfstat
-    `pi.dosage()`
-
--   `"Ho"` for average observed heterozygosity across all sites
-
--   `"allelic_richness"` for average number of alleles across all sites
-
--   `"biallelic_richness"` for average allelic richness across all sites
-    for a biallelic dataset (this option is faster than
-    `"allelic_richness"`)
-
--   `"hwe"` for the proportion of sites that are not in Hardy--Weinberg
-    equilibrium, calculated using pegas `hw.test()` at the 0.05 level
-    (other alpha levels can be specified by adding the sig argument;
-    e.g., `sig = 0.10`)
-
--   `"basic_stats"` for a series of statistics produced by hierfstat
-    `basic.stats()` including mean observed heterozygosity (same as Ho),
-    mean gene diversities within a population (Hs), overall gene
-    diversities (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis
-    following Nei (1987)
-
-You can also calculate multiple statistics at once by providing a vector
+You can calculate multiple statistics at once by providing a vector
 of statistic names to `stat`.
 
 ```{r, cache = TRUE, warning = FALSE}

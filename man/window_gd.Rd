@@ -31,7 +31,7 @@ window_gd(
 
 \item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
 
-\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics.}
+\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics}
 
 \item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
 
@@ -49,7 +49,7 @@ window_gd(
 
 \item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
-\item{rarify_alleles}{for calculating biallelic_richness, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+\item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
 \item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
@@ -76,7 +76,7 @@ Current genetic diversity metrics that can be specified with \code{stat} include
 \item \code{"Ho"} for average observed heterozygosity across all sites
 \item \code{"allelic_richness"} for average number of alleles across all sites
 \item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
-\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level
+\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., \code{sig = 0.10}).
 \item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
 mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
