@@ -34,28 +34,58 @@ run_general <- function(x, lyr, coords,
     # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
     lyr <- raster::raster(lyr)
 
-    rast_vals <- furrr::future_map(1:terra::ncell(lyr), window_helper,
-      lyr = lyr, x = x,
-      coord_cells = coord_cells, nmat = nmat,
-      distmat = distmat, maxdist = maxdist,
-      stat_function = stat_function,
-      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
-    )
+    rast_vals <-
+      furrr::future_map(
+        1:terra::ncell(lyr),
+        ~ window_helper(
+          i = .x,
+          lyr = lyr,
+          x = x,
+          coord_cells = coord_cells,
+          nmat = nmat,
+          distmat = distmat,
+          maxdist = maxdist,
+          stat_function = stat_function,
+          rarify = rarify,
+          rarify_n = rarify_n,
+          rarify_nit = rarify_nit,
+          min_n = min_n,
+          fun = fun,
+          L = L,
+          rarify_alleles = rarify_alleles
+        ),
+        .options = furrr::furrr_options(
+          seed = TRUE,
+          packages = c("wingen", "terra", "raster", "adegenet")
+        ),
+        .progress = TRUE
+      )
 
     future::plan("sequential")
 
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
-    rast_vals <- purrr::map(1:terra::ncell(lyr), window_helper,
-      lyr = lyr, x = x,
-      coord_cells = coord_cells, nmat = nmat,
-      distmat = distmat, maxdist = maxdist,
-      stat_function = stat_function,
-      rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-      min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles
+    rast_vals <- purrr::map(
+      1:terra::ncell(lyr),
+      ~ window_helper(
+        i = .x,
+        lyr = lyr,
+        x = x,
+        coord_cells = coord_cells,
+        nmat = nmat,
+        distmat = distmat,
+        maxdist = maxdist,
+        stat_function = stat_function,
+        rarify = rarify,
+        rarify_n = rarify_n,
+        rarify_nit = rarify_nit,
+        min_n = min_n,
+        fun = fun,
+        L = L,
+        rarify_alleles = rarify_alleles
+      ),
+      .progress = TRUE
     )
   }
 
