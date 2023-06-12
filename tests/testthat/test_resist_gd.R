@@ -11,6 +11,6 @@ test_that("resist_gd returns expected output", {
 
   # check against expected values
   vals <- terra::global(rpi, fun = "mean", na.rm = TRUE)
-  expect_equal(0.2737778, vals["pi", ], tolerance = 0.000001)
-  expect_equal(0.45, vals["sample_count", ])
+  expect_equal(0.2182051, vals["pi", ], tolerance = 0.000001)
+  expect_equal(0.5, vals["sample_count", ])
 })

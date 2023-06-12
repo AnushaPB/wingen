@@ -150,16 +150,13 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)
 
+  # make spatial points
+  sp <- sp::SpatialPoints(coords_df)
+
   # create transition surface
   trSurface <- gdistance::transition(lyr, transitionFunction = transitionFunction, directions = directions)
   # note: type = "c" is for least cost distances
   if (geoCorrection) trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
-
-  # get layer coordinates
-  lyr_coords <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)[, 1:2]
-
-  # get all combinations of layer and sample coordinate indices
-  params <- expand.grid(list(lyr = 1:nrow(lyr_coords), coords = 1:nrow(coords_df)))
 
   # make vector of distances
   if (parallel) {
@@ -167,23 +164,18 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
     future::plan(future::multisession, workers = ncores)
 
-    suppressWarnings({
-      distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)
-    })
+    distrasts <- furrr::future_map(1:length(sp), ~gdistance::accCost(trSurface, sp[.x,]),
+                                   .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
+                                   .progress = TRUE)
 
     future::plan("sequential")
   } else {
-    suppressWarnings({
-      distvec <- purrr::map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)
-    })
+    distrasts <- purrr::map(1:length(sp), ~gdistance::accCost(trSurface, sp[.x,]), .progress = TRUE)
   }
 
-  # convert from vector to matrix
-  distmat <-
-    data.frame(params, dist = distvec) %>%
-    tidyr::pivot_wider(names_from = "coords", values_from = "dist") %>%
-    dplyr::select(-1) %>%
-    as.matrix()
+  # convert from raster to matrix
+  diststack <- terra::rast(raster::stack(distrasts))
+  distmat <- as.matrix(terra::as.data.frame(diststack))
 
   return(distmat)
 }
