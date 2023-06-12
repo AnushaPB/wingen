@@ -4,7 +4,16 @@
 \alias{get_resdist}
 \title{Get a matrix of resistance distances for \link[wingen]{resist_gd}}
 \usage{
-get_resdist(coords, lyr, fact = 0, ncores = 1, parallel = TRUE)
+get_resdist(
+  coords,
+  lyr,
+  fact = 0,
+  transitionFunction = mean,
+  directions = 8,
+  geoCorrection = TRUE,
+  ncores = NULL,
+  parallel = TRUE
+)
 }
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
@@ -12,6 +21,12 @@ get_resdist(coords, lyr, fact = 0, ncores = 1, parallel = TRUE)
 \item{lyr}{conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+
+\item{transitionFunction}{function to calculate transition values from grid values (defaults to mean)}
+
+\item{directions}{directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)}
+
+\item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 

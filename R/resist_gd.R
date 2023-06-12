@@ -6,6 +6,9 @@
 #' Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as `lyr`).
 #' @param lyr conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.
 #' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
+#' @param transitionFunction function to calculate transition values from grid values (defaults to mean)
+#' @param directions directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)
+#' @param geoCorrection whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 #' As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
@@ -23,13 +26,14 @@
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                      transitionFunction = mean, directions = 8, geoCorrection = TRUE,
                       parallel = FALSE, ncores = NULL) {
 
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores)
 
   # run dist_gd
   results <-
@@ -88,12 +92,13 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
+                           transitionFunction = mean, directions = 8, geoCorrection = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores)
 
   # run general resist
   results <- dist_general(
@@ -127,7 +132,6 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' using the gdistance package. This matrix is used by \link[wingen]{resist_gd}.
 #'
 #' @inheritParams resist_gd
-#'
 #' @return a distance matrix used by \link[wingen]{resist_gd}
 #' @export
 #'
@@ -136,7 +140,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, ncores = NULL, parallel = TRUE) {
+get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, ncores = NULL, parallel = TRUE) {
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
@@ -146,9 +150,10 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = NULL, parallel = TRUE) {
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)
 
-  # Create transition surface
-  trSurface <- gdistance::transition(lyr, transitionFunction = mean, directions = 8)
-  trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+  # create transition surface
+  trSurface <- gdistance::transition(lyr, transitionFunction = transitionFunction, directions = directions)
+  # note: type = "c" is for least cost distances
+  if (geoCorrection) trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
   # get layer coordinates
   lyr_coords <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)[, 1:2]
@@ -173,7 +178,6 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = NULL, parallel = TRUE) {
     })
   }
 
-
   # convert from vector to matrix
   distmat <-
     data.frame(params, dist = distvec) %>%
@@ -196,13 +200,13 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = NULL, parallel = TRUE) {
 #'
 #' @noRd
 run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
-  # Make spatial points
+  # make spatial points
   sp <- sp::SpatialPoints(rbind(lyr_coords[x, ], coords_df[y, ]))
 
-  # Calculate circuit distances
+  # calculate circuit distances
   d <- possible_gdist(trSurface, sp)
 
-  # Get distance
+  # get distance
   if (!all(is.na(d))) d <- d[1, 2]
 
   return(d)
