@@ -319,7 +319,7 @@ produced raster stack) and the sample counts layer (the second layer).
 
 *Note: you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning*
 
-```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE}
+```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE, message = FALSE}
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -402,7 +402,7 @@ preview_gd(lotr_lyr3,
 
 Then, we can run `circle_gd()`:
 
-```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 cgd <- circle_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr3,
@@ -426,7 +426,7 @@ cell. In this case, we can use the carrying capacity/conductance map
 (`lotr_lyr3`) and multiply it by 100 so that the radius will range from
 0 to 100 based on the value of the raster.
 
-```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 vcgd <- circle_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr3,
@@ -485,32 +485,35 @@ and each individual.
 
 Again, we can use the `preview_gd()` function to preview parameter
 settings. Here, we specify `method = "resist"` and provide `maxdist`. We
-don't evaluate these chunks because it would take a while and should be
-run in parallel, but we provide the code and resulting plot below.
+don't evaluate the resistance distance code because it would take a while 
+and should be run in parallel, but we provide the created distance matrix
+and results.
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
-distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
+```{r, cache = TRUE, warning = FALSE, eval = FALSE, message = FALSE}
+lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
+```
+
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
+data("lotr_distmat")
 
 preview_gd(lotr_lyr,
   lotr_coords,
   method = "resist",
-  maxdist = 900,
-  distmat = distmat,
+  maxdist = 90,
+  distmat = lotr_distmat,
   fact = 5,
   sample_count = TRUE,
   min_n = 2
 )
 ```
 
-![output from preview_gd()](resist_plots/resist_preview.png)
-
-```{r resist, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+```{r resist, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 rgd <- resist_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  distmat = distmat,
+  distmat = lotr_distmat,
   stat = "pi",
-  maxdist = 800,
+  maxdist = 90,
   fact = 5,
   rarify = FALSE,
   L = 100
@@ -523,10 +526,37 @@ plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
 plot_count(rgd, main = "Resistance moving window sample counts")
 ```
 
-![genetic diversity output from resist_gd()](resist_plots/resist_pi.png)
+In addition to using continuous rasters of connectivity you can also use rasters to designate passable (1) and impassable (NA) areas. This can be useful for designating boundaries you don't want windows to extend across (e.g., mountain ranges) or extend between (e.g., rivers). 
 
-![sample count output from
-resist_gd()](resist_plots/resist_samplecount.png)
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
+bin_lyr <- aggregate(lotr_lyr, 20)
+bin_lyr[] <- 1
+bin_lyr[extent(40, 60, -100, 0)] <- NA
+plot(bin_lyr)
+
+distmat_bin <- get_resdist(coords = lotr_coords[1:2,], lyr = bin_lyr, parallel = TRUE, ncores = 3)
+
+test <- bin_lyr
+test[] <- distmat_bin[,1]
+plot(test)
+points(lotr_coords[1,])
+
+test <- bin_lyr
+test[] <- distmat_bin[,2]
+plot(test)
+points(lotr_coords[2,])
+
+bin_gd <- resist_gd(
+  lotr_vcf,
+  lotr_coords,
+  bin_lyr,
+  maxdist = 900,
+  distmat = distmat_bin,
+  min_n = 2
+)
+
+plot_gd(bin_gd)
+```
 
 ## Transforming the moving window maps
 
@@ -707,7 +737,7 @@ To increase computational speed, users can perform the any of the moving
 window functions calculations with parallelization by setting
 `parallel = TRUE` and `ncores` to the number of cores to use:
 
-```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE}
+```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE, message = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
@@ -728,7 +758,7 @@ wgd <- window_gd(lotr_vcf,
 You can calculate multiple statistics at once by providing a vector
 of statistic names to `stat`.
 
-```{r, cache = TRUE, warning = FALSE}
+```{r, cache = TRUE, warning = FALSE, warning = FALSE, message = FALSE}
 multistat_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -749,7 +779,7 @@ plot_gd(multistat_wgd, bkg = lotr_range)
 change some parameters and reduce the dataset for the purpose of the
 example:
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message = FALSE}
 hwe_wgd <- window_gd(lotr_vcf[1:10, ],
   lotr_coords,
   lotr_lyr,
@@ -820,7 +850,7 @@ As an example, let's create a moving window map of our raster layer
 values (e.g., carrying capacity and conductance, in this case) at the
 sample coordinates:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 # First, we extract the raster values at those coordinates
 vals <- extract(lotr_lyr, lotr_coords)
 
@@ -867,7 +897,7 @@ genind object is still feasible.
 An example of how one could use a genind object as input into
 `window_general()` is as follows:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 # We use the vcfR package to convert vcf to genind for our example
 library(vcfR)
 
