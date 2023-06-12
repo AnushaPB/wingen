@@ -65,7 +65,7 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
     tidyr::as_tibble()
 
   # plot results
-  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
+  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = NULL))
 
   return(plts)
 }
