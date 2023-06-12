@@ -8,7 +8,7 @@
 RasterLayer
 }
 \source{
-created from simulations in Bishop et al. (in review) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
 }
 \usage{
 lotr_lyr
