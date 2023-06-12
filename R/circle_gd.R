@@ -153,9 +153,15 @@ get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) 
 
   if (parallel) {
     if (is.null(ncores)) ncores <- future::availableCores() - 1
+
+    future::plan(future::multisession, workers = ncores)
+
     distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf,
-      .options = furrr::furrr_options(seed = TRUE, packages = c("sf"))
+      .options = furrr::furrr_options(seed = TRUE, packages = c("sf")),
+      .progress = TRUE
     )
+
+    future::plan("sequential")
   } else {
     distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf)
   }

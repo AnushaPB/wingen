@@ -136,7 +136,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE) {
+get_resdist <- function(coords, lyr, fact = 0, ncores = NULL, parallel = TRUE) {
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
@@ -158,11 +158,15 @@ get_resdist <- function(coords, lyr, fact = 0, ncores = 1, parallel = TRUE) {
 
   # make vector of distances
   if (parallel) {
+    if (is.null(ncores)) ncores <- future::availableCores() - 1
+
     future::plan(future::multisession, workers = ncores)
 
     suppressWarnings({
       distvec <- furrr::future_map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)
     })
+
+    future::plan("sequential")
   } else {
     suppressWarnings({
       distvec <- purrr::map2_dbl(params$lyr, params$coords, run_gdist, trSurface, lyr_coords, coords_df, .progress = TRUE)

@@ -44,6 +44,8 @@ run_general <- function(x, lyr, coords,
       .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet"))
     )
 
+    future::plan("sequential")
+
     # convert back to SpatRast
     lyr <- terra::rast(lyr)
   } else {
