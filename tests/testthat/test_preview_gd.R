@@ -68,7 +68,7 @@ test_that("preview_gd works for different coord types", {
 
 test_that("preview_gd works for circle method with all different coordinate types", {
   load_mini_ex(quiet = TRUE)
-  distmat <- get_geodist(mini_coords, mini_lyr, fact = 3)
+  capture_warnings(distmat <- get_geodist(mini_coords, mini_lyr, fact = 3))
   pw <- preview_gd(
     mini_lyr,
     mini_coords,
@@ -125,7 +125,7 @@ test_that("preview_gd works for circle method with all different coordinate type
 
 test_that("preview_gd works for resist method", {
   load_mini_ex(quiet = TRUE)
-  distmat <- get_resdist(mini_coords, mini_lyr, fact = 5, ncores = 2)
+  capture_warnings(distmat <- get_resdist(mini_coords, mini_lyr, fact = 5, ncores = 2))
   pw <- preview_gd(
     mini_lyr,
     mini_coords,

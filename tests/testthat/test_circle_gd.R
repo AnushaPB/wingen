@@ -14,7 +14,7 @@ test_that("circle_gd returns expected output", {
   expect_warning(expect_warning(data <- check_data(mini_vcf_NA, mini_coords)))
   mini_vcf_NA <- data$vcf
   mini_coords <- data$coords
-  distmat <- get_geodist(mini_coords, mini_lyr)
+  capture_warnings(distmat <- get_geodist(mini_coords, mini_lyr))
   capture_warnings(wp <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
   capture_warnings(wh <- circle_general(vcf_to_het(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "Ho", rarify = FALSE))
   capture_warnings(wb <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = 10, distmat = distmat, mini_coords, mini_lyr, stat = "biallelic_richness", rarify = FALSE, rarify_alleles = FALSE))

@@ -34,7 +34,6 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
 
-
   # convert wdim to matrix if provided or set as NULL
   if (!is.null(wdim)) nmat <- wdim_to_mat(wdim) else nmat <- NULL
 
@@ -46,7 +45,7 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
     # check distmat
-    if (!is.null(distmat)) if (terra::ncell(lyr) != nrow(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
+    if (!is.null(distmat)) if (terra::ncell(lyr) != ncol(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
 
     # make distmat
     if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
@@ -150,6 +149,9 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   # get resdist from center
   center_dist <- get_resdist(matrix(center_xy, ncol = 2), lyr, parallel = parallel, ncores = ncores)
 
+  # transpose so you get a vector of cell values
+  center_dist <- t(center_dist)
+
   # fill in window
   lyrw <- lyr * 0
   # note: distmat is masked with distmat > maxdist <- NA, so this is the opposite
@@ -202,7 +204,7 @@ preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NU
 
   # get counts for each raster cell
   if (!is.null(nmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_wdim, lyr, nmat, coord_cells)
-  if (!is.null(distmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_dist, distmat, maxdist)
+  if (!is.null(distmat)) nc <- purrr::map_dbl(1:terra::ncell(lyr), sample_count_dist, t(distmat), maxdist)
 
   # assign values to raster
   lyrc <- terra::setValues(lyr, nc)

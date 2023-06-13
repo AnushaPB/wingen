@@ -1,11 +1,12 @@
 test_that("resist_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
-  distmat <- get_resdist(mini_coords, mini_lyr, ncores = 2)
+  capture_warnings(distmat <- get_resdist(mini_coords, mini_lyr, ncores = 2))
   capture_warnings(rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr,
     rarify = FALSE,
     maxdist = quantile(distmat, 0.05, na.rm = TRUE),
     distmat = distmat
   ))
+
   expect_s4_class(rpi, "SpatRaster")
   expect_equal(terra::nlyr(rpi), 2)
 

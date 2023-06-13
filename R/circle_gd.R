@@ -33,7 +33,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   if (fact > 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores))
 
   # run dist_gd
   results <-
@@ -94,11 +94,12 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
+
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores))
 
   # run general resist
   results <- dist_general(
@@ -171,11 +172,16 @@ get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) 
 
     future::plan("sequential")
   } else {
+    # .y = lyr_sf
+    # .x = index
     distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf)
   }
 
   # convert into matrix
   distmat <- matrix(unlist(distls), ncol = length(distls[[1]]), byrow = TRUE)
+
+  # transpose distmat so that the rows are the samples
+  distmat <- t(distmat)
 
   return(distmat)
 }

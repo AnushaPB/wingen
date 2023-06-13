@@ -32,7 +32,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores))
 
   # run dist_gd
   results <-
@@ -97,7 +97,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores)
+  if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores))
 
   # run general resist
   results <- dist_general(
@@ -177,42 +177,11 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   diststack <- terra::rast(raster::stack(distrasts))
   distmat <- as.matrix(terra::as.data.frame(diststack, na.rm = FALSE))
 
+  # transpose distmat so that the rows are the samples
+  distmat <- t(distmat)
+
   return(distmat)
 }
-
-#' Run gdistance
-#'
-#' @param x index for lyr_coords
-#' @param y index for coords_df
-#' @param trSurface transition surface
-#' @param lyr_coords raster coordinates
-#' @param coords_df individual coordinates
-#'
-#' @return single resistance distance value
-#'
-#' @noRd
-run_gdist <- function(x, y, trSurface, lyr_coords, coords_df) {
-  # make spatial points
-  sp <- sp::SpatialPoints(rbind(lyr_coords[x, ], coords_df[y, ]))
-
-  # calculate circuit distances
-  d <- possible_gdist(trSurface, sp)
-
-  # get distance
-  if (!all(is.na(d))) d <- d[1, 2]
-
-  return(d)
-}
-
-#' Possibly wrapper for gdistance to return NA instead of error
-#'
-#' @param sp pair of coordinates
-#' @param trSurface transition surface
-#'
-#' @return distance matrix
-#'
-#' @noRd
-possible_gdist <- purrr::possibly(function(trSurface, sp) as.matrix(gdistance::commuteDistance(trSurface, sp)), NA)
 
 #' Convert coordinates to dataframe
 #'

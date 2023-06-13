@@ -6,9 +6,9 @@
 run_general <- function(x, lyr, coords,
                         coord_cells = NULL, nmat = NULL,
                         distmat = NULL, maxdist = NULL,
-                        stat,
-                        rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
+                        stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
                         parallel = parallel, ncores = ncores, ...) {
+
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
@@ -22,6 +22,9 @@ run_general <- function(x, lyr, coords,
   # check that coords and x align and reformat data, if necessary
   # note: list2env adds the new, corrected x and coords back to the environment
   list2env(check_data(x, coords = coords, distmat = distmat), envir = environment())
+
+  # transpose distmat so that the rows are the landscape cells
+  if (!is.null(distmat)) distmat <- t(distmat)
 
   # run sliding window calculations
   if (parallel) {
@@ -293,7 +296,7 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
 
   # check distmat
   if (!is.null(distmat)) {
-    if (nind != ncol(distmat)) {
+    if (nind != nrow(distmat)) {
       stop("number of samples in distmat data and number of samples in gen data are not equal")
     }
   }
@@ -344,7 +347,7 @@ check_vcf_NA <- function(vcf, coords = NULL, distmat = NULL) {
 
   # make results
   if (!is.null(coords)) coords <- coords[!NA_ind, ]
-  if (!is.null(distmat)) distmat <- distmat[, !NA_ind]
+  if (!is.null(distmat)) distmat <- distmat[!NA_ind, ]
 
   results <- list(vcf = vcf, coords = coords, distmat = distmat) %>% purrr::discard(is.null)
   return(results)
