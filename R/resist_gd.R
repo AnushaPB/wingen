@@ -140,7 +140,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, ncores = NULL, parallel = TRUE) {
+get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, ncores = NULL, parallel = FALSE) {
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
@@ -175,7 +175,7 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
   # convert from raster to matrix
   diststack <- terra::rast(raster::stack(distrasts))
-  distmat <- as.matrix(terra::as.data.frame(diststack))
+  distmat <- as.matrix(terra::as.data.frame(diststack, na.rm = FALSE))
 
   return(distmat)
 }
