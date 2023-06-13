@@ -484,24 +484,19 @@ individuals. The values are the resistance distance between each cell
 and each individual.
 
 Again, we can use the `preview_gd()` function to preview parameter
-settings. Here, we specify `method = "resist"` and provide `maxdist`. We
-don't evaluate the resistance distance code because it would take a while 
-and should be run in parallel, but we provide the created distance matrix
-and results.
+settings. Here, we specify `method = "resist"` and provide `maxdist`. 
 
-```{r, cache = TRUE, warning = FALSE, eval = FALSE, message = FALSE}
-lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
+```{r, cache = TRUE, warning = FALSE, message = FALSE}
+lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3))
 ```
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
-data("lotr_distmat")
-
 preview_gd(lotr_lyr,
   lotr_coords,
   method = "resist",
-  maxdist = 90,
+  maxdist = 60,
   distmat = lotr_distmat,
-  fact = 5,
+  fact = 3,
   sample_count = TRUE,
   min_n = 2
 )
@@ -513,8 +508,8 @@ rgd <- resist_gd(lotr_vcf,
   lotr_lyr,
   distmat = lotr_distmat,
   stat = "pi",
-  maxdist = 90,
-  fact = 5,
+  maxdist = 60,
+  fact = 3,
   rarify = FALSE,
   L = 100
 )

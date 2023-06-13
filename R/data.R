@@ -27,15 +27,6 @@
 #'
 "lotr_lyr"
 
-#' Middle earth example resistance distance matrix
-#'
-#' Resistance distance matrix made based on \link[wingen]{lotr_lyr} aggregated by a factor of 5 and \link[wingen]{lotr_coords}
-#'
-#' @format matrix
-#' @source created from simulations in Bishop et al. (2023)
-#'
-"lotr_distmat"
-
 #' Middle earth example range polygon
 #'
 #' sf polygon of range map

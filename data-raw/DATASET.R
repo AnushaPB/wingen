@@ -51,10 +51,6 @@ lotr_coords <- lotr_coords %>% dplyr::select(x, y)
 usethis::use_data(lotr_coords, overwrite = TRUE)
 usethis::use_data(lotr_vcf, overwrite = TRUE)
 
-# create resistance distance
-lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 5), parallel = TRUE, ncores = 3)
-usethis::use_data(lotr_distmat, overwrite = TRUE)
-
 # Code to create tiny example dataset ------------------------------------------------------------------
 mini_lyr <- terra::aggregate(lotr_lyr, 10)
 

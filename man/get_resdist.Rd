@@ -12,7 +12,7 @@ get_resdist(
   directions = 8,
   geoCorrection = TRUE,
   ncores = NULL,
-  parallel = TRUE
+  parallel = FALSE
 )
 }
 \arguments{
