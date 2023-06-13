@@ -144,6 +144,14 @@ get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) 
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
+  # check crs
+  layer_coords_check(lyr = lyr, coords = coords)
+
+  # apply CRS so that if one is NA and the other isn't you don't get an error
+  # assumes CRS are the same (warning printed by layer_coords_check)
+  if (is.na(sf::st_crs(lyr)) & !is.na(sf::st_crs(coords))) sf::st_crs(lyr) <- sf::st_crs(coords)
+  if (!is.na(sf::st_crs(lyr)) & is.na(sf::st_crs(coords))) sf::st_crs(coords) <- sf::st_crs(lyr)
+
   # aggregate raster
   if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
