@@ -82,3 +82,4 @@ paperex/plots
 cov_token.R
 *.map
 *.ped
+*.tif
