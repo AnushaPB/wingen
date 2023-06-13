@@ -142,26 +142,30 @@ ani.height = 500,
 outdir = getwd()
 )  
 ```
+
+
 ```{r}
 
-lyr <- terra::aggregate(lotr_lyr, 6, fun = mean)
+coords <- lotr_coords
+gen <- vcf_to_dosage(lotr_vcf)
+lyr <- terra::aggregate(lotr_lyr, 3, fun = mean)
 
 lyrr <- raster::raster(lyr)
 future::plan(future::multisession, workers = 4)
-cell_dists <- furrr::future_map(1:ncell(lyr), \(i){
+cell_dists1 <- furrr::future_map(1:ncell(lyr), \(i){
   xy <- raster::xyFromCell(lyrr, i)
-  resdist <- get_resdist(matrix(xy, ncol = 2), lyr, parallel = FALSE, progress = FALSE)
+  resdist <- get_resdist(matrix(xy, ncol = 2), lyr, parallel = FALSE)
   return(resdist)
   },
   .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet")),
   .progress = TRUE)
 
 
-cell_dists <- cell_dists %>% purrr::map(~data.frame(t(.x))) %>% dplyr::bind_rows()
+cell_dists <- cell_dists1 %>% purrr::map(~data.frame(t(.x))) %>% dplyr::bind_rows()
 
-distmat <- get_resdist(lotr_coords, lyr, ncores = 4, parallel = TRUE)
+distmat <- get_resdist(lotr_coords, lyr)
 
-maxdist <- 6
+maxdist <- 50
 ani.options(
 convert = shQuote('C:/Program Files (x86)/ImageMagick-6.8.1-Q16/convert.exe')
 )
@@ -176,19 +180,20 @@ for(i in 1:289){
   
   # fill in window
   lyrw <- lyr*0
-  lyrw[log(cell_dists[i,] + 1) <= maxdist] <- 1
+  lyrw[cell_dists[i,] <= maxdist] <- 1
   lyrw[i] <- 2
   
-  subc <- coords[log(distmat[i,] + 1) <= maxdist,]
+  subc <- coords[distmat[,i] <= maxdist,]
+  
   val <- window_helper(i = i, lyr = lyr, x = gen, 
-                           distmat = log(distmat + 1),
-                           min_n = 1,
-                           maxdist = maxdist, 
-                           rarify = FALSE,
-                           stat_function = calc_pi, L = L,
-                           rarify_n = NULL, rarify_nit = NULL,
-                           rarify_alleles = FALSE,
-                           fun = mean)
+                       distmat = t(distmat),
+                       min_n = 1,
+                       maxdist = maxdist, 
+                       rarify = FALSE,
+                       stat_function = calc_pi, L = 100,
+                       rarify_n = NULL, rarify_nit = NULL,
+                       rarify_alleles = FALSE,
+                       fun = mean)
   if (names(val)[1] == "pi") val <- val[1] else val <- NA
   lyrg[i] <- val
   
@@ -197,15 +202,17 @@ for(i in 1:289){
   plot_gd(lyrw, col = viridis::mako(3, direction = 1), main = "Landscape", legend = FALSE)
   points(coords, pch = 3, cex = 1, col = rgb(0.3,0.3,0.3))
   points(subc, pch = 3, cex = 1, col = "orange")
-  plot_gd(lyrg, lyr, range = c(0, 0.35), breaks = 100, legend = FALSE, main = "Genetic Diversity")
+  plot_gd(lyrg, lyr, range = c(0, 0.4), breaks = 100, legend = FALSE, main = "Genetic Diversity")
 
 }
 },
 movie.name = "wingen3.gif", 
-interval = 0.20, 
+interval = 0.08, 
 ani.width = 600, 
 ani.height = 300,
 outdir = getwd()
 )  
+
+plot_gd(lyr, col = viridis::cividis(100))
 ```
 
