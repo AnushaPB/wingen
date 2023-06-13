@@ -18,7 +18,7 @@ tess_result <- tess_do_everything(lotr_vcf, lotr_coords, grid = lotr_lyr, K_sele
 pop <- apply(tess_result$Qmatrix, 1, which.max)
 hf <- hierfstat::genind2hierfstat(vcfR::vcfR2genind(lotr_vcf), pop = pop)
 
-bs <- window_general(hf[,1:100], coords = lotr_coords, lyr = lotr_lyr, wdim = 7, fact = 3, stat = "basic_stats")
+bs <- window_general(hf[, 1:100], coords = lotr_coords, lyr = lotr_lyr, wdim = 7, fact = 3, stat = "basic_stats")
 bs_kg <- krig_gd(bs$Fst_hierfstat, index = 1, lotr_lyr, disagg_grd = 2)
 plot_gd(bs$Fst_hierfstat)
 points(lotr_coords)
@@ -50,22 +50,21 @@ plot_gd(m_kg, breaks = 10)
 
 
 plot_gd(lotr_lyr)
-plot_gd(m_kg, breaks = 10, range = c(0.1, 1), add = TRUE, col = rgb(1,1,1,0.5), legend = FALSE)
+plot_gd(m_kg, breaks = 10, range = c(0.1, 1), add = TRUE, col = rgb(1, 1, 1, 0.5), legend = FALSE)
 
 
-m_ll <- mask(disagg(rast(lotr_lyr),2), m_kg)
+m_ll <- mask(disagg(rast(lotr_lyr), 2), m_kg)
 m_kg2 <- m_kg
 m_kg2[m_kg < 0.1] <- NA
 m_ll[m_kg < 0.1] <- NA
 
-par(mfrow = c(1,2))
+par(mfrow = c(1, 2))
 plot_gd(m_kg2, bkg = lotr_range)
 plot_gd(m_ll, bkg = lotr_range)
 summary(lm(values(m_ll) ~ values(m_kg2)))
 ```
 
 ```{r}
-
 mean_dist <- function(x) mean(dist(x), na.rm = TRUE)
 dos <- vcf_to_dosage(lotr_vcf)
 dcg <-

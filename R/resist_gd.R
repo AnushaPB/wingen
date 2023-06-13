@@ -28,7 +28,6 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       transitionFunction = mean, directions = 8, geoCorrection = TRUE,
                       parallel = FALSE, ncores = NULL) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -164,13 +163,14 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
     future::plan(future::multisession, workers = ncores)
 
-    distrasts <- furrr::future_map(1:length(sp), ~gdistance::accCost(trSurface, sp[.x,]),
-                                   .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
-                                   .progress = TRUE)
+    distrasts <- furrr::future_map(1:length(sp), ~ gdistance::accCost(trSurface, sp[.x, ]),
+      .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
+      .progress = TRUE
+    )
 
     future::plan("sequential")
   } else {
-    distrasts <- purrr::map(1:length(sp), ~gdistance::accCost(trSurface, sp[.x,]), .progress = TRUE)
+    distrasts <- purrr::map(1:length(sp), ~ gdistance::accCost(trSurface, sp[.x, ]), .progress = TRUE)
   }
 
   # convert from raster to matrix

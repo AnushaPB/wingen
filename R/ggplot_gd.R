@@ -16,7 +16,6 @@
 #' ggplot_gd(wgd)
 #'
 ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
-
   # format rasters
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
   if (inherits(bkg, "Raster")) bkg <- terra::rast(x)
@@ -31,7 +30,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
     tidyr::as_tibble()
 
   # plot results
-  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
+  plts <- purrr::map(names(x), ~ ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
 
   return(plts)
 }
@@ -65,7 +64,7 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
     tidyr::as_tibble()
 
   # plot results
-  plts <- purrr::map(names(x), ~ggplot_helper(var = .x, x_df = x_df, col = col, bkg = NULL))
+  plts <- purrr::map(names(x), ~ ggplot_helper(var = .x, x_df = x_df, col = col, bkg = NULL))
 
   return(plts)
 }
@@ -77,7 +76,7 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
 #' @param bkg background raster layer or sf objects
 #' @return ggplot
 #' @noRd
-ggplot_helper <- function(var, x_df, col = viridis::magma(100), bkg = NULL){
+ggplot_helper <- function(var, x_df, col = viridis::magma(100), bkg = NULL) {
   # create ggplot
   gg <- ggplot2::ggplot()
 
@@ -98,11 +97,13 @@ ggplot_helper <- function(var, x_df, col = viridis::magma(100), bkg = NULL){
     ggplot2::theme_bw() +
     ggplot2::scale_fill_gradientn(colours = col, na.value = grDevices::rgb(0, 0, 0, 0)) +
     ggplot2::labs(fill = var) +
-    ggplot2::theme(panel.grid = ggplot2::element_blank(),
-                   axis.title = ggplot2::element_blank(),
-                   axis.text = ggplot2::element_blank(),
-                   axis.ticks = ggplot2::element_blank(),
-                   panel.border = ggplot2::element_blank())
+    ggplot2::theme(
+      panel.grid = ggplot2::element_blank(),
+      axis.title = ggplot2::element_blank(),
+      axis.text = ggplot2::element_blank(),
+      axis.ticks = ggplot2::element_blank(),
+      panel.border = ggplot2::element_blank()
+    )
 
   return(gg)
 }

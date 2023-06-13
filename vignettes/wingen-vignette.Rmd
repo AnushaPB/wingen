@@ -431,7 +431,7 @@ vcgd <- circle_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr3,
   stat = "pi",
-  maxdist = lotr_lyr3*100,
+  maxdist = lotr_lyr3 * 100,
   distmat = distmat,
   rarify = FALSE,
   L = 100
@@ -528,34 +528,36 @@ plot_count(rgd, main = "Resistance moving window sample counts")
 
 In addition to using continuous rasters of connectivity you can also use rasters to designate passable (1) and impassable (NA) areas. This can be useful for designating boundaries you don't want windows to extend across (e.g., mountain ranges) or extend between (e.g., rivers). 
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, eval = FALSE}
-bin_lyr <- aggregate(lotr_lyr, 20)
-bin_lyr[] <- 1
-bin_lyr[extent(40, 60, -100, 0)] <- NA
-plot(bin_lyr)
+```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+# create layer
+resist_lyr <- rast(aggregate(lotr_lyr, 5))
 
-distmat_bin <- get_resdist(coords = lotr_coords[1:2,], lyr = bin_lyr, parallel = TRUE, ncores = 3)
+# code passable areas as 1 and then create an impassable area down the middle coded as NA
+resist_lyr[] <- 1
+resist_lyr[ext(40, 60, -100, 0)] <- NA
 
-test <- bin_lyr
-test[] <- distmat_bin[,1]
-plot(test)
-points(lotr_coords[1,])
+# visualize break
+plot(resist_lyr)
 
-test <- bin_lyr
-test[] <- distmat_bin[,2]
-plot(test)
-points(lotr_coords[2,])
+# get resistance distances
+distmat <- get_resdist(coords = lotr_coords, lyr = resist_lyr)
 
-bin_gd <- resist_gd(
+# example resistance distance from coordinate 1
+example <- resist_lyr
+example[] <- distmat[, 1]
+plot_gd(example, col = rocket(100), bkg = resist_lyr, main = "example resistance layer")
+points(lotr_coords[1, ], col = "blue", pch = 3, cex = 2)
+
+# create moving window map
+resist_gd <- resist_gd(
   lotr_vcf,
   lotr_coords,
-  bin_lyr,
-  maxdist = 900,
-  distmat = distmat_bin,
-  min_n = 2
+  resist_lyr,
+  maxdist = 20,
+  distmat = distmat
 )
 
-plot_gd(bin_gd)
+plot_gd(resist_gd)
 ```
 
 ## Transforming the moving window maps

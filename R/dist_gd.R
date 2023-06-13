@@ -9,10 +9,9 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE,
                     parallel = FALSE, ncores = NULL) {
-
   # convert maxdist to SpatRaster
   if (!is.numeric(maxdist)) {
-    if(!inherits(maxdist, "SpatRaster")) maxdist <- terra::rast(maxdist)
+    if (!inherits(maxdist, "SpatRaster")) maxdist <- terra::rast(maxdist)
     if (fact > 0) maxdist <- terra::aggregate(maxdist, fact, fun = mean)
   }
 
