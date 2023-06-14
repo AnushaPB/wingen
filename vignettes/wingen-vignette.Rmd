@@ -540,7 +540,6 @@ resist_lyr[ext(40, 60, -100, 0)] <- NA
 distmat <- get_resdist(coords = lotr_coords, lyr = resist_lyr)
 
 # plot preview
-# Note: since we don't want windows to cross the gap we have created maxdist must be less than 20 cells
 preview_gd(resist_lyr, lotr_coords, method = "resist", distmat = distmat, maxdist = 10)
 
 # create moving window map
