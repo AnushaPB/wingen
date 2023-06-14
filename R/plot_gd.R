@@ -31,75 +31,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
     index <- 1:terra::nlyr(x)
   }
 
-  # suppress irrelevant plot warnings
-  suppressWarnings({
-    if (!is.null(bkg)) {
-      plt <- purrr::map(index, plot_gd_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, range = range, legend = legend, ...)
-    } else {
-      plt <- purrr::map(index, \(index) {
-        terra::plot(x[[index]], col = col, axes = FALSE, box = box, range = range, legend = legend, ...)
-        if (is.null(main)) main <- names(x[[index]])
-        graphics::title(main = list(main, font = 1), adj = 0)
-      })
-    }
-  })
-
-  return(invisible(plt))
-}
-
-#' Helper function for plot_gd
-#'
-#' @inheritParams plot_gd
-#'
-#' @noRd
-plot_gd_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
-  if (is.null(main)) main <- names(x[[index]])
-
-  # suppress irrelevant plot warnings
-  suppressWarnings({
-    # calculate extent
-    extx <- terra::ext(x)
-    extb <- terra::ext(bkg)
-    xmin <- min(min(extx)[1], min(extb)[1])
-    xmax <- max(max(extx)[1], max(extb)[1])
-    ymin <- min(min(extx)[2], min(extb)[2])
-    ymax <- max(max(extx)[2], max(extb)[2])
-
-    terra::plot(x[[index]],
-      col = col,
-      xlim = c(xmin, xmax),
-      ylim = c(ymin, ymax),
-      axes = FALSE,
-      box = box,
-      range = range,
-      legend = legend
-    )
-
-    terra::plot(bkg,
-      col = "lightgray",
-      border = "white",
-      xlim = c(xmin, xmax),
-      ylim = c(ymin, ymax),
-      axes = FALSE,
-      box = FALSE,
-      legend = FALSE,
-      add = TRUE
-    )
-
-    terra::plot(x[[index]],
-      col = col,
-      add = TRUE,
-      axes = FALSE,
-      box = FALSE,
-      range = range,
-      legend = FALSE,
-      ...
-    )
-  })
-
-  graphics::title(main = list(main, font = 1), adj = 0)
-
-  return()
+  plot_general(x, index = index, bkg = bkg, breaks = breaks, col = col, main = main, box = box, range = range, ...)
 }
 
 #' Plot moving window map of sample counts
@@ -130,30 +62,79 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
     if (any(names(x) == "sample_count")) x <- terra::subset(x, "sample_count") else index <- terra::nlyr(x)
   }
 
+  plot_general(x, index = index, breaks = breaks, col = col, main = main, box = box, range = range, ...)
+}
+
+#' Helper function for plot_gd and plot_count
+#'
+#' @inheritParams plot_gd
+#'
+#' @noRd
+plot_general <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...){
   # suppress irrelevant plot warnings
   suppressWarnings({
-    if (terra::nlyr(x) > 1) {
-      plt <- terra::plot(x[[index]],
-        col = col,
-        axes = FALSE,
-        box = box,
-        range = range,
-        ...
-      )
-      graphics::title(main = list(main, font = 1), adj = 0)
-    }
-
-    if (terra::nlyr(x) == 1) {
-      plt <- terra::plot(x,
-        col = col,
-        axes = FALSE,
-        box = box,
-        range = range,
-        ...
-      )
-      graphics::title(main = list(main, font = 1), adj = 0)
+    if (!is.null(bkg)) {
+      purrr::walk(index, plot_bkg, x = x, bkg = bkg, col = col, breaks = breaks, main = main, box = box, range = range, legend = legend, ...)
+    } else {
+      purrr::walk(index, \(index) {
+        terra::plot(x[[index]], col = col, axes = FALSE, box = box, range = range, legend = legend, ...)
+        if (is.null(main)) main <- names(x[[index]])
+        graphics::title(main = list(main, font = 1), adj = 0)
+      })
     }
   })
+}
 
-  return(invisible(plt))
+
+#' Helper function for plot_general
+#'
+#' @inheritParams plot_gd
+#'
+#' @noRd
+plot_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
+  if (is.null(main)) main <- names(x[[index]])
+
+  # suppress irrelevant plot warnings
+  suppressWarnings({
+    # calculate extent
+    extx <- terra::ext(x)
+    extb <- terra::ext(bkg)
+    xmin <- min(min(extx)[1], min(extb)[1])
+    xmax <- max(max(extx)[1], max(extb)[1])
+    ymin <- min(min(extx)[2], min(extb)[2])
+    ymax <- max(max(extx)[2], max(extb)[2])
+
+    terra::plot(x[[index]],
+                col = col,
+                xlim = c(xmin, xmax),
+                ylim = c(ymin, ymax),
+                axes = FALSE,
+                box = box,
+                range = range,
+                legend = legend
+    )
+
+    terra::plot(bkg,
+                col = "lightgray",
+                border = "white",
+                xlim = c(xmin, xmax),
+                ylim = c(ymin, ymax),
+                axes = FALSE,
+                box = FALSE,
+                legend = FALSE,
+                add = TRUE
+    )
+
+    terra::plot(x[[index]],
+                col = col,
+                add = TRUE,
+                axes = FALSE,
+                box = FALSE,
+                range = range,
+                legend = FALSE,
+                ...
+    )
+  })
+
+  graphics::title(main = list(main, font = 1), adj = 0)
 }
