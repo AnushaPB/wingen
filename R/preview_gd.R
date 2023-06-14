@@ -51,9 +51,6 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
     if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
 
-    # Modify dist matrix
-    distmat[distmat > maxdist] <- NA
-
     # plot preview
     if (method == "circle") preview_circle(lyr, maxdist, coords = coords)
     if (method == "resist") preview_resist(lyr, maxdist, coords = coords, parallel = parallel, ncores = ncores)
@@ -88,14 +85,13 @@ preview_window <- function(lyr, nmat, coords = NULL) {
   lyrw[center] <- 2
 
   # suppress irrelevant plot warnings
-  suppressWarnings({
-    terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, axes = FALSE, box = FALSE)
-    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-    if (!is.null(coords)) {
-      coords <- coords_to_sf(coords)
-      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-    }
-  })
+  plot_gd(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, main = "window preview")
+  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+  if (!is.null(coords)) {
+    coords <- coords_to_sf(coords)
+    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+  }
+
 }
 
 #' Plot preview of circle moving window
@@ -120,18 +116,17 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
   lyrw <- lyr * 0
   lyrw[center_i] <- 1
 
-  # suppress irrelevant plot warnings
-  suppressWarnings({
-    terra::plot(lyrw, col = viridis::mako(3, direction = -1)[c(1, 3)], legend = FALSE, axes = FALSE, box = FALSE)
-    # draw the circle
-    graphics::lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
-    # add center point
-    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
-    if (!is.null(coords)) {
-      coords <- coords_to_sf(coords)
-      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-    }
-  })
+  # plot window preview
+  plot_gd(lyrw, col = viridis::mako(3, direction = -1)[c(1, 3)], legend = FALSE, main = "window preview")
+  # draw the circle
+  graphics::lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
+  # add center point
+  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
+  if (!is.null(coords)) {
+    coords <- coords_to_sf(coords)
+    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+  }
+
 }
 
 #' Plot preview of circle moving window
@@ -146,8 +141,18 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   center_xy <- get_center(lyr, xy = TRUE)
   center_i <- get_center(lyr, xy = FALSE)
 
+  # move "center" if the value is NA
+  if (is.na(lyr[center_i]) & !all(is.na(terra::values(lyr)))) {
+    new_center <-
+      as.data.frame(lyr, xy = TRUE, cell = TRUE) %>%
+      tidyr::drop_na() %>%
+      dplyr::slice((dplyr::n() %/% 2) + 1)
+    center_xy <- new_center[ ,c("x", "y")]
+    center_i <- new_center[ ,c("cell")]
+  }
+
   # get resdist from center
-  center_dist <- get_resdist(matrix(center_xy, ncol = 2), lyr, parallel = parallel, ncores = ncores)
+  center_dist <- get_resdist(center_xy, lyr, parallel = parallel, ncores = ncores)
 
   # transpose so you get a vector of cell values
   center_dist <- t(center_dist)
@@ -158,15 +163,21 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   lyrw[center_dist <= maxdist] <- 1
   lyrw[center_i] <- 2
 
-  # suppress irrelevant plot warnings
-  suppressWarnings({
-    terra::plot(lyrw, col = viridis::mako(3, direction = -1), legend = TRUE, axes = FALSE, box = FALSE)
-    graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-    if (!is.null(coords)) {
-      coords <- coords_to_sf(coords)
-      terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-    }
-  })
+  # create plot of window
+  plot_gd(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, main = "window preview")
+  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
+  if (!is.null(coords)) {
+    coords <- coords_to_sf(coords)
+    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
+  }
+
+  # create example plot of resistance distances
+  example <- lyr
+  example[] <- center_dist
+  plot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1), main = "resistance preview")
+  points(center_xy, col = "blue", pch = 3, cex = 2, lwd = 3)
+  graphics::legend("bottomleft", "focal cell", col = "blue", pch = 3)
+
 }
 
 #' Get center cell of a raster
