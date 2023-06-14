@@ -175,7 +175,7 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   example <- lyr
   example[] <- center_dist
   plot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1), main = "resistance preview")
-  points(center_xy, col = "blue", pch = 3, cex = 2, lwd = 3)
+  graphics::points(center_xy, col = "blue", pch = 3, cex = 2, lwd = 3)
   graphics::legend("bottomleft", "focal cell", col = "blue", pch = 3)
 
 }
