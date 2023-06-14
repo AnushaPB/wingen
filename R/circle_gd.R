@@ -131,7 +131,10 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' and columns represent individual locations on the landscape. Each value is
 #' the geographic distance between each individual and each cell calculated
 #' using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
+#' If coords_only = TRUE, the result is a distance matrix for the sample coordinates
+#' only.
 #'
+#' @param lyr SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE)
 #' @inheritParams circle_gd
 #'
 #' @return a distance matrix used by \link[wingen]{circle_gd}
@@ -141,9 +144,12 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_geodist(mini_coords, mini_lyr)
 #'
-get_geodist <- function(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL) {
+get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE, parallel = FALSE, ncores = NULL) {
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
+
+  # create distance matrix using only coordinates
+  if (coords_only) return(sf::st_distance(coords))
 
   # check crs
   layer_coords_check(lyr = lyr, coords = coords)

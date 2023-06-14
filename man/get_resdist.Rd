@@ -11,6 +11,7 @@ get_resdist(
   transitionFunction = mean,
   directions = 8,
   geoCorrection = TRUE,
+  coords_only = FALSE,
   ncores = NULL,
   parallel = FALSE
 )
@@ -18,7 +19,7 @@ get_resdist(
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{lyr}{conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.}
+\item{lyr}{conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -27,6 +28,8 @@ get_resdist(
 \item{directions}{directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)}
 
 \item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
+
+\item{coords_only}{whether to return distances only for sample coordinates}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
 
@@ -39,8 +42,10 @@ a distance matrix used by \link[wingen]{resist_gd}
 Create a distance matrix based on coordinates and a connectivity layer.
 The output is a distance matrix where rows represent cells on the landscape
 and columns represent individual locations on the landscape. Each value is
-the resistance distance between each individual and each cell calculated
+the resistance distance between each sample and each cell calculated
 using the gdistance package. This matrix is used by \link[wingen]{resist_gd}.
+If coords_only = TRUE, the result is a distance matrix for the sample coordinates
+only.
 }
 \examples{
 \dontrun{

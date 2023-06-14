@@ -4,12 +4,19 @@
 \alias{get_geodist}
 \title{Get a matrix of geographic distances for \link[wingen]{circle_gd}}
 \usage{
-get_geodist(coords, lyr, fact = 0, parallel = FALSE, ncores = NULL)
+get_geodist(
+  coords,
+  lyr = NULL,
+  fact = 0,
+  coords_only = FALSE,
+  parallel = FALSE,
+  ncores = NULL
+)
 }
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
+\item{lyr}{SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE)}
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
@@ -26,6 +33,8 @@ The output is a distance matrix where rows represent cells on the landscape
 and columns represent individual locations on the landscape. Each value is
 the geographic distance between each individual and each cell calculated
 using \link[sf]{st_distance}. This matrix is used by \link[wingen]{circle_gd}.
+If coords_only = TRUE, the result is a distance matrix for the sample coordinates
+only.
 }
 \examples{
 load_mini_ex()

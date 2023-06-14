@@ -127,10 +127,13 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' Create a distance matrix based on coordinates and a connectivity layer.
 #' The output is a distance matrix where rows represent cells on the landscape
 #' and columns represent individual locations on the landscape. Each value is
-#' the resistance distance between each individual and each cell calculated
+#' the resistance distance between each sample and each cell calculated
 #' using the gdistance package. This matrix is used by \link[wingen]{resist_gd}.
-#'
+#' If coords_only = TRUE, the result is a distance matrix for the sample coordinates
+#' only.
+#' @param lyr conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.
 #' @inheritParams resist_gd
+#' @param coords_only whether to return distances only for sample coordinates
 #' @return a distance matrix used by \link[wingen]{resist_gd}
 #' @export
 #'
@@ -139,7 +142,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, ncores = NULL, parallel = FALSE) {
+get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE, ncores = NULL, parallel = FALSE) {
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
@@ -150,12 +153,16 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   coords_df <- coords_to_df(coords)
 
   # make spatial points
-  sp <- sp::SpatialPoints(coords_df)
+  sp_coords <- sp::SpatialPoints(coords_df)
 
   # create transition surface
   trSurface <- gdistance::transition(lyr, transitionFunction = transitionFunction, directions = directions)
+
   # note: type = "c" is for least cost distances
   if (geoCorrection) trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+  # create distance matrix using only coordinates
+  if (coords_only) return(as.matrix(gdistance::commuteDistance(trSurface, sp_coords)))
 
   # make vector of distances
   if (parallel) {
@@ -163,14 +170,14 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
     future::plan(future::multisession, workers = ncores)
 
-    distrasts <- furrr::future_map(1:length(sp), ~ gdistance::accCost(trSurface, sp[.x, ]),
+    distrasts <- furrr::future_map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]),
       .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
       .progress = TRUE
     )
 
     future::plan("sequential")
   } else {
-    distrasts <- purrr::map(1:length(sp), ~ gdistance::accCost(trSurface, sp[.x, ]), .progress = TRUE)
+    distrasts <- purrr::map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]), .progress = TRUE)
   }
 
   # convert from raster to matrix
