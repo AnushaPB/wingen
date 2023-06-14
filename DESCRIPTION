@@ -31,6 +31,7 @@ Imports:
     pegas,
     purrr,
     raster,
+    rlang,
     Rcpp,
     Rfast,
     sp,
