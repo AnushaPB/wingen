@@ -135,6 +135,7 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' only.
 #'
 #' @param lyr SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE)
+#' @param coords_only whether to return distances only for sample coordinates
 #' @inheritParams circle_gd
 #'
 #' @return a distance matrix used by \link[wingen]{circle_gd}

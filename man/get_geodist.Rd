@@ -20,6 +20,8 @@ get_geodist(
 
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
+\item{coords_only}{whether to return distances only for sample coordinates}
+
 \item{parallel}{whether to parallelize the function (defaults to FALSE)}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
