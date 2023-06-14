@@ -175,7 +175,7 @@ saveGIF(
 # make raster lyr copy with all NA
 lyr <- terra::mask(lyr, lotr_range)
 lyrg <- lyr/0
-for(i in 1:289){
+for(i in 1:999){
   if(is.na(lyr[i])) next
   
   # fill in window
@@ -202,7 +202,7 @@ for(i in 1:289){
   plot_gd(lyrw, col = viridis::mako(3, direction = 1), main = "Landscape", legend = FALSE)
   points(coords, pch = 3, cex = 1, col = rgb(0.3,0.3,0.3))
   points(subc, pch = 3, cex = 1, col = "orange")
-  plot_gd(lyrg, lyr, range = c(0, 0.4), breaks = 100, legend = FALSE, main = "Genetic Diversity")
+  plot_gd(lyrg, lyr, range = c(0, 0.35), breaks = 100, legend = FALSE, main = "Genetic Diversity")
 
 }
 },
@@ -216,3 +216,4 @@ outdir = getwd()
 plot_gd(lyr, col = viridis::cividis(100))
 ```
 
+# Note: accident deleted gifs 4 and 5
