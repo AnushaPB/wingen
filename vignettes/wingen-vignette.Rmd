@@ -24,6 +24,7 @@ library(raster)
 library(viridis)
 library(sf)
 library(SpatialKDE)
+library(ggplot2)
 devtools::load_all()
 ```
 
@@ -527,33 +528,29 @@ In addition to using continuous rasters of connectivity you can also use rasters
 # create layer
 resist_lyr <- rast(aggregate(lotr_lyr, 5))
 
-# code passable areas as 1 and then create an impassable area down the middle coded as NA
+# code passable areas as 1 and then create an impassable area 20 cells wide down the middle coded as NA
 resist_lyr[] <- 1
 resist_lyr[ext(40, 60, -100, 0)] <- NA
-
-# visualize break
-plot(resist_lyr)
 
 # get resistance distances
 distmat <- get_resdist(coords = lotr_coords, lyr = resist_lyr)
 
-# example resistance distance from coordinate 1
-example <- resist_lyr
-example[] <- distmat[, 1]
-plot_gd(example, col = rocket(100), bkg = resist_lyr, main = "example resistance layer")
-points(lotr_coords[1, ], col = "blue", pch = 3, cex = 2)
+# plot preview
+# note: since we don't want windows to cross the gap we have created maxdist must be less than 20 cells
+preview_gd(resist_lyr, lotr_coords, method = "resist", distmat = distmat, maxdist = 10)
 
 # create moving window map
 resist_gd <- resist_gd(
   lotr_vcf,
   lotr_coords,
   resist_lyr,
-  maxdist = 20,
+  maxdist = 10,
   distmat = distmat
 )
 
 plot_gd(resist_gd)
 ```
+
 
 ## Transforming the moving window maps
 
