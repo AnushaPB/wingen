@@ -526,13 +526,13 @@ plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
 plot_count(rgd, main = "Resistance moving window sample counts")
 ```
 
-In addition to using continuous rasters of connectivity you can also use rasters to designate passable (1) and impassable (NA) areas. This can be useful for designating boundaries you don't want windows to extend across (e.g., mountain ranges) or extend between (e.g., rivers). 
+In addition to using continuous rasters of connectivity you can also use rasters to designate passable and impassable areas. This can be useful for designating boundaries you don't want windows to extend across (e.g., mountain ranges) or extend between (e.g., rivers). 
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # create layer
 resist_lyr <- rast(aggregate(lotr_lyr, 5))
 
-# code passable areas as 1 and then create an impassable area 20 cells wide down the middle coded as NA
+# create an impassable area down the middle coded as NA
 resist_lyr[] <- 1
 resist_lyr[ext(40, 60, -100, 0)] <- NA
 

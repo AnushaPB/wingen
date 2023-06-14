@@ -70,7 +70,7 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
 #' @inheritParams plot_gd
 #'
 #' @noRd
-plot_general <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...){
+plot_general <- function(x, index = 1, bkg = NULL, col = viridis::magma(breaks), breaks = 100, main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
   # suppress irrelevant plot warnings
   suppressWarnings({
     if (!is.null(bkg)) {
@@ -105,34 +105,34 @@ plot_bkg <- function(index, x, bkg, col = viridis::magma(breaks), breaks = 100, 
     ymax <- max(max(extx)[2], max(extb)[2])
 
     terra::plot(x[[index]],
-                col = col,
-                xlim = c(xmin, xmax),
-                ylim = c(ymin, ymax),
-                axes = FALSE,
-                box = box,
-                range = range,
-                legend = legend
+      col = col,
+      xlim = c(xmin, xmax),
+      ylim = c(ymin, ymax),
+      axes = FALSE,
+      box = box,
+      range = range,
+      legend = legend
     )
 
     terra::plot(bkg,
-                col = "lightgray",
-                border = "white",
-                xlim = c(xmin, xmax),
-                ylim = c(ymin, ymax),
-                axes = FALSE,
-                box = FALSE,
-                legend = FALSE,
-                add = TRUE
+      col = "lightgray",
+      border = "white",
+      xlim = c(xmin, xmax),
+      ylim = c(ymin, ymax),
+      axes = FALSE,
+      box = FALSE,
+      legend = FALSE,
+      add = TRUE
     )
 
     terra::plot(x[[index]],
-                col = col,
-                add = TRUE,
-                axes = FALSE,
-                box = FALSE,
-                range = range,
-                legend = FALSE,
-                ...
+      col = col,
+      add = TRUE,
+      axes = FALSE,
+      box = FALSE,
+      range = range,
+      legend = FALSE,
+      ...
     )
   })
 

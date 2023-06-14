@@ -162,7 +162,9 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   if (geoCorrection) trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
   # create distance matrix using only coordinates
-  if (coords_only) return(as.matrix(gdistance::commuteDistance(trSurface, sp_coords)))
+  if (coords_only) {
+    return(as.matrix(gdistance::commuteDistance(trSurface, sp_coords)))
+  }
 
   # make vector of distances
   if (parallel) {

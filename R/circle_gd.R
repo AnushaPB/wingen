@@ -94,7 +94,6 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -150,7 +149,9 @@ get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE, paral
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
   # create distance matrix using only coordinates
-  if (coords_only) return(sf::st_distance(coords))
+  if (coords_only) {
+    return(sf::st_distance(coords))
+  }
 
   # check crs
   layer_coords_check(lyr = lyr, coords = coords)

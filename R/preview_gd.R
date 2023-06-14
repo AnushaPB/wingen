@@ -91,7 +91,6 @@ preview_window <- function(lyr, nmat, coords = NULL) {
     coords <- coords_to_sf(coords)
     terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
   }
-
 }
 
 #' Plot preview of circle moving window
@@ -126,7 +125,6 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
     coords <- coords_to_sf(coords)
     terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
   }
-
 }
 
 #' Plot preview of circle moving window
@@ -147,8 +145,8 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
       as.data.frame(lyr, xy = TRUE, cell = TRUE) %>%
       tidyr::drop_na() %>%
       dplyr::slice((dplyr::n() %/% 2) + 1)
-    center_xy <- new_center[ ,c("x", "y")]
-    center_i <- new_center[ ,c("cell")]
+    center_xy <- new_center[, c("x", "y")]
+    center_i <- new_center[, c("cell")]
   }
 
   # get resdist from center
@@ -177,7 +175,6 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   plot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1), main = "resistance preview")
   graphics::points(center_xy, col = "blue", pch = 3, cex = 2, lwd = 3)
   graphics::legend("bottomleft", "focal cell", col = "blue", pch = 3)
-
 }
 
 #' Get center cell of a raster
