@@ -318,7 +318,7 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-*Note: you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning*
+*Note:* you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning
 
 ```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE, message = FALSE}
 wgd <- window_gd(lotr_vcf,
@@ -383,6 +383,9 @@ want to run `circle_gd()` with `fact = 3` and `lyr = lotr_lyr`, the
 input layer to `get_geodist()` must be `aggregate(lotr_lyr, 3)`.
 Alternatively, you can first create a new aggregated raster to be used
 for all functions, as we have done below.
+
+*Note:* if you want to get only the distances between your sample coordinates,
+set `coords_only = TRUE`.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # First, create a new aggregated raster
@@ -482,7 +485,8 @@ same spatial scale (e.g., the same resolution and extent).
 As with `get_geodist()`, `get_resdist()` produces a distance matrix
 where the rows represent the cells of the raster and the columns are the
 individuals. The values are the resistance distance between each cell
-and each individual.
+and each individual. If you want to get only the distances between your 
+sample coordinates, set `coords_only = TRUE`.
 
 Again, we can use the `preview_gd()` function to preview parameter
 settings. Here, we specify `method = "resist"` and provide `maxdist`. 
@@ -536,7 +540,7 @@ resist_lyr[ext(40, 60, -100, 0)] <- NA
 distmat <- get_resdist(coords = lotr_coords, lyr = resist_lyr)
 
 # plot preview
-# note: since we don't want windows to cross the gap we have created maxdist must be less than 20 cells
+# Note: since we don't want windows to cross the gap we have created maxdist must be less than 20 cells
 preview_gd(resist_lyr, lotr_coords, method = "resist", distmat = distmat, maxdist = 10)
 
 # create moving window map
@@ -665,7 +669,7 @@ exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
 # Disaggregate lotr_lyr to make it the same resolution as kgd before masking
-## note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
+## Note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
 mask_lyr <- disagg(rast(lotr_lyr), 2)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
@@ -819,10 +823,10 @@ calculated.
 For the standard genetic diversity statistics:
 
 -   If `stat = "pi"` or `"biallelic_richness"`, `x` must be a dosage
-    matrix with values of 0, 1, or 2 (*note:* rows must be individuals).
+    matrix with values of 0, 1, or 2 (*Note:* rows must be individuals).
 
 -   If `stat = "Ho"`, `x` must be a heterozygosity matrix where values
-    of 0 = homozygosity and values of 1 = heterozygosity (*note:* rows must be individuals).
+    of 0 = homozygosity and values of 1 = heterozygosity (*Note:* rows must be individuals).
 
 -   If `stat = "allelic_richness"`, `x` must be a `genind` type object.
 
@@ -833,7 +837,7 @@ For other statistics:
 -   If `x` is a vector, `stat` can be any function that can be applied
     to a vector (e.g., `stat = mean, var, sum, etc.`).
 
--   If `x` is a matrix or data frame (*note:* rows must be individuals),
+-   If `x` is a matrix or data frame (*Note:* rows must be individuals),
     `stat` can be any function that takes a matrix or data frame and
     outputs a single numeric value (e.g., a function that produces a
     custom diversity index). *(Note: this functionality has not have
