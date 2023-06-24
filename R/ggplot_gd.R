@@ -32,6 +32,9 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
   # plot results
   plts <- purrr::map(names(x), ~ ggplot_helper(var = .x, x_df = x_df, col = col, bkg = bkg))
 
+  # unlist single ggplot
+  if (length(plts) == 1) return(plts[[1]])
+
   return(plts)
 }
 
@@ -65,6 +68,9 @@ ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
 
   # plot results
   plts <- purrr::map(names(x), ~ ggplot_helper(var = .x, x_df = x_df, col = col, bkg = NULL))
+
+  # unlist single ggplot
+  if (length(plts) == 1) return(plts[[1]])
 
   return(plts)
 }
