@@ -342,8 +342,13 @@ plot_count(wgd, main = "Moving window sample counts")
 
 You can also create ggplots of your results using `ggplot_gd()` and `ggplot_count()`
 ```{r}
-ggplot_gd(wgd, bkg = lotr_range)
-ggplot_count(wgd)
+ggplot_gd(wgd, bkg = lotr_range) + 
+  coord_equal() + 
+  ggtitle("Moving window pi")
+
+ggplot_count(wgd) + 
+  coord_equal() + 
+  ggtitle("Moving window sample counts")
 ```
 
 
