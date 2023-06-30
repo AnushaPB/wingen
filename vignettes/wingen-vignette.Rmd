@@ -336,18 +336,22 @@ wgd <- window_gd(lotr_vcf,
 par(pty = "s")
 # The plot_gd function plots the genetic diversity layer
 plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
+# Add coordinates to map
+points(lotr_coords, pch = 16)
+
 # The plot_count function plots the sample count layer
 plot_count(wgd, main = "Moving window sample counts")
 ```
 
 You can also create ggplots of your results using `ggplot_gd()` and `ggplot_count()`
-```{r}
+```{r, fig.width = 5, fig.height = 5}
 ggplot_gd(wgd, bkg = lotr_range) + 
-  coord_equal() + 
+  coord_sf() +
+  geom_point(data = lotr_coords, aes(x = x, y = y)) + 
   ggtitle("Moving window pi")
 
 ggplot_count(wgd) + 
-  coord_equal() + 
+  coord_sf() +
   ggtitle("Moving window sample counts")
 ```
 
