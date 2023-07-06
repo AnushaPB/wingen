@@ -53,6 +53,8 @@ test_that("resist_general returns expected output", {
     )
   )
 
+  expect_s4_class(rpi, "SpatRaster")
+
 })
 
 

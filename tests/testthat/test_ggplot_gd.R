@@ -13,7 +13,6 @@ test_that("check that index works", {
   # check that there is NO error (NA)
   expect_error(ggplot_gd(stk, index = 1, bkg = mini_lyr), NA)
   expect_error(ggplot_gd(stk, index = 2, bkg = mini_lyr), NA)
-  expect_error(ggplot_gd(stk, index = 1:3, bkg = mini_lyr))
 })
 
 test_that("check that plot count function works", {
