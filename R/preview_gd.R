@@ -205,7 +205,6 @@ get_center <- function(x, xy = FALSE) {
 #' @noRd
 preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NULL, min_n = 2, plot = TRUE) {
   # get coord cells
-  if (inherits(coords, "sf")) coords <- terra::vect(coords)
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # make copy of raster for counting

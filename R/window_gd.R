@@ -165,7 +165,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   nmat <- wdim_to_mat(wdim)
 
   # get cell index for each coordinate
-  if (inherits(coords, "sf")) coords <- terra::vect(coords)
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # run general moving window
