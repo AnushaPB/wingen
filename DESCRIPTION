@@ -48,8 +48,6 @@ Suggests:
     devtools,
     knitr,
     MASS,
-    rgdal,
-    rgeos,
     rmarkdown,
     stringr,
     testthat (>= 3.0.0)
