@@ -152,8 +152,8 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   # get resdist from center
   center_dist <- get_resdist(center_xy, lyr, parallel = parallel, ncores = ncores)
 
-  # transpose so you get a vector of cell values
-  center_dist <- t(center_dist)
+  # flatten so you get a vector of cell values
+  center_dist <- c(center_dist)
 
   # fill in window
   lyrw <- lyr * 0
@@ -205,6 +205,7 @@ get_center <- function(x, xy = FALSE) {
 #' @noRd
 preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NULL, min_n = 2, plot = TRUE) {
   # get coord cells
+  if (inherits(coords, "sf")) coords <- terra::vect(coords)
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # make copy of raster for counting

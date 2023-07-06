@@ -154,6 +154,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+
   # check and aggregate layer and coords (only lyr is returned)
   lyr <- layer_coords_check(lyr, coords, fact)
 
@@ -164,6 +165,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
   nmat <- wdim_to_mat(wdim)
 
   # get cell index for each coordinate
+  if (inherits(coords, "sf")) coords <- terra::vect(coords)
   coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cell"]
 
   # run general moving window

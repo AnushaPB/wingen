@@ -27,7 +27,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
   # plot all layers except sample counts
   if (is.null(index)) {
     # drop sample count layer
-    if (any(names(x) == "sample_count")) x <- terra::subset(x, "sample_count", negate = TRUE)
+    if (any(names(x) == "sample_count")) x <- x[[names(x) != "sample_count"]]
     index <- 1:terra::nlyr(x)
   }
 
@@ -59,7 +59,7 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
 
   # plot sample count layer
   if (is.null(index)) {
-    if (any(names(x) == "sample_count")) x <- terra::subset(x, "sample_count") else index <- terra::nlyr(x)
+    if (any(names(x) == "sample_count")) x <- x[["sample_count"]] else index <- terra::nlyr(x)
   }
 
   plot_general(x, index = index, breaks = breaks, col = col, main = main, box = box, range = range, ...)

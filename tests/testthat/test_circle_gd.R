@@ -40,3 +40,33 @@ test_that("circle_gd returns expected output", {
   foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
   capture_warnings(wm <- circle_general(toy, mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = foo, na.rm = TRUE, silly = 3))
 })
+
+
+
+test_that("circle_gd works for different spatial types", {
+  load_mini_ex(quiet = TRUE)
+
+  # sf coords
+  sf_coords <- sf::st_as_sf(mini_coords, coords = c("x", "y"))
+  capture_warnings(wpi_sf <- circle_gd(mini_vcf, sf_coords, mini_lyr, maxdist = 50, rarify = FALSE))
+
+  # matrix coords
+  mat_coords <- as.matrix(mini_coords)
+  capture_warnings(wpi_mat <- circle_gd(mini_vcf, mat_coords, mini_lyr, maxdist = 50, rarify = FALSE))
+
+  # df coords
+  capture_warnings(wpi_df <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50, rarify = FALSE))
+
+  # spatvec coords
+  vect_coords <- terra::vect(sf_coords)
+  capture_warnings(wpi_vect <- circle_gd(mini_vcf, vect_coords, mini_lyr, maxdist = 50, rarify = FALSE))
+
+  # compare rasters
+  # expect_true(terra::all.equal(wpi_df, wpi_mat))
+  # expect_true(terra::all.equal(wpi_df, wpi_sf))
+  # expect_true(terra::all.equal(wpi_df, wpi_vect))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_mat))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_sf))
+  expect_equal(terra::values(wpi_df), terra::values(wpi_vect))
+})
+
