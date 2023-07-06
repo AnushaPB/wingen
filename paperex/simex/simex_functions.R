@@ -276,7 +276,13 @@ get_timeout <- function(file.name, rarify = NULL, parallel = NULL, nsamp = NULL,
   file <- here(rootPath, locFile)
   r <- purrr::map_dfr(file, read.csv)
 
-  r$stat <- c("pi", "Ho", "allelic richness")
+  # remove AR calculation and rename biallelic richness for plotting
+  r <-
+    r %>%
+    filter(stat != "allelic_richness") %>%
+    mutate(stat = case_when(stat == "biallelic_richness" ~ "allelic richness",
+                            .default = stat))
+
   r$parallel <- parallel
   r$rarify <- rarify
   r$nsamp <- nsamp
