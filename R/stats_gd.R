@@ -210,6 +210,10 @@ calc_mean_basic_stats <- function(hf) {
   hf$pop <- as.numeric(as.character(hf$pop))
   hfstat <- hierfstat::basic.stats(hf)
   mean_stats <- hfstat$overall
+
+  # drop stats that aren't meaningful if there is only one populatoin
+  mean_stats <- mean_stats[c("Ho", "Hs", "Ht", "Fis")]
+
   names(mean_stats) <- paste0(names(mean_stats), "_hierfstat")
 
   return(mean_stats)
