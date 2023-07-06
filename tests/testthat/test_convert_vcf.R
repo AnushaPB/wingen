@@ -98,3 +98,8 @@ test_that("check that vcf to het conversion is correct", {
   expected <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, NA, NA, FALSE)
   expect_equal(obs, expected)
 })
+
+test_that("check vcf to hierfstat", {
+  data("mini_vcf_NA")
+  expect_warning(expect_warning(vcf_to_hf(mini_vcf_NA)))
+})

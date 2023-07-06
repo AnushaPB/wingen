@@ -206,7 +206,7 @@ calc_prop_hwe <- function(genind, sig = 0.05) {
 #' @noRd
 calc_mean_basic_stats <- function(hf) {
   # reassign pop so that if the levels present in the original factor change you don't get an error
-  # e.g., if originall pop was 1 & 2, but a subset only has 2, you will get an error
+  # e.g., if original pop was 1 & 2, but a subset only has 2, you will get an error
   hf$pop <- as.numeric(as.character(hf$pop))
   hfstat <- hierfstat::basic.stats(hf)
   mean_stats <- hfstat$overall

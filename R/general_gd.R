@@ -387,7 +387,7 @@ convert_vcf <- function(vcf, stat) {
   }
 
   if (stat == "basic_stats") {
-    return(hierfstat::genind2hierfstat(vcfR::vcfR2genind(vcf), pop = 1))
+    return(vcf_to_hf(vcf))
   }
 
   stop(paste0(stat, " is an invalid arugment for stat"))
