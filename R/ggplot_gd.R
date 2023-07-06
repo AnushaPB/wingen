@@ -18,7 +18,7 @@
 ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
   # format rasters
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
-  if (inherits(bkg, "Raster")) bkg <- terra::rast(x)
+  if (inherits(bkg, "Raster")) bkg <- terra::rast(bkg)
   if (!is.null(index)) x <- x[[index]]
   if (is.null(index) & "sample_count" %in% names(x)) {
     x <- terra::subset(x, "sample_count", negate = TRUE)
