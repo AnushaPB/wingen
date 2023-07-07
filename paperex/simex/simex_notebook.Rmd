@@ -2,7 +2,10 @@
 title: "Simulation Example"
 output: github_document
 ---
- 
+```{r, eval = FALSE, include = FALSE}
+if (!require("here", quiet = TRUE)) install.packages("here")
+```
+
 ```{r, message = FALSE, warning = FALSE, include = FALSE}
 library(wingen)
 library(raster)

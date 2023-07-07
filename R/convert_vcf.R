@@ -37,6 +37,19 @@ vcf_to_het <- function(x) {
   return(het)
 }
 
+#' Convert vcf to hierfstat
+#'
+#' @param x can either be an object of class 'vcfR' or a path to a .vcf file
+#' @param pop population assignments (defaults to 1 for moving window functions)
+#' @return hierfstat object
+#'
+#' @noRd
+vcf_to_hf <- function(x, pop = 1){
+  genind <- vcfR::vcfR2genind(x)
+  hf <- hierfstat::genind2hierfstat(genind, pop = pop)
+  return(hf)
+}
+
 #' Check if an object is a vcf or a path to a vcf
 #'
 #' @param x vcfR object or path to vcf

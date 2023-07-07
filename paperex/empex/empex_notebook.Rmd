@@ -2,6 +2,12 @@
 title: "Empirical Example"
 output: github_document
 ---
+```{r, eval = FALSE, include = FALSE}
+if (!require("tigris", quiet = TRUE)) install.packages("tigris")
+if (!require("rgdal", quiet = TRUE)) install.packages("rgdal")
+if (!require("here", quiet = TRUE)) install.packages("here")
+```
+
 ```{r, message = FALSE, results = FALSE, warning = FALSE, include = FALSE}
 library(wingen)
 library(vcfR)
@@ -134,7 +140,6 @@ hg_longlat <- terra::project(hg, "+proj=longlat")
 Sys.time() - st
 
 # krige and mask layers
-mpg <- empex_krig_mask(pg, lyr, NUS_longlat)
 mag <- empex_krig_mask(ag, lyr, NUS_longlat)
 mhg <- empex_krig_mask(hg, lyr, NUS_longlat)
 ```
@@ -202,4 +207,3 @@ raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn
 par(mar = rep(0,4))
 raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
-

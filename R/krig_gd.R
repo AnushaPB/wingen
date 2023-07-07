@@ -148,7 +148,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
   krig_spdf <- krig_res$krige_output
 
   # turn spdf into raster
-  krig_r <- terra::rast(krig_spdf, type = "xyz", crs = terra::crs(krig_grid))
+  krig_r <- terra::rast(raster::stack(krig_spdf), type = "xyz", crs = terra::crs(krig_grid))
 
   # perform bounding
   if (is.numeric(lower_bound)) krig_r[krig_r < lower_bound] <- lower_bound

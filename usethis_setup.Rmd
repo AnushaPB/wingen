@@ -91,7 +91,7 @@ use_github_action("test-coverage")
 ```{r}
 # run codecov and make badge
 # note: the cov_token.R file is not stored on github
-source("cov_token.R")
+source(here::here("cov_token.R"))
 covr::codecov(token = cov_token())
 ```
 

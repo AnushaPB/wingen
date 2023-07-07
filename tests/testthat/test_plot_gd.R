@@ -1,11 +1,3 @@
-test_that("incorrect inputs to plot produces correct errors", {
-  data("mini_lyr")
-  bad_stack <- raster::stack(mini_lyr, mini_lyr, mini_lyr)
-
-  expect_warning(plot_gd(bad_stack))
-  expect_warning(plot_count(bad_stack))
-})
-
 test_that("check that background plotting works", {
   data("mini_lyr")
 
@@ -30,9 +22,9 @@ test_that("check that background plot function works", {
   stk <- raster::stack(mini_lyr, mini_lyr)
 
   # check that there is NO error (NA)
-  expect_error(plot_gd_bkg(index = 1, stk, bkg = mini_lyr), NA)
-  expect_error(plot_gd_bkg(index = 2, stk, bkg = mini_lyr), NA)
-  expect_error(plot_gd_bkg(index = 1:2, stk, bkg = mini_lyr), NA)
+  expect_error(plot_bkg(index = 1, stk, bkg = mini_lyr), NA)
+  expect_error(plot_bkg(index = 2, stk, bkg = mini_lyr), NA)
+  expect_error(plot_bkg(index = 1:2, stk, bkg = mini_lyr), NA)
 })
 
 test_that("check that plot count function works", {

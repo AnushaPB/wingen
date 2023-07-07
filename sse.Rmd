@@ -1,0 +1,289 @@
+---
+title: "sse"
+output: html_document
+date: "2023-04-20"
+---
+
+```{r, fig.width = 5, fig.height = 5}
+cgd <- circle_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  maxdist = 10,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  L = 100
+)
+
+wgd <- window_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "pi",
+  wdim = 7,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  L = 100
+)
+
+distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3), ncores = 3)
+rgd <- resist_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  distmat = distmat,
+  stat = "pi",
+  maxdist = 800,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  L = 100
+)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(cgd, bkg = lotr_range, main = "", legend = FALSE)
+# The plot_count function plots the sample count layer
+plot_count(cgd, main = "", legend = FALSE)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(wgd, bkg = lotr_range, main = "", legend = FALSE)
+# The plot_count function plots the sample count layer
+plot_count(wgd, main = "", legend = FALSE)
+
+par(pty = "s")
+# The plot_gd function plots the genetic diversity layer
+plot_gd(rgd, bkg = lotr_range, main = "", legend = FALSE)
+# The plot_count function plots the sample count layer
+plot_count(rgd, main = "", legend = FALSE)
+
+
+
+```
+
+```{r}
+wgd <- window_gd(lotr_vcf,
+  lotr_coords,
+  lotr_lyr,
+  stat = "hwe",
+  wdim = 7,
+  fact = 3,
+  rarify = TRUE,
+  rarify_n = 2,
+  L = 100,
+  parallel = TRUE,
+  ncores = 3
+)
+
+```
+
+
+# wingen 2.0 additions (not included in Bishop et al. 2022)
+## CIRCLE GD
+```{r}
+library(randomForest)
+
+env <- stack(here(wdir, "data", "CLEANED_ENVDATA_NOCOR.tif"))
+abs <- data.frame(layer = sampleRandom(env, 100), pa = 0)
+pres <- data.frame(layer = raster::extract(env, coords), pa = 1)
+df <- rbind(pres, abs)
+df <- df[complete.cases(df),]
+names(df) <- c(names(env), "pa")
+
+mod <- randomForest(pa ~ ., df, mtry = 1)
+pred <- predict(env, mod)
+plot(pred)
+
+writeRaster(pred, "data/SDM.tif")
+plot(lyr)
+
+trSurface <- gdistance::transition(aggregate(pred, 20), transitionFunction = mean, directions = 8)
+trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
+
+distmat <- get_resdist(lotr_coords, cond.r = pred, ncores= 25)
+write.csv(distmat, "distmat30.csv")
+```
+
+```{r, fig.width = 6, fig.height = 6}
+
+pred <- rast("data/SDM.tif")
+lyr <-  aggregate(pred, 30)
+geodistmat <- get_geodist(coords_longlat, lyr = lyr, 
+                          parallel = TRUE, ncores = 3)
+distmat <- read.csv("distmat30.csv")
+distmat <- as.matrix(distmat)
+
+rg <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE))
+
+rg_hwe <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE), stat = "hwe",
+                 parallel = TRUE, ncores = 3)
+
+rg_fis <- resist_gd(vcf, coords, lyr = lyr, distmat = distmat, 
+                 maxdist = quantile(distmat, 0.05, na.rm = TRUE), stat = "Fis",
+                 parallel = TRUE, ncores = 3)
+
+
+cg <- circle_gd(vcf, coords, lyr = lyr, distmat = geodistmat, 
+                maxdist = quantile(geodistmat, 0.015, na.rm = TRUE))
+cg <- terra::mask(cg, rast(lyr))
+
+wg <- window_gd(vcf, coords_longlat, lyr = lyr, wdim = 5)
+wg <- terra::mask(wg, rast(lyr))
+
+```
+
+```{r,fig.height = 3, fig.width = 9}
+par(mfrow = c(1,3), oma = rep(0,4), mar = rep(2,4), pty = "s")
+raster_plot_gd(wg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE, 
+        main = "Rectangle")
+raster_plot_gd(cg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
+        main = "Circle")
+plot_gd(rg, bkg = aggregate(pred, 30), range = c(0.028, 0.137), legend = FALSE,
+        main = "Resistance")
+```
+
+```{r, fig.height = 3, fig.width=3}
+
+par(oma = rep(0,4), mar = rep(1,4), pty = "s")
+raster_plot_gd(raster(trSurface), main = "Resistance Surface", legend = FALSE)
+```
+
+
+change resolution and see what distance differences are
+double the resolution and see if it changes
+convert to real world units by multiplying by real world units
+
+```{r}
+wg <- window_gd(vcf, coords_longlat, lyr = lyr, wdim = 5, stat = "hwe")
+wg <- terra::mask(wg, rast(lyr))
+```
+
+# PROJECTIONS
+```{r}
+# set parameters 
+wdim = 5
+fact = 0
+disagg = 4
+
+```
+
+```{r}
+geodistmat <- make_distmat(coords_utm, lyr = lyr, parallel = TRUE, ncores = 3)
+
+cg <- circle_gd(vcf, coords_utm, lyr, distmat = geodistmat, 
+                radius = quantile(geodistmat, 0.10, na.rm = TRUE))
+cg_longlat <- terra::project(cg, "+proj = longlat")
+
+plot_gd(cg)
+plot_gd(cg_longlat)
+```
+
+```{r, fig.width = 15, fig.height = 5}
+# Read in and transform coords
+coords <- read.table(here(wdir, "data", "Scelop.coord"))
+# project as long lat
+coords_longlat <- st_as_sf(coords, coords = c("V1", "V2"), crs = "+proj=longlat") 
+# reproject as utm
+coords_utm <- st_transform(coords_longlat, proj4string = "+init=epsg:9835")
+
+# Create final layer 
+lyr <- coords_to_raster(coords_utm, res = 0.25, buffer = 10)
+plot(lyr)
+
+# run moving window
+pg <- window_gd(vcf, coords_utm, lyr, stat = "pi", wdim = 5, rarify = TRUE)
+
+# project back to longlat
+pg_longlat <- terra::project(pg, "+proj=longlat")
+# project back and increase resolution
+pg_longlat2 <- terra::project(pg, "+proj=longlat", res = 0.1)
+
+par(pty = "s", oma = rep(1,4), mfrow = c(1,3), mar = rep(0,4))
+plot_gd(pg, legend = FALSE)
+plot_gd(pg_longlat, bkg = NUS_longlat, legend = FALSE)
+plot_gd(pg_longlat2, bkg = NUS_longlat, legend = FALSE)
+```
+
+## Dist test
+```{r}
+library(ggplot2)
+mean_dist <- function(x) mean(dist(x), na.rm = TRUE)
+dos <- vcf_to_dosage(vcf)
+dg <- window_general(dos,
+                     coords_proj, 
+                     lyr,
+                     stat = mean_dist, 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)
+
+dg_rand <- map(1:100, ~window_general(dos,
+                     coords_proj[sample(nrow(dos)),], 
+                     lyr,
+                     stat = mean_dist, 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)[[1]])
+
+difr <- dg[[1]] - mean(terra::rast(dg_rand))
+difr <- difr - mean(values(difr), na.rm = TRUE)
+
+
+kdif <- empex_krig_mask(difr, lyr, NUS_longlat)
+dif <- terra::as.data.frame(kdif, xy = TRUE)
+
+ggplot(data = dif, aes(x = x, y = y, fill = pred)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#2066AC", mid="#F7F7F7", high = "#d79232", midpoint = 0, na.value = "white") +
+  theme_void() +
+  coord_equal()
+  
+``` 
+```{r}
+pg <- window_general(dos,
+                     coords_proj, 
+                     lyr,
+                     stat = "pi", 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)
+
+pg_rand <- map(1:10, ~window_general(dos,
+                     coords_proj[sample(nrow(dos)),], 
+                     lyr,
+                     stat = "pi", 
+                     wdim = 5,
+                     fact = 0, 
+                     rarify = FALSE)[[1]])
+
+difr <- pg[[1]] - mean(terra::rast(pg_rand))
+
+dif <- terra::as.data.frame(difr, xy = TRUE)
+
+ggplot(data = dif, aes(x = x, y = y, fill = pi)) +
+  geom_tile() +
+  scale_fill_gradient2(low = "#2066AC", mid="#F7F7F7", high = "#d79232", midpoint = 0, na.value = "white") +
+  theme_void() +
+  coord_equal()
+```
+## Tess Test
+```{r}
+library(algatr)
+
+cdf <- coords_to_df(coords_proj)
+
+tess_result <- tess_do_everything(dos, coords = cdf, grid = lyr, K_selection = "auto", Kvals = 1:20)
+
+# Use purrr's pmap function to apply the function to each row of the dataframe
+pop <- apply(tess_result$Qmatrix, 1, which.max)
+
+hf <- hierfstat::genind2hierfstat(vcfR::vcfR2genind(vcf), pop = pop)
+bs <- window_general(hf[,1:100], coords = coords_proj, lyr = lyr, wdim = 7, fact = 0, stat = "basic_stats")
+bk <- empex_krig_mask(bs$Fst_hierfstat, lyr, NUS_longlat)
+plot_gd(bk$Fst_hierfstat, breaks = 10)
+```
+
+

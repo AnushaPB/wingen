@@ -2,6 +2,11 @@
 title: "Runtime Analysis"
 output: github_document
 ---
+```{r, eval = FALSE, include = FALSE}
+if (!require("here", quiet = TRUE)) install.packages("here")
+if (!require("ggpubr", quiet = TRUE)) install.packages("ggpubr")
+```
+
 ```{r, warning = FALSE, message = FALSE}
 library(wingen)
 library(terra)

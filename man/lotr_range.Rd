@@ -8,7 +8,7 @@
 sf
 }
 \source{
-created from simulations in Bishop et al. (in review)
+created from simulations in Bishop et al. (2023)
 }
 \usage{
 lotr_range

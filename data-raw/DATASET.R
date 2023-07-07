@@ -51,7 +51,6 @@ lotr_coords <- lotr_coords %>% dplyr::select(x, y)
 usethis::use_data(lotr_coords, overwrite = TRUE)
 usethis::use_data(lotr_vcf, overwrite = TRUE)
 
-
 # Code to create tiny example dataset ------------------------------------------------------------------
 mini_lyr <- terra::aggregate(lotr_lyr, 10)
 

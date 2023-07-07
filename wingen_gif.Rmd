@@ -12,9 +12,7 @@ library(wingen)
 library(animation)
 devtools::load_all()
 ```
-
-
-```{r, fig.width = 6, fig.height = 3}
+```{r}
 load_middle_earth_ex()
 
 lyr = lotr_lyr
@@ -34,6 +32,10 @@ gen <- vcf_to_dosage(lotr_vcf)
 nmat <- wdim_to_mat(wdim)
 # make aggregated raster
 if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
+```
+
+
+```{r, fig.width = 6, fig.height = 3}
 
 # get cell index for each coordinate
 coord_cells <- terra::extract(lyr, coords, cell = TRUE)[, "cells"]
@@ -56,6 +58,7 @@ for(i in 1:999){
   adjci <- purrr::map_dbl(adjc, 1, function(x) {
     seq(x[1], x[2])
   })
+  
   lyrw <- lyr * 0
   lyrw[adjci] <- 1
   lyrw[i] <- 2
@@ -68,7 +71,7 @@ for(i in 1:999){
                            rarify = FALSE,
                            stat_function = calc_pi, L = L,
                            rarify_n = NULL, rarify_nit = NULL,
-                           fun = mean)$gd
+                           fun = mean)$pi
   
   par(mfrow = c(1,2), mar = rep(0,4), oma = rep(0,4), bg = "white")
   plot_gd(lyrw, col = viridis::mako(3, direction = 1), main = "Landscape", legend = FALSE)
@@ -122,7 +125,7 @@ for(i in 1:999){
                            rarify = FALSE,
                            stat_function = calc_pi, L = L,
                            rarify_n = NULL, rarify_nit = NULL,
-                           fun = mean)$gd
+                           fun = mean)$pi
   
   par(mar = rep(0,4), oma = rep(0,4), bg = "white")
   plot_gd(lyr, col = "black", legend = FALSE)
@@ -140,3 +143,77 @@ outdir = getwd()
 )  
 ```
 
+
+```{r}
+
+coords <- lotr_coords
+gen <- vcf_to_dosage(lotr_vcf)
+lyr <- terra::aggregate(lotr_lyr, 3, fun = mean)
+
+lyrr <- raster::raster(lyr)
+future::plan(future::multisession, workers = 4)
+cell_dists1 <- furrr::future_map(1:ncell(lyr), \(i){
+  xy <- raster::xyFromCell(lyrr, i)
+  resdist <- get_resdist(matrix(xy, ncol = 2), lyr, parallel = FALSE)
+  return(resdist)
+  },
+  .options = furrr::furrr_options(seed = TRUE, packages = c("wingen", "terra", "raster", "adegenet")),
+  .progress = TRUE)
+
+
+cell_dists <- cell_dists1 %>% purrr::map(~data.frame(t(.x))) %>% dplyr::bind_rows()
+
+distmat <- get_resdist(lotr_coords, lyr)
+
+maxdist <- 50
+ani.options(
+convert = shQuote('C:/Program Files (x86)/ImageMagick-6.8.1-Q16/convert.exe')
+)
+
+saveGIF(
+{
+# make raster lyr copy with all NA
+lyr <- terra::mask(lyr, lotr_range)
+lyrg <- lyr/0
+for(i in 1:999){
+  if(is.na(lyr[i])) next
+  
+  # fill in window
+  lyrw <- lyr*0
+  lyrw[cell_dists[i,] <= maxdist] <- 1
+  lyrw[i] <- 2
+  
+  subc <- coords[distmat[,i] <= maxdist,]
+  
+  val <- window_helper(i = i, lyr = lyr, x = gen, 
+                       distmat = t(distmat),
+                       min_n = 1,
+                       maxdist = maxdist, 
+                       rarify = FALSE,
+                       stat_function = calc_pi, L = 100,
+                       rarify_n = NULL, rarify_nit = NULL,
+                       rarify_alleles = FALSE,
+                       fun = mean)
+  if (names(val)[1] == "pi") val <- val[1] else val <- NA
+  lyrg[i] <- val
+  
+  
+  par(mfrow = c(1,2), mar = rep(0,4), oma = rep(0,4), bg = "white")
+  plot_gd(lyrw, col = viridis::mako(3, direction = 1), main = "Landscape", legend = FALSE)
+  points(coords, pch = 3, cex = 1, col = rgb(0.3,0.3,0.3))
+  points(subc, pch = 3, cex = 1, col = "orange")
+  plot_gd(lyrg, lyr, range = c(0, 0.35), breaks = 100, legend = FALSE, main = "Genetic Diversity")
+
+}
+},
+movie.name = "wingen3.gif", 
+interval = 0.08, 
+ani.width = 600, 
+ani.height = 300,
+outdir = getwd()
+)  
+
+plot_gd(lyr, col = viridis::cividis(100))
+```
+
+# Note: accident deleted gifs 4 and 5

@@ -15,22 +15,31 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Imports:  
+Imports: 
     adegenet,
     automap,
     crayon,
+    dplyr,
     furrr,
     future,
+    gdistance,
     graphics,
+    grDevices,
+    ggplot2,
     hierfstat,
     magrittr,
+    pegas,
     purrr,
     raster,
+    rlang,
     Rcpp,
+    Rfast,
     sp,
     SpatialKDE,
     sf,
     terra,
+    tidyr,
+    tidyselect,
     utils,
     vcfR,
     viridis
@@ -39,8 +48,6 @@ Suggests:
     devtools,
     knitr,
     MASS,
-    rgdal,
-    rgeos,
     rmarkdown,
     stringr,
     testthat (>= 3.0.0)
