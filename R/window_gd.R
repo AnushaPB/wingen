@@ -33,7 +33,8 @@
 #' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
 #' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
 #' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
-#' Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
+#' Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}
+#' are not included as they are not meaningful within the individual-based moving windows.
 #'
 #' @return SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export

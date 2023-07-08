@@ -79,7 +79,8 @@ Current genetic diversity metrics that can be specified with \code{stat} include
 \item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., \code{sig = 0.10}).
 \item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
 mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
-Gene diversities overall (Ht), corrected Htp, Dst, Dstp, Fst, Fstp, and Fis following Nei (1987)
+Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}
+are not included as they are not meaningful within the individual-based moving windows.
 }
 }
 \examples{
