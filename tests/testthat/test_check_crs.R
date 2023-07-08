@@ -31,7 +31,7 @@ test_that("CRS are handled correctly by window_gd", {
 
   # mismatched CRS
   crs2_lyr <- mini_lyr
-  terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
+  terra::crs(crs2_lyr) <- "+proj=longlat +ellps=GRS80 +datum=NAD83
   +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
 })
@@ -71,7 +71,7 @@ test_that("CRS are handled correctly by krig_gd (coords vs r)", {
 
   # mismatched CRS
   crs2_lyr <- nocrs_lyr
-  terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
+  terra::crs(crs2_lyr) <- "+proj=longlat +ellps=GRS80 +datum=NAD83
   +no_defs +towgs84=0,0,0"
   expect_error(krig_gd(r = crs2_lyr, coords = crs_coords))
 })
@@ -108,7 +108,7 @@ test_that("CRS are handled correctly by krig_gd (r vs grd)", {
 
   # mismatched CRS
   crs2_lyr <- mini_lyr
-  terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
+  terra::crs(crs2_lyr) <- "+proj=longlat +ellps=GRS80 +datum=NAD83
   +no_defs +towgs84=0,0,0"
   expect_error(krig_gd(r = crs2_lyr, grd = crs_lyr))
   expect_error(krig_gd(grd = crs2_lyr, r = crs_lyr))
