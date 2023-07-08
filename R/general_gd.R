@@ -445,6 +445,12 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
   # convert from list to raster stack
   rast_stack <- terra::rast(rast_list)
 
+  # assign back names (necessary if only one layer (sample_count) is returned)
+  names(rast_stack) <- names(rast_list)
+
+  # give warning if only sample_count is returned
+  if (terra::nlyr(rast_stack) == 1) warning("All values NA, only a sample count layer will be returned")
+
   return(rast_stack)
 }
 
