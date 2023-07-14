@@ -34,7 +34,6 @@ test_that("resist_gd returns expected output", {
       distmat = NULL
     )
   )
-
 })
 
 test_that("resist_general returns expected output", {
@@ -54,7 +53,6 @@ test_that("resist_general returns expected output", {
   )
 
   expect_s4_class(rpi, "SpatRaster")
-
 })
 
 
