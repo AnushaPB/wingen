@@ -18,7 +18,9 @@ test_that("all stats and parallel works", {
   capture_warnings(wg <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE))
 
   # check parallel
-  capture_warnings(wgp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE, parallel = TRUE, ncores = 2))
+  future::plan("multisession", workers = 2)
+  capture_warnings(wgp <- window_gd(mini_vcf_NA, mini_coords, mini_lyr, stat, rarify = FALSE))
+  future::plan("sequential")
 
   # expect_true(terra::all.equal(wgp, wg))
   expect_equal(terra::values(wgp), terra::values(wg))
@@ -46,10 +48,13 @@ test_that("check that setting the seed produces the same results", {
   # expect_true(terra::all.equal(wg1, wg1))
   expect_equal(terra::values(wg1), terra::values(wg2))
 
+
+  future::plan("multisession", workers = 2)
   set.seed(42)
-  capture_warnings(wg1p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
+  capture_warnings(wg1p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
   set.seed(42)
-  capture_warnings(wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE, parallel = TRUE, ncores = 2))
+  capture_warnings(wg2p <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE))
+  future::plan("sequential")
   # expect_true(terra::all.equal(wg1p, wg1p))
   expect_equal(terra::values(wg1p), terra::values(wg2p))
 })
@@ -163,7 +168,6 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
       rarify_n = 2,
       rarify_nit = 5,
       rarify = TRUE,
-      parallel = FALSE,
       rarify_alleles = TRUE
     )
   )
@@ -179,8 +183,7 @@ test_that("allelic richness is calculated correctly for dataset with NAs (and ra
       fact = 3,
       rarify_n = 2,
       rarify_nit = 5,
-      rarify = TRUE,
-      parallel = FALSE
+      rarify = TRUE
     )
   )
 
@@ -219,7 +222,6 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
       rarify_n = 2,
       rarify_nit = 5,
       rarify = TRUE,
-      parallel = FALSE,
       rarify_alleles = TRUE
     )
   )
@@ -236,7 +238,6 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
       rarify_n = 2,
       rarify_nit = 5,
       rarify = TRUE,
-      parallel = FALSE,
       rarify_alleles = FALSE
     )
   )
@@ -251,8 +252,7 @@ test_that("allelic richness is calculated correctly for dataset with no NAs", {
       fact = 3,
       rarify_n = 2,
       rarify_nit = 5,
-      rarify = TRUE,
-      parallel = FALSE
+      rarify = TRUE
     )
   )
 
