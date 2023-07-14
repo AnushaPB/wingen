@@ -44,7 +44,7 @@ vcf_to_het <- function(x) {
 #' @return hierfstat object
 #'
 #' @noRd
-vcf_to_hf <- function(x, pop = 1){
+vcf_to_hf <- function(x, pop = 1) {
   genind <- vcfR::vcfR2genind(x)
   hf <- hierfstat::genind2hierfstat(genind, pop = pop)
   return(hf)
