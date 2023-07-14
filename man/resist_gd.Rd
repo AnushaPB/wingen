@@ -62,9 +62,9 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
 
-\item{parallel}{whether to parallelize the function (defaults to FALSE)}
+\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.1.0: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.1.0: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell

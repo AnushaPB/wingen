@@ -222,12 +222,6 @@ The main arguments that all three functions have in common are:
     confident that there is no effect of rarefaction after performing
     your analysis with and without rarefaction.
 
-7.  `parallel` - In order to increase computational efficiency, we
-    provide the option for parallelization by setting the `parallel`
-    argument to `TRUE`. Parallelization is performed using the furrr
-    package. Use the `ncores` argument to set the number of cores to use
-    for parallelization.
-
 ------------------------------------------------------------------------
 
 *Note:* Coordinates and rasters used in wingen should be in a projected
@@ -347,12 +341,12 @@ plot_count(wgd, main = "Moving window sample counts")
 
 You can also create ggplots of your results using `ggplot_gd()` and `ggplot_count()`
 ```{r, fig.width = 5, fig.height = 5}
-ggplot_gd(wgd, bkg = lotr_range) + 
+ggplot_gd(wgd, bkg = lotr_range) +
   coord_sf() +
-  geom_point(data = lotr_coords, aes(x = x, y = y)) + 
+  geom_point(data = lotr_coords, aes(x = x, y = y)) +
   ggtitle("Moving window pi")
 
-ggplot_count(wgd) + 
+ggplot_count(wgd) +
   coord_sf() +
   ggtitle("Moving window sample counts")
 ```
@@ -742,11 +736,16 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 ## Parallelization
 
 To increase computational speed, users can perform the any of the moving
-window functions calculations with parallelization by setting
-`parallel = TRUE` and `ncores` to the number of cores to use:
+window functions calculations with parallelization by using furrr. 
+Checkout the [furrr package documentation](https://furrr.futureverse.org/) 
+for more details on using parallelization.
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE, message = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
+
+# setup parallel session
+furrr::plan("multisession", workers = 2)
+
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -755,11 +754,14 @@ wgd <- window_gd(lotr_vcf,
   fact = 3,
   rarify_n = 2,
   rarify_nit = 5,
-  rarify = TRUE,
-  parallel = TRUE,
-  ncores = 2
+  rarify = TRUE
 )
+
+# end parallel session
+future::plan("sequential")
 ```
+
+*Note:* the parallel and ncores arguments have been deprecated as of wingen 2.1.0
 
 ## Other genetic diversity metrics
 

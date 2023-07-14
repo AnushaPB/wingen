@@ -8,10 +8,9 @@ run_general <- function(x, lyr, coords,
                         distmat = NULL, maxdist = NULL,
                         stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
                         parallel = parallel, ncores = ncores, ...) {
+
   # deprecation warning for parallel/ncores
   # note: didn't use lifecycle or missing() because the nested/interrelated functions made this tricky
-  # the warning is only presented if parallel is set to TRUE
-  # if parallel is FALSE it isn't presented, which isn't great, but it shouldn't affect much since that is the default
   if (parallel) {
     warning("The `parallel` and `ncores` arguments have been deprecated as of 2.1.0
 furrr::plan() should be used to setup parallelization instead (see package vignette)\n")
@@ -486,3 +485,4 @@ rm_duplicate_sample_count <- function(r) {
   r <- c(gd, sample_count)
   return(r)
 }
+
