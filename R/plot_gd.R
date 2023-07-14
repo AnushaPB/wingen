@@ -59,7 +59,7 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
 
   # plot sample count layer
   if (is.null(index)) {
-    if (any(names(x) == "sample_count")) x <- x[["sample_count"]] else index <- terra::nlyr(x)
+    if (any(names(x) == "sample_count")) index <- which(names(x) == "sample_count") else index <- terra::nlyr(x)
   }
 
   plot_general(x, index = index, breaks = breaks, col = col, main = main, box = box, range = range, ...)
