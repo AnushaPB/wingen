@@ -744,7 +744,7 @@ for more details on using parallelization.
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
 
 # setup parallel session
-furrr::plan("multisession", workers = 2)
+future::plan("multisession", workers = 2)
 
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
