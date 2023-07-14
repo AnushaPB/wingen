@@ -12,7 +12,7 @@ run_general <- function(x, lyr, coords,
   # deprecation warning for parallel/ncores
   # note: didn't use lifecycle or missing() because the nested/interrelated functions made this tricky
   if (parallel) {
-    warning("The `parallel` and `ncores` arguments have been deprecated as of 2.1.0
+    warning("The `parallel` and `ncores` arguments have been deprecated as of 2.0.1
 furrr::plan() should be used to setup parallelization instead (see package vignette)\n")
     if (is.null(ncores)) ncores <- future::availableCores() - 1
     future::plan(future::multisession, workers = ncores)
