@@ -8,6 +8,17 @@ run_general <- function(x, lyr, coords,
                         distmat = NULL, maxdist = NULL,
                         stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
                         parallel = parallel, ncores = ncores, ...) {
+  # deprecation warning for parallel/ncores
+  # note: didn't use lifecycle or missing() because the nested/interrelated functions made this tricky
+  # the warning is only presented if parallel is set to TRUE
+  # if parallel is FALSE it isn't presented, which isn't great, but it shouldn't affect much since that is the default
+  if (parallel) {
+    warning("The `parallel` and `ncores` arguments have been deprecated as of 2.1.0
+furrr::plan() should be used to setup parallelization instead (see package vignette)\n")
+    if (is.null(ncores)) ncores <- future::availableCores() - 1
+    future::plan(future::multisession, workers = ncores)
+  }
+
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
@@ -26,48 +37,12 @@ run_general <- function(x, lyr, coords,
   if (!is.null(distmat)) distmat <- t(distmat)
 
   # run sliding window calculations
-  if (parallel) {
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
+  # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
+  # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
+  lyr <- raster::raster(lyr)
 
-    future::plan(future::multisession, workers = ncores)
-
-    # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
-    # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
-    lyr <- raster::raster(lyr)
-
-    rast_vals <-
-      furrr::future_map(
-        1:terra::ncell(lyr),
-        ~ window_helper(
-          i = .x,
-          lyr = lyr,
-          x = x,
-          coord_cells = coord_cells,
-          nmat = nmat,
-          distmat = distmat,
-          maxdist = maxdist,
-          stat_function = stat_function,
-          rarify = rarify,
-          rarify_n = rarify_n,
-          rarify_nit = rarify_nit,
-          min_n = min_n,
-          fun = fun,
-          L = L,
-          rarify_alleles = rarify_alleles
-        ),
-        .options = furrr::furrr_options(
-          seed = TRUE,
-          packages = c("wingen", "terra", "raster", "adegenet")
-        ),
-        .progress = TRUE
-      )
-
-    future::plan("sequential")
-
-    # convert back to SpatRast
-    lyr <- terra::rast(lyr)
-  } else {
-    rast_vals <- purrr::map(
+  rast_vals <-
+    furrr::future_map(
       1:terra::ncell(lyr),
       ~ window_helper(
         i = .x,
@@ -86,9 +61,17 @@ run_general <- function(x, lyr, coords,
         L = L,
         rarify_alleles = rarify_alleles
       ),
+      .options = furrr::furrr_options(
+        seed = TRUE,
+        packages = c("wingen", "terra", "raster", "adegenet")
+      ),
       .progress = TRUE
     )
-  }
+
+  if (parallel) future::plan("sequential")
+
+  # convert back to SpatRast
+  lyr <- terra::rast(lyr)
 
   # format resulting raster values
   result <- vals_to_lyr(lyr, rast_vals, stat)
