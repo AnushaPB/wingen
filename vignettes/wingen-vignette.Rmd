@@ -24,7 +24,6 @@ library(raster)
 library(viridis)
 library(sf)
 library(SpatialKDE)
-library(ggplot2)
 devtools::load_all()
 ```
 
@@ -33,7 +32,7 @@ devtools::load_all()
 wingen uses a moving window approach to create maps of genetic
 diversity. The method and its rationale are described in [Bishop et al.
 (2023)](http://doi.org/10.1111/2041-210X.14090) and on the [Methods
-blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/)
+blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/).
 
 ## Example
 
@@ -746,9 +745,9 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed, users can perform the any of the moving
-window functions calculations with parallelization by using furrr.
-Checkout the [furrr package
+To increase computational speed, users can perform any of the moving
+window functions calculations with parallelization using the furrr
+package. Checkout the [furrr package
 documentation](https://furrr.futureverse.org/) for more details on using
 parallelization.
 
