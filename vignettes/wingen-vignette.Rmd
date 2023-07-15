@@ -746,10 +746,10 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 ## Parallelization
 
 To increase computational speed, users can perform any of the moving
-window functions calculations with parallelization using the furrr
-package. Checkout the [furrr package
-documentation](https://furrr.futureverse.org/) for more details on using
-parallelization.
+window functions calculations with parallelization using future::plan(). 
+
+Checkout the [furrr package documentation](https://furrr.futureverse.org/) 
+for more details on setting up the backend for parallelization.
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE, message = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
