@@ -69,4 +69,3 @@ test_that("circle_gd works for different spatial types", {
   expect_equal(terra::values(wpi_df), terra::values(wpi_sf))
   expect_equal(terra::values(wpi_df), terra::values(wpi_vect))
 })
-

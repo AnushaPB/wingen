@@ -24,7 +24,6 @@ library(raster)
 library(viridis)
 library(sf)
 library(SpatialKDE)
-library(ggplot2)
 devtools::load_all()
 ```
 
@@ -32,7 +31,8 @@ devtools::load_all()
 
 wingen uses a moving window approach to create maps of genetic
 diversity. The method and its rationale are described in [Bishop et al.
-(2023)](http://doi.org/10.1111/2041-210X.14090) and on the [Methods blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/)
+(2023)](http://doi.org/10.1111/2041-210X.14090) and on the [Methods
+blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/).
 
 ## Example
 
@@ -139,39 +139,43 @@ The main arguments that all three functions have in common are:
     across to create the final map. In most cases, this will take the
     form of a raster of the study area.
 
-4.  `stat` - The genetic diversity summary statistic to calculate. 
-    Current genetic diversity metrics that can be specified with `stat` 
+4.  `stat` - The genetic diversity summary statistic to calculate.
+    Current genetic diversity metrics that can be specified with `stat`
     include:
-    
-    - `"pi"` for nucleotide diversity (default) calculated using 
-    `hierfstat::pi.dosage()` (only works for bi-allelic data).
-    
-    - `"Ho"` for average observed heterozygosity across all sites
-    
-    - `"allelic_richness"` for average number of alleles across all sites
-    
-    - `"biallelic_richness"` for average allelic richness across all sites
-    for a biallelic dataset (this option is faster than `"allelic_richness"`). 
-    When calculating `“biallelic_richness”`, users can choose to rarify 
-    allele counts (as in `hierfstat::allelic.richness()`) by setting 
-    `rarify_alleles = TRUE` (the default) or to use the raw allele counts 
-    by setting `rarify_alleles = FALSE`. We recommend performing allele 
-    count rarefaction (`rarify_alleles = TRUE`) if there are missing values 
-    in the genetic data, but for datasets with no missing data, it is faster 
-    to use the raw counts (`rarify_alleles = FALSE`).
-    
-    - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg 
-    equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 
-    level (other alpha levels  can be specified by adding the sig argument; 
-    e.g., `sig = 0.10`).
-    
-    - `"basic_stats"` for a series of statistics produced by 
-    `hierfstat::basic.stats()` including mean observed heterozygosity 
-    (same as Ho), mean gene diversities within population (Hs), G
-    ene diversities overall (Ht), and Fis following Nei (1987).
-    Population-based statistics (e.g., FST) normally reported by 
-    `hierfstat::basic.stats()` are not included as they are not meaningful 
-    within the individual-based moving windows.
+
+    -   `"pi"` for nucleotide diversity (default) calculated using
+        `hierfstat::pi.dosage()` (only works for bi-allelic data).
+
+    -   `"Ho"` for average observed heterozygosity across all sites
+
+    -   `"allelic_richness"` for average number of alleles across all
+        sites
+
+    -   `"biallelic_richness"` for average allelic richness across all
+        sites for a biallelic dataset (this option is faster than
+        `"allelic_richness"`). When calculating `“biallelic_richness”`,
+        users can choose to rarify allele counts (as in
+        `hierfstat::allelic.richness()`) by setting
+        `rarify_alleles = TRUE` (the default) or to use the raw allele
+        counts by setting `rarify_alleles = FALSE`. We recommend
+        performing allele count rarefaction (`rarify_alleles = TRUE`) if
+        there are missing values in the genetic data, but for datasets
+        with no missing data, it is faster to use the raw counts
+        (`rarify_alleles = FALSE`).
+
+    -   `"hwe"` for the proportion of sites that are not in
+        Hardy--Weinberg equilibrium, calculated using `pegas`
+        \link[pegas]{hw.test} at the 0.05 level (other alpha levels can
+        be specified by adding the sig argument; e.g., `sig = 0.10`).
+
+    -   `"basic_stats"` for a series of statistics produced by
+        `hierfstat::basic.stats()` including mean observed
+        heterozygosity (same as Ho), mean gene diversities within
+        population (Hs), G ene diversities overall (Ht), and Fis
+        following Nei (1987). Population-based statistics (e.g., FST)
+        normally reported by `hierfstat::basic.stats()` are not included
+        as they are not meaningful within the individual-based moving
+        windows.
 
 5.  `fact` - To decrease computational time, we provide the option to
     aggregate the input raster layer by some factor defined using the
@@ -221,12 +225,6 @@ The main arguments that all three functions have in common are:
     this is not worth the trade-off in inaccuracy unless you are
     confident that there is no effect of rarefaction after performing
     your analysis with and without rarefaction.
-
-7.  `parallel` - In order to increase computational efficiency, we
-    provide the option for parallelization by setting the `parallel`
-    argument to `TRUE`. Parallelization is performed using the furrr
-    package. Use the `ncores` argument to set the number of cores to use
-    for parallelization.
 
 ------------------------------------------------------------------------
 
@@ -289,8 +287,8 @@ landscape. Here, we provide the raster layer (`lotr_lyr`), the
 coordinates (`lotr_coords`), the window dimensions (7), the aggregation
 factor (3), and the minimum sample number (`min_n`). `min_n` will be
 used to mask the sample count layer to show how much of the landscape
-will be excluded due to low sample count. We specify `method = window` for
-a preview of `window_gd()`, we will discuss other methods (i.e.,
+will be excluded due to low sample count. We specify `method = window`
+for a preview of `window_gd()`, we will discuss other methods (i.e.,
 `circle` and `resist` later).
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
@@ -320,7 +318,10 @@ example, so that missing sites are not considered in the calculation.
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
-*Note:* you will get a warning that no CRS is found for the provided coordinates or raster and to check that the CRS for these objects match. This is because these simulated data doesn't have a CRS, but we know they match, so we can ignore this warning
+*Note:* you will get a warning that no CRS is found for the provided
+coordinates or raster and to check that the CRS for these objects match.
+This is because these simulated data doesn't have a CRS, but we know
+they match, so we can ignore this warning
 
 ```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE, message = FALSE}
 wgd <- window_gd(lotr_vcf,
@@ -345,18 +346,19 @@ points(lotr_coords, pch = 16)
 plot_count(wgd, main = "Moving window sample counts")
 ```
 
-You can also create ggplots of your results using `ggplot_gd()` and `ggplot_count()`
+You can also create ggplots of your results using `ggplot_gd()` and
+`ggplot_count()`
+
 ```{r, fig.width = 5, fig.height = 5}
-ggplot_gd(wgd, bkg = lotr_range) + 
+ggplot_gd(wgd, bkg = lotr_range) +
   coord_sf() +
-  geom_point(data = lotr_coords, aes(x = x, y = y)) + 
+  geom_point(data = lotr_coords, aes(x = x, y = y)) +
   ggtitle("Moving window pi")
 
-ggplot_count(wgd) + 
+ggplot_count(wgd) +
   coord_sf() +
   ggtitle("Moving window sample counts")
 ```
-
 
 ### Run moving window calculations with `circle_gd()`
 
@@ -395,8 +397,8 @@ input layer to `get_geodist()` must be `aggregate(lotr_lyr, 3)`.
 Alternatively, you can first create a new aggregated raster to be used
 for all functions, as we have done below.
 
-*Note:* if you want to get only the distances between your sample coordinates,
-set `coords_only = TRUE`.
+*Note:* if you want to get only the distances between your sample
+coordinates, set `coords_only = TRUE`.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # First, create a new aggregated raster
@@ -496,11 +498,11 @@ same spatial scale (e.g., the same resolution and extent).
 As with `get_geodist()`, `get_resdist()` produces a distance matrix
 where the rows represent the cells of the raster and the columns are the
 individuals. The values are the resistance distance between each cell
-and each individual. If you want to get only the distances between your 
+and each individual. If you want to get only the distances between your
 sample coordinates, set `coords_only = TRUE`.
 
 Again, we can use the `preview_gd()` function to preview parameter
-settings. Here, we specify `method = "resist"` and provide `maxdist`. 
+settings. Here, we specify `method = "resist"` and provide `maxdist`.
 
 ```{r, cache = TRUE, warning = FALSE, message = FALSE}
 lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3))
@@ -537,7 +539,10 @@ plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
 plot_count(rgd, main = "Resistance moving window sample counts")
 ```
 
-In addition to using continuous rasters of connectivity you can also use rasters to designate passable and impassable areas. This can be useful for designating boundaries you don't want windows to extend across (e.g., mountain ranges) or extend between (e.g., rivers). 
+In addition to using continuous rasters of connectivity you can also use
+rasters to designate passable and impassable areas. This can be useful
+for designating boundaries you don't want windows to extend across
+(e.g., mountain ranges) or extend between (e.g., rivers).
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # create layer
@@ -564,7 +569,6 @@ resist_gd <- resist_gd(
 
 plot_gd(resist_gd)
 ```
-
 
 ## Transforming the moving window maps
 
@@ -741,12 +745,18 @@ plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
 
 ## Parallelization
 
-To increase computational speed, users can perform the any of the moving
-window functions calculations with parallelization by setting
-`parallel = TRUE` and `ncores` to the number of cores to use:
+To increase computational speed, users can perform any of the moving
+window functions calculations with parallelization using the furrr
+package. Checkout the [furrr package
+documentation](https://furrr.futureverse.org/) for more details on using
+parallelization.
 
 ```{r parallelization, fig.width = 5, fig.height = 5, eval = FALSE, message = FALSE}
 # Note: this code is not evaluated when building the vignette as it spawns multiple processes
+
+# setup parallel session
+future::plan("multisession", workers = 2)
+
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
@@ -755,16 +765,20 @@ wgd <- window_gd(lotr_vcf,
   fact = 3,
   rarify_n = 2,
   rarify_nit = 5,
-  rarify = TRUE,
-  parallel = TRUE,
-  ncores = 2
+  rarify = TRUE
 )
+
+# end parallel session
+future::plan("sequential")
 ```
+
+*Note:* the parallel and ncores arguments have been deprecated as of
+wingen 2.0.1.
 
 ## Other genetic diversity metrics
 
-You can calculate multiple statistics at once by providing a vector
-of statistic names to `stat`.
+You can calculate multiple statistics at once by providing a vector of
+statistic names to `stat`.
 
 ```{r, cache = TRUE, warning = FALSE, warning = FALSE, message = FALSE}
 multistat_wgd <- window_gd(lotr_vcf,
@@ -836,7 +850,8 @@ For the standard genetic diversity statistics:
     matrix with values of 0, 1, or 2 (*Note:* rows must be individuals).
 
 -   If `stat = "Ho"`, `x` must be a heterozygosity matrix where values
-    of 0 = homozygosity and values of 1 = heterozygosity (*Note:* rows must be individuals).
+    of 0 = homozygosity and values of 1 = heterozygosity (*Note:* rows
+    must be individuals).
 
 -   If `stat = "allelic_richness"`, `x` must be a `genind` type object.
 

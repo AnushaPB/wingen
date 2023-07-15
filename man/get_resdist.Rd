@@ -31,9 +31,9 @@ get_resdist(
 
 \item{coords_only}{whether to return distances only for sample coordinates}
 
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 
-\item{parallel}{whether to parallelize the function (defaults to FALSE)}
+\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 a distance matrix used by \link[wingen]{resist_gd}

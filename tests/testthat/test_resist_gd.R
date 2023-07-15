@@ -1,9 +1,6 @@
 test_that("resist_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
-  capture_warnings(distmatp <- get_resdist(mini_coords, mini_lyr, parallel = TRUE, ncores = 2))
-  capture_warnings(distmat <- get_resdist(mini_coords, mini_lyr, parallel = FALSE))
-  expect_equal(distmat, distmatp)
-
+  capture_warnings(distmat <- get_resdist(mini_coords, mini_lyr))
   capture_warnings(
     rpi <- resist_gd(
       mini_vcf,
@@ -34,7 +31,6 @@ test_that("resist_gd returns expected output", {
       distmat = NULL
     )
   )
-
 })
 
 test_that("resist_general returns expected output", {
@@ -54,7 +50,6 @@ test_that("resist_general returns expected output", {
   )
 
   expect_s4_class(rpi, "SpatRaster")
-
 })
 
 

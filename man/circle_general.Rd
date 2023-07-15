@@ -54,9 +54,9 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
-\item{parallel}{whether to parallelize the function (defaults to FALSE)}
+\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1)}
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
 
 \item{...}{if a function is provided for \code{stat}, additional arguments to pass to the \code{stat} function (e.g. if \code{stat = mean}, users may want to set \code{na.rm = TRUE})}
 }
