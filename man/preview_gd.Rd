@@ -42,7 +42,7 @@ preview_gd(
 
 \item{parallel}{whether to use parallelization for calculating the distance matrices for \code{method = "circle"} or \verb{method = "resist} (defaults to \code{FALSE}).}
 
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)})}
+\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 Plots preview of window and returns SpatRaster with sample counts layer (if sample_count = TRUE)

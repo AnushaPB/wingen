@@ -15,8 +15,8 @@
 #' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
 #' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
 #' @param rarify_alleles for calculating `"biallelic_richness"`, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
-#' @param parallel whether to parallelize the function (defaults to FALSE; **deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)**)
-#' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; **deprecated as of 2.0.1: furrr::plan() should be used to setup parallelization instead (see package vignette)**)
+#' @param parallel whether to parallelize the function (defaults to FALSE; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
+#' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
 #' @param ... additional arguments to pass to the `stat` function (e.g. if `stat = hwe`, users may want to set `sig` to a different value)
 #' @details
