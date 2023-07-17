@@ -31,7 +31,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
     index <- 1:terra::nlyr(x)
   }
 
-  plot_general(x, index = index, bkg = bkg, breaks = breaks, col = col, main = main, box = box, range = range, ...)
+  plot_general(x, index = index, bkg = bkg, breaks = breaks, col = col, main = main, box = box, range = range, legend = legend, ...)
 }
 
 #' Plot moving window map of sample counts
@@ -54,7 +54,7 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #' @examples
 #' data("mini_lyr")
 #' plot_count(mini_lyr)
-plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, range = NULL, ...) {
+plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks), main = NULL, box = FALSE, range = NULL, legend = TRUE, ...) {
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
 
   # plot sample count layer
@@ -62,7 +62,7 @@ plot_count <- function(x, index = NULL, breaks = 100, col = viridis::mako(breaks
     if (any(names(x) == "sample_count")) index <- which(names(x) == "sample_count") else index <- terra::nlyr(x)
   }
 
-  plot_general(x, index = index, breaks = breaks, col = col, main = main, box = box, range = range, ...)
+  plot_general(x, index = index, breaks = breaks, col = col, main = main, box = box, range = range, legend = legend, ...)
 }
 
 #' Helper function for plot_gd and plot_count
