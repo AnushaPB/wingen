@@ -24,7 +24,6 @@ library(raster)
 library(viridis)
 library(sf)
 library(SpatialKDE)
-devtools::load_all()
 ```
 
 ## Background
