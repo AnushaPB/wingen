@@ -16,11 +16,23 @@ MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badg
 released!](https://github.com/AnushaPB/wingen/releases/tag/v2.0.0)**
 
 Generate continuous maps of genetic diversity using moving windows with
-options for rarefaction, interpolation, and masking ([Bishop et
-al. 2023](http://doi.org/10.1111/2041-210X.14090);
-[blog](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/)).
+options for rarefaction, interpolation, and masking.
 
 ![](wingen.gif)
+
+## Citation
+
+Please cite the original Bishop et al. (2023) paper if you use this
+package:
+
+**Bishop, A. P., Chambers, E. A., & Wang, I. J. (2023). Generating
+continuous maps of genetic diversity using moving windows. ***Methods in
+Ecology and Evolution***, 14, 1175–1181.
+<http://doi.org/10.1111/2041-210X.14090>**
+
+Checkout our [Methods blog
+post](https://methodsblog.com/2023/05/03/wingen-mapping-genetic-diversity-using-moving-windows/)
+about wingen for a quick overview of the package and its uses.
 
 ## Installation
 
