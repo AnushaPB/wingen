@@ -36,7 +36,7 @@ about wingen for a quick overview of the package and its uses.
 
 ## Installation
 
-Install the development version from [GitHub](https://github.com/) with:
+Install wingen from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
