@@ -32,10 +32,7 @@ Imports:
     purrr,
     raster,
     rlang,
-    Rcpp,
-    Rfast,
     sp,
-    SpatialKDE,
     sf,
     terra,
     tidyr,
@@ -50,6 +47,7 @@ Suggests:
     MASS,
     rmarkdown,
     stringr,
+    SpatialKDE,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
