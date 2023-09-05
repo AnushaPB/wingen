@@ -62,7 +62,7 @@ future::plan() should be used to setup parallelization instead (see package vign
       ),
       .options = furrr::furrr_options(
         seed = TRUE,
-        packages = c("wingen", "terra", "raster", "adegenet")
+        packages = c("wingen", "terra", "raster")
       ),
       .progress = TRUE
     )

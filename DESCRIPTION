@@ -16,7 +16,6 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-    adegenet,
     automap,
     crayon,
     dplyr,
@@ -41,6 +40,7 @@ Imports:
     vcfR,
     viridis
 Suggests: 
+    adegenet,
     covr,
     devtools,
     knitr,
