@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - "R/**.R"
-      - .github/workflows/R-CMD-check.yml
+      - .github/workflows/R-CMD-check.yaml
       - "vignettes/**.Rmd"
     branches:
       - main
