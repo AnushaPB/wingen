@@ -7,10 +7,10 @@
 <!-- [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/check-release.yaml) -->
 
 [![codecov](https://codecov.io/gh/AnushaPB/wingen/branch/main/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
+[![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml)
 [![test-coverage](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg?branch=main)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
 [![license:
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
-
 <!-- badges: end -->
 
 **[wingen 2.0 has been
