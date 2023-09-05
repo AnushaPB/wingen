@@ -4,7 +4,7 @@
 #'
 #' @param r SpatRaster produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
-#' @param grd object to create grid for kriging; can be a SpatRaster, RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param grd object to create grid for kriging; can be a SpatRaster, RasterLayer, sf points, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates
 #' @param agg_grd factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
 #' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
@@ -110,7 +110,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
   }
 
   # create df
-  krig_df <- make_krig_df(r, coords)
+  krig_df <- make_krige_df(r, coords)
 
   # create grid
   krig_grid <- make_krige_grid(r, grd)
@@ -144,11 +144,11 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
     stop("invalid krig_method specified")
   }
 
-  # Get kriged spdf
-  krig_spdf <- krig_res$krige_output
+  # Convert results to vector
+  krig_vect <- terra::vect(krig_res$krige_output)
 
-  # turn spdf into raster
-  krig_r <- terra::rast(raster::stack(krig_spdf), type = "xyz", crs = terra::crs(krig_grid))
+  # turn results into raster
+  krig_r <- terra::rasterize(krig_vect,  r, field = names(krig_vect))
 
   # perform bounding
   if (is.numeric(lower_bound)) krig_r[krig_r < lower_bound] <- lower_bound
@@ -178,7 +178,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
 #' @inheritParams krig_gd
 #'
 #' @noRd
-make_krig_df <- function(r, coords = NULL) {
+make_krige_df <- function(r, coords = NULL) {
   # use coords if provided
   if (!is.null(coords)) {
     if (inherits(coords, "sf")) coords <- terra::vect(coords)
@@ -194,17 +194,13 @@ make_krig_df <- function(r, coords = NULL) {
   # reassign crs
   sf::st_crs(krig_sf) <- sf::st_crs(r)
 
-  # convert to sp
-  krig_sp <- sf::as_Spatial(krig_sf)
-
   # edit names
-  names(krig_sp) <- "layer"
-  colnames(krig_sp@coords) <- c("x", "y")
+  names(krig_sf) <- c("layer", "geometry")
 
   # remove na values
-  krig_sp <- krig_sp[!is.na(krig_sp$layer), ]
+  krig_sf <- krig_sf[!is.na(krig_sf$layer), ]
 
-  return(krig_sp)
+  return(krig_sf)
 }
 
 #' Create grid for kriging
@@ -217,10 +213,10 @@ make_krige_grid <- function(r = NULL, grd = NULL) {
     krig_grid <- raster_to_grid(r)
   } else if (inherits(grd, "SpatRaster")) {
     krig_grid <- raster_to_grid(grd)
-  } else if (sp::gridded(grd)) {
+  } else if (inherits(grd, "sf") | inherits(grd, "sp") | inherits(grd, "stars")) {
     krig_grid <- grd
   } else {
-    stop(" unable to find an inherited method for type of grd provided")
+    stop("unable to find an inherited method for the grd provided")
   }
   return(krig_grid)
 }
@@ -233,9 +229,15 @@ make_krige_grid <- function(r = NULL, grd = NULL) {
 #'
 #' @noRd
 raster_to_grid <- function(x) {
+  # convert from raster to coords
   grd <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
-  sp::coordinates(grd) <- ~ x + y
-  sp::gridded(grd) <- TRUE
+
+  # convert to sf
+  grd <- sf::st_as_sf(grd, coords = c("x", "y"))
+
+  # edit names
+  names(grd) <- c("layer", "geometry")
+
   return(grd)
 }
 
