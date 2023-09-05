@@ -25,9 +25,7 @@ jobs:
           use-public-rspm: true
       
       - name: Install Latest ggplot2
-        run: |
-          R -e "remotes::install_cran('ggplot2')"
-        shell: Rscript {0}
+        run: Rscript -e "install.packages('ggplot2', repos='https://cloud.r-project.org/')"
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
