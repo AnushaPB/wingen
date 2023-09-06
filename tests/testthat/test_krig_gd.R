@@ -1,13 +1,19 @@
 test_that("krig_gd returns expected output", {
   load_mini_ex(quiet = TRUE)
   names(mini_lyr) <- "test"
+
+  # check basic kriging
   capture_warnings(kpi <- krig_gd(mini_lyr, mini_lyr))
   expect_s4_class(kpi, "SpatRaster")
   expect_equal(terra::nlyr(kpi), 1)
 
+  # check kriging of stakc
   capture_warnings(expect_warning(kpi <- krig_gd(raster::stack(mini_lyr, mini_lyr), index = 1:2, mini_lyr)))
   expect_s4_class(kpi, "SpatRaster")
   expect_equal(raster::nlayers(mini_lyr), 1)
+
+  # check extents match
+  expect_true(terra::ext(mini_lyr) == terra::ext(kpi))
 })
 
 test_that("krig_gd returns warning when not provided grd", {
@@ -27,18 +33,6 @@ test_that("coord kriging works", {
   # expect_true(terra::all.equal(kpi1, kpi2))
   expect_equal(terra::values(kpi1), terra::values(kpi2))
 })
-
-test_that("grd kriging works", {
-  load_mini_ex(quiet = TRUE)
-
-  grd <- raster_to_grid(mini_lyr)
-
-  capture_warnings(kpi <- krig_gd(mini_lyr, grd = grd))
-
-  # test doesn't matter, just checking if above lines don't error
-  expect_true(TRUE)
-})
-
 
 test_that("krige_gd returns error when provided bad grd", {
   load_mini_ex(quiet = TRUE)
@@ -151,3 +145,4 @@ test_that("bound check", {
   expect_true(min(terra::values(kpi)) >= 0)
   expect_true(max(terra::values(kpi)) <= 0.5)
 })
+
