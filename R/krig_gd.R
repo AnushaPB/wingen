@@ -4,7 +4,7 @@
 #'
 #' @param r SpatRaster produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
-#' @param grd object to create grid for kriging; can be a SpatRaster, RasterLayer, sf points, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.
+#' @param grd object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.
 #' @param coords if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates
 #' @param agg_grd factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)
 #' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)
@@ -99,24 +99,31 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
                         krig_method = "ordinary",
                         resample = FALSE, resample_first = TRUE) {
   # Transform raster layer
-  if (inherits(grd, "SpatRaster")) {
-    stk <- raster_transform(
-      r = r, grd = grd,
-      agg_grd = agg_grd, disagg_grd = disagg_grd, agg_r = agg_r, disagg_r = disagg_r,
-      resample = resample, resample_first = resample_first
-    )
-    r <- stk[[names(r)]]
-    grd <- stk[["grd"]]
-  }
+  stk <- raster_transform(
+    r = r,
+    grd = grd,
+    agg_grd = agg_grd,
+    disagg_grd = disagg_grd,
+    agg_r = agg_r,
+    disagg_r = disagg_r,
+    resample = resample,
+    resample_first = resample_first
+  )
+
+  r <- stk[[names(r)]]
+  grd <- stk[["grd"]]
 
   # create df
   krig_df <- make_krige_df(r, coords)
 
   # create grid
-  krig_grid <- make_krige_grid(r, grd)
+  krig_grid <- make_krige_grid(grd)
 
   # krige using autoKrige
-  krig_r <- krig(krig_df, krig_grid,
+  krig_r <- krig(
+    krig_df = krig_df,
+    krig_grid = krig_grid,
+    grd = grd,
     autoKrige_output = autoKrige_output,
     krig_method = krig_method,
     lower_bound = lower_bound,
@@ -134,7 +141,7 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 #' @inheritParams krig_gd
 #'
 #' @noRd
-krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "ordinary", lower_bound = TRUE, upper_bound = TRUE) {
+krig <- function(krig_df, krig_grid, grd, autoKrige_output = FALSE, krig_method = "ordinary", lower_bound = TRUE, upper_bound = TRUE) {
   # autokrige
   if (krig_method == "ordinary") {
     krig_res <- automap::autoKrige(layer ~ 1, input_data = krig_df, new_data = krig_grid)
@@ -148,7 +155,7 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
   krig_vect <- terra::vect(krig_res$krige_output)
 
   # turn results into raster
-  krig_r <- terra::rasterize(krig_vect,  r, field = names(krig_vect))
+  krig_r <- terra::rasterize(krig_vect, grd, field = names(krig_vect))
 
   # perform bounding
   if (is.numeric(lower_bound)) krig_r[krig_r < lower_bound] <- lower_bound
@@ -189,13 +196,10 @@ make_krige_df <- function(r, coords = NULL) {
   }
 
   # convert to sf
-  krig_sf <- sf::st_as_sf(krig_df, coords = c("x", "y"))
+  krig_sf <- make_krige_sf(krig_df)
 
   # reassign crs
   sf::st_crs(krig_sf) <- sf::st_crs(r)
-
-  # edit names
-  names(krig_sf) <- c("layer", "geometry")
 
   # remove na values
   krig_sf <- krig_sf[!is.na(krig_sf$layer), ]
@@ -208,37 +212,39 @@ make_krige_df <- function(r, coords = NULL) {
 #' @inheritParams krig_gd
 #'
 #' @noRd
-make_krige_grid <- function(r = NULL, grd = NULL) {
-  if (is.null(grd)) {
-    krig_grid <- raster_to_grid(r)
-  } else if (inherits(grd, "SpatRaster")) {
-    krig_grid <- raster_to_grid(grd)
-  } else if (inherits(grd, "sf") | inherits(grd, "sp") | inherits(grd, "stars")) {
-    krig_grid <- grd
-  } else {
-    stop("unable to find an inherited method for the grd provided")
-  }
-  return(krig_grid)
+make_krige_grid <- function(grd = NULL) {
+  # make sf
+  krig_sf <- make_krige_sf(grd)
+
+  # reassign crs
+  sf::st_crs(krig_sf) <- sf::st_crs(grd)
+
+  return(krig_sf)
 }
 
-#' Convert a raster to a grid
+#' Convert a raster or data.frame of coordinates to a sf object for kriging
 #'
 #' @param x SpatRaster
 #'
-#' @return gridded SpatialPixelsDataFrame
+#' @return sf points
 #'
 #' @noRd
-raster_to_grid <- function(x) {
-  # convert from raster to coords
-  grd <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
+make_krige_sf <- function(x) {
+  # convert from raster to coords if not already a data.frame
+  if (inherits(x, "SpatRaster")) x <- terra::as.data.frame(x, xy = TRUE, na.rm = FALSE)
 
   # convert to sf
-  grd <- sf::st_as_sf(grd, coords = c("x", "y"))
+  krig_sf <- sf::st_as_sf(x, coords = c("x", "y"))
 
-  # edit names
-  names(grd) <- c("layer", "geometry")
+  # rename layer
+  names(krig_sf)[1] <- "layer"
 
-  return(grd)
+  # add columns for x and y
+  # Note: this is necessary for universal kriging with the formula "layer ~ x + y"
+  krig_sf$x <- x$x
+  krig_sf$y <- x$y
+
+  return(krig_sf)
 }
 
 #' Transform raster
