@@ -149,11 +149,8 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   # aggregate raster
   if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
-  # convert coords to dataframe and rename
-  coords_df <- coords_to_df(coords)
-
-  # make spatial points
-  sp_coords <- sp::SpatialPoints(coords_df)
+  # convert coords to matrix and rename
+  coords_mat <- as.matrix(coords_to_df(coords))
 
   # create transition surface
   trSurface <- gdistance::transition(lyr, transitionFunction = transitionFunction, directions = directions)
@@ -163,7 +160,7 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
   # create distance matrix using only coordinates
   if (coords_only) {
-    return(as.matrix(gdistance::commuteDistance(trSurface, sp_coords)))
+    return(as.matrix(gdistance::commuteDistance(trSurface, coords_mat)))
   }
 
   # make vector of distances
@@ -172,14 +169,14 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
     future::plan(future::multisession, workers = ncores)
 
-    distrasts <- furrr::future_map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]),
+    distrasts <- furrr::future_map(1:nrow(coords_mat), ~ gdistance::accCost(trSurface, coords_mat[.x, ]),
       .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
       .progress = TRUE
     )
 
     future::plan("sequential")
   } else {
-    distrasts <- purrr::map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]), .progress = TRUE)
+    distrasts <- purrr::map(1:nrow(coords_mat), ~ gdistance::accCost(trSurface, coords_mat[.x, ]), .progress = TRUE)
   }
 
   # convert from raster to matrix
