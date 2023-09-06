@@ -150,20 +150,20 @@ krig <- function(krig_df, krig_grid, autoKrige_output = FALSE, krig_method = "or
   # turn spdf into raster
   krig_r <- terra::rast(raster::stack(krig_spdf), type = "xyz", crs = terra::crs(krig_grid))
 
-  # perform bounding
-  if (is.numeric(lower_bound)) krig_r[krig_r < lower_bound] <- lower_bound
-  if (is.numeric(upper_bound)) krig_r[krig_r > upper_bound] <- upper_bound
+  # rename autoKrige output
+  names(krig_r) <- c("pred", "var", "stdev")
+
+  # perform bounding on pred layer
+  if (is.numeric(lower_bound)) krig_r$pred[krig_r$pred < lower_bound] <- lower_bound
+  if (is.numeric(upper_bound)) krig_r$pred[krig_r$pred > upper_bound] <- upper_bound
 
   if (is.logical(lower_bound)) {
-    if (lower_bound) krig_r[krig_r < min(krig_df$layer, na.rm = TRUE)] <- min(krig_df$layer, na.rm = TRUE)
+    if (lower_bound) krig_r$pred[krig_r$pred < min(krig_df$layer, na.rm = TRUE)] <- min(krig_df$layer, na.rm = TRUE)
   }
 
   if (is.logical(upper_bound)) {
-    if (upper_bound) krig_r[krig_r > max(krig_df$layer, na.rm = TRUE)] <- max(krig_df$layer, na.rm = TRUE)
+    if (upper_bound) krig_r$pred[krig_r$pred > max(krig_df$layer, na.rm = TRUE)] <- max(krig_df$layer, na.rm = TRUE)
   }
-
-  # rename autoKrige output
-  names(krig_r) <- c("pred", "var", "stdev")
 
   # create results
   if (autoKrige_output) {
