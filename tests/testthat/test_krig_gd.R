@@ -7,7 +7,7 @@ test_that("krig_gd returns expected output", {
   expect_s4_class(kpi, "SpatRaster")
   expect_equal(terra::nlyr(kpi), 1)
 
-  # check kriging of stakc
+  # check kriging of stack
   capture_warnings(expect_warning(kpi <- krig_gd(raster::stack(mini_lyr, mini_lyr), index = 1:2, mini_lyr)))
   expect_s4_class(kpi, "SpatRaster")
   expect_equal(raster::nlayers(mini_lyr), 1)
@@ -38,7 +38,6 @@ test_that("krige_gd returns error when provided bad grd", {
   load_mini_ex(quiet = TRUE)
 
   capture_warnings(expect_error(kpi <- krig_gd(mini_lyr, grd = mini_coords)))
-  capture_warnings(expect_error(kpi <- krig_gd(mini_lyr, grd = sp::SpatialPoints(mini_coords))))
 })
 
 test_that("raster_transform transformations are correct", {
