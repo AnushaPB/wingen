@@ -53,7 +53,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
   }
 
   # Temporary: warning if non-spatRaster grd is used
-  if (!inherits(grd, "SpatRaster")) warning("/n Starting November 2023, the krig_gd() grd argument will only accept SpatRaster and Raster objects")
+  if (!inherits(grd, "SpatRaster")) warning("/n Starting October 2023, the krig_gd() grd argument will only accept SpatRaster and Raster objects")
 
   # krige
   rstk <- purrr::map(rls,
