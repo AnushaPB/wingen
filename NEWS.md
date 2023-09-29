@@ -1,11 +1,3 @@
-# wingen 2.1.1
-
-## Changes to krig_gd following removal of sp dependency
-The legacy packages maptools, rgdal, and rgeos, underpinning the sp package will retire in October 2023, so we have made steps to remove sp as a required package to avoid any associated issues since sp is no longer being actively developed.
-- the grd argument now only accepts either Raster or SpatRasters
-
-
-
 # wingen 2.0.1
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8125610.svg)](https://doi.org/10.5281/zenodo.8125610)
