@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
+Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking as described in Bishop et al. (2023) \doi{10.1111/2041-210X.14090}
 }
 \author{
 \strong{Maintainer}: Anusha Bishop \email{anusha.bishop@berkeley.edu} (\href{https://orcid.org/0000-0003-1731-8683}{ORCID})

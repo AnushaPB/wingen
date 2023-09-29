@@ -3,13 +3,13 @@ Title: Continuous mapping of genetic diversity in R
 Version: 2.0.1
 Authors@R: c(
             person("Anusha", "Bishop", , email = "anusha.bishop@berkeley.edu", role = c("aut", "cre"), 
-                   comment = c(ORCID="0000-0003-1731-8683")),
+                   comment = c(ORCID = "0000-0003-1731-8683")),
             person("Anne", "Chambers", role ="aut", 
-                   comment = c(ORCID="0000-0002-7369-0108")),
+                   comment = c(ORCID = "0000-0002-7369-0108")),
             person("Ian", "Wang", , email = "ianwang@berkeley.edu", role = "aut",
                    comment = c(ORCID = "0000-0003-2554-9414"))
             )
-Description: Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
+Description: Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking as described in Bishop et al. (2023) <doi:10.1111/2041-210X.14090>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -31,7 +31,6 @@ Imports:
     purrr,
     raster,
     rlang,
-    sp,
     sf,
     terra,
     tidyr,

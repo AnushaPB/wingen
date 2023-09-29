@@ -1,0 +1,11 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Generating continuous maps of genetic diversity using moving windows. Methods in Ecology and Evolution",
+  author   = "Anusha P. Bishop, E. Anne Chambers, I. J. Wang",
+  journal  = "Methods in Ecology and Evolution",
+  year     = 2023,
+  volume   = 14,
+  number   = 5,
+  pages    = "1175-1181",
+  doi      = "10.1111/2041-210X.14090"
+)
