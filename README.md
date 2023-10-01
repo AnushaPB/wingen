@@ -12,9 +12,6 @@
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 <!-- badges: end -->
 
-**[wingen 2.0 has been
-released!](https://github.com/AnushaPB/wingen/releases/tag/v2.0.0)**
-
 Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking.
 
