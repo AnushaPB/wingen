@@ -1,3 +1,13 @@
+# wingen 2.0.2
+
+### Removal of sp
+
+sp is no longer imported by wingen
+
+### Changes to grd argument
+
+The `grd` argument in `krig_gd()` now only accepts SpatRaster and Raster objects
+
 # wingen 2.0.1
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.8125610.svg)](https://doi.org/10.5281/zenodo.8125610)
