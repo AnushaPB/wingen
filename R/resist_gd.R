@@ -143,11 +143,11 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
 get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE, ncores = NULL, parallel = FALSE) {
+  # check lyr and coords
+  lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
+
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
-
-  # aggregate raster
-  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # convert coords to dataframe and rename
   coords_df <- coords_to_df(coords)
@@ -202,7 +202,7 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 coords_to_df <- function(coords) {
   if (inherits(coords, "SpatVector")) coords <- sf::st_as_sf(coords)
   if (is.matrix(coords)) coords <- data.frame(coords)
-  if (inherits(coords, "sf")) coords <- as.data.frame(sf::as_Spatial(coords))
+  if (inherits(coords, "sf")) coords <- data.frame(sf::st_coordinates(coords))
   colnames(coords) <- c("x", "y")
   return(coords)
 }
