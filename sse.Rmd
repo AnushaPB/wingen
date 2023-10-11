@@ -101,7 +101,7 @@ plot(lyr)
 trSurface <- gdistance::transition(aggregate(pred, 20), transitionFunction = mean, directions = 8)
 trSurface <- gdistance::geoCorrection(trSurface, type = "c", scl = FALSE)
 
-distmat <- get_resdist(lotr_coords, cond.r = pred, ncores= 25)
+distmat <- get_resdist(coords, cond.r = pred, ncores= 25)
 write.csv(distmat, "distmat30.csv")
 ```
 
