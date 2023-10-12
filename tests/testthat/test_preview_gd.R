@@ -126,7 +126,7 @@ test_that("preview_gd works for circle method with all different coordinate type
 test_that("preview_gd works for resist method", {
   load_mini_ex(quiet = TRUE)
   capture_warnings(distmat <- get_resdist(mini_coords, mini_lyr, fact = 5, ncores = 2))
-  pw <- preview_gd(
+  capture_warnings(pw <- preview_gd(
     mini_lyr,
     mini_coords,
     method = "resist",
@@ -136,7 +136,7 @@ test_that("preview_gd works for resist method", {
     sample_count = TRUE,
     min_n = 2,
     ncores = 2
-  )
+  ))
 
   expect_equal(terra::nlyr(pw), 1)
 })

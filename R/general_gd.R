@@ -38,6 +38,8 @@ future::plan() should be used to setup parallelization instead (see package vign
   # run sliding window calculations
   # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
   # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
+  ## also save the original CRS since it gets coded slightly differently in raster
+  original_crs <- terra::crs(lyr)
   lyr <- raster::raster(lyr)
 
   rast_vals <-
@@ -69,8 +71,9 @@ future::plan() should be used to setup parallelization instead (see package vign
 
   if (parallel) future::plan("sequential")
 
-  # convert back to SpatRast
+  # convert back to SpatRast and reassign original crs
   lyr <- terra::rast(lyr)
+  terra::crs(lyr) <- original_crs
 
   # format resulting raster values
   result <- vals_to_lyr(lyr, rast_vals, stat)
