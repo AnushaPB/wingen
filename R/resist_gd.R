@@ -28,10 +28,11 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
                       transitionFunction = mean, directions = 8, geoCorrection = TRUE,
                       parallel = FALSE, ncores = NULL) {
-  # check and aggregate layer and coords  (only lyr is returned)
+
+  # check layer and coords and perform aggregation
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
-  # make distmat
+  # make distmat (note: aggregation factor not needed here because it is done in the previous step)
   if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores))
 
   # run dist_gd
@@ -93,7 +94,8 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
                            transitionFunction = mean, directions = 8, geoCorrection = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {
-  # check and aggregate layer and coords  (only lyr is returned)
+
+  # check and aggregate layer and coords  and perform aggregation
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
@@ -143,14 +145,11 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
 get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE, ncores = NULL, parallel = FALSE) {
-  # check lyr and coords
+  # check lyr and coords and perform aggregation
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
-
-  # aggregate raster
-  if (fact != 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # convert coords to matrix and rename
   coords_mat <- as.matrix(coords_to_df(coords))
