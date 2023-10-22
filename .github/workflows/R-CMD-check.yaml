@@ -8,7 +8,12 @@ on:
       - "vignettes/**.Rmd"
     branches:
       - main
-
+  pull_request:
+       paths:
+        - "R/**.R"
+        - .github/workflows/R-CMD-check.yaml
+        - "vignettes/**.Rmd"
+        
 name: R-CMD-check
 
 jobs:

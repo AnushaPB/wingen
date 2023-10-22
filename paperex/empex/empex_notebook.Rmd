@@ -140,6 +140,7 @@ hg_longlat <- terra::project(hg, "+proj=longlat")
 Sys.time() - st
 
 # krige and mask layers
+mpg <- empex_krig_mask(pg, lyr, NUS_longlat)
 mag <- empex_krig_mask(ag, lyr, NUS_longlat)
 mhg <- empex_krig_mask(hg, lyr, NUS_longlat)
 ```
