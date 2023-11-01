@@ -11,6 +11,8 @@
 [![test-coverage](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml/badge.svg?branch=main)](https://github.com/AnushaPB/wingen/actions/workflows/test-coverage.yaml)
 [![license:
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
+[![Zenodo
+DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi/499617621)
 <!-- badges: end -->
 
 **[wingen 2.0 has been
