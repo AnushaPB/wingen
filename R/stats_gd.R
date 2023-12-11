@@ -200,15 +200,16 @@ calc_prop_hwe <- function(genind, sig = 0.05) {
 #' Calculate basic stats using \link[hierfstat]{basic.stats}
 #'
 #' @param hf hierfstat object
+#' @param ... additional arguments to pass to basic stats
 #'
 #' @return vector of overall stats produced by \link[hierfstat]{basic.stats}
 #'
 #' @noRd
-calc_mean_basic_stats <- function(hf) {
+calc_mean_basic_stats <- function(hf, ...) {
   # reassign pop so that if the levels present in the original factor change you don't get an error
   # e.g., if original pop was 1 & 2, but a subset only has 2, you will get an error
   hf$pop <- as.numeric(as.character(hf$pop))
-  hfstat <- hierfstat::basic.stats(hf)
+  hfstat <- hierfstat::basic.stats(hf, ...)
   mean_stats <- hfstat$overall
 
   # drop stats that aren't meaningful if there is only one populatoin
@@ -233,27 +234,27 @@ return_stat <- function(stat, ...) {
   }
 
   if (stat == "pi") {
-    return(calc_pi)
+    return(purrr::partial(calc_pi, ...))
   }
 
   if (stat == "biallelic_richness") {
-    return(calc_mean_biar)
+    return(purrr::partial(calc_mean_biar, ...))
   }
 
   if (stat == "allelic_richness") {
-    return(calc_mean_ar)
+    return(purrr::partial(calc_mean_ar, ...))
   }
 
   if (stat == "Ho") {
-    return(calc_mean_het)
+    return(purrr::partial(calc_mean_het, ...))
   }
 
   if (stat == "hwe") {
-    return(calc_prop_hwe)
+    return(purrr::partial(calc_prop_hwe, ...))
   }
 
   if (stat == "basic_stats") {
-    return(calc_mean_basic_stats)
+    return(purrr::partial(calc_mean_basic_stats, ...))
   }
 
   stop(paste(stat, "is an invalid argument for stat"))
