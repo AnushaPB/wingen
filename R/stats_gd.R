@@ -250,7 +250,7 @@ return_stat <- function(stat, ...) {
   }
 
   if (stat == "hwe") {
-    return(purrr::partial(calc_prop_hwe, ...))
+    return(calc_prop_hwe)
   }
 
   if (stat == "basic_stats") {
