@@ -175,7 +175,7 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
     stat = stat,
     rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
     min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-    parallel = parallel, ncores = ncores
+    parallel = parallel, ncores = ncores, ...
   )
 
   # crop resulting raster

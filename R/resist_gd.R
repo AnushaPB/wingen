@@ -116,6 +116,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
     rarify_alleles = rarify_alleles,
     parallel = parallel,
     ncores = ncores,
+    ...
   )
 
   return(results)
