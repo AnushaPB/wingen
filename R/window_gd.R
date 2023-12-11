@@ -170,12 +170,24 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
   # run general moving window
   result <- run_general(
-    x = x, lyr = lyr, coords = coords,
-    coord_cells = coord_cells, nmat = nmat,
+    x = x,
+    lyr = lyr,
+    coords = coords,
+    coord_cells = coord_cells,
+    nmat = nmat,
+    distmat = NULL,
+    maxdist = NULL,
     stat = stat,
-    rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-    parallel = parallel, ncores = ncores, ...
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    parallel = parallel,
+    ncores = ncores,
+    ...
   )
 
   # crop resulting raster
