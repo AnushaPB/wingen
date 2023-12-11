@@ -90,7 +90,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
-circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
+circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE,
                            parallel = FALSE, ncores = NULL, ...) {

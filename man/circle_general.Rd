@@ -9,7 +9,7 @@ circle_general(
   coords,
   lyr,
   maxdist,
-  distmat,
+  distmat = NULL,
   stat,
   fact = 0,
   rarify = FALSE,
