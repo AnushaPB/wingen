@@ -22,7 +22,7 @@
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL) {
+                      parallel = FALSE, ncores = NULL, ...) {
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
@@ -53,7 +53,8 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       L = L,
       rarify_alleles = rarify_alleles,
       parallel = parallel,
-      ncores = ncores
+      ncores = ncores,
+      ...
     )
 
   return(results)

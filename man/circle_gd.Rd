@@ -20,7 +20,8 @@ circle_gd(
   L = "nvariants",
   rarify_alleles = TRUE,
   parallel = FALSE,
-  ncores = NULL
+  ncores = NULL,
+  ...
 )
 }
 \arguments{
@@ -56,6 +57,8 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 \item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 
 \item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
+
+\item{...}{additional arguments to pass to the \code{stat} function (e.g. if \code{stat = hwe}, users may want to set \code{sig} to a different value)}
 }
 \value{
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
