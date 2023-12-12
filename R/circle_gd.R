@@ -119,7 +119,8 @@ circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
     rarify_alleles = rarify_alleles,
     sig = sig,
     parallel = parallel,
-    ncores = ncores
+    ncores = ncores,
+    ...
   )
 
   return(results)
