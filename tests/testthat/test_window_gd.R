@@ -366,7 +366,6 @@ test_that("custom functions with window general work", {
   expect_equal(terra::values(wm_1), terra::values(wm_2)*2)
 })
 
-
 test_that("get_adj works", {
   load_mini_ex(quiet = TRUE)
   data("mini_lyr")
@@ -450,8 +449,7 @@ test_that("CRS are handled correctly", {
 
   # mismatched CRS
   crs2_lyr <- terra::rast(mini_lyr)
-  terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
-  +no_defs +towgs84=0,0,0"
+  terra::crs(crs2_lyr) <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
 })
 
