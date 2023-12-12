@@ -6,17 +6,7 @@
 run_general <- function(x, lyr, coords,
                         coord_cells = NULL, nmat = NULL,
                         distmat = NULL, maxdist = NULL,
-                        stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles,
-                        parallel = parallel, ncores = ncores, ...) {
-
-  # deprecation warning for parallel/ncores
-  # note: didn't use lifecycle or missing() because the nested/interrelated functions made this tricky
-  if (parallel) {
-    warning("The `parallel` and `ncores` arguments have been deprecated as of 2.0.1
-future::plan() should be used to setup parallelization instead (see package vignette)\n")
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
-    future::plan(future::multisession, workers = ncores)
-  }
+                        stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles, ...) {
 
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
@@ -68,8 +58,6 @@ future::plan() should be used to setup parallelization instead (see package vign
       ),
       .progress = TRUE
     )
-
-  if (parallel) future::plan("sequential")
 
   # convert back to SpatRast and reassign original crs
   lyr <- terra::rast(lyr)

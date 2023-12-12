@@ -21,8 +21,7 @@
 #' }
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                      fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      parallel = FALSE, ncores = NULL) {
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE) {
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
@@ -33,7 +32,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
   if (fact > 0) lyr <- terra::aggregate(lyr, fact, fun = mean)
 
   # make distmat
-  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores))
+  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr))
 
   # run dist_gd
   results <-
@@ -51,9 +50,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       min_n = min_n,
       fun = fun,
       L = L,
-      rarify_alleles = rarify_alleles,
-      parallel = parallel,
-      ncores = ncores
+      rarify_alleles = rarify_alleles
     )
 
   return(results)
@@ -92,13 +89,12 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @export
 circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                           fun = mean, L = NULL, rarify_alleles = TRUE,
-                           parallel = FALSE, ncores = NULL, ...) {
+                           fun = mean, L = NULL, rarify_alleles = TRUE, ...) {
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr, parallel = parallel, ncores = ncores))
+  if (is.null(distmat)) suppressWarnings(distmat <- get_geodist(coords, lyr))
 
   # run general resist
   results <- dist_general(
@@ -114,9 +110,7 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
     min_n = min_n,
     fun = fun,
     L = L,
-    rarify_alleles = rarify_alleles,
-    parallel = parallel,
-    ncores = ncores,
+    rarify_alleles = rarify_alleles
   )
 
   return(results)
@@ -144,7 +138,7 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
 #' load_mini_ex()
 #' distmat <- get_geodist(mini_coords, mini_lyr)
 #'
-get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE, parallel = FALSE, ncores = NULL) {
+get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE) {
   # convert coords if not in sf
   if (!inherits(coords, "sf")) coords <- coords_to_sf(coords)
 
@@ -168,22 +162,16 @@ get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE, paral
   lyr_df <- terra::as.data.frame(lyr, xy = TRUE, na.rm = FALSE)
   lyr_sf <- sf::st_as_sf(lyr_df, coords = c("x", "y"), crs = terra::crs(lyr))
 
-  if (parallel) {
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
-
-    future::plan(future::multisession, workers = ncores)
-
-    distls <- furrr::future_map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf,
+  # .y = lyr_sf
+  # .x = index
+  distls <-
+    furrr::future_map(
+      1:nrow(lyr_sf),
+      ~ sf::st_distance(.y[.x,], coords),
+      lyr_sf,
       .options = furrr::furrr_options(seed = TRUE, packages = c("sf")),
       .progress = TRUE
     )
-
-    future::plan("sequential")
-  } else {
-    # .y = lyr_sf
-    # .x = index
-    distls <- purrr::map(1:nrow(lyr_sf), ~ sf::st_distance(.y[.x, ], coords), lyr_sf)
-  }
 
   # convert into matrix
   distmat <- matrix(unlist(distls), ncol = length(distls[[1]]), byrow = TRUE)
