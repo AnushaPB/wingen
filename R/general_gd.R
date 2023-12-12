@@ -29,8 +29,10 @@ future::plan() should be used to setup parallelization instead (see package vign
   stat_function <- return_stat(stat = stat, ...)
 
   # check that coords and x align and reformat data, if necessary
-  # note: list2env adds the new, corrected x and coords back to the environment
-  list2env(check_data(x, coords = coords, distmat = distmat), envir = environment())
+  corrected_data <- check_data(x, coords = coords, distmat = distmat)
+  x <- corrected_data$x
+  coords <- corrected_data$coords
+  distmat <- corrected_data$distmat
 
   # transpose distmat so that the rows are the landscape cells
   if (!is.null(distmat)) distmat <- t(distmat)
