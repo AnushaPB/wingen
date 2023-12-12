@@ -19,9 +19,11 @@ resist_gd(
   fun = mean,
   L = "nvariants",
   rarify_alleles = TRUE,
+  sig = 0.05,
   transitionFunction = mean,
   directions = 8,
-  geoCorrection = TRUE
+  geoCorrection = TRUE,
+  ...
 )
 }
 \arguments{
@@ -50,15 +52,19 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
-\item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+
+\item{sig}{for calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)}
 
 \item{transitionFunction}{function to calculate transition values from grid values (defaults to mean)}
 
 \item{directions}{directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)}
 
 \item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
+
+\item{...}{\link{deprecated} this was intended to be used to pass additional arguments to the \code{stat} function, however now formal arguments are used instead (see \code{L}, \code{rarify_alleles}, and \code{sig}). Passing additional arguments using \code{...} is still possible with the \verb{*_general()} functions.}
 }
 \value{
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell

@@ -25,8 +25,8 @@
 #' }
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                      fun = mean, L = "nvariants", rarify_alleles = TRUE,
-                      transitionFunction = mean, directions = 8, geoCorrection = TRUE) {
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
+                      transitionFunction = mean, directions = 8, geoCorrection = TRUE, ...) {
 
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
@@ -50,7 +50,8 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       min_n = min_n,
       fun = fun,
       L = L,
-      rarify_alleles = rarify_alleles
+      rarify_alleles = rarify_alleles,
+      sig = sig
     )
 
   return(results)
@@ -86,16 +87,28 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
-resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
+resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                           fun = mean, L = NULL, rarify_alleles = TRUE,
+                           fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
                            transitionFunction = mean, directions = 8, geoCorrection = TRUE, ...) {
 
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores))
+  if (is.null(distmat))
+    suppressWarnings(
+      distmat <-
+        get_resdist(
+          coords,
+          lyr = lyr,
+          transitionFunction = transitionFunction,
+          directions = directions,
+          geoCorrection = geoCorrection,
+          parallel = parallel,
+          ncores = ncores
+        )
+    )
 
   # run general resist
   results <- dist_general(
@@ -111,7 +124,9 @@ resist_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
     min_n = min_n,
     fun = fun,
     L = L,
-    rarify_alleles = rarify_alleles
+    rarify_alleles = rarify_alleles,
+    sig = sig,
+    ...
   )
 
   return(results)

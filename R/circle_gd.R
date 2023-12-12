@@ -21,7 +21,8 @@
 #' }
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                      fun = mean, L = "nvariants", rarify_alleles = TRUE) {
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05) {
+
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
@@ -50,7 +51,8 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       min_n = min_n,
       fun = fun,
       L = L,
-      rarify_alleles = rarify_alleles
+      rarify_alleles = rarify_alleles,
+      sig = sig
     )
 
   return(results)
@@ -87,9 +89,10 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #'
 #' @export
-circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
+circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                           fun = mean, L = NULL, rarify_alleles = TRUE, ...) {
+                           fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05, ...) {
+
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -110,7 +113,8 @@ circle_general <- function(x, coords, lyr, maxdist, distmat, stat, fact = 0,
     min_n = min_n,
     fun = fun,
     L = L,
-    rarify_alleles = rarify_alleles
+    rarify_alleles = rarify_alleles,
+    sig = sig
   )
 
   return(results)

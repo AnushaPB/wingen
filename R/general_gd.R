@@ -6,7 +6,9 @@
 run_general <- function(x, lyr, coords,
                         coord_cells = NULL, nmat = NULL,
                         distmat = NULL, maxdist = NULL,
-                        stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles, ...) {
+                        stat, rarify, rarify_n, rarify_nit, min_n,
+                        fun, L, rarify_alleles, sig,
+                        ...) {
 
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
@@ -16,11 +18,13 @@ run_general <- function(x, lyr, coords,
   if (is.character(stat) & !is.null(L)) if (stat == "pi" & L == "nvariants") L <- ncol(x)
 
   # Get function to calculate the desired statistic
-  stat_function <- return_stat(stat, ...)
+  stat_function <- return_stat(stat = stat, ...)
 
   # check that coords and x align and reformat data, if necessary
-  # note: list2env adds the new, corrected x and coords back to the environment
-  list2env(check_data(x, coords = coords, distmat = distmat), envir = environment())
+  corrected_data <- check_data(x, coords = coords, distmat = distmat)
+  x <- corrected_data$x
+  coords <- corrected_data$coords
+  distmat <- corrected_data$distmat
 
   # transpose distmat so that the rows are the landscape cells
   if (!is.null(distmat)) distmat <- t(distmat)
@@ -50,7 +54,8 @@ run_general <- function(x, lyr, coords,
         min_n = min_n,
         fun = fun,
         L = L,
-        rarify_alleles = rarify_alleles
+        rarify_alleles = rarify_alleles,
+        sig = sig
       ),
       .options = furrr::furrr_options(
         seed = TRUE,
@@ -80,7 +85,7 @@ window_helper <- function(i, x, lyr,
                           distmat = NULL, maxdist = NULL,
                           stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
-                          fun, L, rarify_alleles) {
+                          fun, L, rarify_alleles, sig) {
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
   if (is.null(rarify_n)) rarify_n <- min_n
 
@@ -101,9 +106,9 @@ window_helper <- function(i, x, lyr,
   if (length(sub) < min_n) {
     gd <- NA
   } else if (rarify) {
-    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat_function, fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_helper(x, sub, rarify_n, rarify_nit, stat_function, fun, L = L, rarify_alleles = rarify_alleles, sig = sig)
   } else {
-    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles, sig = sig)
   }
 
   # count the number of samples in the window
@@ -130,7 +135,7 @@ window_helper <- function(i, x, lyr,
 #'
 #' @noRd
 rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
-                          fun, L, rarify_alleles) {
+                          fun, L, rarify_alleles, sig) {
   # if number of samples is less than rarify_n, assign the value NA
   if (length(sub) < rarify_n) {
     gd <- NA
@@ -138,12 +143,12 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
 
   # if number of samples is greater than rarify_n, rarify
   if (length(sub) > rarify_n) {
-    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles)
+    gd <- rarify_gd(x, sub, rarify_nit = rarify_nit, rarify_n = rarify_n, stat_function = stat_function, fun = fun, L = L, rarify_alleles = rarify_alleles, sig = sig)
   }
 
   # if the number of samples is equal to rarify_n, calculate stat
   if (length(sub) == rarify_n) {
-    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles)
+    gd <- sample_gd(x, sub, stat_function, L = L, rarify_alleles = rarify_alleles, sig = sig)
   }
 
   return(gd)
@@ -158,7 +163,7 @@ rarify_helper <- function(x, sub, rarify_n, rarify_nit, stat_function,
 #'
 #' @noRd
 rarify_gd <- function(x, sub, rarify_nit, rarify_n, stat_function,
-                      fun, L, rarify_alleles) {
+                      fun, L, rarify_alleles, sig) {
   # check to make sure sub is greater than rarify_n
   if (!(length(sub) > rarify_n)) {
     stop("rarify_n is less than the number of samples provided")
@@ -181,7 +186,7 @@ rarify_gd <- function(x, sub, rarify_nit, rarify_n, stat_function,
   # get all possible combos (rows are unique combos)
   # for each of the possible combos get gendiv stat
   cmb_ls <- as.list(data.frame(cmb))
-  gdrar <- purrr::map(cmb_ls, \(sub) sample_gd(x = x, sub = sub, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles))
+  gdrar <- purrr::map(cmb_ls, \(sub) sample_gd(x = x, sub = sub, stat_function = stat_function, L = L, rarify_alleles = rarify_alleles, sig = sig))
 
   # summarize rarefaction results
   gd <- purrr::list_transpose(gdrar) %>% purrr::map_dbl(fun, na.rm = TRUE)
@@ -195,13 +200,19 @@ rarify_gd <- function(x, sub, rarify_nit, rarify_n, stat_function,
 #' @return mean allelic richness of a subsample
 #'
 #' @noRd
-sample_gd <- function(x, sub, stat_function, L, rarify_alleles) {
+sample_gd <- function(x, sub, stat_function, L, rarify_alleles, sig) {
   if (isTRUE(all.equal(stat_function, calc_mean_biar))) {
-    return(stat_function(x[sub, ], rarify_alleles))
+    return(stat_function(x[sub, ], rarify_alleles = rarify_alleles))
   }
+
   if (isTRUE(all.equal(stat_function, calc_pi))) {
-    return(stat_function(x[sub, ], L))
+    return(stat_function(x[sub, ], L = L))
   }
+
+  if (isTRUE(all.equal(stat_function, calc_prop_hwe))) {
+    return(stat_function(x[sub, ], sig = sig))
+  }
+
   return(stat_function(x[sub, ]))
 }
 
