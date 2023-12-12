@@ -19,7 +19,7 @@
 #' @param parallel whether to parallelize the function (defaults to FALSE; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
-#' @param ... additional arguments to pass to the `stat` function (e.g. if `stat = hwe`, users may want to set `sig` to a different value)
+#' @param ... [deprecated] this was intended to be used to pass additional arguments to the `stat` function, however now formal arguments are used instead (see `L`, `rarify_alleles`, and `sig`). Passing additional arguments using `...` is still possible with the `*_general()` functions.
 #' @details
 #'
 #' Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
@@ -74,8 +74,7 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
         sig = sig,
         parallel = parallel,
         ncores = ncores,
-        crop_edges = crop_edges,
-        ...
+        crop_edges = crop_edges
       )
     )
 

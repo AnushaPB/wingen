@@ -60,7 +60,7 @@ window_gd(
 
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 
-\item{...}{additional arguments to pass to the \code{stat} function (e.g. if \code{stat = hwe}, users may want to set \code{sig} to a different value)}
+\item{...}{\link{deprecated} this was intended to be used to pass additional arguments to the \code{stat} function, however now formal arguments are used instead (see \code{L}, \code{rarify_alleles}, and \code{sig}). Passing additional arguments using \code{...} is still possible with the \verb{*_general()} functions.}
 }
 \value{
 SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell
