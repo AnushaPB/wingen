@@ -104,9 +104,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
           lyr = lyr,
           transitionFunction = transitionFunction,
           directions = directions,
-          geoCorrection = geoCorrection,
-          parallel = parallel,
-          ncores = ncores
+          geoCorrection = geoCorrection
         )
     )
 
