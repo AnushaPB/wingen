@@ -175,8 +175,8 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   # make vector of distances
   distrasts <-
     furrr::future_map(
-      1:length(sp_coords),
-      ~ gdistance::accCost(trSurface, sp_coords[.x,]),
+      1:nrow(coords_mat),
+      ~ gdistance::accCost(trSurface, coords_mat[.x,]),
       .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
       .progress = TRUE
     )
