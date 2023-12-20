@@ -12,6 +12,12 @@ all of the rasters and time data for the different dataset types.
 The results and figures from the paper were created using the
 `simex_notebook.Rmd` and `runtime_notebook.Rmd`
 
+These analyses were run using wingen v1.0.0 which can be downloaded from
+Zenodo:
+
+    zenodo_path <- "https://zenodo.org/records/7199558/files/AnushaPB/wingen-v1.0.0.zip"
+    install.packages(zenodo_path, repos = NULL, type = "source")
+
 **Directory structure:**
 
     [simex]

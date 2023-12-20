@@ -7,8 +7,9 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
                     fact = fact,
                     maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                    fun = mean, L = NULL, rarify_alleles = TRUE,
-                    parallel = FALSE, ncores = NULL) {
+                    fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
+                    ...) {
+
   # convert maxdist to SpatRaster
   if (!is.numeric(maxdist)) {
     if (!inherits(maxdist, "SpatRaster")) maxdist <- terra::rast(maxdist)
@@ -33,8 +34,8 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
         fun = fun,
         L = L,
         rarify_alleles = rarify_alleles,
-        parallel = parallel,
-        ncores = ncores
+        sig = sig,
+        ...
       )
     )
 
@@ -54,8 +55,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
 #' @noRd
 dist_gd_stats <- function(gen, coords, lyr, stat, maxdist, distmat,
                           rarify, rarify_n, rarify_nit, min_n,
-                          fun, L, rarify_alleles,
-                          parallel, ncores) {
+                          fun, L, rarify_alleles, sig, ...) {
   # check that the input file is a vcfR or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -80,8 +80,8 @@ dist_gd_stats <- function(gen, coords, lyr, stat, maxdist, distmat,
     fun = fun,
     L = L,
     rarify_alleles = rarify_alleles,
-    parallel = parallel,
-    ncores = ncores,
+    sig = sig,
+    ...
   )
 
   return(results)
@@ -99,20 +99,31 @@ dist_gd_stats <- function(gen, coords, lyr, stat, maxdist, distmat,
 #' @noRd
 dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                         fun = mean, L = NULL, rarify_alleles = TRUE,
-                         parallel = FALSE, ncores = NULL, ...) {
+                         fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05, ...) {
+
   # check lyr and distmat
   lyr <- layer_coords_check(lyr, coords)
   if (terra::ncell(lyr) != ncol(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
 
   # run general moving window
   result <- run_general(
-    x = x, lyr = lyr, coords = coords,
-    distmat = distmat, maxdist = maxdist,
+    x = x,
+    lyr = lyr,
+    coords = coords,
+    coord_cells = NULL,
+    nmat = NULL,
+    distmat = distmat,
+    maxdist = maxdist,
     stat = stat,
-    rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-    parallel = parallel, ncores = ncores
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    sig = sig,
+    ...
   )
 
   return(result)

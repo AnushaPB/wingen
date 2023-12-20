@@ -1,4 +1,15 @@
-# wingen 2.0.2
+# wingen 2.1.0
+
+### Fixed handling of arguments passed to functions via `...`
+
+There was a bug that resulted in arguments not being passed to`*_general()`/`*_gd()` functions, this has been fixed for `*_general()` and deprecated for `*gd()` (see below)
+
+### Deprecation of `...` for `window_gd()`/`circle_gd()`/`resist_gd()` and addition of `sig` argument
+- The use of `...` has been deprecated for these functions because it wasn't actually passing the `...` arguments to anywhere in the first place, so this should hopefully not affect any users
+-  The only argument that may have been passed via `...` is `sig` which is used to set the alpha threshold when `stat = "hwe"`. We have addressed this issue by adding `sig` as an argument to all the functions.
+
+### Removal of `parallel` and `ncores` arguments
+parallelization must now be setup outside of functions, as described in the vignette
 
 ### Removal of sp
 

@@ -11,9 +11,7 @@ get_resdist(
   transitionFunction = mean,
   directions = 8,
   geoCorrection = TRUE,
-  coords_only = FALSE,
-  ncores = NULL,
-  parallel = FALSE
+  coords_only = FALSE
 )
 }
 \arguments{
@@ -30,10 +28,6 @@ get_resdist(
 \item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
 
 \item{coords_only}{whether to return distances only for sample coordinates}
-
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
-
-\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 a distance matrix used by \link[wingen]{resist_gd}
