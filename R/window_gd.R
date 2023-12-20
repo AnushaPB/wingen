@@ -13,12 +13,13 @@
 #' @param rarify_nit if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to `"all"` to use all possible combinations of samples of size `rarify_n` within the window.
 #' @param min_n minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)
 #' @param fun function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument)
-#' @param L for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
+#' @param L for calculating `"pi"`, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)
 #' @param rarify_alleles for calculating `"biallelic_richness"`, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)
+#' @param sig for calculating `"hwe"`, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)
 #' @param parallel whether to parallelize the function (defaults to FALSE; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
 #' @param ncores if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; **deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)**)
 #' @param crop_edges whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)
-#' @param ... additional arguments to pass to the `stat` function (e.g. if `stat = hwe`, users may want to set `sig` to a different value)
+#' @param ... [deprecated] this was intended to be used to pass additional arguments to the `stat` function, however now formal arguments are used instead (see `L`, `rarify_alleles`, and `sig`). Passing additional arguments using `...` is still possible with the `*_general()` functions.
 #' @details
 #'
 #' Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
@@ -48,17 +49,19 @@
 #'
 window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
-                      fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                      fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                       parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
+
   # run moving window
   result <-
     purrr::map(
       stat,
-      ~ window_gd_stats(
+      \(stat)
+      window_gd_stats(
         gen = gen,
         coords = coords,
         lyr = lyr,
-        stat = .x,
+        stat = stat,
         wdim = wdim,
         fact = fact,
         rarify = rarify,
@@ -68,10 +71,10 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
         fun = fun,
         L = L,
         rarify_alleles = rarify_alleles,
+        sig = sig,
         parallel = parallel,
         ncores = ncores,
-        crop_edges = crop_edges,
-        ...
+        crop_edges = crop_edges
       )
     )
 
@@ -88,8 +91,9 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
 #' @noRd
 window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
                             rarify, rarify_n, rarify_nit, min_n,
-                            fun, L, rarify_alleles,
+                            fun, L, rarify_alleles, sig,
                             parallel, ncores, crop_edges, ...) {
+
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -114,6 +118,7 @@ window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
     fun = fun,
     L = L,
     rarify_alleles = rarify_alleles,
+    sig = sig,
     parallel = parallel,
     ncores = ncores,
     crop_edges = crop_edges,
@@ -153,7 +158,7 @@ window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
 #' @export
 window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
-                           fun = mean, L = "nvariants", rarify_alleles = TRUE,
+                           fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                            parallel = FALSE, ncores = NULL, crop_edges = FALSE, ...) {
 
   # check and aggregate layer and coords (only lyr is returned)
@@ -170,12 +175,25 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
 
   # run general moving window
   result <- run_general(
-    x = x, lyr = lyr, coords = coords,
-    coord_cells = coord_cells, nmat = nmat,
+    x = x,
+    lyr = lyr,
+    coords = coords,
+    coord_cells = coord_cells,
+    nmat = nmat,
+    distmat = NULL,
+    maxdist = NULL,
     stat = stat,
-    rarify = rarify, rarify_n = rarify_n, rarify_nit = rarify_nit,
-    min_n = min_n, fun = fun, L = L, rarify_alleles = rarify_alleles,
-    parallel = parallel, ncores = ncores
+    rarify = rarify,
+    rarify_n = rarify_n,
+    rarify_nit = rarify_nit,
+    min_n = min_n,
+    fun = fun,
+    L = L,
+    rarify_alleles = rarify_alleles,
+    sig = sig,
+    parallel = parallel,
+    ncores = ncores,
+    ...
   )
 
   # crop resulting raster

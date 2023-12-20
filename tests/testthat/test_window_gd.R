@@ -343,20 +343,28 @@ test_that("custom functions with window general work", {
   capture_warnings(wa <- window_general(vcfR::vcfR2genind(mini_vcf_NA), mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
 
   # examples with custom functions
-  toy <- vcf_to_dosage(mini_vcf_NA)
+  toy <- vcf_to_dosage(mini_vcf_NA)*0 + 1
+  toy[1:2, ] <- NA
+
   # test on vector
   capture_warnings(wm <- window_general(toy[, 1], mini_coords, mini_lyr, stat = mean, na.rm = TRUE))
+
   # test on matrix
   capture_warnings(wm <- window_general(toy, mini_coords, mini_lyr, stat = mean, na.rm = TRUE))
-  # test custom functions
-  foo <- function(x) var(apply(x, 2, var, na.rm = TRUE), na.rm = TRUE)
-  capture_warnings(wm <- window_general(toy, mini_coords, mini_lyr, stat = foo))
-  foo <- function(x, na.rm = TRUE) var(apply(x, 2, var))
-  capture_warnings(wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE))
-  foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
-  capture_warnings(wm <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE, silly = 3))
-})
 
+  # check NA removal
+  foo <- function(x) sum(apply(x, 2, sum, na.rm = TRUE), na.rm = TRUE)
+  capture_warnings(wm_1 <- window_general(toy, mini_coords, mini_lyr, stat = foo))
+  foo <- function(x, na.rm = FALSE) sum(apply(x, 2, sum, na.rm = na.rm), na.rm = na.rm)
+  capture_warnings(wm_2 <- window_general(toy, mini_coords, mini_lyr, stat = foo, na.rm = TRUE))
+  expect_true(terra::all.equal(wm_1, wm_2))
+
+  # check if additional custom arguments provided work
+  foo <- function(x, silly) sum(x * silly, na.rm = TRUE)
+  capture_warnings(wm_1 <- window_general(toy[, 3], mini_coords, mini_lyr, stat = foo, silly = 2)[[1]])
+  capture_warnings(wm_2 <- window_general(toy[, 3], mini_coords, mini_lyr, stat = foo, silly = 1)[[1]])
+  expect_equal(terra::values(wm_1), terra::values(wm_2)*2)
+})
 
 test_that("get_adj works", {
   load_mini_ex(quiet = TRUE)
@@ -441,8 +449,7 @@ test_that("CRS are handled correctly", {
 
   # mismatched CRS
   crs2_lyr <- terra::rast(mini_lyr)
-  terra::crs(crs2_lyr) <- "+init=epsg:4269 +proj=longlat +ellps=GRS80 +datum=NAD83
-  +no_defs +towgs84=0,0,0"
+  terra::crs(crs2_lyr) <- "+proj=longlat +ellps=GRS80 +datum=NAD83 +no_defs +towgs84=0,0,0"
   expect_error(window_gd(mini_vcf, crs_coords, crs2_lyr, rarify = FALSE), "CRS of the provided coordinates and raster do not match")
 })
 

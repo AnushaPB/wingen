@@ -27,18 +27,30 @@ test_that("circle_gd returns expected output", {
   capture_warnings(wp <- circle_general(vcf_to_dosage(mini_vcf_NA), maxdist = mini_lyr, distmat = distmat, mini_coords, mini_lyr, stat = "pi", rarify = FALSE))
 
   # examples with custom functions
-  toy <- vcf_to_dosage(mini_vcf_NA)
-  # test on vector
-  capture_warnings(wm <- circle_general(toy[, 1], mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = mean, na.rm = TRUE))
-  # test on matrix
-  capture_warnings(wm <- circle_general(toy, mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = mean, na.rm = TRUE))
-  # test custom functions
-  foo <- function(x) var(apply(x, 2, var, na.rm = TRUE), na.rm = TRUE)
-  capture_warnings(wm <- circle_general(toy, mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = foo))
-  foo <- function(x, na.rm = TRUE) var(apply(x, 2, var))
-  capture_warnings(wm <- circle_general(toy, mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = foo, na.rm = TRUE))
-  foo <- function(x, na.rm = TRUE, silly = 2) sd(apply(x, 2, var)) * silly
-  capture_warnings(wm <- circle_general(toy, mini_coords, mini_lyr, maxdist = 10, distmat = distmat, stat = foo, na.rm = TRUE, silly = 3))
+  toy <- vcf_to_dosage(mini_vcf_NA)*0 + 1
+  # check if additional custom arguments provided work
+  foo <- function(x, silly) sum(x * silly, na.rm = TRUE)
+  capture_warnings(cg_1 <-
+                     circle_general(
+                       toy[, 3],
+                       mini_coords,
+                       mini_lyr,
+                       stat = foo,
+                       maxdist = 50,
+                       silly = 2
+                     )[[1]])
+
+  capture_warnings(cg_2 <-
+                     circle_general(
+                       toy[, 3],
+                       mini_coords,
+                       mini_lyr,
+                       stat = foo,
+                       maxdist = 50,
+                       silly = 1
+                     )[[1]])
+
+  expect_equal(terra::values(cg_1), terra::values(cg_2) * 2)
 })
 
 

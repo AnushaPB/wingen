@@ -18,6 +18,7 @@ window_gd(
   fun = mean,
   L = "nvariants",
   rarify_alleles = TRUE,
+  sig = 0.05,
   parallel = FALSE,
   ncores = NULL,
   crop_edges = FALSE,
@@ -47,9 +48,11 @@ window_gd(
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
-\item{L}{for calculating pi, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+
+\item{sig}{for calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)}
 
 \item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 
@@ -57,7 +60,7 @@ window_gd(
 
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 
-\item{...}{additional arguments to pass to the \code{stat} function (e.g. if \code{stat = hwe}, users may want to set \code{sig} to a different value)}
+\item{...}{\link{deprecated} this was intended to be used to pass additional arguments to the \code{stat} function, however now formal arguments are used instead (see \code{L}, \code{rarify_alleles}, and \code{sig}). Passing additional arguments using \code{...} is still possible with the \verb{*_general()} functions.}
 }
 \value{
 SpatRaster that includes raster layers of genetic diversity and a raster layer of the number of samples within the window for each cell

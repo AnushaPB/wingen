@@ -200,6 +200,7 @@ calc_prop_hwe <- function(genind, sig = 0.05) {
 #' Calculate basic stats using \link[hierfstat]{basic.stats}
 #'
 #' @param hf hierfstat object
+#' @param ... additional arguments to pass to basic stats
 #'
 #' @return vector of overall stats produced by \link[hierfstat]{basic.stats}
 #'
