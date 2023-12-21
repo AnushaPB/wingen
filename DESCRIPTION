@@ -41,6 +41,7 @@ Suggests:
     adegenet,
     covr,
     devtools,
+    future,
     knitr,
     MASS,
     rmarkdown,
