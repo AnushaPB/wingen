@@ -39,7 +39,7 @@ vcf <- read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_ran
 # Coordinates
 coords <- read.table(here(wdir, "data", "Scelop.coord"))
 coords_longlat <- st_as_sf(coords, coords = c("V1", "V2"), crs = "+proj=longlat") 
-coords_proj <- st_transform(coords_longlat, crs = 3085)
+coords_proj <- st_transform(coords_longlat, crs = 3310)
 ```
 
 Additionally, state data is used from TIGRIS:
@@ -50,7 +50,7 @@ states <- states(cb = TRUE)
 
 # reproject into wgs84 to match coordinates
 states_longlat <- st_transform(states, crs = "+proj=longlat")
-states_proj <- st_transform(states, crs = 3085)
+states_proj <- st_transform(states, crs = 3310)
 
 # subset out CONUS
 conus <- states_longlat[-which(states_longlat$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
