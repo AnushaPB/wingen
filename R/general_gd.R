@@ -6,17 +6,9 @@
 run_general <- function(x, lyr, coords,
                         coord_cells = NULL, nmat = NULL,
                         distmat = NULL, maxdist = NULL,
-                        stat, rarify, rarify_n, rarify_nit, min_n, fun, L, rarify_alleles, sig,
-                        parallel = parallel, ncores = ncores, ...) {
-
-  # deprecation warning for parallel/ncores
-  # note: didn't use lifecycle or missing() because the nested/interrelated functions made this tricky
-  if (parallel) {
-    warning("The `parallel` and `ncores` arguments have been deprecated as of 2.0.1
-future::plan() should be used to setup parallelization instead (see package vignette)\n")
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
-    future::plan(future::multisession, workers = ncores)
-  }
+                        stat, rarify, rarify_n, rarify_nit, min_n,
+                        fun, L, rarify_alleles, sig,
+                        ...) {
 
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
@@ -38,18 +30,16 @@ future::plan() should be used to setup parallelization instead (see package vign
   if (!is.null(distmat)) distmat <- t(distmat)
 
   # run sliding window calculations
-  # currently, terra uses a C++ pointer which means SpatRasters cannot be directly passed to nodes on a computer cluster
-  # instead of saving the raster layer to a file, I am converting it to a RasterLayer temporarily (it will get switched back)
-  ## also save the original CRS since it gets coded slightly differently in raster
-  original_crs <- terra::crs(lyr)
-  lyr <- raster::raster(lyr)
+
+  # wrapping SpatRaster so it can be passed to future_map
+  wlyr <- terra::wrap(lyr)
 
   rast_vals <-
     furrr::future_map(
       1:terra::ncell(lyr),
       ~ window_helper(
         i = .x,
-        lyr = lyr,
+        wlyr = wlyr,
         x = x,
         coord_cells = coord_cells,
         nmat = nmat,
@@ -67,16 +57,10 @@ future::plan() should be used to setup parallelization instead (see package vign
       ),
       .options = furrr::furrr_options(
         seed = TRUE,
-        packages = c("wingen", "terra", "raster")
+        packages = c("wingen", "terra")
       ),
       .progress = TRUE
     )
-
-  if (parallel) future::plan("sequential")
-
-  # convert back to SpatRast and reassign original crs
-  lyr <- terra::rast(lyr)
-  terra::crs(lyr) <- original_crs
 
   # format resulting raster values
   result <- vals_to_lyr(lyr, rast_vals, stat)
@@ -90,12 +74,15 @@ future::plan() should be used to setup parallelization instead (see package vign
 #' @return genetic diversity and counts for a single cell
 #'
 #' @noRd
-window_helper <- function(i, x, lyr,
+window_helper <- function(i, x, wlyr,
                           coord_cells = NULL, nmat = NULL,
                           distmat = NULL, maxdist = NULL,
                           stat_function,
                           rarify, rarify_n, rarify_nit, min_n,
                           fun, L, rarify_alleles, sig) {
+  # unwrap layer
+  lyr <- terra::unwrap(wlyr)
+
   # if rarify = TRUE and rarify_n isn't specified, rarify_n = min_n (i.e. rarify_n defaults to min_n)
   if (is.null(rarify_n)) rarify_n <- min_n
 

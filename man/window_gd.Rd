@@ -19,8 +19,6 @@ window_gd(
   L = "nvariants",
   rarify_alleles = TRUE,
   sig = 0.05,
-  parallel = FALSE,
-  ncores = NULL,
   crop_edges = FALSE,
   ...
 )
@@ -53,10 +51,6 @@ window_gd(
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
 \item{sig}{for calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)}
-
-\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
-
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 
 \item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
 

@@ -14,9 +14,7 @@ preview_gd(
   fact = 0,
   sample_count = TRUE,
   min_n = 0,
-  plot = TRUE,
-  parallel = FALSE,
-  ncores = NULL
+  plot = TRUE
 )
 }
 \arguments{
@@ -39,10 +37,6 @@ preview_gd(
 \item{min_n}{minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
 
 \item{plot}{whether to plot results (default = TRUE)}
-
-\item{parallel}{whether to use parallelization for calculating the distance matrices for \code{method = "circle"} or \verb{method = "resist} (defaults to \code{FALSE}).}
-
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 Plots preview of window and returns SpatRaster with sample counts layer (if sample_count = TRUE)

@@ -47,11 +47,11 @@ vcf <- read.vcfR(here(wdir, "data", "populations_r20.haplotypes.filtered_m70_ran
 # Coordinates
 coords <- read.table(here(wdir, "data", "Scelop.coord"))
 coords_longlat <- st_as_sf(coords, coords = c("V1", "V2"), crs = "+proj=longlat") 
-coords_proj <- st_transform(coords_longlat, crs = 3085)
+coords_proj <- st_transform(coords_longlat, crs = 3310)
 plot(coords_proj)
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
 Additionally, state data is used from TIGRIS:
 
@@ -61,7 +61,7 @@ states <- states(cb = TRUE)
 
 # reproject into wgs84 to match coordinates
 states_longlat <- st_transform(states, crs = "+proj=longlat")
-states_proj <- st_transform(states, crs = 3085)
+states_proj <- st_transform(states, crs = 3310)
 
 # subset out CONUS
 conus <- states_longlat[-which(states_longlat$NAME %in% c("Alaska", "Hawaii", "Puerto Rico", "American Samoa", "Guam", "Commonwealth of the Northern Mariana Islands", "United States Virgin Islands")), "STUSPS"]
@@ -75,7 +75,7 @@ NUS_longlat <- states_longlat[which(states_longlat$NAME %in% c("California", "Or
 plot(NUS_proj)
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ### **Figure 4:** Geographic context plots
 
@@ -85,14 +85,14 @@ plot(conus, col = "lightgray", border = "lightgray", main = "")
 plot(NUS_longlat, col = mako(1, begin = 0.7), border = "white", add = TRUE, main = "")
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 par(mar = rep(0,4))
 plot(NUS_longlat, col = mako(1, begin = 0.7), border = "white", lwd = 2, main = "")
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 ## Run wingen analysis
 
@@ -106,14 +106,18 @@ rarefaction size (`rarify_n`).
 params <- df_to_ls(expand.grid(res = c(30000, 40000, 50000), wdim = c(3, 5), rarify_n = c(2, 3, 4)))
 
 stk <- map(params, test_params_empex, vcf, coords_proj)
+```
 
+    ## Warning: package 'terra' was built under R version 4.3.2
+
+``` r
 stk_longlat <- map(stk, ~terra::project(.x, "+proj=longlat"))
 
 par(mfrow = c(2, 3), mar = rep(1, 4))
 walk(stk_longlat, test_empex_plot, bkg = NUS_longlat, zlim = c(0.02, 0.11))
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-6-3.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->![](empex_notebook_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
 
 Based on the results above, we chose a final set of parameters:
 
@@ -129,7 +133,7 @@ lyr <- coords_to_raster(coords_proj, res = res, buffer = 10)
 plot_gd(lyr, breaks = 100)
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 And ran the moving window function again, this time kriging and masking
 the resulting rasters:
@@ -145,7 +149,7 @@ Sys.time() - st
 plot_gd(pg)
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 set.seed(22)
@@ -184,7 +188,7 @@ plot(NUS_longlat, add = TRUE, col = NA, border = "#808080", lwd = 2)
 plot(coords_longlat, pch = 16, col = "black", cex = 1.5, add = TRUE)
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### **Figure S6:** moving window calculations with and without rarefaction
 
@@ -214,7 +218,7 @@ raster_plot_gd(agn_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.ar
 raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 par(mfrow = c(2, 3), mar = rep(1,4), oma = rep(3,4))
@@ -228,11 +232,11 @@ raster_plot_gd(agn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(ag, agn
 raster_plot_gd(hgn_longlat, NUS_longlat, breaks = 100, zlim = get_minmax(hg, hgn), legend.width = 2, axis.args = list(cex.axis = 2))
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 ``` r
 par(mar = rep(0,4))
 raster_plot_gd(ag_longlat[[2]], col = mako(100))
 ```
 
-![](empex_notebook_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](empex_notebook_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->

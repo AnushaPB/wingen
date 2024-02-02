@@ -24,7 +24,7 @@ krig_gd(
 \arguments{
 \item{r}{SpatRaster produced by \link[wingen]{window_gd}}
 
-\item{grd}{object to create grid for kriging; can be a SpatRaster, RasterLayer, SpatialPointsDataFrame, or a gridded object as defined by 'sp'. If undefined, will use \code{r} to create a grid.}
+\item{grd}{object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.}
 
 \item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
 

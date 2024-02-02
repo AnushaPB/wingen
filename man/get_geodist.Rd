@@ -4,14 +4,7 @@
 \alias{get_geodist}
 \title{Get a matrix of geographic distances for \link[wingen]{circle_gd}}
 \usage{
-get_geodist(
-  coords,
-  lyr = NULL,
-  fact = 0,
-  coords_only = FALSE,
-  parallel = FALSE,
-  ncores = NULL
-)
+get_geodist(coords, lyr = NULL, fact = 0, coords_only = FALSE)
 }
 \arguments{
 \item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
@@ -21,10 +14,6 @@ get_geodist(
 \item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
 
 \item{coords_only}{whether to return distances only for sample coordinates}
-
-\item{parallel}{whether to parallelize the function (defaults to FALSE; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
-
-\item{ncores}{if parallel = TRUE, number of cores to use for parallelization (defaults to total available number of cores minus 1; \strong{deprecated as of 2.0.1: \link[future]{plan} should be used to setup parallelization instead (see package vignette)})}
 }
 \value{
 a distance matrix used by \link[wingen]{circle_gd}

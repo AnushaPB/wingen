@@ -14,7 +14,6 @@
 #' @param maxdist if `method = "circle"` or `method = "resist`, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist} or \link[wingen]{get_resdist})
 #' @param min_n minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)
 #' @param plot whether to plot results (default = TRUE)
-#' @param parallel whether to use parallelization for calculating the distance matrices for `method = "circle"` or `method = "resist` (defaults to `FALSE`).
 #' @inheritParams window_gd
 #' @details
 #'
@@ -29,7 +28,7 @@
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
 preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL,
-                       fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE, parallel = FALSE, ncores = NULL) {
+                       fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE) {
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
   if (fact != 0) lyr <- terra::aggregate(lyr, fact)
@@ -48,12 +47,12 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
     if (!is.null(distmat)) if (terra::ncell(lyr) != ncol(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
 
     # make distmat
-    if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
-    if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords = coords, lyr = lyr, parallel = parallel, ncores = ncores)
+    if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr)
+    if (is.null(distmat) & method == "resist") distmat <- get_resdist(coords = coords, lyr = lyr)
 
     # plot preview
     if (method == "circle") preview_circle(lyr, maxdist, coords = coords)
-    if (method == "resist") preview_resist(lyr, maxdist, coords = coords, parallel = parallel, ncores = ncores)
+    if (method == "resist") preview_resist(lyr, maxdist, coords = coords)
   }
 
   # plot count preview and return count raster
@@ -134,7 +133,7 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
 #' @param coords coordinates
 #'
 #' @noRd
-preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores = NULL) {
+preview_resist <- function(lyr, maxdist, coords = NULL) {
   # get center of raster
   center_xy <- get_center(lyr, xy = TRUE)
   center_i <- get_center(lyr, xy = FALSE)
@@ -150,7 +149,7 @@ preview_resist <- function(lyr, maxdist, coords = NULL, parallel = FALSE, ncores
   }
 
   # get resdist from center
-  center_dist <- get_resdist(center_xy, lyr, parallel = parallel, ncores = ncores)
+  center_dist <- get_resdist(center_xy, lyr)
 
   # flatten so you get a vector of cell values
   center_dist <- c(center_dist)

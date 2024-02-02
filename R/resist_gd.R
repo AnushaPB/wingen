@@ -26,14 +26,13 @@
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
-                      transitionFunction = mean, directions = 8, geoCorrection = TRUE,
-                      parallel = FALSE, ncores = NULL, ...) {
+                      transitionFunction = mean, directions = 8, geoCorrection = TRUE) {
 
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection, parallel = parallel, ncores = ncores))
+  if (is.null(distmat)) suppressWarnings(distmat <- get_resdist(coords, lyr = lyr, transitionFunction = transitionFunction, directions = directions, geoCorrection = geoCorrection))
 
   # run dist_gd
   results <-
@@ -52,9 +51,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
       fun = fun,
       L = L,
       rarify_alleles = rarify_alleles,
-      sig = sig,
-      parallel = parallel,
-      ncores = ncores
+      sig = sig
     )
 
   return(results)
@@ -93,8 +90,7 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
-                           transitionFunction = mean, directions = 8, geoCorrection = TRUE,
-                           parallel = FALSE, ncores = NULL, ...) {
+                           transitionFunction = mean, directions = 8, geoCorrection = TRUE, ...) {
 
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
@@ -108,9 +104,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
           lyr = lyr,
           transitionFunction = transitionFunction,
           directions = directions,
-          geoCorrection = geoCorrection,
-          parallel = parallel,
-          ncores = ncores
+          geoCorrection = geoCorrection
         )
     )
 
@@ -130,8 +124,6 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
     L = L,
     rarify_alleles = rarify_alleles,
     sig = sig,
-    parallel = parallel,
-    ncores = ncores,
     ...
   )
 
@@ -159,18 +151,15 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
 #' }
-get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE, ncores = NULL, parallel = FALSE) {
+get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE) {
   # check lyr and coords
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # convert lyr to raster
   if (!inherits(lyr, "RasterLayer")) lyr <- raster::raster(lyr)
 
-  # convert coords to dataframe and rename
-  coords_df <- coords_to_df(coords)
-
-  # make spatial points
-  sp_coords <- sp::SpatialPoints(coords_df)
+  # convert coords to matrix and rename
+  coords_mat <- as.matrix(coords_to_df(coords))
 
   # create transition surface
   trSurface <- gdistance::transition(lyr, transitionFunction = transitionFunction, directions = directions)
@@ -180,24 +169,17 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
   # create distance matrix using only coordinates
   if (coords_only) {
-    return(as.matrix(gdistance::commuteDistance(trSurface, sp_coords)))
+    return(as.matrix(gdistance::commuteDistance(trSurface, coords_mat)))
   }
 
   # make vector of distances
-  if (parallel) {
-    if (is.null(ncores)) ncores <- future::availableCores() - 1
-
-    future::plan(future::multisession, workers = ncores)
-
-    distrasts <- furrr::future_map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]),
+  distrasts <-
+    furrr::future_map(
+      1:nrow(coords_mat),
+      ~ gdistance::accCost(trSurface, coords_mat[.x,]),
       .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
       .progress = TRUE
     )
-
-    future::plan("sequential")
-  } else {
-    distrasts <- purrr::map(1:length(sp_coords), ~ gdistance::accCost(trSurface, sp_coords[.x, ]), .progress = TRUE)
-  }
 
   # convert from raster to matrix
   diststack <- terra::rast(raster::stack(distrasts))

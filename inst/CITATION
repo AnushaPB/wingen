@@ -12,7 +12,7 @@ bibentry(
   journal  = "Methods in Ecology and Evolution",
   year     = "2023",
   volume   = "14",
-  number   = "",
+  number   = "5",
   pages    = "1175–1181",
   doi      = "10.1111/2041-210X.14090"
 )
