@@ -261,11 +261,23 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
   }
 
   # check number of samples
+  nind <- NULL
+
   if (inherits(x, "genind")) nind <- nrow(x$tab)
 
   if (inherits(x, "vcfR")) nind <- (ncol(x@gt) - 1)
 
-  if (inherits(x, "data.frame") | inherits(x, "matrix")) nind <- nrow(x)
+  if (inherits(x, "data.frame") | inherits(x, "matrix") | inherits(x, "sf")) nind <- nrow(x)
+
+  # if no other type matches, try and calculate based on nrow() or length()
+  if (is.null(nind)) {
+    nind_nrow <- nrow(x)
+    nind_length <- length(x)
+
+    if ((!is.null(nind_nrow) & !is.null(nind_length)) | (is.null(nind_nrow) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
+    if (is.null(nind_nrow) & !is.null(nind_length)) nind <- nind_length
+    if (!is.null(nind_nrow) & is.null(nind_length)) nind <- nind_row
+  }
 
   # check coords
   if (!is.null(coords)) {
