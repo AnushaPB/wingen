@@ -271,12 +271,12 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
 
   # if no other type matches, try and calculate based on nrow() or length()
   if (is.null(nind)) {
-    nind_nrow <- nrow(x)
+    nind_row <- nrow(x)
     nind_length <- length(x)
 
-    if ((!is.null(nind_nrow) & !is.null(nind_length)) | (is.null(nind_nrow) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
-    if (is.null(nind_nrow) & !is.null(nind_length)) nind <- nind_length
-    if (!is.null(nind_nrow) & is.null(nind_length)) nind <- nind_row
+    if ((!is.null(nind_row) & !is.null(nind_length)) | (is.null(nind_row) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
+    if (is.null(nind_row) & !is.null(nind_length)) nind <- nind_length
+    if (!is.null(nind_row) & is.null(nind_length)) nind <- nind_row
   }
 
   # check coords
