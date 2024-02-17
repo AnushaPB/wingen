@@ -26,3 +26,4 @@
 ^wingen_gif\.Rmd$
 ^sse\.Rmd$
 ^.*\.gif$
+^renv\.LOCK$
