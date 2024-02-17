@@ -15,7 +15,7 @@ Generate continuous maps of genetic diversity using moving windows with options 
 
 Authors:
 \itemize{
-  \item Anne Chambers (\href{https://orcid.org/0000-0002-7369-0108}{ORCID})
+  \item Anne Chambers \email{eachambers@berkeley.edu} (\href{https://orcid.org/0000-0002-7369-0108}{ORCID})
   \item Ian Wang \email{ianwang@berkeley.edu} (\href{https://orcid.org/0000-0003-2554-9414}{ORCID})
 }
 
