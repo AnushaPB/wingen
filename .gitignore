@@ -83,3 +83,5 @@ cov_token.R
 *.map
 *.ped
 *.tif
+/doc/
+/Meta/
