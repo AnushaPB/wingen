@@ -276,7 +276,7 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
 
     if ((!is.null(nind_nrow) & !is.null(nind_length)) | (is.null(nind_nrow) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
     if (is.null(nind_nrow) & !is.null(nind_length)) nind <- nind_length
-    if (!is.null(nind_nrow) & is.null(nind_length)) nind <- nind_row
+    if (!is.null(nind_nrow) & is.null(nind_length)) nind <- nind_nrow
   }
 
   # check coords
