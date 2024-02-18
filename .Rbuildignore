@@ -27,3 +27,5 @@
 ^sse\.Rmd$
 ^.*\.gif$
 ^renv\.LOCK$
+^doc$
+^Meta$

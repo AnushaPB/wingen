@@ -9,7 +9,6 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                     fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
                     ...) {
-
   # convert maxdist to SpatRaster
   if (!is.numeric(maxdist)) {
     if (!inherits(maxdist, "SpatRaster")) maxdist <- terra::rast(maxdist)
@@ -100,7 +99,6 @@ dist_gd_stats <- function(gen, coords, lyr, stat, maxdist, distmat,
 dist_general <- function(x, coords, lyr, stat, maxdist, distmat,
                          rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                          fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05, ...) {
-
   # check lyr and distmat
   lyr <- layer_coords_check(lyr, coords)
   if (terra::ncell(lyr) != ncol(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")

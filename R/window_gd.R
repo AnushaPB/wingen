@@ -49,7 +49,6 @@ window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                       crop_edges = FALSE, ...) {
-
   # run moving window
   result <-
     purrr::map(
@@ -89,7 +88,6 @@ window_gd_stats <- function(gen, coords, lyr, stat, wdim, fact,
                             rarify, rarify_n, rarify_nit, min_n,
                             fun, L, rarify_alleles, sig,
                             crop_edges, ...) {
-
   # check that the input file is a vcf or a path to a vcf object
   vcf <- vcf_check(gen)
 
@@ -154,7 +152,6 @@ window_general <- function(x, coords, lyr, stat, wdim = 3, fact = 0,
                            rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,
                            fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                            crop_edges = FALSE, ...) {
-
   # check and aggregate layer and coords (only lyr is returned)
   lyr <- layer_coords_check(lyr, coords, fact)
 

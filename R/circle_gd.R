@@ -22,7 +22,6 @@
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05) {
-
   # convert lyr to SpatRaster
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
 
@@ -92,7 +91,6 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05, ...) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -172,7 +170,7 @@ get_geodist <- function(coords, lyr = NULL, fact = 0, coords_only = FALSE) {
   distls <-
     furrr::future_map(
       1:nrow(lyr_sf),
-      ~ sf::st_distance(.y[.x,], coords),
+      ~ sf::st_distance(.y[.x, ], coords),
       lyr_sf,
       .options = furrr::furrr_options(seed = TRUE, packages = c("sf")),
       .progress = TRUE

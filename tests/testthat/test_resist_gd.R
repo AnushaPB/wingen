@@ -37,31 +37,31 @@ test_that("resist_general returns expected output", {
   load_mini_ex(quiet = TRUE)
 
   # examples with custom functions
-  toy <- vcf_to_dosage(mini_vcf_NA)*0 + 1
+  toy <- vcf_to_dosage(mini_vcf_NA) * 0 + 1
   toy[1:2, ] <- NA
 
   # check if additional custom arguments provided work
   foo <- function(x, silly) sum(x * silly, na.rm = TRUE)
 
   capture_warnings(rg_1 <-
-                     resist_general(
-                       toy[, 3],
-                       mini_coords,
-                       mini_lyr,
-                       stat = foo,
-                       maxdist = 100,
-                       silly = 2
-                     )[[1]])
+    resist_general(
+      toy[, 3],
+      mini_coords,
+      mini_lyr,
+      stat = foo,
+      maxdist = 100,
+      silly = 2
+    )[[1]])
 
   capture_warnings(rg_2 <-
-                     resist_general(
-                       toy[, 3],
-                       mini_coords,
-                       mini_lyr,
-                       stat = foo,
-                       maxdist = 100,
-                       silly = 1
-                     )[[1]])
+    resist_general(
+      toy[, 3],
+      mini_coords,
+      mini_lyr,
+      stat = foo,
+      maxdist = 100,
+      silly = 1
+    )[[1]])
 
   expect_equal(terra::values(rg_1), terra::values(rg_2) * 2)
 })
