@@ -25,7 +25,8 @@
 ^vignettes/wingen-vignette\.pdf$
 ^wingen_gif\.Rmd$
 ^sse\.Rmd$
-^.*\.gif$
+^wingen2\.gif$
+^wingen3\.gif$
 ^renv\.LOCK$
 ^doc$
 ^Meta$
