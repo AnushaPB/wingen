@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![codecov](https://codecov.io/gh/AnushaPB/wingen/graph/badge.svg?token=P4Z35HFR4Y)](https://codecov.io/gh/AnushaPB/wingen)
+[![codecov](https://codecov.io/gh/AnushaPB/wingen/graph/badge.svg?token=P4Z35HFR4Y)](https://app.codecov.io/gh/AnushaPB/wingen)
 [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml)
 [![license:
 MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
