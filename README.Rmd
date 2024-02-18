@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
 
-![](wingen.gif)
+![](man/figures/README-gif.gif)
 
 ## Citation
 

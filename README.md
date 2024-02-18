@@ -16,7 +16,7 @@ DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi
 Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking.
 
-![](wingen.gif)
+![](man/figures/README-gif.gif)
 
 ## Citation
 
