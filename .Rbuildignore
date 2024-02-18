@@ -31,3 +31,4 @@
 ^renv\.LOCK$
 ^doc$
 ^Meta$
+^CRAN-SUBMISSION$
