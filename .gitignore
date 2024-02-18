@@ -85,3 +85,6 @@ cov_token.R
 *.tif
 /doc/
 /Meta/
+
+# vignette pdf
+!vignettes/*.pdf
