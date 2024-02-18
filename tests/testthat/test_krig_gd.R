@@ -144,4 +144,3 @@ test_that("bound check", {
   expect_true(min(terra::values(kpi)) >= 0)
   expect_true(max(terra::values(kpi)) <= 0.5)
 })
-

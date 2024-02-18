@@ -343,7 +343,7 @@ test_that("custom functions with window general work", {
   capture_warnings(wa <- window_general(vcfR::vcfR2genind(mini_vcf_NA), mini_coords, mini_lyr, stat = "allelic_richness", rarify = FALSE))
 
   # examples with custom functions
-  toy <- vcf_to_dosage(mini_vcf_NA)*0 + 1
+  toy <- vcf_to_dosage(mini_vcf_NA) * 0 + 1
   toy[1:2, ] <- NA
 
   # test on vector
@@ -363,7 +363,7 @@ test_that("custom functions with window general work", {
   foo <- function(x, silly) sum(x * silly, na.rm = TRUE)
   capture_warnings(wm_1 <- window_general(toy[, 3], mini_coords, mini_lyr, stat = foo, silly = 2)[[1]])
   capture_warnings(wm_2 <- window_general(toy[, 3], mini_coords, mini_lyr, stat = foo, silly = 1)[[1]])
-  expect_equal(terra::values(wm_1), terra::values(wm_2)*2)
+  expect_equal(terra::values(wm_1), terra::values(wm_2) * 2)
 })
 
 test_that("get_adj works", {

@@ -9,7 +9,6 @@ run_general <- function(x, lyr, coords,
                         stat, rarify, rarify_n, rarify_nit, min_n,
                         fun, L, rarify_alleles, sig,
                         ...) {
-
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
@@ -271,12 +270,12 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
 
   # if no other type matches, try and calculate based on nrow() or length()
   if (is.null(nind)) {
-    nind_nrow <- nrow(x)
+    nind_row <- nrow(x)
     nind_length <- length(x)
 
-    if ((!is.null(nind_nrow) & !is.null(nind_length)) | (is.null(nind_nrow) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
-    if (is.null(nind_nrow) & !is.null(nind_length)) nind <- nind_length
-    if (!is.null(nind_nrow) & is.null(nind_length)) nind <- nind_nrow
+    if ((!is.null(nind_row) & !is.null(nind_length)) | (is.null(nind_row) & is.null(nind_length))) stop("Unable to determine length or numeber of rows from the provided x")
+    if (is.null(nind_row) & !is.null(nind_length)) nind <- nind_length
+    if (!is.null(nind_row) & is.null(nind_length)) nind <- nind_row
   }
 
   # check coords
@@ -496,4 +495,3 @@ rm_duplicate_sample_count <- function(r) {
   r <- c(gd, sample_count)
   return(r)
 }
-

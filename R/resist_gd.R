@@ -27,7 +27,6 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                       transitionFunction = mean, directions = 8, geoCorrection = TRUE) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
@@ -91,12 +90,11 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                            fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
                            transitionFunction = mean, directions = 8, geoCorrection = TRUE, ...) {
-
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 
   # make distmat
-  if (is.null(distmat))
+  if (is.null(distmat)) {
     suppressWarnings(
       distmat <-
         get_resdist(
@@ -107,6 +105,7 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
           geoCorrection = geoCorrection
         )
     )
+  }
 
   # run general resist
   results <- dist_general(
@@ -176,7 +175,7 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
   distrasts <-
     furrr::future_map(
       1:nrow(coords_mat),
-      ~ gdistance::accCost(trSurface, coords_mat[.x,]),
+      ~ gdistance::accCost(trSurface, coords_mat[.x, ]),
       .options = furrr::furrr_options(seed = TRUE, packages = c("gdistance")),
       .progress = TRUE
     )
