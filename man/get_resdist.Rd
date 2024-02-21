@@ -42,8 +42,6 @@ If coords_only = TRUE, the result is a distance matrix for the sample coordinate
 only.
 }
 \examples{
-\dontrun{
 load_mini_ex()
 distmat <- get_resdist(mini_coords, mini_lyr)
-}
 }

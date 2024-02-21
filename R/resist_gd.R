@@ -17,12 +17,10 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' load_mini_ex()
 #' rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 500)
 #' plot_gd(rpi, main = "Resist pi")
 #' plot_count(rpi)
-#' }
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
@@ -146,10 +144,8 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
 #' @export
 #'
 #' @examples
-#' \dontrun{
 #' load_mini_ex()
 #' distmat <- get_resdist(mini_coords, mini_lyr)
-#' }
 get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, directions = 8, geoCorrection = TRUE, coords_only = FALSE) {
   # check lyr and coords
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
