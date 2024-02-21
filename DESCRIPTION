@@ -1,5 +1,5 @@
 Package: wingen
-Title: Continuous Mapping of Genetic Diversity in R
+Title: Continuous Mapping of Genetic Diversity
 Version: 2.1.0
 Authors@R: c(
             person("Anusha", "Bishop", , email = "anusha.bishop@berkeley.edu", role = c("aut", "cre"), 
