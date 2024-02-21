@@ -31,7 +31,6 @@ test_that("preview_gd works for different coord types", {
   coords_mat <- as.matrix(mini_coords)
   coords_vect <- terra::vect(coords_sf)
 
-  par(mfrow = c(1, 2))
   pw1 <- preview_gd(
     mini_lyr,
     coords_sf,
@@ -84,7 +83,6 @@ test_that("preview_gd works for circle method with all different coordinate type
   coords_mat <- as.matrix(mini_coords)
   coords_vect <- terra::vect(coords_sf)
 
-  par(mfrow = c(1, 3))
   pw1 <- preview_gd(
     mini_lyr,
     coords_sf,
