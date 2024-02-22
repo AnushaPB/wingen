@@ -278,7 +278,7 @@ plot_preview <- function(lyrw, coords = NULL) {
   lyrw_df <-
     terra::as.data.frame(lyrw, ID = FALSE, na.rm = FALSE, xy = TRUE) %>%
     dplyr::mutate(value = dplyr::case_when(lyrw == 1 ~ "window", lyrw == 2 ~ "focal cell", TRUE ~ "raster layer")) %>%
-    dplyr::mutate(value = factor(.data[["value"], levels = c("raster layer", "focal cell", "window")))
+    dplyr::mutate(value = factor(.data[["value"]], levels = c("raster layer", "focal cell", "window")))
 
   # create plot
   plt <-
