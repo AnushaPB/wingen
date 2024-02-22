@@ -38,7 +38,7 @@ devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
 
 The following example demonstrates the basic functionality of wingen using a **small subset (100 variant loci x 100 samples) of the simulated data from [Bishop et al. (2023)](http://doi.org/10.1111/2041-210X.14090)**.
 
-```{r, comment = FALSE, message = FALSE, results = FALSE}
+```{r, comment = FALSE, message = FALSE, results = FALSE, warning = FALSE}
 library(wingen)
 
 # Load ggplot for plotting

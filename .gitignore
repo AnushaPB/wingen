@@ -12,6 +12,7 @@
 *.vcf
 *.zip
 *.DS_Store
+*.html
 
 # History files
 .Rhistory

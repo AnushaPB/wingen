@@ -7,9 +7,7 @@
 
 [![codecov](https://codecov.io/gh/AnushaPB/wingen/graph/badge.svg?token=P4Z35HFR4Y)](https://app.codecov.io/gh/AnushaPB/wingen)
 [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml)
-[![license:
-MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
-[![Zenodo
+<https://img.shields.io/badge/license-MIT-blue> [![Zenodo
 DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi/499617621)
 <!-- badges: end -->
 
@@ -53,11 +51,7 @@ library(wingen)
 
 # Load ggplot for plotting
 library(ggplot2)
-```
 
-    FALSE Warning: package 'ggplot2' was built under R version 4.3.2
-
-``` r
 # Load example data
 load_middle_earth_ex()
 ```
