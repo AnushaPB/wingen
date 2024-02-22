@@ -27,7 +27,7 @@
 #' @examples
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
-preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL,
+preview_gd <- function(lyr, coords, method = "window", wdim = 3, maxdist = NULL, distmat = NULL,
                        fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE) {
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
@@ -37,8 +37,6 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
   if (!is.null(wdim)) nmat <- wdim_to_mat(wdim) else nmat <- NULL
 
   if (method == "window") {
-    # check for wdim
-    if (is.null(wdim)) stop("If `method = 'window'`, `wdim` must be provided")
     # plot window preview
     if (plot) preview_window(lyr = lyr, nmat = nmat, coords = coords)
   } else {
