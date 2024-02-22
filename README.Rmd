@@ -47,13 +47,17 @@ The following example demonstrates the basic functionality of wingen using a **s
 
 ```{r, comment = FALSE, message = FALSE, results = FALSE}
 library(wingen)
+
+# Load ggplot for plotting
+library(ggplot2)
+
 # Load example data
 load_middle_earth_ex()
 ```
 
 The core function of this package is `window_gd()`, which takes as inputs a vcfR object (or a path to a .vcf file), sample coordinates (as a data.frame, matrix, or sf object), and a raster layer (as a SpatRaster or RasterLayer) which the moving window will slide across. Users can control the genetic diversity statistic that is calculated (`stat`), the window dimensions (`wdim`), the aggregation factor to use on the raster (`fact`), whether to perform rarefaction (`rarify`), and other aspects of the moving window calculations. Additional arguments for this function are described in the vignette and function documentation.
 
-```{r window_gd, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
+```{r window_gd, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 4.5}
 # Run moving window calculations of pi with rarefaction
 wgd <- window_gd(lotr_vcf,
   lotr_coords,
@@ -64,10 +68,13 @@ wgd <- window_gd(lotr_vcf,
   rarify = TRUE
 )
 
-# Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
-par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
-plot_gd(wgd, main = "Moving window pi", legend.width = 1.5)
-plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
+# Use ggplot_gd() to plot the genetic diversity layer and ggplot_count() to plot the sample counts layer
+ggplot_gd(wgd) +
+  ggtitle("Moving window pi")
+```
+```{r, fig.width = 5, fig.height = 4}
+ggplot_count(wgd) +
+  ggtitle("Moving window sample counts")
 ```
 
 Next, the output from `window_gd()` can be interpolated using kriging with the `krig_gd()` function.
@@ -84,13 +91,13 @@ Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to exclude
 mgd <- mask_gd(kgd, lotr_range)
 ```
 
-```{r result, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 8}
+```{r result, warning = FALSE, message = FALSE, cache = TRUE, results = FALSE, fig.height = 4, fig.width = 4.5}
 # Plot results
-par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
+ggplot_gd(kgd) +
+  ggtitle("Kriged pi")
 
-plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
-
-plot_gd(mgd, main = "Masked pi", legend.width = 1.5)
+ggplot_gd(mgd) +
+  ggtitle("Masked pi")
 ```
 
 For an extended walk through, see the package vignette:
