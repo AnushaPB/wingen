@@ -128,7 +128,7 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
         x = maxdist * cos(theta) + center_x,
         y = maxdist * sin(theta) + center_y
       ),
-      ggplot2::aes(x = x, y = y, col = "window"),
+      ggplot2::aes(x = .data[["x"]], y = .data[["y"]], col = "window"),
       fill = NA
     ) +
     ggplot2::scale_color_manual(values = "#357BA2FF")
@@ -180,7 +180,7 @@ preview_resist <- function(lyr, maxdist, coords = NULL) {
 
   plt2 <- ggplot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1)) +
     ggplot2::ggtitle("Resistance preview") +
-    ggplot2::geom_point(data = data.frame(center_xy), ggplot2::aes(x = x, y = y, col = "focal cell"), pch = 3, cex = 3, stroke = 1) +
+    ggplot2::geom_point(data = data.frame(center_xy), ggplot2::aes(x = .data[["x"]], y = .data[["y"]], col = "focal cell"), pch = 3, cex = 3, stroke = 1) +
     ggplot2::labs(fill = "Resistance distance\nfrom focal cell", col = "") +
     ggplot2::scale_color_manual(values = "blue")
 
@@ -282,7 +282,7 @@ plot_preview <- function(lyrw, coords = NULL){
   # create plot
   plt <-
     ggplot2::ggplot(lyrw_df) +
-    ggplot2::geom_raster(ggplot2::aes(x = x, y = y, fill = value)) +
+    ggplot2::geom_raster(ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[["value"]])) +
     ggplot2::scale_fill_manual(values = c("#DEF5E5FF", "#0B0405FF", "#357BA2FF")) +
     ggplot2::theme_void() +
     ggplot2::ggtitle("Window preview") +
