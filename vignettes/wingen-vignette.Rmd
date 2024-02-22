@@ -939,7 +939,7 @@ genind object is still feasible.
 An example of how one could use a genind object as input into
 `window_general()` is as follows:
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
+```{r, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 # We use the vcfR package to convert vcf to genind for our example
 library(vcfR)
 
