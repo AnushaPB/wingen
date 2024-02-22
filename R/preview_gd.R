@@ -236,7 +236,8 @@ preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NU
 
   # plot results
   if (plot) {
-    ggplot_count(lyrc, col = viridis::mako(100)) + ggplot2::ggtitle("Sample count")
+    ggplot_count(lyrc, col = viridis::mako(100)) +
+      ggplot2::ggtitle("Sample count")
   }
 
   return(lyrc)
@@ -272,7 +273,7 @@ sample_count_dist <- function(i, distmat, maxdist) {
 #' @param coords optional coordinates
 #'
 #' @noRd
-plot_preview <- function(lyrw, coords = NULL){
+plot_preview <- function(lyrw, coords = NULL) {
   # convert to df
   lyrw_df <-
     terra::as.data.frame(lyrw, ID = FALSE, na.rm = FALSE, xy = TRUE) %>%
