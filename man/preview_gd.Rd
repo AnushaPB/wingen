@@ -8,7 +8,7 @@ preview_gd(
   lyr,
   coords,
   method = "window",
-  wdim = NULL,
+  wdim = 3,
   maxdist = NULL,
   distmat = NULL,
   fact = 0,

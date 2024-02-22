@@ -27,7 +27,7 @@
 #' @examples
 #' load_mini_ex()
 #' preview_gd(mini_lyr, mini_coords, wdim = 3, fact = 3, sample_count = TRUE, min_n = 2)
-preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NULL, distmat = NULL,
+preview_gd <- function(lyr, coords, method = "window", wdim = 3, maxdist = NULL, distmat = NULL,
                        fact = 0, sample_count = TRUE, min_n = 0, plot = TRUE) {
   # convert to spat rast
   if (!inherits(lyr, "SpatRaster")) lyr <- terra::rast(lyr)
@@ -45,6 +45,9 @@ preview_gd <- function(lyr, coords, method = "window", wdim = NULL, maxdist = NU
 
     # check distmat
     if (!is.null(distmat)) if (terra::ncell(lyr) != ncol(distmat)) stop("Number of cells in raster layer and number of columns of distmat do not match")
+
+    # check that maxdist is not null
+    if (is.null(maxdist)) stop(paste0("If `method = '", method, "'`, `maxdist` must be provided"))
 
     # make distmat
     if (is.null(distmat) & method == "circle") distmat <- get_geodist(coords = coords, lyr = lyr)
@@ -82,14 +85,12 @@ preview_window <- function(lyr, nmat, coords = NULL) {
   lyrw <- lyr * 0
   lyrw[adjci] <- 1
   lyrw[center] <- 2
+  names(lyrw) <- "lyrw"
 
-  # suppress irrelevant plot warnings
-  plot_gd(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, main = "window preview")
-  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-  if (!is.null(coords)) {
-    coords <- coords_to_sf(coords)
-    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-  }
+  # plot result
+  plt <- plot_preview(lyrw, coords = coords)
+
+  print(plt)
 }
 
 #' Plot preview of circle moving window
@@ -112,18 +113,25 @@ preview_circle <- function(lyr, maxdist, coords = NULL) {
 
   # fill in window
   lyrw <- lyr * 0
-  lyrw[center_i] <- 1
+  lyrw[center_i] <- 2
+  names(lyrw) <- "lyrw"
 
   # plot window preview
-  plot_gd(lyrw, col = viridis::mako(3, direction = -1)[c(1, 3)], legend = FALSE, main = "window preview")
-  # draw the circle
-  graphics::lines(x = maxdist * cos(theta) + center_x, y = maxdist * sin(theta) + center_y, col = viridis::mako(3, direction = -1)[2], lwd = 2)
-  # add center point
-  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = c(15, NA, 15), lwd = c(NA, 2, NA))
-  if (!is.null(coords)) {
-    coords <- coords_to_sf(coords)
-    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-  }
+  plt <- plot_preview(lyrw, coords = coords)
+  # add circle
+  plt <-
+    plt +
+    ggplot2::geom_polygon(
+      data = data.frame(
+        x = maxdist * cos(theta) + center_x,
+        y = maxdist * sin(theta) + center_y
+      ),
+      ggplot2::aes(x = .data[["x"]], y = .data[["y"]], col = "window"),
+      fill = NA
+    ) +
+    ggplot2::scale_color_manual(values = "#357BA2FF")
+
+  print(plt)
 }
 
 #' Plot preview of circle moving window
@@ -159,21 +167,23 @@ preview_resist <- function(lyr, maxdist, coords = NULL) {
   # note: distmat is masked with distmat > maxdist <- NA, so this is the opposite
   lyrw[center_dist <= maxdist] <- 1
   lyrw[center_i] <- 2
+  names(lyrw) <- "lyrw"
 
   # create plot of window
-  plot_gd(lyrw, col = viridis::mako(3, direction = -1), legend = FALSE, main = "window preview")
-  graphics::legend("bottomleft", c("raster layer", "window", "focal cell"), col = viridis::mako(3, direction = -1), pch = 15)
-  if (!is.null(coords)) {
-    coords <- coords_to_sf(coords)
-    terra::plot(coords, pch = 3, col = viridis::magma(1, begin = 0.7), add = TRUE)
-  }
+  plt1 <- plot_preview(lyrw, coords = coords)
 
   # create example plot of resistance distances
   example <- lyr
   example[] <- center_dist
-  plot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1), main = "resistance preview")
-  graphics::points(center_xy, col = "blue", pch = 3, cex = 2, lwd = 3)
-  graphics::legend("bottomleft", "focal cell", col = "blue", pch = 3)
+
+  plt2 <- ggplot_gd(example, bkg = lyr, col = viridis::rocket(100, direction = -1)) +
+    ggplot2::ggtitle("Resistance preview") +
+    ggplot2::geom_point(data = data.frame(center_xy), ggplot2::aes(x = .data[["x"]], y = .data[["y"]], col = "focal cell"), pch = 3, cex = 3, stroke = 1) +
+    ggplot2::labs(fill = "Resistance distance\nfrom focal cell", col = "") +
+    ggplot2::scale_color_manual(values = "blue")
+
+  print(plt1)
+  print(plt2)
 }
 
 #' Get center cell of a raster
@@ -224,8 +234,8 @@ preview_count <- function(lyr, coords, nmat = NULL, distmat = NULL, maxdist = NU
 
   # plot results
   if (plot) {
-    suppressWarnings(terra::plot(lyrc, col = viridis::mako(100), box = FALSE, axes = FALSE))
-    graphics::title(main = list("Sample Count", font = 1), adj = 0, line = -0.5)
+    ggplot_count(lyrc, col = viridis::mako(100)) +
+      ggplot2::ggtitle("Sample count")
   }
 
   return(lyrc)
@@ -253,4 +263,35 @@ sample_count_wdim <- function(i, lyr, nmat, coord_cells) {
 sample_count_dist <- function(i, distmat, maxdist) {
   sub <- get_dist_index(i, distmat, maxdist)
   return(length(sub))
+}
+
+#' Create preview plot
+#'
+#' @param lyrw raster layer where 1 indicates the window cells and 2 indidicates the focal cell
+#' @param coords optional coordinates
+#'
+#' @noRd
+plot_preview <- function(lyrw, coords = NULL) {
+  # convert to df
+  lyrw_df <-
+    terra::as.data.frame(lyrw, ID = FALSE, na.rm = FALSE, xy = TRUE) %>%
+    dplyr::mutate(value = dplyr::case_when(lyrw == 1 ~ "window", lyrw == 2 ~ "focal cell", TRUE ~ "raster layer")) %>%
+    dplyr::mutate(value = factor(.data[["value"]], levels = c("raster layer", "focal cell", "window")))
+
+  # create plot
+  plt <-
+    ggplot2::ggplot(lyrw_df) +
+    ggplot2::geom_raster(ggplot2::aes(x = .data[["x"]], y = .data[["y"]], fill = .data[["value"]])) +
+    ggplot2::scale_fill_manual(values = c("#DEF5E5FF", "#0B0405FF", "#357BA2FF")) +
+    ggplot2::theme_void() +
+    ggplot2::ggtitle("Window preview") +
+    ggplot2::labs(fill = "", col = "")
+
+  # suppress irrelevant plot warnings
+  if (!is.null(coords)) {
+    coords <- coords_to_sf(coords)
+    plt <- plt + ggplot2::geom_sf(data = coords, pch = 3, col = viridis::magma(1, begin = 0.7))
+  }
+
+  return(plt)
 }

@@ -290,7 +290,7 @@ will be excluded due to low sample count. We specify `method = window`
 for a preview of `window_gd()`, we will discuss other methods (i.e.,
 `circle` and `resist` later).
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 6, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
   method = "window",
@@ -334,29 +334,25 @@ wgd <- window_gd(lotr_vcf,
   rarify_nit = 5,
   L = 100
 )
-
-par(pty = "s")
-# The plot_gd function plots the genetic diversity layer
-plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
-# Add coordinates to map
-points(lotr_coords, pch = 16)
-
+# The ggplot_gd function plots the genetic diversity layer
+ggplot_gd(wgd, bkg = lotr_range) +
+  ggtitle("Moving window pi") +
+  # add coordinates
+  geom_point(data = lotr_coords, aes(x = x, y = y), pch = 16)
+```
+```{r, fig.height = 5, fig.width = 5.5}
 # The plot_count function plots the sample count layer
-plot_count(wgd, main = "Moving window sample counts")
+ggplot_count(wgd) +
+  ggtitle("Moving window sample counts")
 ```
 
-You can also create ggplots of your results using `ggplot_gd()` and
-`ggplot_count()`
+You can also create base R plots of your results using `plot_gd()` and
+`plot_count()`
 
 ```{r, fig.width = 5, fig.height = 5}
-ggplot_gd(wgd, bkg = lotr_range) +
-  coord_sf() +
-  geom_point(data = lotr_coords, aes(x = x, y = y)) +
-  ggtitle("Moving window pi")
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
 
-ggplot_count(wgd) +
-  coord_sf() +
-  ggtitle("Moving window sample counts")
+plot_count(wgd, main = "Moving window sample counts")
 ```
 
 ### Run moving window calculations with `circle_gd()`
@@ -429,11 +425,13 @@ cgd <- circle_gd(lotr_vcf,
   L = 100
 )
 
-par(pty = "s")
-# The plot_gd function plots the genetic diversity layer
-plot_gd(cgd, bkg = lotr_range, main = "Circle moving window pi")
+ggplot_gd(cgd, bkg = lotr_range) +
+  ggtitle("Circle moving window pi")
+```
+```{r, fig.width = 5.75, fig.height = 5}
 # The plot_count function plots the sample count layer
-plot_count(cgd, main = "Circle moving window sample counts")
+ggplot_count(cgd) +
+  ggtitle("Circle moving window sample counts")
 ```
 
 For `circle_gd()` (and `resist_gd()`), you can also define `maxdist`
@@ -453,11 +451,12 @@ vcgd <- circle_gd(lotr_vcf,
   L = 100
 )
 
-par(pty = "s")
-# The plot_gd function plots the genetic diversity layer
-plot_gd(vcgd, bkg = lotr_range, main = "Circle moving window pi")
-# The plot_count function plots the sample count layer
-plot_count(vcgd, main = "Circle moving window sample counts")
+ggplot_gd(vcgd, bkg = lotr_range) +
+  ggtitle("Circle moving window pi")
+```
+```{r, fig.height = 5, fig.width = 6}
+ggplot_count(vcgd) +
+  ggtitle("Circle moving window sample counts")
 ```
 
 ### Run moving window calculations with `resist_gd()`
@@ -507,7 +506,7 @@ settings. Here, we specify `method = "resist"` and provide `maxdist`.
 lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3))
 ```
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
+```{r, fig.width = 6.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 preview_gd(lotr_lyr,
   lotr_coords,
   method = "resist",
@@ -531,11 +530,12 @@ rgd <- resist_gd(lotr_vcf,
   L = 100
 )
 
-par(pty = "s")
-# The plot_gd function plots the genetic diversity layer
-plot_gd(rgd, bkg = lotr_range, main = "Resistance moving window pi")
-# The plot_count function plots the sample count layer
-plot_count(rgd, main = "Resistance moving window sample counts")
+ggplot_gd(rgd, bkg = lotr_range) +
+  ggtitle("Resistance moving window pi")
+```
+```{r, fig.width = 6, fig.height = 5}
+ggplot_count(rgd) +
+  ggtitle("Resistance moving window sample counts")
 ```
 
 In addition to using continuous rasters of connectivity you can also use
@@ -543,7 +543,7 @@ rasters to designate passable and impassable areas. This can be useful
 for designating boundaries you don't want windows to extend across
 (e.g., mountain ranges) or extend between (e.g., rivers).
 
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r, fig.width = 6.5, fig.height = 5, cache = TRUE, warning = FALSE}
 # create layer
 resist_lyr <- rast(aggregate(lotr_lyr, 5))
 
@@ -566,7 +566,7 @@ resist_gd <- resist_gd(
   distmat = distmat
 )
 
-plot_gd(resist_gd)
+ggplot_gd(resist_gd)
 ```
 
 ## Transforming the moving window maps
@@ -619,8 +619,8 @@ kriged input layers.
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, grd = lotr_lyr, disagg_grd = 2)
 
-par(pty = "s")
-plot_gd(kgd, main = "Kriged pi")
+ggplot_gd(kgd) +
+  ggtitle("Kriged pi")
 ```
 
 *Note:* By default, the kriging method is set to
@@ -639,7 +639,7 @@ kriging, we recommend these articles:
 -   [Kriging
     interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
 
-```{r universal krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
+```{r universal krige results, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE}
 kgd_ordinary <-
   krig_gd(
     wgd,
@@ -649,8 +649,7 @@ kgd_ordinary <-
     krig_method = "ordinary"
   )
 
-par(pty = "s")
-plot_gd(kgd_ordinary, main = "Kriged pi")
+ggplot_gd(kgd_ordinary) + ggtitle("Kriged pi")
 ```
 
 Users can optionally get the full output from `autoKrige()`
@@ -694,24 +693,24 @@ areas where the carrying capacity is lower than 0.1. Alternatively, one
 could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
-```{r mask results 1, fig.width = 5, fig.height = 5, warning = FALSE}
+```{r mask results 1, fig.width = 5.5, fig.height = 5, warning = FALSE}
 # Disaggregate lotr_lyr to make it the same resolution as kgd before masking
 ## Note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
 mask_lyr <- disagg(rast(lotr_lyr), 2)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
-par(pty = "s")
-plot_gd(mgd, main = "Kriged & carrying capacity masked pi")
+ggplot_gd(mgd) +
+  ggtitle("Kriged & carrying capacity masked pi")
 ```
 
 **Method 2:** Mask the layer using a species range map (in this case, an
 sf polygon) to exclude areas falling outside the species range.
 
-```{r mask results 2, fig.width = 5, fig.height = 5, warning = FALSE}
+```{r mask results 2, fig.width = 5.5, fig.height = 5, warning = FALSE}
 mgd <- mask_gd(kgd, lotr_range)
 
-par(pty = "s")
-plot_gd(mgd, main = "Kriged & range masked pi")
+ggplot_gd(mgd) +
+  ggtitle("Kriged & range masked pi")
 ```
 
 **Method 3:** Mask the layer using a spatial Kernel Density Estimation
@@ -724,7 +723,7 @@ if (!require("SpatialKDE", quietly = TRUE)) install.packages("SpatialKDE")
 library(SpatialKDE)
 ```
 
-```{r mask results 3, fig.width = 5, fig.height = 5, eval = FALSE}
+```{r mask results 3, fig.width = 5.5, fig.height = 5, eval = FALSE}
 # Note: this code is not evaluated when building the vignette as it requires the SpatialKDE package
 
 # Spatial KDE requires an sf data.frame containing only POINTS that is in a projected coordinate system
@@ -745,14 +744,15 @@ kde_lyr <- kde(
   grid = grid,
 )
 
-par(pty = "s")
 # Visualize KDE layer
-plot_count(kde_lyr, main = "KDE")
+ggplot_count(kde_lyr) +
+  ggtitle("KDE")
 
 # Mask with mask_gd
 mgd <- mask_gd(kgd, kde_lyr, minval = 1)
 
-plot_gd(mgd, main = "Kriged & sample density masked pi")
+ggplot_gd(mgd) +
+  ggtitle("Kriged & sample density masked pi")
 ```
 
 Another nice visualization option is to add a "background" to your plots
@@ -760,8 +760,8 @@ in the form of a raster or other sp or sf object (e.g., a country or
 range boundary) which can help provide geographic context:
 
 ```{r range map background, fig.width = 5, fig.height = 5, warning = FALSE}
-par(pty = "s")
-plot_gd(mgd, bkg = lotr_range, main = "Kriged & masked pi")
+ggplot_gd(mgd, bkg = lotr_range) +
+  ggtitle("Kriged & masked pi")
 ```
 
 ## Parallelization
@@ -815,8 +815,7 @@ multistat_wgd <- window_gd(lotr_vcf,
 ```
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
-par(pty = "s")
-plot_gd(multistat_wgd, bkg = lotr_range)
+ggplot_gd(multistat_wgd, bkg = lotr_range)
 ```
 
 `"hwe"` and `"basic_stats"` take a bit longer to calculate, so here we
@@ -847,13 +846,11 @@ bs_wgd <- window_gd(lotr_vcf[1:10, ],
 ```
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
-par(pty = "s")
-plot_gd(hwe_wgd, bkg = lotr_range)
+ggplot_gd(hwe_wgd, bkg = lotr_range)
 ```
 
 ```{r, fig.width = 5, fig.height = 5, warning = FALSE}
-par(pty = "s")
-plot_gd(bs_wgd, bkg = lotr_range)
+ggplot_gd(bs_wgd, bkg = lotr_range)
 ```
 
 # General moving window
@@ -913,8 +910,8 @@ we <- window_general(vals,
   na.rm = TRUE
 )
 
-par(pty = "s")
-plot_gd(we, main = "Mean raster value")
+ggplot_gd(we) +
+  ggtitle("Mean raster value")
 ```
 
 # Other genetic data input file types in wingen
@@ -960,6 +957,6 @@ we_gi <- window_general(genind,
 )
 
 # Plot results
-par(pty = "s")
-plot_gd(we_gi, main = "Allelic richness")
+ggplot_gd(we_gi) +
+  ggtitle("Allelic richness")
 ```

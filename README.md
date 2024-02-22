@@ -50,6 +50,14 @@ al. (2023)](http://doi.org/10.1111/2041-210X.14090)**.
 
 ``` r
 library(wingen)
+
+# Load ggplot for plotting
+library(ggplot2)
+```
+
+    FALSE Warning: package 'ggplot2' was built under R version 4.3.2
+
+``` r
 # Load example data
 load_middle_earth_ex()
 ```
@@ -75,13 +83,19 @@ wgd <- window_gd(lotr_vcf,
   rarify = TRUE
 )
 
-# Use plot_gd() to plot the genetic diversity layer and plot_count() to plot the sample counts layer
-par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
-plot_gd(wgd, main = "Moving window pi", legend.width = 1.5)
-plot_count(wgd, main = "Moving window sample counts", legend.width = 1.5)
+# Use ggplot_gd() to plot the genetic diversity layer and ggplot_count() to plot the sample counts layer
+ggplot_gd(wgd) +
+  ggtitle("Moving window pi")
 ```
 
-<img src="man/figures/README-window_gd-1.png" width="100%" />
+![](README_files/figure-gfm/window_gd-1.png)<!-- -->
+
+``` r
+ggplot_count(wgd) +
+  ggtitle("Moving window sample counts")
+```
+
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Next, the output from `window_gd()` can be interpolated using kriging
 with the `krig_gd()` function.
@@ -102,14 +116,18 @@ mgd <- mask_gd(kgd, lotr_range)
 
 ``` r
 # Plot results
-par(mfrow = c(1, 2), oma = rep(0, 4), mar = rep(0, 4), pty = "s")
-
-plot_gd(kgd, main = "Kriged pi", legend.width = 1.5)
-
-plot_gd(mgd, main = "Masked pi", legend.width = 1.5)
+ggplot_gd(kgd) +
+  ggtitle("Kriged pi")
 ```
 
-<img src="man/figures/README-result-1.png" width="100%" />
+![](README_files/figure-gfm/result-1.png)<!-- -->
+
+``` r
+ggplot_gd(mgd) +
+  ggtitle("Masked pi")
+```
+
+![](README_files/figure-gfm/result-2.png)<!-- -->
 
 For an extended walk through, see the package vignette:
 

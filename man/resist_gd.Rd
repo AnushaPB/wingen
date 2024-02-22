@@ -74,10 +74,8 @@ Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM co
 As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 }
 \examples{
-\dontrun{
 load_mini_ex()
 rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 500)
 plot_gd(rpi, main = "Resist pi")
 plot_count(rpi)
-}
 }
