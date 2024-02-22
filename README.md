@@ -88,14 +88,14 @@ ggplot_gd(wgd) +
   ggtitle("Moving window pi")
 ```
 
-<img src="man/figures/README-window_gd-1.png" width="100%" />
+![](README_files/figure-gfm/window_gd-1.png)<!-- -->
 
 ``` r
 ggplot_count(wgd) +
   ggtitle("Moving window sample counts")
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Next, the output from `window_gd()` can be interpolated using kriging
 with the `krig_gd()` function.
@@ -120,14 +120,14 @@ ggplot_gd(kgd) +
   ggtitle("Kriged pi")
 ```
 
-<img src="man/figures/README-result-1.png" width="100%" />
+![](README_files/figure-gfm/result-1.png)<!-- -->
 
 ``` r
 ggplot_gd(mgd) +
   ggtitle("Masked pi")
 ```
 
-<img src="man/figures/README-result-2.png" width="100%" />
+![](README_files/figure-gfm/result-2.png)<!-- -->
 
 For an extended walk through, see the package vignette:
 
