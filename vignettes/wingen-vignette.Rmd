@@ -335,22 +335,22 @@ wgd <- window_gd(lotr_vcf,
   L = 100
 )
 # The ggplot_gd function plots the genetic diversity layer
-ggplot_gd(wgd, bkg = lotr_range) + 
+ggplot_gd(wgd, bkg = lotr_range) +
   ggtitle("Moving window pi") +
   # add coordinates
-  geom_point(data = lotr_coords, aes(x = x, y = y), pch = 16) 
+  geom_point(data = lotr_coords, aes(x = x, y = y), pch = 16)
 ```
 ```{r, fig.height = 5, fig.width = 5.5}
 # The plot_count function plots the sample count layer
-ggplot_count(wgd) + 
-  ggtitle("Moving window sample counts") 
+ggplot_count(wgd) +
+  ggtitle("Moving window sample counts")
 ```
 
 You can also create base R plots of your results using `plot_gd()` and
 `plot_count()`
 
 ```{r, fig.width = 5, fig.height = 5}
-plot_gd(wgd, bkg = lotr_range, main = "Moving window pi") 
+plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
 
 plot_count(wgd, main = "Moving window sample counts")
 ```
@@ -425,12 +425,12 @@ cgd <- circle_gd(lotr_vcf,
   L = 100
 )
 
-ggplot_gd(cgd, bkg = lotr_range) + 
+ggplot_gd(cgd, bkg = lotr_range) +
   ggtitle("Circle moving window pi")
 ```
 ```{r, fig.width = 5.75, fig.height = 5}
 # The plot_count function plots the sample count layer
-ggplot_count(cgd) + 
+ggplot_count(cgd) +
   ggtitle("Circle moving window sample counts")
 ```
 
@@ -451,7 +451,7 @@ vcgd <- circle_gd(lotr_vcf,
   L = 100
 )
 
-ggplot_gd(vcgd, bkg = lotr_range) + 
+ggplot_gd(vcgd, bkg = lotr_range) +
   ggtitle("Circle moving window pi")
 ```
 ```{r, fig.height = 5, fig.width = 6}
@@ -530,11 +530,11 @@ rgd <- resist_gd(lotr_vcf,
   L = 100
 )
 
-ggplot_gd(rgd, bkg = lotr_range) + 
+ggplot_gd(rgd, bkg = lotr_range) +
   ggtitle("Resistance moving window pi")
 ```
 ```{r, fig.width = 6, fig.height = 5}
-ggplot_count(rgd) + 
+ggplot_count(rgd) +
   ggtitle("Resistance moving window sample counts")
 ```
 
@@ -619,7 +619,7 @@ kriged input layers.
 # index = 1 kriges the first layer in wgd (the genetic diversity layer)
 kgd <- krig_gd(wgd, index = 1, grd = lotr_lyr, disagg_grd = 2)
 
-ggplot_gd(kgd) + 
+ggplot_gd(kgd) +
   ggtitle("Kriged pi")
 ```
 
@@ -699,7 +699,7 @@ exclude areas where the probability of presence is very low:
 mask_lyr <- disagg(rast(lotr_lyr), 2)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
-ggplot_gd(mgd) + 
+ggplot_gd(mgd) +
   ggtitle("Kriged & carrying capacity masked pi")
 ```
 
@@ -709,7 +709,7 @@ sf polygon) to exclude areas falling outside the species range.
 ```{r mask results 2, fig.width = 5.5, fig.height = 5, warning = FALSE}
 mgd <- mask_gd(kgd, lotr_range)
 
-ggplot_gd(mgd) + 
+ggplot_gd(mgd) +
   ggtitle("Kriged & range masked pi")
 ```
 
@@ -745,13 +745,13 @@ kde_lyr <- kde(
 )
 
 # Visualize KDE layer
-ggplot_count(kde_lyr) + 
+ggplot_count(kde_lyr) +
   ggtitle("KDE")
 
 # Mask with mask_gd
 mgd <- mask_gd(kgd, kde_lyr, minval = 1)
 
-ggplot_gd(mgd) + 
+ggplot_gd(mgd) +
   ggtitle("Kriged & sample density masked pi")
 ```
 
@@ -910,7 +910,7 @@ we <- window_general(vals,
   na.rm = TRUE
 )
 
-ggplot_gd(we) + 
+ggplot_gd(we) +
   ggtitle("Mean raster value")
 ```
 
@@ -957,6 +957,6 @@ we_gi <- window_general(genind,
 )
 
 # Plot results
-ggplot_gd(we_gi) + 
+ggplot_gd(we_gi) +
   ggtitle("Allelic richness")
 ```
