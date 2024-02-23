@@ -66,7 +66,5 @@ As such, longitude-latitude systems should be transformed before using dist_gd. 
 }
 \examples{
 load_mini_ex()
-cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 20)
-plot_gd(cpi, main = "Circle pi")
-plot_count(cpi)
+cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 15)
 }
