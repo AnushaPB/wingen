@@ -65,8 +65,10 @@ Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM co
 As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
 }
 \examples{
+\donttest{
 load_mini_ex()
 cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
 plot_gd(cpi, main = "Circle pi")
 plot_count(cpi)
+}
 }

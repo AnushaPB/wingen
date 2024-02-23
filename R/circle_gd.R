@@ -13,10 +13,12 @@
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' load_mini_ex()
 #' cpi <- circle_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
 #' plot_gd(cpi, main = "Circle pi")
 #' plot_count(cpi)
+#' }
 circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05) {
