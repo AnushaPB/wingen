@@ -397,12 +397,12 @@ coordinates, set `coords_only = TRUE`.
 
 ```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
 # First, create a new aggregated raster
-lotr_lyr3 <- aggregate(lotr_lyr, 3)
+lotr_lyr5 <- aggregate(lotr_lyr, 5)
 
 # Then calculate the distance matrix
-distmat <- get_geodist(coords = lotr_coords, lyr = lotr_lyr3)
+distmat <- get_geodist(coords = lotr_coords, lyr = lotr_lyr5)
 
-preview_gd(lotr_lyr3,
+preview_gd(lotr_lyr5,
   lotr_coords,
   method = "circle",
   maxdist = 10,
@@ -417,7 +417,7 @@ Then, we can run `circle_gd()`:
 ```{r circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 cgd <- circle_gd(lotr_vcf,
   lotr_coords,
-  lotr_lyr3,
+  lotr_lyr5,
   stat = "pi",
   maxdist = 10,
   distmat = distmat,
@@ -428,24 +428,20 @@ cgd <- circle_gd(lotr_vcf,
 ggplot_gd(cgd, bkg = lotr_range) +
   ggtitle("Circle moving window pi")
 ```
-```{r, fig.width = 5.75, fig.height = 5}
-# The plot_count function plots the sample count layer
-ggplot_count(cgd) +
-  ggtitle("Circle moving window sample counts")
-```
 
 For `circle_gd()` (and `resist_gd()`), you can also define `maxdist`
 with a raster to set the maximum distance (i.e., the radius) for each
 cell. In this case, we can use the carrying capacity/conductance map
-(`lotr_lyr3`) and multiply it by 100 so that the radius will range from
+(`lotr_lyr5`) and multiply it by 100 so that the radius will range from
 0 to 100 based on the value of the raster.
 
 ```{r variable circle, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
-vcgd <- circle_gd(lotr_vcf,
+vcgd <- circle_gd(
+  lotr_vcf,
   lotr_coords,
-  lotr_lyr3,
+  lotr_lyr5,
   stat = "pi",
-  maxdist = lotr_lyr3 * 100,
+  maxdist = lotr_lyr5 * 100,
   distmat = distmat,
   rarify = FALSE,
   L = 100
@@ -453,10 +449,6 @@ vcgd <- circle_gd(lotr_vcf,
 
 ggplot_gd(vcgd, bkg = lotr_range) +
   ggtitle("Circle moving window pi")
-```
-```{r, fig.height = 5, fig.width = 6}
-ggplot_count(vcgd) +
-  ggtitle("Circle moving window sample counts")
 ```
 
 ### Run moving window calculations with `resist_gd()`
@@ -503,16 +495,15 @@ Again, we can use the `preview_gd()` function to preview parameter
 settings. Here, we specify `method = "resist"` and provide `maxdist`.
 
 ```{r, cache = TRUE, warning = FALSE, message = FALSE}
-lotr_distmat <- get_resdist(coords = lotr_coords, lyr = aggregate(lotr_lyr, 3))
+lotr_distmat <- get_resdist(coords = lotr_coords, lyr = lotr_lyr5)
 ```
 
 ```{r, fig.width = 6.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
-preview_gd(lotr_lyr,
+preview_gd(lotr_lyr5,
   lotr_coords,
   method = "resist",
   maxdist = 60,
   distmat = lotr_distmat,
-  fact = 3,
   sample_count = TRUE,
   min_n = 2
 )
@@ -521,21 +512,16 @@ preview_gd(lotr_lyr,
 ```{r resist, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
 rgd <- resist_gd(lotr_vcf,
   lotr_coords,
-  lotr_lyr,
+  lotr_lyr5,
   distmat = lotr_distmat,
   stat = "pi",
   maxdist = 60,
-  fact = 3,
   rarify = FALSE,
   L = 100
 )
 
 ggplot_gd(rgd, bkg = lotr_range) +
   ggtitle("Resistance moving window pi")
-```
-```{r, fig.width = 6, fig.height = 5}
-ggplot_count(rgd) +
-  ggtitle("Resistance moving window sample counts")
 ```
 
 In addition to using continuous rasters of connectivity you can also use
@@ -639,33 +625,7 @@ kriging, we recommend these articles:
 -   [Kriging
     interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
 
-```{r universal krige results, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE}
-kgd_ordinary <-
-  krig_gd(
-    wgd,
-    index = 1,
-    grd = lotr_lyr,
-    disagg_grd = 2,
-    krig_method = "ordinary"
-  )
-
-ggplot_gd(kgd_ordinary) + ggtitle("Kriged pi")
-```
-
-Users can optionally get the full output from `autoKrige()`
-
-```{r, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-kgd_autoKrige <-
-  krig_gd(
-    wgd,
-    index = 1,
-    grd = lotr_lyr,
-    disagg_grd = 2,
-    autoKrige_output = TRUE
-  )
-
-summary(kgd_autoKrige)
-```
+Users can optionally get the full output from `autoKrige()` by setting `autoKrige_output = TRUE` in which case `krig_gd()` returns a list where the first element ("raster") is the kriged raster and second element ("autoKrige_output") is the autoKrige output. 
 
 *Note:* `autoKrige()` does not work for non-projected systems (i.e.,
 latitude-longitude) and will throw an error. See above example for how
@@ -806,7 +766,7 @@ statistic names to `stat`.
 multistat_wgd <- window_gd(lotr_vcf,
   lotr_coords,
   lotr_lyr,
-  stat = c("pi", "Ho", "biallelic_richness"),
+  stat = c("pi", "Ho"),
   wdim = 7,
   fact = 3,
   rarify = FALSE,
@@ -818,11 +778,9 @@ multistat_wgd <- window_gd(lotr_vcf,
 ggplot_gd(multistat_wgd, bkg = lotr_range)
 ```
 
-`"hwe"` and `"basic_stats"` take a bit longer to calculate, so here we
-change some parameters and reduce the dataset for the purpose of the
-example:
+`"hwe"` and `"basic_stats"` take longer to calculate, so we do not evaluate these statistics here. We also change the parameters and reduce the dataset in the example to make it faster for users who wish to run it:
 
-```{r, warning = FALSE, message = FALSE}
+```{r, warning = FALSE, message = FALSE, eval = FALSE}
 hwe_wgd <- window_gd(lotr_vcf[1:10, ],
   lotr_coords,
   lotr_lyr,
@@ -843,14 +801,11 @@ bs_wgd <- window_gd(lotr_vcf[1:10, ],
   rarify = FALSE,
   L = 100
 )
-```
 
-```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 ggplot_gd(hwe_wgd, bkg = lotr_range)
-```
 
-```{r, fig.width = 5, fig.height = 5, warning = FALSE}
 ggplot_gd(bs_wgd, bkg = lotr_range)
+
 ```
 
 # General moving window
@@ -939,7 +894,7 @@ genind object is still feasible.
 An example of how one could use a genind object as input into
 `window_general()` is as follows:
 
-```{r, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE}
+```{r, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
 # We use the vcfR package to convert vcf to genind for our example
 library(vcfR)
 
@@ -955,8 +910,4 @@ we_gi <- window_general(genind,
   fact = 3,
   na.rm = TRUE
 )
-
-# Plot results
-ggplot_gd(we_gi) +
-  ggtitle("Allelic richness")
 ```
