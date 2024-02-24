@@ -42,8 +42,6 @@
 #'
 #' load_mini_ex()
 #' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
-#' plot_gd(wpi, main = "Window pi")
-#' plot_count(wpi)
 #'
 window_gd <- function(gen, coords, lyr, stat = "pi", wdim = 3, fact = 0,
                       rarify = FALSE, rarify_n = NULL, rarify_nit = 5, min_n = 2,

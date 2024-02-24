@@ -84,7 +84,5 @@ are not included as they are not meaningful within the individual-based moving w
 
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, rarify = TRUE)
-plot_gd(wpi, main = "Window pi")
-plot_count(wpi)
 
 }

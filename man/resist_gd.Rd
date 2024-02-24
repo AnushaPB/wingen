@@ -75,5 +75,5 @@ As such, longitude-latitude systems should be transformed before using dist_gd. 
 }
 \examples{
 load_mini_ex()
-rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 500)
+rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
 }

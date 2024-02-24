@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' load_mini_ex()
-#' rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 500)
+#' rpi <- resist_gd(mini_vcf, mini_coords, mini_lyr, maxdist = 50)
 resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fact = 0,
                       rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
                       fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,

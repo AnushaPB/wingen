@@ -11,11 +11,8 @@
 #' @export
 #'
 #' @examples
-#' load_mini_ex()
-#' wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
-#' kpi <- krig_gd(wpi, mini_lyr)
-#' mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
-#' plot_gd(mpi, main = "Kriged and Masked Pi")
+#' data("mini_lyr")
+#' mpi <- mask_gd(mini_lyr, mini_lyr, minval = 0.01)
 #'
 mask_gd <- function(x, y, minval = NULL, maxval = NULL) {
   # make sure x is a SpatRaster

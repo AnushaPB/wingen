@@ -22,10 +22,7 @@ RasterLayer
 Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
-load_mini_ex()
-wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
-kpi <- krig_gd(wpi, mini_lyr)
-mpi <- mask_gd(kpi, mini_lyr, minval = 0.01)
-plot_gd(mpi, main = "Kriged and Masked Pi")
+data("mini_lyr")
+mpi <- mask_gd(mini_lyr, mini_lyr, minval = 0.01)
 
 }
