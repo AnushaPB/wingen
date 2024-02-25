@@ -805,7 +805,6 @@ bs_wgd <- window_gd(lotr_vcf[1:10, ],
 ggplot_gd(hwe_wgd, bkg = lotr_range)
 
 ggplot_gd(bs_wgd, bkg = lotr_range)
-
 ```
 
 # General moving window
