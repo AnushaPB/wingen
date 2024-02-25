@@ -1,3 +1,15 @@
+# wingen 2.1.1
+
+Minor changes for CRAN
+
+### Switch to `ggplot()` in examples and `preview_gd()`
+- Switch from using base R plotting with `plot_gd()`/`plot_count()` to ggplot plotting with `ggplot_gd()`/`ggplot_count()` in the README, vignette, and` preview_gd()` functions
+- This was done to avoid modifying the users environment with `par()`
+- `plot_gd()` and `plot_count()` can still be used
+
+### Simplification of vignette and examples
+- To decrease code test time for CRAN the vignettes and the examples were reduced, however the core information remains the same
+
 # wingen 2.1.0
 
 ### Fixed handling of arguments passed to functions via `...`
