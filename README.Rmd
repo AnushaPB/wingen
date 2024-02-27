@@ -30,7 +30,7 @@ Checkout our [Methods blog post](https://methodsblog.com/2023/05/03/wingen-mappi
 
 Install the released version of wingen from CRAN:
 ``` r
-install.packages("wingen")
+install.packages("wingen", build_vignettes = TRUE)
 ```
 
 Or install the development version from GitHub:

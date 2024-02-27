@@ -39,7 +39,7 @@ about wingen for a quick overview of the package and its uses.
 Install the released version of wingen from CRAN:
 
 ``` r
-install.packages("wingen")
+install.packages("wingen", build_vignettes = TRUE)
 ```
 
 Or install the development version from GitHub:
