@@ -11,6 +11,7 @@ output: github_document
 [![R-CMD-check](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AnushaPB/wingen/actions/workflows/R-CMD-check.yaml)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badge/license-MIT-blue)
 [![Zenodo DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi/499617621)
+[![CRAN status](https://www.r-pkg.org/badges/version/wingen)](https://CRAN.R-project.org/package=wingen)
 <!-- badges: end -->
 
 Generate continuous maps of genetic diversity using moving windows with options for rarefaction, interpolation, and masking.
@@ -27,8 +28,12 @@ Checkout our [Methods blog post](https://methodsblog.com/2023/05/03/wingen-mappi
 
 ## Installation
 
-Install wingen from [GitHub](https://github.com/) with:
+Install the released version of wingen from CRAN:
+``` r
+install.packages("wingen")
+```
 
+Or install the development version from GitHub:
 ``` r
 # install.packages("devtools")
 devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
