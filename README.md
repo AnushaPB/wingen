@@ -39,14 +39,14 @@ about wingen for a quick overview of the package and its uses.
 Install the released version of wingen from CRAN:
 
 ``` r
-install.packages("wingen", build_vignettes = TRUE)
+install.packages("wingen")
 ```
 
 Or install the development version from GitHub:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("AnushaPB/wingen", build_vignettes = TRUE)
+devtools::install_github("AnushaPB/wingen")
 ```
 
 ## Example
