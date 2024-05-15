@@ -1,37 +1,39 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Updated 2/25 based on : https://github.com/r-lib/actions/blob/v2/examples/check-standard.yaml
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    paths:
-      - "R/**.R"
-      - .github/workflows/R-CMD-check.yaml
-      - "vignettes/**.Rmd"
-    branches:
-      - main
+    branches: [main, master]
   pull_request:
-       paths:
-        - "R/**.R"
-        - .github/workflows/R-CMD-check.yaml
-        - "vignettes/**.Rmd"
-        
+    branches: [main, master]
+
 name: R-CMD-check
 
 jobs:
   R-CMD-check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
-
-      - name: Install Latest ggplot2
-        run: Rscript -e "install.packages('ggplot2', repos='https://cloud.r-project.org/')"
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -39,3 +41,6 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
