@@ -1,3 +1,9 @@
+# wingen 2.1.2
+
+Patch to fix `L` argument defaults and improve documentation. 
+
+The wingen default for all functions is now `L = "nvariants"`, which sets `L` to the number of variants in the VCF when calculating pi. This was already the default in the original `window_gd()` function, but `circle_gd()` and `resist_gd()` had `L = NULL` as the default, which returns the sum over SNPs of nucleotide diversity. We have also improved documentation for `L`.
+
 # wingen 2.1.1
 
 Minor changes for CRAN
