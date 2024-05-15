@@ -48,7 +48,7 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
-\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
@@ -63,6 +63,23 @@ Generate a continuous raster map of genetic diversity using circle moving window
 \details{
 Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+
+Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
+Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
+Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+
+Current genetic diversity metrics that can be specified with \code{stat} include:
+\itemize{
+\item \code{"pi"} for nucleotide diversity (default) calculated using \code{hierfstat} \link[hierfstat]{pi.dosage}. Use the \code{L} argument to set the sequence length (defaults to dividing by the number of variants).
+\item \code{"Ho"} for average observed heterozygosity across all sites
+\item \code{"allelic_richness"} for average number of alleles across all sites
+\item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
+\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., \code{sig = 0.10}).
+\item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
+mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}
+are not included as they are not meaningful within the individual-based moving windows.
+}
 }
 \examples{
 \donttest{

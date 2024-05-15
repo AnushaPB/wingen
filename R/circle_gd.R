@@ -11,6 +11,22 @@
 #'
 #' @return SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell
 #' @export
+#' @details
+#'
+#' Coordinates and rasters should be in a projected (planar) coordinate system such that raster cells are of equal sizes.
+#' Therefore, spherical systems (including latitute-longitude coordinate systems) should be projected prior to use.
+#' Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
+#'
+#' Current genetic diversity metrics that can be specified with `stat` include:
+#' - `"pi"` for nucleotide diversity (default) calculated using `hierfstat` \link[hierfstat]{pi.dosage}. Use the `L` argument to set the sequence length (defaults to dividing by the number of variants).
+#' - `"Ho"` for average observed heterozygosity across all sites
+#' - `"allelic_richness"` for average number of alleles across all sites
+#' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
+#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
+#' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
+#' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
+#' Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}
+#' are not included as they are not meaningful within the individual-based moving windows.
 #'
 #' @examples
 #' \donttest{
@@ -88,7 +104,7 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' @export
 circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact = 0,
                            rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                           fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05, ...) {
+                           fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05, ...) {
   # check and aggregate layer and coords  (only lyr is returned)
   lyr <- layer_coords_check(lyr = lyr, coords = coords, fact = fact)
 

@@ -46,7 +46,7 @@ window_gd(
 
 \item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
 
-\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants" which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
 
 \item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
 
@@ -69,7 +69,7 @@ Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \
 
 Current genetic diversity metrics that can be specified with \code{stat} include:
 \itemize{
-\item \code{"pi"} for nucleotide diversity (default) calculated using \code{hierfstat} \link[hierfstat]{pi.dosage}
+\item \code{"pi"} for nucleotide diversity (default) calculated using \code{hierfstat} \link[hierfstat]{pi.dosage}. Use the \code{L} argument to set the sequence length (defaults to dividing by the number of variants).
 \item \code{"Ho"} for average observed heterozygosity across all sites
 \item \code{"allelic_richness"} for average number of alleles across all sites
 \item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
