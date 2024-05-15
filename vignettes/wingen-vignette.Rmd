@@ -315,13 +315,6 @@ window size of 7 x 7, an aggregation factor of 3, and rarefaction with a
 rarefaction size of 2 (i.e., minimum sample size of 2), and 5
 iterations.
 
-The `L` argument is used in the calculation of pi. If `L = NULL`
-(default), the function returns the sum over SNPs of nucleotide
-diversity. Otherwise, the function returns the average nucleotide
-diversity per nucleotide given the length L of the sequence. Users may
-want to set `L` differently depending on amounts of missing data, for
-example, so that missing sites are not considered in the calculation.
-
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
 
