@@ -11,9 +11,8 @@
 #' @export
 #'
 #' @examples
-#' load_mini_ex()
-#' wgd <- window_gd(mini_vcf, mini_coords, mini_lyr)
-#' ggplot_gd(wgd)
+#' data("mini_lyr")
+#' ggplot_gd(mini_lyr)
 #'
 ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
   # format rasters
@@ -54,7 +53,7 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
 #'
 #' @examples
 #' data("mini_lyr")
-#' plot_count(mini_lyr)
+#' ggplot_count(mini_lyr)
 ggplot_count <- function(x, index = NULL, col = viridis::mako(100)) {
   # format rasters
   if (!inherits(x, "SpatRaster")) x <- terra::rast(x)
