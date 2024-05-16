@@ -9,6 +9,7 @@ run_general <- function(x, lyr, coords,
                         stat, rarify, rarify_n, rarify_nit, min_n,
                         fun, L, rarify_alleles, sig,
                         ...) {
+
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")

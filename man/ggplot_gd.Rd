@@ -22,7 +22,8 @@ list of ggplots
 Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 }
 \examples{
-data("mini_lyr")
-ggplot_gd(mini_lyr)
+load_mini_ex()
+wgd <- window_gd(mini_vcf, mini_coords, mini_lyr)
+ggplot_gd(wgd)
 
 }

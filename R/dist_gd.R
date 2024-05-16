@@ -7,7 +7,7 @@ dist_gd <- function(gen, coords, lyr, stat = "pi",
                     fact = fact,
                     maxdist, distmat,
                     rarify = FALSE, rarify_n = 2, rarify_nit = 5, min_n = 2,
-                    fun = mean, L = NULL, rarify_alleles = TRUE, sig = 0.05,
+                    fun = mean, L = "nvariants", rarify_alleles = TRUE, sig = 0.05,
                     ...) {
   # convert maxdist to SpatRaster
   if (!is.numeric(maxdist)) {

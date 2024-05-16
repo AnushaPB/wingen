@@ -143,7 +143,15 @@ The main arguments that all three functions have in common are:
     include:
 
     -   `"pi"` for nucleotide diversity (default) calculated using
-        `hierfstat::pi.dosage()` (only works for bi-allelic data).
+        `hierfstat::pi.dosage()` (only works for bi-allelic data). 
+        Use the `L` argument to set the sequence length for the pi calculation. 
+        If the sequence  length is unknown, L can be set to "nvariants" (default) 
+        which setsL to the number of variants; however, note that this is not 
+        strictly the correct calculation of pi because it does not account for 
+        invariant sites. If `L` is set to NULL, the sum over SNPs of nucleotide 
+        diversity is returned (*note:* `L = NULL` is the \link[hierfstat]{pi.dosage}). 
+        Otherwise, L can be set to any numeric value which will serve as the 
+        denominator of the pi calculation. 
 
     -   `"Ho"` for average observed heterozygosity across all sites
 
@@ -306,13 +314,6 @@ raster layer. Here, we set the parameters to calculate pi, using a
 window size of 7 x 7, an aggregation factor of 3, and rarefaction with a
 rarefaction size of 2 (i.e., minimum sample size of 2), and 5
 iterations.
-
-The `L` argument is used in the calculation of pi. If `L = NULL`
-(default), the function returns the sum over SNPs of nucleotide
-diversity. Otherwise, the function returns the average nucleotide
-diversity per nucleotide given the length L of the sequence. Users may
-want to set `L` differently depending on amounts of missing data, for
-example, so that missing sites are not considered in the calculation.
 
 We then plot the genetic diversity layer (the first layer of the
 produced raster stack) and the sample counts layer (the second layer).
