@@ -21,5 +21,5 @@ Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{k
 }
 \examples{
 data("mini_lyr")
-plot_count(mini_lyr)
+ggplot_count(mini_lyr)
 }
