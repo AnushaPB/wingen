@@ -9,7 +9,6 @@ run_general <- function(x, lyr, coords,
                         stat, rarify, rarify_n, rarify_nit, min_n,
                         fun, L, rarify_alleles, sig,
                         ...) {
-
   # check that any stats will be calculated
   counts <- preview_count(lyr = lyr, coords = coords, distmat = distmat, nmat = nmat, min_n = min_n, plot = FALSE)
   if (all(is.na(terra::values(counts)))) stop("Minimum sample size (min_n) is not met for any window across this raster")
@@ -486,6 +485,11 @@ edge_crop <- function(x, wdim) {
 #'
 #' @noRd
 rm_duplicate_sample_count <- function(r) {
+  # if all names are sample count return that layer
+  if (all(names(r) == "sample_count")) {
+    return(r)
+  }
+
   # subset one sample_count layer
   sample_count <- r[[which(names(r) == "sample_count")]][[1]]
 
