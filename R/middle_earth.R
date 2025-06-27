@@ -22,7 +22,7 @@ load_middle_earth_ex <- function(quiet = FALSE) {
       crayon::yellow(paste0("vcfR object (100 variants x 100 samples)")),
       crayon::green(crayon::bold("\nlotr_coords: ")), crayon::green("dataframe with x and y coordinates"),
       crayon::magenta(crayon::bold("\nlotr_lyr: ")), crayon::magenta("middle earth RasterLayer (100 x 100)"),
-      crayon::blue(crayon::bold("\nlotr_range: ")), crayon::blue("SpatialPolygonsDataFrame of spp range"),
+      crayon::blue(crayon::bold("\nlotr_range: ")), crayon::blue("sf polygon of the species range"),
       crayon::cyan(crayon::bold("\n\n--------------------------------------------------\n"))
     ))
   }
