@@ -15,6 +15,16 @@ MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badg
 DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi/499617621)
 <!-- badges: end -->
 
+**⚠️ Notice: wingen temporarily archived on CRAN**
+
+*As of 06/30/2025, wingen has been archived on CRAN because it depended
+on the now-archived automap package. We are working on resolving this
+issue. Wingen can still be installed from GitHub and automap can be
+installed from the CRAN archive:
+`install.packages("https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz", repos = NULL, type = "source")`*
+
+------------------------------------------------------------------------
+
 Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking.
 
@@ -36,7 +46,8 @@ about wingen for a quick overview of the package and its uses.
 
 ## Installation
 
-Install the released version of wingen from CRAN:
+Install the released version of wingen from CRAN (⚠️ temporarily
+unavailable, see notice above):
 
 ``` r
 install.packages("wingen")
