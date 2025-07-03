@@ -167,12 +167,12 @@ krig <- function(krig_df, krig_grid, grd, autoKrige_output = FALSE, krig_method 
   if (is.numeric(lower_bound)) krig_r$pred[krig_r$pred < lower_bound] <- lower_bound
   if (is.numeric(upper_bound)) krig_r$pred[krig_r$pred > upper_bound] <- upper_bound
 
-  if (is.logical(lower_bound)) {
-    if (lower_bound) krig_r$pred[krig_r$pred < min(krig_df$layer, na.rm = TRUE)] <- min(krig_df$layer, na.rm = TRUE)
+  if (isTRUE(lower_bound)) {
+    krig_r$pred[krig_r$pred < min(krig_df$layer, na.rm = TRUE)] <- min(krig_df$layer, na.rm = TRUE)
   }
 
-  if (is.logical(upper_bound)) {
-    if (upper_bound) krig_r$pred[krig_r$pred > max(krig_df$layer, na.rm = TRUE)] <- max(krig_df$layer, na.rm = TRUE)
+  if (isTRUE(upper_bound)) {
+    krig_r$pred[krig_r$pred > max(krig_df$layer, na.rm = TRUE)] <- max(krig_df$layer, na.rm = TRUE)
   }
 
   # create results
