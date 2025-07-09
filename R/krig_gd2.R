@@ -1,6 +1,6 @@
 #' Krige raster layers with variogram model selection (BETA)
 #'
-#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the `gstat` package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. I have not formally validated the default parameters, but in practice they have performed well for kriging wingen outputs from both my simulated and empirical datasets.
+#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the `gstat` package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
 #'
 #' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. Includes optional weighting to account for sample count variation.
 #' 
@@ -8,23 +8,24 @@
 #' - partial sill = ~80% of global variance
 #' - nugget = ~20% of global variance
 #' - range = 50% of maximum pairwise distance
-#' The variogram fitting method defaults to Ordinary Least Squares (\code{fit_method = 6}), which tends to produce more stable fits for noisy or irregular datasets. Weighted methods (1, 2, and 7) may offer improved accuracy in large, well-distributed datasets.
-#' 
-#' For more fine scale control over variogram fitting and kriging, check out the `gstat` package. 
-#' 
-#' @note This function is in **beta testing**: its behavior may change in future versions. Use with caution for production workflows.
+#'
+#' The variogram fitting method defaults to Ordinary Least Squares (\code{fit_method = 6}), which tends to produce more stable fits in noisy or irregular datasets. Weighted methods (1, 2, and 7) may offer improved accuracy in large, well-distributed datasets.
+#'
+#' For more fine-scale control over variogram fitting and kriging, consult the `gstat` package documentation. 
+#'
+#' @note This function is in **beta testing**: its behavior may change in future versions. Use with caution in production workflows.
 #'
 #' @param r SpatRaster produced by \link[wingen]{window_gd}. Only the first layer is used if multiple layers are present.
-#' @param grd Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.
+#' @param grd Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, \code{r} is used to create a grid.
 #' @param weight_r Optional \link[terra]{SpatRaster} with sample counts per cell, used to compute location-specific measurement variance and weights for kriging. If \code{NULL} (default), no weighting is applied.
 #' @param nmax Integer. Maximum number of neighboring observations to use for kriging at each prediction location (default: \code{Inf}). Users are encouraged to experiment with \code{nmax} to balance smoothness and local detail; starting with a value of 30 is recommended to reduce computational cost while still capturing local variability.
-#' @param maxdist Maximum distance to consider for neighboring observations (default: \code{Inf}). If set with \code{nmax}, both parameters are used to limit the number of neighbors.
+#' @param maxdist Maximum distance to consider for neighboring observations (default: \code{Inf}). If set together with \code{nmax}, both parameters limit the number of neighbors.
 #' @param candidate_models Character vector of variogram model names to try (default: \code{c("Sph", "Exp", "Gau", "Mat")}).
 #' @param psill_start Optional starting value for partial sill. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param nugget_start Optional starting value for nugget effect. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param range_start Optional starting value for range parameter. If \code{NULL} (default), a heuristic value is used (see Note).
-#' @param fit_method Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}: 1 = weights \(N_j\); 2 = weights \(N_j / \gamma(h_j)^2\); 6 = Ordinary Least Squares (unweighted); 7 = weights \(N_j / h_j^2\). The default (\code{6}) uses OLS, which is generally more stable for small or noisy datasets (see Note).
-#' @param model_output Logical. If \code{TRUE}, returns a list with prediction raster, variogram, and fitted variogram model. If \code{FALSE} (default), returns only the prediction raster.
+#' @param fit_method Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}: 1 = weights \(N_j\); 2 = weights \(N_j / \gamma(h_j)^2\); 6 = Ordinary Least Squares (unweighted); 7 = weights \(N_j / h_j^2\). The default (\code{6}) uses OLS, which is generally more robust for small or noisy datasets (see Note).
+#' @param model_output Logical. If \code{TRUE}, returns a list with the prediction raster, variogram, and fitted variogram model. If \code{FALSE} (default), returns only the prediction raster.
 #'
 #' @note
 #'
@@ -46,7 +47,6 @@
 #' @details
 #' This function uses \link[gstat]{gstat} for variogram fitting and kriging. Weights are computed as the inverse of estimated location-specific variance (\eqn{\sigma^2 / n}) if sample counts are provided.
 #'
-
 #' @examples
 #' # Note: this toy example uses a very small dataset. 
 #' # Warnings may occur due to limited points for variogram fitting.
