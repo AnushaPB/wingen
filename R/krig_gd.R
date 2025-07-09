@@ -35,7 +35,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
   # check CRS
   crs_check_krig(r = r, grd = grd, coords = coords)
 
-  # Make sure grid and raster layer are SpatRasters
+  # make sure grid and raster layer are SpatRasters
   if (!inherits(grd, "SpatRaster") & !is.null(grd) & inherits(grd, "RasterLayer")) grd <- terra::rast(grd)
   if (!inherits(r, "SpatRaster")) r <- terra::rast(r)
 
