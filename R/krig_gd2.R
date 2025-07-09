@@ -1,11 +1,72 @@
-
-# gstat vignette (Pebesma, 2004) uses nmax = 20.
-# Diggle & Ribeiro (2007), Model-based Geostatistics, discuss ~30 neighbors as typical.
-# ArcGIS kriging defaults to 12–32 neighbors.
+#' Krige raster layers with variogram model selection (BETA)
+#'
+#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the `gstat` package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection.
+#' 
+#' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on  SSErr. Includes optional weighting to account for sample count variation.
+#' 
+#' When all starting values for variogram parameters are left \code{NULL}, gstat's internal defaults are used:
+#' - nugget = mean of first 3 semivariances
+#' - partial sill = mean of last 5 semivariances
+#' - range = one third of maximum pairwise distance
+#' 
+#' For more fine scale control over variogram fitting and kriging, check out the `gstat` package. 
+#' 
+#' @note This function is in **beta testing**: its behavior may change in future versions. Use with caution for production workflows.
+#' 
+#' @param r SpatRaster produced by \link[wingen]{window_gd}. Only the first layer is used if multiple layers are present.
+#' @param grd object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.
+#' @param weight_r Optional \link[terra]{SpatRaster} with sample counts per cell, used to compute location-specific measurement variance and weights for kriging. If \code{NULL} (default), no weighting is applied.
+#' @param nmax Integer. Maximum number of neighboring observations to use for kriging at each prediction location (default: \code{Inf}). Users are encouraged to experiment with \code{nmax} to balance smoothness and local detail; starting with a value of 30 is recommended to reduce computational cost while still capturing local variability.
+#' @param maxdist Maximum distance to consider for neighboring observations (default: \code{Inf}). If set with \code{nmax}, both parameters are used to limit the number of neighbors.
+#' @param candidate_models Character vector of variogram model names to try (default: \code{c("Sph", "Exp", "Gau", "Mat")}).
+#' @param psill_start Optional starting value for partial sill. If \code{NULL} (default), gstat uses its internal defaults: mean of the last five semivariances.
+#' @param nugget_start Optional starting value for nugget effect. If \code{NULL} (default), gstat uses mean of the first three semivariances.
+#' @param range_start Optional starting value for range parameter. If \code{NULL} (default), gstat uses one third of the maximum variogram distance.
+#' @param fit_method Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}: 1 = weights \(N_j\); 2 = weights \(N_j / \gamma(h_j)^2\); 6 = Ordinary Least Squares (unweighted); 7 = weights \(N_j / h_j^2\) (default). The default (\code{7}) emphasizes shorter distances and is recommended in most cases.
+#' @param model_output Logical. If \code{TRUE}, returns a list with prediction raster, variogram, and fitted variogram model. If \code{FALSE} (default), returns only the prediction raster.
+#' 
+#' @note
+#' **Convergence warnings from `gstat::fit.variogram()`**
+#'
+#' During variogram fitting, you may see:
+#' ```
+#' Warning: No convergence after 200 iterations: try different initial values?
+#' ```
+#' This means the optimizer reached its iteration limit before fully minimizing the error. 
+#' Even in these cases, `gstat` returns the best-fit model found so far. 
+#' This warning often occurs with small datasets or when the empirical variogram is noisy.
+#' In many cases, these “non-converged” fits may be acceptable and produce reliable results. 
+#' However, you can also try testing different values for `psill_start`, `range_start`, and `nugget_start`, 
+#' using a different variogram fit method (e.g., `fit_method = 6`), 
+#' or increasing the iteration limit with `options(gstat.fit.maxiter)`.
+#'
+#' @return A \link[terra]{SpatRaster} object of kriged predictions if \code{model_output = FALSE}. If \code{model_output = TRUE}, returns a list with:  
+#' \describe{
+#'   \item{prediction}{Kriged prediction raster (\link[terra]{SpatRaster})}
+#'   \item{variogram}{Empirical variogram (\link[gstat]{variogram})}
+#'   \item{model}{Best-fit variogram model (\link[gstat]{vgm})}
+#' }
+#'
+#' @details
+#' This function uses \link[gstat]{gstat} for variogram fitting and kriging.
+#' Weights are computed as the inverse of estimated location-specific variance (\eqn{\sigma^2 / n}) if sample counts are provided.
+#' 
+#' @seealso \link[gstat]{variogram}, \link[gstat]{fit.variogram}, \link[gstat]{krige}, \link[terra]{SpatRaster}
+#' 
+#' @examples
+#' # Note: this toy example uses a very small dataset. 
+#' # Warnings may occur due to limited points for variogram fitting.
+#' suppressWarnings({
+#'   load_mini_ex()
+#'   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
+#'   kpi <- krig_gd2(wpi[["pi"]], grd = mini_lyr, nugget = 0)
+#'   plot_gd(kpi, main = "Kriged Pi")
+#' })
+#' @export
 krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
                      candidate_models = c("Sph", "Exp", "Gau", "Mat"),
-                     max_range_frac = 0.5, nmax = 30, verbose = TRUE,
-                     psill_start = NULL, nugget_start = NULL, range_start = NULL,
+                     nmax = Inf, maxdist = Inf,
+                     psill_start = NULL, nugget_start = NULL, range_start = NULL, fit_method = 7,
                      model_output = FALSE) {
 
   # Add check for r being a SpatRaster with one layer
@@ -28,6 +89,9 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   # Gstat expects weights = 1/variance to reflect confidence in observations.
   # More samples → lower variance → higher weight.
   if (!is.null(weight_r)) {
+    # Convert weight_r to SpatRaster if not already
+    if (!inherits(weight_r, "SpatRaster")) weight_r <- terra::rast(weight_r)
+
     # Extract sample counts
     sample_counts <- terra::extract(weight_r, r_pts[, c("x", "y")])[,2]
     
@@ -48,20 +112,18 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   }
 
   # Fit variogram model
-  formula_str <- value ~ 1
-  v <- gstat::variogram(formula_str, data = r_sf)
+  v <- gstat::variogram(value ~ 1, data = r_sf)
 
-  # Approximate starting values
-  if (is.null(psill_start)) psill_start <- stats::var(r_pts$value, na.rm = TRUE) * 0.8
-  if (is.null(nugget_start)) nugget_start <- stats::var(r_pts$value, na.rm = TRUE) * 0.2
-  if (is.null(range_start)) range_start <- max(v$dist, na.rm = TRUE) * max_range_frac
-
-  # Fit multiple models and pick the best
   fitted_models <- purrr::map(candidate_models, purrr::safely(function(mod) {
-    start_model <- gstat::vgm(psill = psill_start, model = mod, range = range_start, nugget = nugget_start)
-    fit <- gstat::fit.variogram(v, model = start_model, fit.method = 6)
+    # Use gstat defaults if all start values NULL
+    if (is.null(psill_start) && is.null(nugget_start) && is.null(range_start)) {
+      start_model <- gstat::vgm(model = mod)
+    } else {
+      start_model <- gstat::vgm(psill = psill_start, model = mod, range = range_start, nugget = nugget_start)
+    }
+    fit <- gstat::fit.variogram(v, model = start_model, fit.method = fit_method)
     attr(fit, "model_name") <- mod
-    return(fit)
+    fit
   }))
 
   # Extract successful results
@@ -75,16 +137,14 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   best_fit <- fitted_models[[which.min(sse)]]
   best_model <- attr(best_fit, "model_name")
 
-  if (verbose) {
-    cat("Best model:", best_model, "\n")
-    cat("SSErr:", min(sse), "\n")
-  }
+  message("Best model:", best_model, "\n")
+  message("SSErr:", min(sse), "\n")
 
   # Krige results
   if (is.null(weight_r)) {
-    krig_model <- gstat::gstat(formula = value ~ 1, locations = r_sf, model = best_fit, nmax = nmax)
+    krig_model <- gstat::gstat(formula = value ~ 1, locations = r_sf, model = best_fit, nmax = nmax, maxdist = maxdist)
   } else {
-    krig_model <- gstat::gstat(formula = value ~ 1, locations = r_sf, model = best_fit, weights = r_pts$weight, nmax = nmax)
+    krig_model <- gstat::gstat(formula = value ~ 1, locations = r_sf, model = best_fit, weights = r_pts$weight, nmax = nmax, maxdist = maxdist)
   }
 
   # Create prediction grid
@@ -106,5 +166,3 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
     return(r_pred)
   }
 }
-
-
