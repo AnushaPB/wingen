@@ -31,7 +31,13 @@ lotr_coords <- lotr_coords[samples, ]
 # check if file exists locally and if not download it from figshare
 file <- "inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"
 if (!file.exists(file)) {
-  download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
+  download.file(
+    url = "https://figshare.com/ndownloader/files/36617433",
+    destfile = file,
+    method = "libcurl",                      # Use libcurl to allow headers
+    headers = c("User-Agent" = "Mozilla/5.0"),
+    mode = "wb"                              # Write as binary
+  )
 }
 vcf <- vcfR::read.vcfR(file)
 
@@ -73,3 +79,34 @@ usethis::use_data(mini_lyr, overwrite = TRUE)
 usethis::use_data(mini_vcf, overwrite = TRUE)
 usethis::use_data(mini_coords, overwrite = TRUE)
 usethis::use_data(mini_vcf_NA, overwrite = TRUE)
+
+# Code to create dataset with sampling bias ------------------------------------------------------------
+
+# load coords
+lotr_coords <- read.csv("inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.csv") %>%
+  dplyr::select(idx, x, y) %>%
+  dplyr::mutate(y = -y)
+
+# get subsample 
+# (because there are more samples in some areas than others in the original dataset, due to the nature of the simulation, this is a realistic depiction of biased sampling)
+set.seed(42)
+samples <- sample(nrow(lotr_coords), 100)
+lotr_biased_coords <- lotr_coords[samples, ]
+
+vcf <- vcfR::read.vcfR(file)
+
+# subsample loci and individuals
+# note: first column is FORMAT, hence c(1, samples + 1)
+lotr_biased_vcf <- vcf[, c(1, samples + 1)]
+# retain only variant sites
+lotr_biased_vcf <- lotr_biased_vcf[vcfR::is.polymorphic(lotr_biased_vcf), ]
+# subsample loci
+set.seed(42)
+lotr_biased_vcf <- lotr_biased_vcf[sample(1:nrow(lotr_biased_vcf@gt), 100), ]
+# check to make sure order and IDs are the same
+stopifnot(colnames(lotr_biased_vcf@gt)[-1] == lotr_biased_coords$idx)
+
+# save results
+lotr_biased_coords <- lotr_biased_coords %>% dplyr::select(x, y)
+usethis::use_data(lotr_biased_coords, overwrite = TRUE)
+usethis::use_data(lotr_biased_vcf, overwrite = TRUE)
