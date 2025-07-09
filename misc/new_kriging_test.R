@@ -7,6 +7,8 @@ library(here)
 
 load_middle_earth_ex()
 
+setwd(here("misc"))
+
 # ORIGINAL DATA ANALYSIS ---------------------------------------------------
 lotr_vcf <- lotr_vcf # already loaded in load_middle_earth_ex
 
