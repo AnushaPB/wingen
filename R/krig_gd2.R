@@ -1,8 +1,8 @@
-#' Krige raster layers with variogram model selection (BETA)
+#' Krige moving window maps with variogram selection (BETA)
 #'
 #' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the `gstat` package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
 #'
-#' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. Includes optional weighting to account for sample count variation.
+#' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. It also includes optional weighting to account for sample count variation.
 #' 
 #' By default, starting values for variogram parameters are set heuristically:
 #' - partial sill = ~80% of global variance
@@ -114,6 +114,7 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   if (is.null(nugget_start)) nugget_start <- stats::var(r_pts$value, na.rm = TRUE) * 0.2
   if (is.null(range_start)) range_start <- max(v$dist, na.rm = TRUE) * max_range_frac
 
+  # Fit models
   fitted_models <- purrr::map(candidate_models, purrr::safely(function(mod) {
     start_model <- gstat::vgm(psill = psill_start, model = mod, range = range_start, nugget = nugget_start)
     fit <- gstat::fit.variogram(v, model = start_model, fit.method = fit_method)
@@ -123,6 +124,7 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
 
   # Extract successful results
   fitted_models <- purrr::map(fitted_models, "result")
+
   # Check if any models were successfully fitted
   fitted_models <- Filter(Negate(is.null), fitted_models)
   if (length(fitted_models) == 0) stop("Variogram fitting failed for all models.")
@@ -132,10 +134,11 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   best_fit <- fitted_models[[which.min(sse)]]
   best_model <- attr(best_fit, "model_name")
 
+  # Print best model information
   message("Best model:", best_model, "\n")
   message("SSErr:", min(sse), "\n")
 
-  # Krige results
+  # Use best model for kriging
   if (is.null(weight_r)) {
     krig_model <- gstat::gstat(formula = value ~ 1, locations = r_sf, model = best_fit, nmax = nmax, maxdist = maxdist)
   } else {
