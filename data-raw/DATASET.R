@@ -31,7 +31,13 @@ lotr_coords <- lotr_coords[samples, ]
 # check if file exists locally and if not download it from figshare
 file <- "inst/extdata/mod-sim_params_it-0_t-1000_spp-spp_0.vcf"
 if (!file.exists(file)) {
-  download.file("https://figshare.com/ndownloader/files/36617433?private_link=7f6783de9b3d7a0ed897", file)
+  download.file(
+    url = "https://figshare.com/ndownloader/files/36617433",
+    destfile = file,
+    method = "libcurl",                      # Use libcurl to allow headers
+    headers = c("User-Agent" = "Mozilla/5.0"),
+    mode = "wb"                              # Write as binary
+  )
 }
 vcf <- vcfR::read.vcfR(file)
 
