@@ -54,7 +54,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
                     resample = FALSE, resample_first = TRUE) {
 
   # Soft deprecation
-  lifecycle::deprecate_soft(
+  lifecycle::deprecate_warn(
     when = "2.2.0",
     what = "wingen::krig_gd()",
     with = "wingen::winkrig_gd()"
