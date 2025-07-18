@@ -561,13 +561,10 @@ ggplot_gd(resist_gd)
 ### Krige results
 
 To produce smoother maps of genetic diversity, we provide the function
-`krig_gd()` which creates a spatially interpolated raster from the
+`winkrige_gd()` which creates a spatially interpolated raster from the
 moving window raster produced by the moving window functions. This
-function uses the `autoKrige()` function from the R package automap to
-perform kriging on the moving window raster using an automatically
-generated variogram. Note that the moving window raster stack, including
-both the genetic diversity layer and the sample count layer, can be used
-to generate kriged maps of both genetic diversity and sample count.
+function uses the gstat package to fit different variogram models and
+select the best one to perform kriging.
 
 Kriging is performed by first transforming the moving window layer into
 a set of coordinates with corresponding genetic diversity (or sample
@@ -581,61 +578,42 @@ grid-like artifacts during kriging.
 To deal with this issue, users can either (1) resample their moving
 window raster layers and grid layers to the same resolution using the
 `resample` argument, or (2) manually disaggregate or aggregate either
-the moving window or grid layers using the `agg_r`, `disagg_r`,
-`agg_grd`, or `disagg_grd` arguments. Generally, if users want a
-smoother resulting surface, a higher resolution grid layer should be
-used (this can be accomplished by using the `disagg_grd` argument to
-disaggregate the grid layer). The resampling, aggregation, and
-disaggregation options currently only work if the object provided to
-create the grid is a raster layer. Keep in mind that increasing the
+the moving window or grid layers using the terra `aggregate()` or
+`disagg()` functions. Generally, if users want a smoother resulting surface, a
+higher resolution grid layer should be used. Keep in mind that increasing the
 resolution of the moving window layer (i.e., either by resampling or
-disaggregating) can increase computational time substantially as this
+disaggregating) can increase computational time as this
 increases the number of coordinates being used for kriging. This is also
 the case for increasing the resolution of the grid layer, though to a
 lesser extent.
 
-To run this function, we provide the moving window raster stack output,
-the indices of the layers we want to krige, and the raster layer to
-interpolate across. We also disaggregate the original layer by a factor
-of two to get a smoother output surface (users should play around with
-this parameter). The output of this function is a raster stack of the
-kriged input layers.
+To run this function, we provide the moving window raster layer and a raster
+layer to interpolate across. If no raster layer for interpolation is provided,
+the moving window layer will be used (i.e., the output kriged layer will have
+the same resolution and extent of the input window layer) If a stack of rasters
+is provided, only the first layer will be used. The output of this function is a
+kriged raster layer. Optionally, users can supply the moving window sample
+counts layer with the `weight_r` argument to set weights for variogram fitting
+and kriging, giving higher influence to cells with more samples. Users may also
+want to test different values for `nmax`, which is the maximum number of points
+to use for kriging; here we use `nmax = 30` to balance speed and accuracy.
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-# Note: this step can take a little while
-# index = 1 kriges the first layer in wgd (the genetic diversity layer)
-kgd <- krig_gd(wgd, index = 1, grd = lotr_lyr, disagg_grd = 2)
+kgd <- winkrige_gd(wgd[["pi"]], grd = lotr_lyr, weight_r = wgd[["n"]], nmax = 30)
 
 ggplot_gd(kgd) +
   ggtitle("Kriged pi")
 ```
 
-*Note:* By default, the kriging method is set to
-`krig_method = "ordinary"` for ordinary/simple kriging (model formula:
-\~ 1) which assumes that the mean and variance are constant across
-space. Alternatively, `krig_method` can be set to `"universal"` for
-universal kriging (model formula: \~ x + y), which allows the mean to
-vary across locations, while variance is held constant.
-
-For information on the differences between universal and ordinary
-kriging, we recommend these articles:
-
--   [What are the different kriging
-    models?](https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm)
-
--   [Kriging
-    interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
-
-Users can optionally get the full output from `autoKrige()` by setting `autoKrige_output = TRUE` in which case `krig_gd()` returns a list where the first element ("raster") is the kriged raster and second element ("autoKrige_output") is the autoKrige output. 
-
-*Note:* `autoKrige()` does not work for non-projected systems (i.e.,
-latitude-longitude) and will throw an error. See above example for how
-latitude-longitude coordinates and rasters can be transformed.
+Users can optionally get the full model output by setting `model_output = TRUE`
+in which case `winkrige_gd()` returns a list where the first element ("raster")
+is the kriged raster, the second element ("variogram") is the variogram, and the
+third element ("model") is the best-fit variogram model.
 
 *Note:* Kriging can produce values that fall outside the range of
 possible values (e.g., genetic diversity values less than 0 or greater
 than the possible maximum). By default, in order to ensure that the
-values are bounded within the range of possible values, `krig_gd`
+values are bounded within the range of possible values, `winkrige_gd()`
 converts all values greater than the maximum of the input raster to that
 maximum (`upper_bound = TRUE`), and all values less than the minimum of
 the input raster to that minimum (`lower_bound = TRUE`). Users can turn
@@ -643,6 +621,13 @@ off this functionality by setting `lower_bound` and `upper_bound` to
 `FALSE`. Users can also set their own custom `lower_bound` and
 `upper_bound` values (e.g., for heterozygosity or pi, you may want to
 set `lower_bound = 0` and `upper_bound = 1`).
+
+**Legacy method: krig_gd()**
+Users should note that `winkrige_gd()` superseded `krig_gd()`. This legacy
+function used the `autoKrige()` function from the R package automap to perform
+kriging using an automatically generated variogram. We have found that
+`winkrige_gd()` provides improved performance for interpolation of the moving
+window raster and we recommend using it instead of `krig_gd()`.
 
 ### Mask results
 

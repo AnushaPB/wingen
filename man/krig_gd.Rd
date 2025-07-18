@@ -2,7 +2,7 @@
 % Please edit documentation in R/krig_gd.R
 \name{krig_gd}
 \alias{krig_gd}
-\title{Krige moving window maps}
+\title{Superseded: Krige moving window maps}
 \usage{
 krig_gd(
   r,
@@ -22,44 +22,58 @@ krig_gd(
 )
 }
 \arguments{
-\item{r}{SpatRaster produced by \link[wingen]{window_gd}}
+\item{r}{SpatRaster produced by \code{\link[wingen]{window_gd}}.}
 
-\item{grd}{object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.}
+\item{grd}{Raster object (SpatRaster or RasterLayer) to create grid for kriging. If \code{NULL}, uses \code{r} to create grid.}
 
-\item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
+\item{index}{Integer index of layers in raster stack to krige (defaults to 1; i.e., the first layer).}
 
-\item{coords}{if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates}
+\item{coords}{Optional coordinates (sf POINTS, matrix, or data.frame) to perform kriging only at specific locations.}
 
-\item{agg_grd}{factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
+\item{agg_grd, }{disagg_grd Aggregation/disaggregation factors for \code{grd} (default: \code{NULL}).}
 
-\item{disagg_grd}{factor to use for disaggregation of \code{grd}, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
+\item{agg_r, }{disagg_r Aggregation/disaggregation factors for \code{r} (default: \code{NULL}).}
 
-\item{agg_r}{factor to use for aggregation of \code{r}, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)}
+\item{autoKrige_output}{Logical. Return full \code{\link[automap]{autoKrige}} output? Defaults to \code{FALSE}.}
 
-\item{disagg_r}{factor to use for disaggregation, of \code{r} if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
+\item{lower_bound, }{upper_bound Logical. Bound kriged values to range of \code{r}? Defaults to \code{TRUE}.}
 
-\item{autoKrige_output}{whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
+\item{krig_method}{Kriging method: \code{"ordinary"} (default) or \code{"universal"}.}
 
-\item{lower_bound}{if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum}
+\item{resample}{Character or logical. Resample \code{r} or \code{grd}? Options: \code{"r"}, \code{"grd"}, or \code{FALSE} (default).}
 
-\item{upper_bound}{if TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum}
-
-\item{krig_method}{method to use for kriging. If \code{ordinary}, ordinary/simple kriging is performed (formula: ~ 1; default). If \code{universal},  universal kriging is performed (formula = ~ x + y).}
-
-\item{resample}{whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE for no resampling)}
-
-\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
+\item{resample_first}{Logical. Resample before (\code{TRUE}, default) or after aggregation/disaggregation?}
 }
 \value{
-a SpatRaster object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
+A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of \code{\link[automap]{autoKrige}} outputs.
 }
 \description{
-Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
+\strong{This function has been superseded by \code{\link[wingen]{winkrig_gd}} and may be removed in a future release.}
+Please use \code{winkrig_gd()} instead, which provides improved performance and does not depend on the \pkg{automap} package.
+
+Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using \code{\link[automap]{autoKrige}}.
+}
+\details{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
+
+This legacy function depends on the \pkg{automap} package, which has been archived on CRAN.
+Users wishing to use \code{krig_gd()} must install the archived version of \pkg{automap} manually:
+
+\preformatted{
+install.packages(
+  "https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz",
+  repos = NULL, type = "source"
+)
+}
 }
 \examples{
+\dontrun{
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
 plot_gd(kpi, main = "Kriged Pi")
-
+}
+}
+\seealso{
+\code{\link[wingen]{winkrig_gd}} for the updated kriging function.
 }
