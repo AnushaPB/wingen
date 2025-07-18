@@ -52,11 +52,11 @@
 #' suppressWarnings({
 #'   load_mini_ex()
 #'   wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
-#'   kpi <- krig_gd2(wpi[["pi"]], grd = mini_lyr, nugget = 0)
+#'   kpi <- winkrige_gd(wpi[["pi"]], grd = mini_lyr, nugget = 0)
 #'   plot_gd(kpi, main = "Kriged Pi")
 #' })
 #' @export
-winkrig_gd <- function(r, grd = NULL, weight_r = NULL,
+winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
                      models = c("Sph", "Exp", "Gau", "Mat"),
                      nmax = Inf, maxdist = Inf,
                      psill_start = NULL, nugget_start = NULL, range_start = NULL, max_range_frac = 0.5, fit_method = 6,
