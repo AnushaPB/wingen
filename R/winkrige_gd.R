@@ -62,8 +62,14 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
                      psill_start = NULL, nugget_start = NULL, range_start = NULL, max_range_frac = 0.5, fit_method = 6,
                      model_output = FALSE) {
 
-  # Add check for r being a SpatRaster with one layer
+  # Make sure grid and raster layer are SpatRasters
+  if (!inherits(grd, "SpatRaster") & !is.null(grd) & inherits(grd, "RasterLayer")) grd <- terra::rast(grd)
   if (!inherits(r, "SpatRaster")) r <- terra::rast(r)
+  
+  # Check CRS
+  crs_check_krig(r = r, grd = grd)                    
+
+  # Add check for r being a SpatRaster with one layer
   if (terra::nlyr(r) > 1) {
     message("Input raster has multiple layers. Using only the first layer.")
     r <- terra::subset(r, 1)
