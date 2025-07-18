@@ -1,6 +1,6 @@
-#' Krige moving window maps with variogram selection (BETA)
+#' Krige moving window maps with variogram selection
 #'
-#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the `gstat` package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
+#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the gstat package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
 #'
 #' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. It also includes optional weighting to account for sample count variation.
 #' 
@@ -11,16 +11,14 @@
 #'
 #' The variogram fitting method defaults to Ordinary Least Squares (\code{fit_method = 6}), which tends to produce more stable fits in noisy or irregular datasets. Weighted methods (1, 2, and 7) may offer improved accuracy in large, well-distributed datasets.
 #'
-#' For more fine-scale control over variogram fitting and kriging, consult the `gstat` package documentation. 
-#'
-#' @note This function is in **beta testing**: its behavior may change in future versions. Use with caution in production workflows.
-#'
+#' For more fine-scale control over variogram fitting and kriging, consult the `gstat` package documentation.
+#' 
 #' @param r SpatRaster produced by \link[wingen]{window_gd}. Only the first layer is used if multiple layers are present.
 #' @param grd Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, \code{r} is used to create a grid.
 #' @param weight_r Optional \link[terra]{SpatRaster} with sample counts per cell, used to compute location-specific measurement variance and weights for kriging. If \code{NULL} (default), no weighting is applied.
 #' @param nmax Integer. Maximum number of neighboring observations to use for kriging at each prediction location (default: \code{Inf}). Users are encouraged to experiment with \code{nmax} to balance smoothness and local detail; starting with a value of 30 is recommended to reduce computational cost while still capturing local variability.
 #' @param maxdist Maximum distance to consider for neighboring observations (default: \code{Inf}). If set together with \code{nmax}, both parameters limit the number of neighbors.
-#' @param candidate_models Character vector of variogram model names to try (default: \code{c("Sph", "Exp", "Gau", "Mat")}).
+#' @param models Character vector of variogram model names to try (default: \code{c("Sph", "Exp", "Gau", "Mat")}).
 #' @param psill_start Optional starting value for partial sill. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param nugget_start Optional starting value for nugget effect. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param range_start Optional starting value for range parameter. If \code{NULL} (default), a heuristic value is used (see Note).
@@ -58,8 +56,8 @@
 #'   plot_gd(kpi, main = "Kriged Pi")
 #' })
 #' @export
-krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
-                     candidate_models = c("Sph", "Exp", "Gau", "Mat"),
+winkrig_gd <- function(r, grd = NULL, weight_r = NULL,
+                     models = c("Sph", "Exp", "Gau", "Mat"),
                      nmax = Inf, maxdist = Inf,
                      psill_start = NULL, nugget_start = NULL, range_start = NULL, max_range_frac = 0.5, fit_method = 6,
                      model_output = FALSE) {
@@ -115,7 +113,7 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
   if (is.null(range_start)) range_start <- max(v$dist, na.rm = TRUE) * max_range_frac
 
   # Fit models
-  fitted_models <- purrr::map(candidate_models, purrr::safely(function(mod) {
+  fitted_models <- purrr::map(models, purrr::safely(function(mod) {
     start_model <- gstat::vgm(psill = psill_start, model = mod, range = range_start, nugget = nugget_start)
     fit <- gstat::fit.variogram(v, model = start_model, fit.method = fit_method)
     attr(fit, "model_name") <- mod
@@ -158,7 +156,7 @@ krig_gd2 <- function(r, grd = NULL, weight_r = NULL,
  
   if (model_output) {
     # If model output is requested, return the prediction and variogram
-    return(list(prediction = r_pred, variogram = v, model = best_fit))
+    return(list(raster = r_pred, variogram = v, model = best_fit))
   } else {
     # If only prediction is requested, return the raster
     return(r_pred)
