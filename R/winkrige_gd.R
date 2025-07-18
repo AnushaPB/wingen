@@ -87,10 +87,10 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
 
     # Extract sample counts
     sample_counts <- terra::extract(weight_r, r_pts[, c("x", "y")])[,2]
-    
-    # Confirm no sample count values are less than 1 or NA
-    stopifnot(all(sample_counts >= 1))
-    stopifnot(all(!is.na(sample_counts))) 
+
+    # Confirm all sample count values are greater than 0 and not NA
+    if (any(sample_counts <= 0, na.rm = TRUE))  stop("All values of weight_r must be > 0")
+    if (any(is.na(sample_counts))) stop("All values of weight_r must be non-NA")
 
     # Estimate global variance
     sigma2_global <- stats::var(r_pts$value, na.rm = TRUE)
@@ -131,10 +131,6 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
   sse <- sapply(fitted_models, function(f) attr(f, "SSErr"))
   best_fit <- fitted_models[[which.min(sse)]]
   best_model <- attr(best_fit, "model_name")
-
-  # Print best model information
-  message("Best model:", best_model, "\n")
-  message("SSErr:", min(sse), "\n")
 
   # Use best model for kriging
   if (is.null(weight_r)) {
