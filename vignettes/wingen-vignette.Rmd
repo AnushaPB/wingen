@@ -599,7 +599,13 @@ want to test different values for `nmax`, which is the maximum number of points
 to use for kriging; here we use `nmax = 30` to balance speed and accuracy.
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-kgd <- winkrige_gd(wgd[["pi"]], grd = lotr_lyr, weight_r = wgd[["n"]], nmax = 30)
+# First, let's make a layer to krige across
+# Let's say I want to krige to twice the resolution of the moving window layer
+# I can use the disagg() function to disaggregate the moving window layer
+grd <- disagg(wgd, 2)
+
+# Then, I can use this layer as the grid to krige across
+kgd <- winkrige_gd(wgd[["pi"]], grd = grd, weight_r = wgd[["sample_count"]], nmax = 30)
 
 ggplot_gd(kgd) +
   ggtitle("Kriged pi")
@@ -640,9 +646,10 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5.5, fig.height = 5, warning = FALSE}
-# Disaggregate lotr_lyr to make it the same resolution as kgd before masking
+# Aggregate the lotr_lyr to make it the same resolution as kgd before masking
 ## Note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
-mask_lyr <- disagg(rast(lotr_lyr), 2)
+lotr_rast <- rast(lotr_lyr)
+mask_lyr <- aggregate(lotr_rast, 2)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
 ggplot_gd(mgd) +

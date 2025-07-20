@@ -40,7 +40,12 @@ winkrige_gd(
 
 \item{max_range_frac}{Numeric. Maximum fraction of the range parameter to consider for neighboring observations (default: 0.5). This can help to limit the influence of distant points.}
 
-\item{fit_method}{Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}: 1 = weights \(N_j\); 2 = weights \(N_j / \gamma(h_j)^2\); 6 = Ordinary Least Squares (unweighted); 7 = weights \(N_j / h_j^2\). The default (\code{6}) uses OLS, which is generally more robust for small or noisy datasets (see Note).}
+\item{fit_method}{Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}:
+1 = weights N_j;
+2 = weights N_j / gamma(h_j)^2;
+6 = Ordinary Least Squares (unweighted);
+7 = weights N_j / h_j^2.
+The default (6) uses OLS, which is generally more robust for small or noisy datasets (see Note).}
 
 \item{model_output}{Logical. If \code{TRUE}, returns a list with the prediction raster, variogram, and fitted variogram model. If \code{FALSE} (default), returns only the prediction raster.}
 }

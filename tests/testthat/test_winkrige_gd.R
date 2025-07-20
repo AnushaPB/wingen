@@ -31,14 +31,14 @@ test_that("winkrige_gd with weights produces expected results", {
   # Confirm error if weights have values > 0
   weight_r[1] <- 0
   expect_error(
-    winkrige_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r),
+    capture_warnings(winkrige_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r)),
     "All values of weight_r must be > 0"
   )
 
   # Confirm error if weights have NA values
   weight_r[1] <- NA
   expect_error(
-    winkrige_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r),
+    capture_warnings(winkrige_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r)),
     "All values of weight_r must be non-NA"
   )
 })
@@ -79,4 +79,3 @@ test_that("winkrige_gd can handle multiple models", {
   
   expect_true(inherits(kpi, "list"))
 })
-
