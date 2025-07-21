@@ -647,9 +647,8 @@ exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5.5, fig.height = 5, warning = FALSE}
 # Aggregate the lotr_lyr to make it the same resolution as kgd before masking
-## Note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
-lotr_rast <- rast(lotr_lyr)
-mask_lyr <- aggregate(lotr_rast, 2)
+# Note: lotr_lyr is a RasterLayer, so we convert it to a SpatRaster
+mask_lyr <- resample(rast(lotr_lyr), kgd)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
 ggplot_gd(mgd) +
