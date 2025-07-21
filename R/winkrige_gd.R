@@ -155,7 +155,7 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
   if (!inherits(grd, "SpatRaster")) grd <- terra::rast(grd)
   grd_df <- terra::as.data.frame(grd, xy = TRUE, na.rm = FALSE)
   grd_sf <- sf::st_as_sf(grd_df, coords = c("x", "y"), crs = terra::crs(r))
-  krig_pred <- predict(krig_model, newdata = grd_sf)
+  krig_pred <- terra::predict(krig_model, newdata = grd_sf)
 
   # Convert predictions to rasters
   r_pred <- terra::rasterize(krig_pred, grd, crs = terra::crs(grd), field = "var1.pred")
