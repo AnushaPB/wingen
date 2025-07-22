@@ -1,6 +1,8 @@
 comment: false
 
 coverage:
+  ignore:
+    - "R/krig_gd.R"
   status:
     project:
       default:
@@ -12,3 +14,4 @@ coverage:
         target: auto
         threshold: 1%
         informational: true
+

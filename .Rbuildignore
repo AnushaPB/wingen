@@ -31,6 +31,7 @@
 ^renv\.LOCK$
 ^doc$
 ^Meta$
+^misc$
 ^CRAN-SUBMISSION$
 ^README_files$
 ^README\.html$

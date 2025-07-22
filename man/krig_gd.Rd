@@ -2,7 +2,7 @@
 % Please edit documentation in R/krig_gd.R
 \name{krig_gd}
 \alias{krig_gd}
-\title{Krige moving window maps}
+\title{Superseded: Krige moving window maps}
 \usage{
 krig_gd(
   r,
@@ -38,7 +38,7 @@ krig_gd(
 
 \item{disagg_r}{factor to use for disaggregation, of \code{r} if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
 
-\item{autoKrige_output}{whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
+\item{autoKrige_output}{whether to return full output from  autoKrige including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
 
 \item{lower_bound}{if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum}
 
@@ -51,15 +51,25 @@ krig_gd(
 \item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
 }
 \value{
-a SpatRaster object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
+A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of autoKrige outputs.
 }
 \description{
-Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
+\strong{This function has been superseded by \code{\link[wingen]{winkrige_gd}} and may be removed in a future release.}
+Please use \code{winkrige_gd()} instead, which provides improved performance and does not depend on the automap package.
+
+Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
+}
+\details{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
 }
 \examples{
+\dontrun{
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
 plot_gd(kpi, main = "Kriged Pi")
-
+}
+}
+\seealso{
+\code{\link[wingen]{winkrige_gd}} for the updated kriging function.
 }

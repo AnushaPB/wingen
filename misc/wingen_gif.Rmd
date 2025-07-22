@@ -139,7 +139,7 @@ movie.name = "wingen2.gif",
 interval = 0.08, 
 ani.width = 500, 
 ani.height = 500,
-outdir = getwd()
+outdir = "misc"
 )  
 ```
 
@@ -210,7 +210,7 @@ movie.name = "wingen3.gif",
 interval = 0.08, 
 ani.width = 600, 
 ani.height = 300,
-outdir = getwd()
+outdir = "misc"
 )  
 
 plot_gd(lyr, col = viridis::cividis(100))
