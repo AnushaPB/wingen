@@ -61,16 +61,6 @@ Performs spatial interpolation (kriging) of the raster(s) produced by \code{\lin
 }
 \details{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
-
-This legacy function depends on the automap package, which has been archived on CRAN.
-Users wishing to use \code{krig_gd()} must install the archived version of automap manually:
-
-\preformatted{
-install.packages(
-  "https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz",
-  repos = NULL, type = "source"
-)
-}
 }
 \examples{
 \dontrun{
