@@ -23,6 +23,9 @@ issue. Wingen can still be installed from GitHub and automap can be
 installed from the CRAN archive:
 `install.packages("https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz", repos = NULL, type = "source")`*
 
+*Update 07/22/2025: automap is back on CRAN and wingen will be up shortly. 
+We are taking this opportunity to introduce a new kriging approach. Stay tuned!*
+
 ------------------------------------------------------------------------
 
 Generate continuous maps of genetic diversity using moving windows with
