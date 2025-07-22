@@ -590,7 +590,7 @@ lesser extent.
 To run this function, we provide the moving window raster layer and a raster
 layer to interpolate across. If no raster layer for interpolation is provided,
 the moving window layer will be used (i.e., the output kriged layer will have
-the same resolution and extent of the input window layer) If a stack of rasters
+the same resolution and extent of the input window layer). If a stack of rasters
 is provided, only the first layer will be used. The output of this function is a
 kriged raster layer. Optionally, users can supply the moving window sample
 counts layer with the `weight_r` argument to set weights for variogram fitting
