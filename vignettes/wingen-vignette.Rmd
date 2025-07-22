@@ -178,7 +178,7 @@ The main arguments that all three functions have in common are:
     -   `"basic_stats"` for a series of statistics produced by
         `hierfstat::basic.stats()` including mean observed
         heterozygosity (same as Ho), mean gene diversities within
-        population (Hs), G ene diversities overall (Ht), and Fis
+        population (Hs), Gene diversities overall (Ht), and Fis
         following Nei (1987). Population-based statistics (e.g., FST)
         normally reported by `hierfstat::basic.stats()` are not included
         as they are not meaningful within the individual-based moving
