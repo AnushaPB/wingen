@@ -181,13 +181,18 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 #' @noRd
 krig <- function(krig_df, krig_grid, grd, autoKrige_output = FALSE, krig_method = "ordinary", lower_bound = TRUE, upper_bound = TRUE) {
   # autokrige
-  autoKrige <- getExportedValue("automap", "autoKrige") # Use this so R CMD check doesn't complain about automap::
+  if (!requireNamespace("automap", quietly = TRUE)) {
+    stop("The 'automap' package is not installed. This function requires 'automap', which is archived on CRAN. Install it manually using:\n  install.packages(\"https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz\", repos = NULL, type = \"source\")")
+  }
+
+  autoKrige <- getExportedValue("automap", "autoKrige") # Use this so R CMD check doesn't complain about automap
+
   if (krig_method == "ordinary") {
     krig_res <- autoKrige(layer ~ 1, input_data = krig_df, new_data = krig_grid)
   } else if (krig_method == "universal") {
     krig_res <- autoKrige(layer ~ x + y, input_data = krig_df, new_data = krig_grid)
   } else {
-    stop("invalid krig_method specified")
+    stop("Invalid krig_method specified")
   }
 
   # Convert results to vector
