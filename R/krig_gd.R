@@ -7,17 +7,6 @@
 #' Please use \code{winkrige_gd()} instead, which provides improved performance and does not depend on the automap package.
 #'
 #' Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
-#'
-#' @details
-#' This legacy function depends on the automap package, which has been archived on CRAN. 
-#' Users wishing to use \code{krig_gd()} must install the archived version of automap manually:
-#' 
-#' \preformatted{
-#' install.packages(
-#'   "https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz",
-#'   repos = NULL, type = "source"
-#' )
-#' }
 #' 
 #' @param r SpatRaster produced by \link[wingen]{window_gd}
 #' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)
@@ -64,7 +53,10 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
   )
 
   if (!requireNamespace("automap", quietly = TRUE)) {
-    stop("The automap package is not installed. This function requires automap, which is archived on CRAN. Install it manually using:\n  install.packages(\"https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz\", repos = NULL, type = \"source\")")
+    stop(
+      "The 'automap' package is required but not installed. ",
+      "Please install it with:\n    install.packages(\"automap\")"
+    )
   }
 
   # check CRS
