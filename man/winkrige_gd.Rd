@@ -52,7 +52,7 @@ The default (6) uses OLS, which is generally more robust for small or noisy data
 \value{
 A \link[terra]{SpatRaster} object of kriged predictions if \code{model_output = FALSE}. If \code{model_output = TRUE}, returns a list with:
 \describe{
-\item{prediction}{Kriged prediction raster (\link[terra]{SpatRaster})}
+\item{raster}{Kriged prediction raster (\link[terra]{SpatRaster})}
 \item{variogram}{Empirical variogram (\link[gstat]{variogram})}
 \item{model}{Best-fit variogram model (\link[gstat]{vgm})}
 }
@@ -87,7 +87,7 @@ During variogram fitting, you may see:
 This means the optimizer reached its iteration limit before fully minimizing the error. Even in these cases, \code{gstat} returns the best-fit model found so far. Warnings often occur with small datasets or noisy empirical variograms. You can experiment with different \code{psill_start}, \code{range_start}, and \code{nugget_start} values, or increase the iteration limit using \code{options(gstat.fit.maxiter)}.
 }
 \examples{
-# Note: this toy example uses a very small dataset. 
+# Note: this toy example uses a very small dataset.
 # Warnings may occur due to limited points for variogram fitting.
 suppressWarnings({
   load_mini_ex()

@@ -3,7 +3,7 @@
 #' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the gstat package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
 #'
 #' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. It also includes optional weighting to account for sample count variation.
-#' 
+#'
 #' By default, starting values for variogram parameters are set heuristically:
 #' - partial sill = ~80% of global variance
 #' - nugget = ~20% of global variance
@@ -12,7 +12,7 @@
 #' The variogram fitting method defaults to Ordinary Least Squares (\code{fit_method = 6}), which tends to produce more stable fits in noisy or irregular datasets. Weighted methods (1, 2, and 7) may offer improved accuracy in large, well-distributed datasets.
 #'
 #' For more fine-scale control over variogram fitting and kriging, consult the `gstat` package documentation.
-#' 
+#'
 #' @param r SpatRaster produced by \link[wingen]{window_gd}. Only the first layer is used if multiple layers are present.
 #' @param grd Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, \code{r} is used to create a grid.
 #' @param weight_r Optional \link[terra]{SpatRaster} with sample counts per cell, used to compute location-specific measurement variance and weights for kriging. If \code{NULL} (default), no weighting is applied.
@@ -23,11 +23,11 @@
 #' @param nugget_start Optional starting value for nugget effect. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param range_start Optional starting value for range parameter. If \code{NULL} (default), a heuristic value is used (see Note).
 #' @param max_range_frac Numeric. Maximum fraction of the range parameter to consider for neighboring observations (default: 0.5). This can help to limit the influence of distant points.
-#' @param fit_method Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}: 
-#' 1 = weights N_j; 
-#' 2 = weights N_j / gamma(h_j)^2; 
-#' 6 = Ordinary Least Squares (unweighted); 
-#' 7 = weights N_j / h_j^2. 
+#' @param fit_method Integer. Variogram fitting method passed to \link[gstat]{fit.variogram}:
+#' 1 = weights N_j;
+#' 2 = weights N_j / gamma(h_j)^2;
+#' 6 = Ordinary Least Squares (unweighted);
+#' 7 = weights N_j / h_j^2.
 #' The default (6) uses OLS, which is generally more robust for small or noisy datasets (see Note).
 #' @param model_output Logical. If \code{TRUE}, returns a list with the prediction raster, variogram, and fitted variogram model. If \code{FALSE} (default), returns only the prediction raster.
 #'
@@ -43,7 +43,7 @@
 #'
 #' @return A \link[terra]{SpatRaster} object of kriged predictions if \code{model_output = FALSE}. If \code{model_output = TRUE}, returns a list with:
 #' \describe{
-#'   \item{prediction}{Kriged prediction raster (\link[terra]{SpatRaster})}
+#'   \item{raster}{Kriged prediction raster (\link[terra]{SpatRaster})}
 #'   \item{variogram}{Empirical variogram (\link[gstat]{variogram})}
 #'   \item{model}{Best-fit variogram model (\link[gstat]{vgm})}
 #' }
@@ -52,7 +52,7 @@
 #' This function uses \link[gstat]{gstat} for variogram fitting and kriging. Weights are computed as the inverse of estimated location-specific variance (\eqn{\sigma^2 / n}) if sample counts are provided.
 #'
 #' @examples
-#' # Note: this toy example uses a very small dataset. 
+#' # Note: this toy example uses a very small dataset.
 #' # Warnings may occur due to limited points for variogram fitting.
 #' suppressWarnings({
 #'   load_mini_ex()
@@ -70,9 +70,9 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
   # Make sure grid and raster layer are SpatRasters
   if (!inherits(grd, "SpatRaster") & !is.null(grd) & inherits(grd, "RasterLayer")) grd <- terra::rast(grd)
   if (!inherits(r, "SpatRaster")) r <- terra::rast(r)
-  
+
   # Check CRS
-  crs_check_krig(r = r, grd = grd)                    
+  crs_check_krig(r = r, grd = grd)
 
   # Add check for r being a SpatRaster with one layer
   if (terra::nlyr(r) > 1) {
@@ -110,7 +110,7 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
     r_pts$variance <- sigma2_global / sample_counts
 
     # Convert variance to weights
-    r_pts$weight <- 1 / r_pts$variance  
+    r_pts$weight <- 1 / r_pts$variance
   } else {
     r_pts$weight <- NULL  # No location-specific variance information
   }
@@ -160,7 +160,7 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
   # Convert predictions to rasters
   r_pred <- terra::rasterize(krig_pred, grd, crs = terra::crs(grd), field = "var1.pred")
   names(r_pred) <- names(r)
- 
+
   if (model_output) {
     # If model output is requested, return the prediction and variogram
     return(list(raster = r_pred, variogram = v, model = best_fit))
