@@ -90,7 +90,7 @@ winkrige_gd <- function(r, grd = NULL, weight_r = NULL,
   # - σ²_global = variance of all raster values (assumes homoskedasticity)
   # - n = sample count in each cell
   # - Var(mean) = σ² / n because averaging reduces variance by factor n
-  # Gstat expects weights = 1/variance to reflect confidence in observations.
+  # gstat expects weights = 1/variance to reflect confidence in observations.
   # More samples → lower variance → higher weight.
   if (!is.null(weight_r)) {
     # Convert weight_r to SpatRaster if not already
