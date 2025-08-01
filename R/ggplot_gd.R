@@ -2,10 +2,10 @@
 #'
 #' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
-#' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity)
-#' @param bkg optional raster or sf polygon
-#' @param col color palette to use for plotting (defaults to \link[viridis]{magma} palette)
-#' @param index index of raster layers to plot (defaults to plotting all of the layers except the one called "sample_count", if more than one layer is provided)
+#' @param x Output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (RasterStack where first layer is genetic diversity).
+#' @param bkg Optional raster or sf polygon.
+#' @param col Color palette to use for plotting (defaults to \link[viridis]{magma} palette).
+#' @param index Index of raster layers to plot (defaults to plotting all of the layers except the one called "sample_count", if more than one layer is provided).
 #'
 #' @return list of ggplots
 #' @export
@@ -44,9 +44,9 @@ ggplot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(100)) {
 #'
 #' Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
-#' @param x single SpatRaster of counts or SpatRaster where indexed layer is sample counts
-#' @param index  index of raster layers to plot (defaults to plotting the one called "sample_count", if more than one layer is provided)
-#' @param col color palette to use for plotting (defaults to viridis::mako palette)
+#' @param x Single SpatRaster of counts or SpatRaster where indexed layer is sample counts.
+#' @param index Index of raster layers to plot (defaults to plotting the one called "sample_count", if more than one layer is provided).
+#' @param col Color palette to use for plotting (defaults to viridis::mako palette).
 #'
 #' @return list of ggplots
 #' @export

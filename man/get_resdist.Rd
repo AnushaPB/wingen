@@ -15,22 +15,22 @@ get_resdist(
 )
 }
 \arguments{
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+\item{coords}{Coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections).}
 
-\item{lyr}{conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.}
+\item{lyr}{Conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.}
 
-\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{Aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time).}
 
-\item{transitionFunction}{function to calculate transition values from grid values (defaults to mean)}
+\item{transitionFunction}{Function to calculate transition values from grid values (defaults to mean).}
 
-\item{directions}{directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)}
+\item{directions}{Directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8).}
 
-\item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
+\item{geoCorrection}{Whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
 
-\item{coords_only}{whether to return distances only for sample coordinates}
+\item{coords_only}{Whether to return distances only for sample coordinates.}
 }
 \value{
-a distance matrix used by \link[wingen]{resist_gd}
+A distance matrix used by \link[wingen]{resist_gd}.
 }
 \description{
 Create a distance matrix based on coordinates and a connectivity layer.

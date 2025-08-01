@@ -2,9 +2,9 @@
 #'
 #' Loads middle earth example data
 #'
-#' @param quiet whether to hide message (defaults to FALSE)
+#' @param quiet Whether to hide message (defaults to FALSE).
 #'
-#' @return three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
+#' @return Three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs).
 #' @export
 #'
 #' @examples
@@ -32,9 +32,9 @@ load_middle_earth_ex <- function(quiet = FALSE) {
 #'
 #' Loads mini middle earth example data
 #'
-#' @param quiet whether to hide message (defaults to FALSE)
+#' @param quiet Whether to hide message (defaults to FALSE).
 #'
-#' @return three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
+#' @return Three objects are assigned in the GlobalEnv (vcf, coords, and lyr).
 #' @export
 #'
 #' @examples

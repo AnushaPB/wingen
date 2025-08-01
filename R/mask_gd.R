@@ -2,10 +2,10 @@
 #'
 #' Mask genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
-#' @param x Raster object to mask
-#' @param y Raster object or Spatial object to use as mask
-#' @param minval if y is a Raster object, value of y below which to mask
-#' @param maxval if y is a Raster object, value of y above which to mask
+#' @param x Raster object to mask.
+#' @param y Raster object or Spatial object to use as mask.
+#' @param minval If y is a Raster object, value of y below which to mask.
+#' @param maxval If y is a Raster object, value of y above which to mask.
 #'
 #' @return RasterLayer
 #' @export

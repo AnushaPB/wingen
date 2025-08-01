@@ -18,25 +18,25 @@ preview_gd(
 )
 }
 \arguments{
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For \code{method = "resist"} this should also be the conductivity layer (see \link[wingen]{resist_gd})}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections). For \code{method = "resist"} this should also be the conductivity layer (see \link[wingen]{resist_gd}).}
 
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+\item{coords}{Coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections).}
 
-\item{method}{which method to use to create preview (\code{"window"} for \link[wingen]{window_gd}, \code{"circle"} for \link[wingen]{circle_gd}, or \code{"resist"} for \link[wingen]{resist_gd}; defaults to \code{"window"})}
+\item{method}{Which method to use to create preview (\code{"window"} for \link[wingen]{window_gd}, \code{"circle"} for \link[wingen]{circle_gd}, or \code{"resist"} for \link[wingen]{resist_gd}; defaults to \code{"window"}).}
 
-\item{wdim}{if \code{method = "window"}, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
+\item{wdim}{If \code{method = "window"}, dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window).}
 
-\item{maxdist}{if \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist} or \link[wingen]{get_resdist})}
+\item{maxdist}{If \code{method = "circle"} or \verb{method = "resist}, the maximum geographic distance used to define the neighborhood; any samples further than this distance will not be included (see \link[wingen]{get_geodist} or \link[wingen]{get_resdist}).}
 
-\item{distmat}{if \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist} or \link[wingen]{get_resdist}, respectively. If not provided, one will be automatically calculated.}
+\item{distmat}{If \code{method = "circle"} or \code{method = "resist"}, an optional distance matrix to be used output from either \link[wingen]{get_geodist} or \link[wingen]{get_resdist}, respectively. If not provided, one will be automatically calculated.}
 
-\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{Aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time).}
 
-\item{sample_count}{whether to create plot of sample counts for each cell (defaults to TRUE)}
+\item{sample_count}{Whether to create plot of sample counts for each cell (defaults to TRUE).}
 
-\item{min_n}{minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA)}
+\item{min_n}{Minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA).}
 
-\item{plot}{whether to plot results (default = TRUE)}
+\item{plot}{Whether to plot results (default = TRUE).}
 }
 \value{
 Plots preview of window and returns SpatRaster with sample counts layer (if sample_count = TRUE)

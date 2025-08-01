@@ -2,13 +2,13 @@
 #'
 #' Generate a continuous raster map of genetic diversity using resistance distances calculated with a conductivity surface
 #'
-#' @param maxdist maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
+#' @param maxdist Maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
 #' Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as `lyr`).
-#' @param lyr conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.
-#' @param distmat distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)
-#' @param transitionFunction function to calculate transition values from grid values (defaults to mean)
-#' @param directions directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)
-#' @param geoCorrection whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).
+#' @param lyr Conductivity layer (higher values should mean greater conductivity) to move window across. Can be either a SpatRaster or RasterLayer.
+#' @param distmat Distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations).
+#' @param transitionFunction Function to calculate transition values from grid values (defaults to mean).
+#' @param directions Directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8).
+#' @param geoCorrection Whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 #' As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
@@ -77,9 +77,9 @@ resist_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' will not convert your data into the correct format for calculations of different
 #' diversity metrics. See details for how to format data inputs for different statistics.
 #'
-#' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
-#' @param stat moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
-#' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
+#' @param x Data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details).
+#' @param stat Moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`).
+#' @param ... If a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`).
 #' @inheritParams window_general
 #' @inheritParams resist_gd
 #'
@@ -151,10 +151,10 @@ resist_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
 #' using the gdistance package. This matrix is used by \link[wingen]{resist_gd}.
 #' If coords_only = TRUE, the result is a distance matrix for the sample coordinates
 #' only.
-#' @param lyr conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.
+#' @param lyr Conductivity layer (higher values should mean greater conductivity) for generating distances. Can be either a SpatRaster or RasterLayer.
 #' @inheritParams resist_gd
-#' @param coords_only whether to return distances only for sample coordinates
-#' @return a distance matrix used by \link[wingen]{resist_gd}
+#' @param coords_only Whether to return distances only for sample coordinates.
+#' @return A distance matrix used by \link[wingen]{resist_gd}.
 #' @export
 #'
 #' @examples
@@ -202,7 +202,7 @@ get_resdist <- function(coords, lyr, fact = 0, transitionFunction = mean, direct
 
 #' Convert coordinates to dataframe
 #'
-#' @param coords coordinates
+#' @param coords Coordinates.
 #'
 #' @return dataframe of coordinates
 #'

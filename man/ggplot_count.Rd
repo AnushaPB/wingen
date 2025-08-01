@@ -7,11 +7,11 @@
 ggplot_count(x, index = NULL, col = viridis::mako(100))
 }
 \arguments{
-\item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
+\item{x}{Single SpatRaster of counts or SpatRaster where indexed layer is sample counts.}
 
-\item{index}{index of raster layers to plot (defaults to plotting the one called "sample_count", if more than one layer is provided)}
+\item{index}{Index of raster layers to plot (defaults to plotting the one called "sample_count", if more than one layer is provided).}
 
-\item{col}{color palette to use for plotting (defaults to viridis::mako palette)}
+\item{col}{Color palette to use for plotting (defaults to viridis::mako palette).}
 }
 \value{
 list of ggplots

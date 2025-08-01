@@ -14,17 +14,17 @@ coords_to_raster(
 )
 }
 \arguments{
-\item{coords}{coordinates of samples as sf points, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates}
+\item{coords}{Coordinates of samples as sf points, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates.}
 
-\item{buffer}{size of buffer to add to edge of raster (defaults to 0)}
+\item{buffer}{Size of buffer to add to edge of raster (defaults to 0).}
 
-\item{res}{desired resolution of raster (defaults to 1). Can be a single value for square cells or a vector with two values representing x and y resolutions}
+\item{res}{Desired resolution of raster (defaults to 1). Can be a single value for square cells or a vector with two values representing x and y resolutions.}
 
-\item{agg}{aggregation factor to apply to raster (defaults to NULL)}
+\item{agg}{Aggregation factor to apply to raster (defaults to NULL).}
 
-\item{disagg}{disaggregation factor to apply to raster (defaults to NULL)}
+\item{disagg}{Disaggregation factor to apply to raster (defaults to NULL).}
 
-\item{plot}{whether to plot resulting raster with coords (defaults to FALSE)}
+\item{plot}{Whether to plot resulting raster with coords (defaults to FALSE).}
 }
 \value{
 RasterLayer

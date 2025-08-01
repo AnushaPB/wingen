@@ -7,10 +7,10 @@
 load_middle_earth_ex(quiet = FALSE)
 }
 \arguments{
-\item{quiet}{whether to hide message (defaults to FALSE)}
+\item{quiet}{Whether to hide message (defaults to FALSE).}
 }
 \value{
-three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs)
+Three objects are loaded (lotr_vcf, lotr_coords, and lotr_lyrs).
 }
 \description{
 Loads middle earth example data

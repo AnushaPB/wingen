@@ -7,13 +7,13 @@
 mask_gd(x, y, minval = NULL, maxval = NULL)
 }
 \arguments{
-\item{x}{Raster object to mask}
+\item{x}{Raster object to mask.}
 
-\item{y}{Raster object or Spatial object to use as mask}
+\item{y}{Raster object or Spatial object to use as mask.}
 
-\item{minval}{if y is a Raster object, value of y below which to mask}
+\item{minval}{If y is a Raster object, value of y below which to mask.}
 
-\item{maxval}{if y is a Raster object, value of y above which to mask}
+\item{maxval}{If y is a Raster object, value of y above which to mask.}
 }
 \value{
 RasterLayer

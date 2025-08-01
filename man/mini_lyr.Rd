@@ -5,10 +5,10 @@
 \alias{mini_lyr}
 \title{Mini middle earth example raster}
 \format{
-A RasterLayer of middle earth
+A RasterLayer of middle earth.
 }
 \source{
-created from simulations in Bishop et al. (2023)
+Created from simulations in Bishop et al. (2023).
 }
 \usage{
 mini_lyr

@@ -7,12 +7,12 @@
 \format{
 A data frame with 10 rows and 2 columns
 \describe{
-\item{x}{x coordinate}
-\item{y}{y coordinate}
+\item{x}{X coordinate.}
+\item{y}{Y coordinate.}
 }
 }
 \source{
-created from simulations in Bishop et al. (2023)
+Created from simulations in Bishop et al. (2023).
 }
 \usage{
 mini_coords

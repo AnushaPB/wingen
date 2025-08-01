@@ -5,10 +5,10 @@
 \alias{lotr_vcf}
 \title{Middle earth example vcf}
 \format{
-Object of class vcfR with 100 individuals and 1000 loci
+Object of class vcfR with 100 individuals and 1000 loci.
 }
 \source{
-created from simulations in Bishop et al. (2023)
+Created from simulations in Bishop et al. (2023).
 }
 \usage{
 lotr_vcf

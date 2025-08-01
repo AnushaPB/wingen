@@ -17,22 +17,22 @@ plot_count(
 )
 }
 \arguments{
-\item{x}{single SpatRaster of counts or SpatRaster where indexed layer is sample counts}
+\item{x}{Single SpatRaster of counts or SpatRaster where indexed layer is sample counts.}
 
-\item{index}{if a raster stack is provided, index of the sample count layer to plot
-(defaults to plotting the layer named "sample_count" or the last layer of the stack)}
+\item{index}{If a raster stack is provided, index of the sample count layer to plot
+(defaults to plotting the layer named "sample_count" or the last layer of the stack).}
 
-\item{breaks}{number of breaks to use in color scale (defaults to 10)}
+\item{breaks}{Number of breaks to use in color scale (defaults to 10).}
 
-\item{col}{color palette to use for plotting (defaults to viridis::magma palette)}
+\item{col}{Color palette to use for plotting (defaults to viridis::magma palette).}
 
 \item{main}{character. Main plot titles (one for each layer to be plotted). You can use arguments \code{cex.main}, \code{font.main}, \code{col.main} to change the appearance; and \code{loc.main} to change the location of the main title (either two coordinates, or a character value such as "topleft")}
 
-\item{box}{whether to include a box around the raster plot (defaults to FALSE)}
+\item{box}{Whether to include a box around the raster plot (defaults to FALSE).}
 
-\item{range}{numeric. minimum and maximum values to be used for the continuous legend}
+\item{range}{Numeric. minimum and maximum values to be used for the continuous legend.}
 
-\item{legend}{whether to include legend}
+\item{legend}{Whether to include legend.}
 
 \item{...}{arguments passed to \code{plot("SpatRaster", "numeric")} and additional graphical arguments}
 }

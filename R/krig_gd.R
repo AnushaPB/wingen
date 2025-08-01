@@ -9,19 +9,19 @@
 #' Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
 #'
 #' @param r SpatRaster produced by \link[wingen]{window_gd}.
-#' @param index integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer).
-#' @param grd object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.
-#' @param coords if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates.
-#' @param agg_grd factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL).
-#' @param disagg_grd factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL).
-#' @param agg_r factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL).
-#' @param disagg_r factor to use for disaggregation of `r`, if provided (this will increase the number of points used in the kriging model; defaults to NULL).
-#' @param autoKrige_output whether to return full output from autoKrige including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
-#' @param lower_bound if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum.
-#' @param upper_bound if TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum.
-#' @param krig_method method to use for kriging. If `ordinary`, ordinary/simple kriging is performed (formula: ~ 1; default). If `universal`,  universal kriging is performed (formula = ~ x + y).
-#' @param resample whether to resample `grd` or `r`. Set to `"r"` to resample `r` to `grd`. Set to `"grd"` to resample `grd` to `r` (defaults to FALSE for no resampling).
-#' @param resample_first if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE).
+#' @param index Integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer).
+#' @param grd Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.
+#' @param coords If provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates.
+#' @param agg_grd Factor to use for aggregation of `grd`, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL).
+#' @param disagg_grd Factor to use for disaggregation of `grd`, if provided (this will increase the resolution of the final kriged raster; defaults to NULL).
+#' @param agg_r Factor to use for aggregation of `r`, if provided (this will decrease the number of points used in the kriging model; defaults to NULL).
+#' @param disagg_r Factor to use for disaggregation of `r`, if provided (this will increase the number of points used in the kriging model; defaults to NULL).
+#' @param autoKrige_output Whether to return full output from autoKrige including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").
+#' @param lower_bound If TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum.
+#' @param upper_bound If TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum.
+#' @param krig_method Method to use for kriging. If `ordinary`, ordinary/simple kriging is performed (formula: ~ 1; default). If `universal`,  universal kriging is performed (formula = ~ x + y).
+#' @param resample Whether to resample `grd` or `r`. Set to `"r"` to resample `r` to `grd`. Set to `"grd"` to resample `grd` to `r` (defaults to FALSE for no resampling).
+#' @param resample_first If aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE).
 #'
 #' @return
 #' A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of autoKrige outputs.
@@ -166,8 +166,8 @@ krig_gd_lyr <- function(r, grd = NULL, coords = NULL,
 
 #' Perform kriging with autoKrige
 #'
-#' @param krig_df dataframe for kriging
-#' @param krig_grid grid for kriging
+#' @param krig_df Dataframe for kriging.
+#' @param krig_grid Grid for kriging.
 #' @inheritParams krig_gd
 #'
 #' @noRd
@@ -254,7 +254,7 @@ make_krige_grid <- function(grd = NULL) {
 
 #' Convert a raster or data.frame of coordinates to a sf object for kriging
 #'
-#' @param x SpatRaster
+#' @param x SpatRaster.
 #'
 #' @return sf points
 #'

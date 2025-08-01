@@ -7,16 +7,16 @@
 get_geodist(coords, lyr = NULL, fact = 0, coords_only = FALSE)
 }
 \arguments{
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+\item{coords}{Coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections).}
 
-\item{lyr}{SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE)}
+\item{lyr}{SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE).}
 
-\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{Aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time).}
 
-\item{coords_only}{whether to return distances only for sample coordinates}
+\item{coords_only}{Whether to return distances only for sample coordinates.}
 }
 \value{
-a distance matrix used by \link[wingen]{circle_gd}
+A distance matrix used by \link[wingen]{circle_gd}.
 }
 \description{
 Create a distance matrix based on coordinates and a raster layer.
