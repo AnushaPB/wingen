@@ -75,15 +75,15 @@ ggplot_count(wgd) +
   ggtitle("Moving window sample counts")
 ```
 
-Next, the output from `window_gd()` can be interpolated using kriging with the `winkrige_gd()` function.
+Next, the output from `window_gd()` can be interpolated using kriging with the `wkrig_gd()` function.
 
 ```{r krig_gd, warning = FALSE, message = FALSE, results = FALSE}
 # Interpolate to a higher resolution
 krige_layer <- disagg(wgd, 2) 
-kgd <- winkrige_gd(wgd, krige_layer)
+kgd <- wkrig_gd(wgd, krige_layer)
 ```
 
-Finally, the output from `winkrige_gd()` (or `window_gd()`) can be masked to exclude areas that fall outside of the study area or that were undersampled.
+Finally, the output from `wkrig_gd()` (or `window_gd()`) can be masked to exclude areas that fall outside of the study area or that were undersampled.
 
 ```{r mask_gd, warning = FALSE, message = FALSE, results = FALSE}
 # Mask results that fall outside of the "range"

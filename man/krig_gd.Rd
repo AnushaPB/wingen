@@ -54,8 +54,8 @@ krig_gd(
 A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of autoKrige outputs.
 }
 \description{
-\strong{This function has been superseded by \code{\link[wingen]{winkrige_gd}} and may be removed in a future release.}
-Please use \code{winkrige_gd()} instead, which provides improved performance and does not depend on the automap package.
+\strong{This function has been superseded by \code{\link[wingen]{wkrig_gd}} and may be removed in a future release.}
+Please use \code{wkrig_gd()} instead, which provides improved performance and does not depend on the automap package.
 
 Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
 }
@@ -71,5 +71,5 @@ plot_gd(kpi, main = "Kriged Pi")
 }
 }
 \seealso{
-\code{\link[wingen]{winkrige_gd}} for the updated kriging function.
+\code{\link[wingen]{wkrig_gd}} for the updated kriging function.
 }

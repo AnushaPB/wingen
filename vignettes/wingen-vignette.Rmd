@@ -102,7 +102,7 @@ The workflow of wingen uses three main functions:
 1.  `window_gd()`, `circle_gd()`, or `resist_gd()` to generate moving
     window maps of genetic diversity
 
-2.  `winkrige_gd()` to use kriging to interpolate the moving window maps
+2.  `wkrig_gd()` to use kriging to interpolate the moving window maps
 
 3.  `mask_gd()` to mask areas of the maps from (1) and (2) (e.g., to
     exclude areas outside the study region)
@@ -564,7 +564,7 @@ ggplot_gd(resist_gd)
 ### Krige results
 
 To produce smoother maps of genetic diversity, we provide the function
-`winkrige_gd()` which creates a spatially interpolated raster from the
+`wkrig_gd()` which creates a spatially interpolated raster from the
 moving window raster produced by the moving window functions. This
 function uses the gstat package to fit different variogram models and
 select the best one to perform kriging.
@@ -610,14 +610,14 @@ speed and accuracy.
 grd <- disagg(wgd, 2)
 
 # Then, I can use this layer as the grid to krige across
-kgd <- winkrige_gd(wgd[["pi"]], grd = grd, weight_r = wgd[["sample_count"]], nmax = 30)
+kgd <- wkrig_gd(wgd[["pi"]], grd = grd, weight_r = wgd[["sample_count"]], nmax = 30)
 
 ggplot_gd(kgd) +
   ggtitle("Kriged pi")
 ```
 
 Users can optionally get the full model output by setting
-`model_output = TRUE` in which case `winkrige_gd()` returns a list where
+`model_output = TRUE` in which case `wkrig_gd()` returns a list where
 the first element ("raster") is the kriged raster, the second element
 ("variogram") is the variogram, and the third element ("model") is the
 best-fit variogram model.
@@ -625,7 +625,7 @@ best-fit variogram model.
 *Note:* Kriging can produce values that fall outside the range of
 possible values (e.g., genetic diversity values less than 0 or greater
 than the possible maximum). By default, in order to ensure that the
-values are bounded within the range of possible values, `winkrige_gd()`
+values are bounded within the range of possible values, `wkrig_gd()`
 converts all values greater than the maximum of the input raster to that
 maximum (`upper_bound = TRUE`), and all values less than the minimum of
 the input raster to that minimum (`lower_bound = TRUE`). Users can turn
@@ -634,10 +634,10 @@ off this functionality by setting `lower_bound` and `upper_bound` to
 `upper_bound` values (e.g., for heterozygosity or pi, you may want to
 set `lower_bound = 0` and `upper_bound = 1`).
 
-**Legacy method: krig_gd()** Users should note that `winkrige_gd()`
+**Legacy method: krig_gd()** Users should note that `wkrig_gd()`
 superseded `krig_gd()`. This legacy function used the `autoKrige()`
 function from the R package automap to perform kriging using an
-automatically generated variogram. We have found that `winkrige_gd()`
+automatically generated variogram. We have found that `wkrig_gd()`
 provides improved performance for interpolation of the moving window
 raster and we recommend using it instead of `krig_gd()`.
 

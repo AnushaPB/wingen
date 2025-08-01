@@ -103,15 +103,15 @@ ggplot_count(wgd) +
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Next, the output from `window_gd()` can be interpolated using kriging
-with the `winkrige_gd()` function.
+with the `wkrig_gd()` function.
 
 ``` r
 # Interpolate to a higher resolution
 krige_layer <- disagg(wgd, 2) 
-kgd <- winkrige_gd(wgd, krige_layer)
+kgd <- wkrig_gd(wgd, krige_layer)
 ```
 
-Finally, the output from `winkrige_gd()` (or `window_gd()`) can be
+Finally, the output from `wkrig_gd()` (or `window_gd()`) can be
 masked to exclude areas that fall outside of the study area or that were
 undersampled.
 

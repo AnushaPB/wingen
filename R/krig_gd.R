@@ -3,8 +3,8 @@
 #' `r lifecycle::badge('superseded')`
 #'
 #' @description
-#' **This function has been superseded by \code{\link[wingen]{winkrige_gd}} and may be removed in a future release.**
-#' Please use \code{winkrige_gd()} instead, which provides improved performance and does not depend on the automap package.
+#' **This function has been superseded by \code{\link[wingen]{wkrig_gd}} and may be removed in a future release.**
+#' Please use \code{wkrig_gd()} instead, which provides improved performance and does not depend on the automap package.
 #'
 #' Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
 #'
@@ -27,7 +27,7 @@
 #' A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of autoKrige outputs.
 #'
 #' @seealso
-#' \code{\link[wingen]{winkrige_gd}} for the updated kriging function.
+#' \code{\link[wingen]{wkrig_gd}} for the updated kriging function.
 #'
 #' @export
 #'
@@ -49,7 +49,7 @@ krig_gd <- function(r, grd = NULL, index = 1, coords = NULL,
   lifecycle::deprecate_warn(
     when = "2.2.0",
     what = "wingen::krig_gd()",
-    with = "wingen::winkrige_gd()"
+    with = "wingen::wkrig_gd()"
   )
 
   if (!requireNamespace("automap", quietly = TRUE)) {
