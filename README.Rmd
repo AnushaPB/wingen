@@ -28,7 +28,7 @@ Checkout our [Methods blog post](https://methodsblog.com/2023/05/03/wingen-mappi
 
 ## Installation
 
-Install the released version of wingen from CRAN (⚠️ temporarily unavailable, see notice above):
+Install the released version of wingen from CRAN:
 ``` r
 install.packages("wingen")
 ```

@@ -36,8 +36,7 @@ about wingen for a quick overview of the package and its uses.
 
 ## Installation
 
-Install the released version of wingen from CRAN (⚠️ temporarily
-unavailable, see notice above):
+Install the released version of wingen from CRAN:
 
 ``` r
 install.packages("wingen")
