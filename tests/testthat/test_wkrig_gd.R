@@ -28,7 +28,7 @@ test_that("wkrig_gd with weights produces expected results", {
   capture_warnings(kpi <- wkrig_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r))
   expect_s4_class(kpi, "SpatRaster")
 
-  # Confirm error if weights have values > 0
+  # Confirm error if weights have values <= 0
   weight_r[1] <- 0
   expect_error(
     capture_warnings(wkrig_gd(mini_lyr, grd = mini_lyr, weight_r = weight_r)),
