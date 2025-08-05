@@ -100,7 +100,7 @@ wkrig_gd <- function(r, grd = NULL, weight_r = NULL,
     sample_counts <- terra::extract(weight_r, r_pts[, c("x", "y")])[,2]
 
     # Confirm all sample count values are greater than 0 and not NA
-    if (any(sample_counts <= 0, na.rm = TRUE))  stop("All values of weight_r must be > 0")
+    if (any(sample_counts <= 0, na.rm = TRUE)) stop("All values of weight_r must be > 0")
     if (any(is.na(sample_counts))) stop("All values of weight_r must be non-NA")
 
     # Estimate global variance
