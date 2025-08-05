@@ -1,6 +1,6 @@
 #' Krige moving window maps with variogram selection
 #'
-#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the gstat package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While I have not formally validated the default parameters, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
+#' Perform ordinary kriging of the raster(s) produced by \link[wingen]{window_gd} using the gstat package to fit variograms and perform model selection. This function replaces the older \link[wingen]{krig_gd} function to provide more flexibility in variogram model selection. While the default parameters have not been formally validated, they have performed well in practice for kriging `wingen` outputs from both simulated and empirical datasets.
 #'
 #' The function fits multiple variogram models (Spherical, Exponential, Gaussian, Matern by default) and selects the best fit based on SSErr. It also includes optional weighting to account for sample count variation.
 #'
