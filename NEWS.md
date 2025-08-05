@@ -1,4 +1,4 @@
-## wingen 2.2.0
+# wingen 2.2.0
 
 -   New `wkrig_gd()` for improved kriging performance.
 -   Superseded `krig_gd()`: This legacy function now gives a deprecation warning and requires manual installation of the {automap} package.
