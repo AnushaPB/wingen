@@ -15,19 +15,6 @@ MIT](https://img.shields.io/badge/license-MIT-blue)](https://img.shields.io/badg
 DOI](https://zenodo.org/badge/499617621.svg)](https://zenodo.org/badge/latestdoi/499617621)
 <!-- badges: end -->
 
-**⚠️ Notice: wingen temporarily archived on CRAN**
-
-*As of 06/30/2025, wingen has been archived on CRAN because it depended
-on the now-archived automap package. We are working on resolving this
-issue. Wingen can still be installed from GitHub and automap can be
-installed from the CRAN archive:
-`install.packages("https://cran.r-project.org/src/contrib/Archive/automap/automap_1.1-16.tar.gz", repos = NULL, type = "source")`*
-
-*Update 07/22/2025: automap is back on CRAN and wingen will be up shortly. 
-We are taking this opportunity to introduce a new kriging approach. Stay tuned!*
-
-------------------------------------------------------------------------
-
 Generate continuous maps of genetic diversity using moving windows with
 options for rarefaction, interpolation, and masking.
 
@@ -49,8 +36,7 @@ about wingen for a quick overview of the package and its uses.
 
 ## Installation
 
-Install the released version of wingen from CRAN (⚠️ temporarily
-unavailable, see notice above):
+Install the released version of wingen from CRAN:
 
 ``` r
 install.packages("wingen")
@@ -116,15 +102,16 @@ ggplot_count(wgd) +
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 Next, the output from `window_gd()` can be interpolated using kriging
-with the `krig_gd()` function.
+with the `wkrig_gd()` function.
 
 ``` r
-# Krige genetic diversity (disaggregate grid to project across a smoother final surface)
-kgd <- krig_gd(wgd, lotr_lyr, index = 1, disagg_grd = 2)
+# Interpolate to a higher resolution
+krige_layer <- disagg(wgd, 2) 
+kgd <- wkrig_gd(wgd, krige_layer)
 ```
 
-Finally, the output from `krig_gd()` (or `window_gd()`) can be masked to
-exclude areas that fall outside of the study area or that were
+Finally, the output from `wkrig_gd()` (or `window_gd()`) can be
+masked to exclude areas that fall outside of the study area or that were
 undersampled.
 
 ``` r

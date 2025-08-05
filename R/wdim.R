@@ -1,6 +1,6 @@
 #' Helper function to convert wdim object to neighbor matrix
 #'
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#' @param wdim Dimensions (height x width) of window, if only one value is provided a square window is created.
 #'
 #' @return neighborhood matrix
 #'
@@ -24,7 +24,7 @@ wdim_to_mat <- function(wdim) {
 
 #' Helper function to check that wdim object is correctly assigned
 #'
-#' @param wdim dimensions (height x width) of window, if only one value is provided a square window is created
+#' @param wdim Dimensions (height x width) of window, if only one value is provided a square window is created.
 #'
 #' @return corrected wdim
 #'

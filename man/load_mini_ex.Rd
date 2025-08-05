@@ -7,10 +7,10 @@
 load_mini_ex(quiet = FALSE)
 }
 \arguments{
-\item{quiet}{whether to hide message (defaults to FALSE)}
+\item{quiet}{Whether to hide message (defaults to FALSE).}
 }
 \value{
-three objects are assigned in the GlobalEnv (vcf, coords, and lyr)
+Three objects are assigned in the GlobalEnv (vcf, coords, and lyr).
 }
 \description{
 Loads mini middle earth example data

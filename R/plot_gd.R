@@ -2,14 +2,14 @@
 #'
 #' Plot genetic diversity layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
-#' @param x output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (SpatRaster where first layer is genetic diversity)
-#' @param index if a raster stack is provided, index of the layer to plot (defaults to plotting all layers except layers named "sample_count")
-#' @param bkg optional SpatRaster or other spatial object that will be plotted as the "background" in gray
-#' @param col color palette to use for plotting (defaults to \link[viridis]{magma} palette)
-#' @param breaks number of breaks to use in color scale (defaults to 100)
-#' @param box whether to include a box around the Raster plot (defaults to FALSE)
-#' @param range numeric. minimum and maximum values to be used for the continuous legend
-#' @param legend whether to include legend
+#' @param x Output from \link[wingen]{window_gd} or \link[wingen]{krig_gd} (SpatRaster where first layer is genetic diversity).
+#' @param index If a raster stack is provided, index of the layer to plot (defaults to plotting all layers except layers named "sample_count").
+#' @param bkg Optional SpatRaster or other spatial object that will be plotted as the "background" in gray.
+#' @param col Color palette to use for plotting (defaults to \link[viridis]{magma} palette).
+#' @param breaks Number of breaks to use in color scale (defaults to 100).
+#' @param box Whether to include a box around the Raster plot (defaults to FALSE).
+#' @param range Numeric. minimum and maximum values to be used for the continuous legend.
+#' @param legend Whether to include legend.
 #'
 #' @inheritParams terra::plot
 #'
@@ -38,13 +38,13 @@ plot_gd <- function(x, bkg = NULL, index = NULL, col = viridis::magma(breaks), b
 #'
 #' Plot sample counts layer produced by \link[wingen]{window_gd} or \link[wingen]{krig_gd}
 #'
-#' @param x single SpatRaster of counts or SpatRaster where indexed layer is sample counts
-#' @param index if a raster stack is provided, index of the sample count layer to plot
-#' (defaults to plotting the layer named "sample_count" or the last layer of the stack)
-#' @param col color palette to use for plotting (defaults to viridis::magma palette)
-#' @param breaks number of breaks to use in color scale (defaults to 10)
-#' @param box whether to include a box around the raster plot (defaults to FALSE)
-#' @param range numeric. minimum and maximum values to be used for the continuous legend
+#' @param x Single SpatRaster of counts or SpatRaster where indexed layer is sample counts.
+#' @param index If a raster stack is provided, index of the sample count layer to plot
+#' (defaults to plotting the layer named "sample_count" or the last layer of the stack).
+#' @param col Color palette to use for plotting (defaults to viridis::magma palette).
+#' @param breaks Number of breaks to use in color scale (defaults to 10).
+#' @param box Whether to include a box around the raster plot (defaults to FALSE).
+#' @param range Numeric. minimum and maximum values to be used for the continuous legend.
 #' @inheritParams plot_gd
 #' @inheritParams terra::plot
 #'

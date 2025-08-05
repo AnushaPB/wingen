@@ -2,12 +2,12 @@
 #'
 #' Generate a raster layer from coordinates which can be used in \link[wingen]{window_gd} as the RasterLayer to move the window across
 #'
-#' @param coords coordinates of samples as sf points, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates
-#' @param buffer size of buffer to add to edge of raster (defaults to 0)
-#' @param res desired resolution of raster (defaults to 1). Can be a single value for square cells or a vector with two values representing x and y resolutions
-#' @param agg aggregation factor to apply to raster (defaults to NULL)
-#' @param disagg disaggregation factor to apply to raster (defaults to NULL)
-#' @param plot whether to plot resulting raster with coords (defaults to FALSE)
+#' @param coords Coordinates of samples as sf points, a SpatVector, a two-column matrix, or a data.frame with x and y coordinates.
+#' @param buffer Size of buffer to add to edge of raster (defaults to 0).
+#' @param res Desired resolution of raster (defaults to 1). Can be a single value for square cells or a vector with two values representing x and y resolutions.
+#' @param agg Aggregation factor to apply to raster (defaults to NULL).
+#' @param disagg Disaggregation factor to apply to raster (defaults to NULL).
+#' @param plot Whether to plot resulting raster with coords (defaults to FALSE).
 #'
 #' @return RasterLayer
 #' @export

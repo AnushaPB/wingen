@@ -7,10 +7,10 @@
 vcf_to_dosage(x)
 }
 \arguments{
-\item{x}{can either be an object of class 'vcfR' or a path to a .vcf file}
+\item{x}{Can either be an object of class 'vcfR' or a path to a .vcf file.}
 }
 \value{
-dosage matrix
+Dosage matrix.
 }
 \description{
 Convert a vcf to a dosage matrix

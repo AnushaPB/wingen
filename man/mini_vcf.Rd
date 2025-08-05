@@ -5,10 +5,10 @@
 \alias{mini_vcf}
 \title{Mini middle earth example vcf}
 \format{
-Object of class vcfR with 10 individuals and 10 loci
+Object of class vcfR with 10 individuals and 10 loci.
 }
 \source{
-created from simulations in Bishop et al. (2023)
+Created from simulations in Bishop et al. (2023).
 }
 \usage{
 mini_vcf

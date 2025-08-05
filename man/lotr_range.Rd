@@ -5,10 +5,10 @@
 \alias{lotr_range}
 \title{Middle earth example range polygon}
 \format{
-sf
+sf.
 }
 \source{
-created from simulations in Bishop et al. (2023)
+Created from simulations in Bishop et al. (2023).
 }
 \usage{
 lotr_range

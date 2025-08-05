@@ -215,10 +215,10 @@ sample_gd <- function(x, sub, stat_function, L, rarify_alleles, sig) {
 
 #' Helper function to get adjacent cells to a given cell index
 #'
-#' @param i cell index
-#' @param r SpatRast
-#' @param n neighborhood matrix
-#' @param coord_cells cell numbers of coordinates
+#' @param i Cell index.
+#' @param r SpatRaster.
+#' @param n Neighborhood matrix.
+#' @param coord_cells Cell numbers of coordinates.
 #'
 #' @return indices of coordinates that are adjacent to the given cell
 #'
@@ -244,9 +244,9 @@ get_adj <- function(i, r, n, coord_cells) {
 #'
 #' Check that the number of individuals in each data set align
 #'
-#' @param x moving window data
-#' @param coords coordinates
-#' @param distmat distance matrix
+#' @param x Moving window data.
+#' @param coords Coordinates.
+#' @param distmat Distance matrix.
 #'
 #' @noRd
 #'
@@ -302,9 +302,9 @@ check_data <- function(x, coords = NULL, distmat = NULL) {
 
 #' Check vcf for loci and individuals with all NAs and return corrected vcf and coords
 #'
-#' @param vcf vcfR
-#' @param coords coordinates
-#' @param distmat distance matrix
+#' @param vcf VcfR object.
+#' @param coords Coordinates.
+#' @param distmat Distance matrix.
 #'
 #' @noRd
 check_vcf_NA <- function(vcf, coords = NULL, distmat = NULL) {
@@ -361,8 +361,8 @@ get_allNA <- function(x, MARGIN = NULL) {
 
 #' Convert vcf to correct format based on stat
 #'
-#' @param vcf vcfR
-#' @param stat genetic diversity statistic
+#' @param vcf VcfR object.
+#' @param stat Genetic diversity statistic.
 #'
 #' @noRd
 convert_vcf <- function(vcf, stat) {
@@ -388,9 +388,9 @@ convert_vcf <- function(vcf, stat) {
 
 #' Helper function to check and convert lyr and coords
 #'
-#' @param lyr RasterLayer or SpatRaster
-#' @param coords sf points, data frame, or matrix representing coordinates
-#' @param fact factor of aggregation
+#' @param lyr RasterLayer or SpatRaster.
+#' @param coords Sf points, data frame, or matrix representing coordinates.
+#' @param fact Factor of aggregation.
 #'
 #' @return SpatRaster
 #'
@@ -416,8 +416,8 @@ layer_coords_check <- function(lyr, coords, fact = 0) {
 
 #' Convert values into new raster layers
 #'
-#' @param lyr SpatRaster
-#' @param rast_vals dataframe of gd and ns
+#' @param lyr SpatRaster.
+#' @param rast_vals Dataframe of gd and ns.
 #'
 #' @return SpatRaster
 #'
@@ -449,8 +449,8 @@ vals_to_lyr <- function(lyr, rast_vals, stat) {
 
 #' Crop edge off raster
 #'
-#' @param x SpatRaster
-#' @param wdim window dimensions
+#' @param x SpatRaster.
+#' @param wdim Window dimensions.
 #'
 #' @return SpatRaster
 #'
@@ -479,7 +479,7 @@ edge_crop <- function(x, wdim) {
 
 #' Remove duplicate sample count layers
 #'
-#' @param r SpatRaster
+#' @param r SpatRaster.
 #'
 #' @return SpatRaster
 #'

@@ -24,35 +24,35 @@ window_gd(
 )
 }
 \arguments{
-\item{gen}{genetic data either as an object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this)}
+\item{gen}{Genetic data either as an object of type vcf or a path to a vcf file (\emph{note:} order matters! The coordinate and genetic data should be in the same order; there are currently no checks for this).}
 
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+\item{coords}{Coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections).}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections).}
 
-\item{stat}{genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics}
+\item{stat}{Genetic diversity statistic(s) to calculate (see Details, defaults to \code{"pi"}). Can be a single statistic or a vector of statistics.}
 
-\item{wdim}{dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window)}
+\item{wdim}{Dimensions (height x width) of window; if only one value is provided, a square window is created (defaults to 3 x 3 window).}
 
-\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{Aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time).}
 
-\item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
+\item{rarify}{If rarify = TRUE, rarefaction is performed (defaults to FALSE).}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
+\item{rarify_n}{If rarify = TRUE, number of points to use for rarefaction (defaults to min_n).}
 
-\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
+\item{rarify_nit}{If rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
-\item{min_n}{minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)}
+\item{min_n}{Minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2).}
 
-\item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
+\item{fun}{Function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument).}
 
-\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{For calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use).}
 
-\item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+\item{rarify_alleles}{For calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).}
 
-\item{sig}{for calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)}
+\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).}
 
-\item{crop_edges}{whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE)}
+\item{crop_edges}{Whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE).}
 
 \item{...}{\link{deprecated} this was intended to be used to pass additional arguments to the \code{stat} function, however now formal arguments are used instead (see \code{L}, \code{rarify_alleles}, and \code{sig}). Passing additional arguments using \code{...} is still possible with the \verb{*_general()} functions.}
 }

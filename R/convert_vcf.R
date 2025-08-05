@@ -1,8 +1,8 @@
 #' Convert a vcf to a dosage matrix
 #'
-#' @param x can either be an object of class 'vcfR' or a path to a .vcf file
+#' @param x Can either be an object of class 'vcfR' or a path to a .vcf file.
 #'
-#' @return dosage matrix
+#' @return Dosage matrix.
 #'
 #' @export
 vcf_to_dosage <- function(x) {
@@ -18,9 +18,9 @@ vcf_to_dosage <- function(x) {
 
 #' Convert vcf to heterozygosity matrix
 #'
-#' @param x can either be an object of class 'vcfR' or a path to a .vcf file
+#' @param x Can either be an object of class 'vcfR' or a path to a .vcf file.
 #'
-#' @return heterozygosity matrix
+#' @return Heterozygosity matrix.
 #'
 #' @noRd
 vcf_to_het <- function(x) {
@@ -39,9 +39,9 @@ vcf_to_het <- function(x) {
 
 #' Convert vcf to hierfstat
 #'
-#' @param x can either be an object of class 'vcfR' or a path to a .vcf file
-#' @param pop population assignments (defaults to 1 for moving window functions)
-#' @return hierfstat object
+#' @param x Can either be an object of class 'vcfR' or a path to a .vcf file.
+#' @param pop Population assignments (defaults to 1 for moving window functions).
+#' @return Hierfstat object.
 #'
 #' @noRd
 vcf_to_hf <- function(x, pop = 1) {
@@ -52,9 +52,9 @@ vcf_to_hf <- function(x, pop = 1) {
 
 #' Check if an object is a vcf or a path to a vcf
 #'
-#' @param x vcfR object or path to vcf
+#' @param x VcfR object or path to vcf.
 #'
-#' @return vcf object
+#' @return Vcf object.
 #'
 #' @noRd
 vcf_check <- function(x) {

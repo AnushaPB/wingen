@@ -2,7 +2,7 @@
 % Please edit documentation in R/krig_gd.R
 \name{krig_gd}
 \alias{krig_gd}
-\title{Krige moving window maps}
+\title{Superseded: Krige moving window maps}
 \usage{
 krig_gd(
   r,
@@ -22,44 +22,54 @@ krig_gd(
 )
 }
 \arguments{
-\item{r}{SpatRaster produced by \link[wingen]{window_gd}}
+\item{r}{SpatRaster produced by \link[wingen]{window_gd}.}
 
-\item{grd}{object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.}
+\item{grd}{Object to create grid for kriging; can be a SpatRaster or RasterLayer. If undefined, will use \code{r} to create a grid.}
 
-\item{index}{integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer)}
+\item{index}{Integer indices of layers in raster stack to krige (defaults to 1; i.e., the first layer).}
 
-\item{coords}{if provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates}
+\item{coords}{If provided, kriging will occur based only on values at these coordinates. Can be provided as an sf points, a two-column matrix, or a data.frame representing x and y coordinates.}
 
-\item{agg_grd}{factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL)}
+\item{agg_grd}{Factor to use for aggregation of \code{grd}, if provided (this will decrease the resolution of the final kriged raster; defaults to NULL).}
 
-\item{disagg_grd}{factor to use for disaggregation of \code{grd}, if provided (this will increase the resolution of the final kriged raster; defaults to NULL)}
+\item{disagg_grd}{Factor to use for disaggregation of \code{grd}, if provided (this will increase the resolution of the final kriged raster; defaults to NULL).}
 
-\item{agg_r}{factor to use for aggregation of \code{r}, if provided (this will decrease the number of points used in the kriging model; defaults to NULL)}
+\item{agg_r}{Factor to use for aggregation of \code{r}, if provided (this will decrease the number of points used in the kriging model; defaults to NULL).}
 
-\item{disagg_r}{factor to use for disaggregation, of \code{r} if provided (this will increase the number of points used in the kriging model; defaults to NULL)}
+\item{disagg_r}{Factor to use for disaggregation of \code{r}, if provided (this will increase the number of points used in the kriging model; defaults to NULL).}
 
-\item{autoKrige_output}{whether to return full output from \link[automap]{autoKrige} including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
+\item{autoKrige_output}{Whether to return full output from autoKrige including uncertainty rasters (defaults to FALSE). If TRUE, returns a list with the kriged input raster layer ("raster"), kriged variance ("var"), kriged standard deviation ("stdev"), and full autoKrige output ("autoKrige_output").}
 
-\item{lower_bound}{if TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum}
+\item{lower_bound}{If TRUE (default), converts all values in the kriged raster less than the minimum value of the input raster, to that minimum.}
 
-\item{upper_bound}{if TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum}
+\item{upper_bound}{If TRUE (default), converts all values in the kriged raster greater than the maximum value of the input raster, to that maximum.}
 
-\item{krig_method}{method to use for kriging. If \code{ordinary}, ordinary/simple kriging is performed (formula: ~ 1; default). If \code{universal},  universal kriging is performed (formula = ~ x + y).}
+\item{krig_method}{Method to use for kriging. If \code{ordinary}, ordinary/simple kriging is performed (formula: ~ 1; default). If \code{universal},  universal kriging is performed (formula = ~ x + y).}
 
-\item{resample}{whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE for no resampling)}
+\item{resample}{Whether to resample \code{grd} or \code{r}. Set to \code{"r"} to resample \code{r} to \code{grd}. Set to \code{"grd"} to resample \code{grd} to \code{r} (defaults to FALSE for no resampling).}
 
-\item{resample_first}{if aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE)}
+\item{resample_first}{If aggregation or disaggregation is used in addition to resampling, specifies whether to resample before (resample_first = TRUE) or after (resample_first = FALSE) aggregation/disaggregation (defaults to TRUE).}
 }
 \value{
-a SpatRaster object or a list of \link[automap]{autoKrige} outputs (if autoKrige_output = TRUE)
+A \code{SpatRaster} object (if \code{autoKrige_output = FALSE}) or a list of autoKrige outputs.
 }
 \description{
-Perform interpolation of the raster(s) produced by \link[wingen]{window_gd} using \link[automap]{autoKrige}
+\strong{This function has been superseded by \code{\link[wingen]{wkrig_gd}} and may be removed in a future release.}
+Please use \code{wkrig_gd()} instead, which provides improved performance and does not depend on the automap package.
+
+Performs spatial interpolation (kriging) of the raster(s) produced by \code{\link[wingen]{window_gd}} using the autoKrige function from automap.
+}
+\details{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#superseded}{\figure{lifecycle-superseded.svg}{options: alt='[Superseded]'}}}{\strong{[Superseded]}}
 }
 \examples{
+\dontrun{
 load_mini_ex()
 wpi <- window_gd(mini_vcf, mini_coords, mini_lyr, L = 10, rarify = TRUE)
 kpi <- krig_gd(wpi, mini_lyr)
 plot_gd(kpi, main = "Kriged Pi")
-
+}
+}
+\seealso{
+\code{\link[wingen]{wkrig_gd}} for the updated kriging function.
 }

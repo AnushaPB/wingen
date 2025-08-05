@@ -2,9 +2,9 @@
 #'
 #' Generate a continuous raster map of genetic diversity using circle moving windows
 #'
-#' @param maxdist maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius)
+#' @param maxdist Maximum geographic distance used to define neighborhood; any samples further than this distance will not be included (this can be thought of as the neighborhood radius).
 #' Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as `lyr`).
-#' @param distmat distance matrix output from \link[wingen]{get_geodist} (optional; can be used to save time on distance calculations)
+#' @param distmat Distance matrix output from \link[wingen]{get_geodist} (optional; can be used to save time on distance calculations).
 #' @inheritParams window_gd
 #' @details Coordinates and rasters should be in a Euclidean coordinate system (i.e., UTM coordinates) such that raster cell width and height are equal distances.
 #' As such, longitude-latitude systems should be transformed before using dist_gd. Transformation can be performed using \link[sf]{st_set_crs} for coordinates or \link[terra]{project} for rasters (see vignette for more details).
@@ -81,9 +81,9 @@ circle_gd <- function(gen, coords, lyr, maxdist, distmat = NULL, stat = "pi", fa
 #' will not convert your data into the correct format for calculations of different
 #' diversity metrics. See details for how to format data inputs for different statistics.
 #'
-#' @param x data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details)
-#' @param stat moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`)
-#' @param ... if a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`)
+#' @param x Data to be summarized by the moving window (*note:* order matters! `coords` should be in the same order, there are currently no checks for this). The class of `x` required depends on the statistic being calculated (see the `stat` argument and the function description for more details).
+#' @param stat Moving window statistic to calculate (see details). `stat` can generally be set to any function that will take `x`as input and return a single numeric value (for example, `x` can be a vector and `stat` can be set equal to a summary statistic like `mean`, `sum`, or `sd`).
+#' @param ... If a function is provided for `stat`, additional arguments to pass to the `stat` function (e.g. if `stat = mean`, users may want to set `na.rm = TRUE`).
 #' @inheritParams window_general
 #' @inheritParams circle_gd
 #'
@@ -144,11 +144,11 @@ circle_general <- function(x, coords, lyr, maxdist, distmat = NULL, stat, fact =
 #' If coords_only = TRUE, the result is a distance matrix for the sample coordinates
 #' only.
 #'
-#' @param lyr SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE)
-#' @param coords_only whether to return distances only for sample coordinates
+#' @param lyr SpatRaster or RasterLayer for generating distances (not required if coords_only = TRUE).
+#' @param coords_only Whether to return distances only for sample coordinates.
 #' @inheritParams circle_gd
 #'
-#' @return a distance matrix used by \link[wingen]{circle_gd}
+#' @return A distance matrix used by \link[wingen]{circle_gd}.
 #' @export
 #'
 #' @examples

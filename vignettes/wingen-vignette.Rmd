@@ -102,7 +102,7 @@ The workflow of wingen uses three main functions:
 1.  `window_gd()`, `circle_gd()`, or `resist_gd()` to generate moving
     window maps of genetic diversity
 
-2.  `krig_gd()` to use kriging to interpolate the moving window maps
+2.  `wkrig_gd()` to use kriging to interpolate the moving window maps
 
 3.  `mask_gd()` to mask areas of the maps from (1) and (2) (e.g., to
     exclude areas outside the study region)
@@ -143,15 +143,17 @@ The main arguments that all three functions have in common are:
     include:
 
     -   `"pi"` for nucleotide diversity (default) calculated using
-        `hierfstat::pi.dosage()` (only works for bi-allelic data). 
-        Use the `L` argument to set the sequence length for the pi calculation. 
-        If the sequence  length is unknown, L can be set to "nvariants" (default) 
-        which setsL to the number of variants; however, note that this is not 
-        strictly the correct calculation of pi because it does not account for 
-        invariant sites. If `L` is set to NULL, the sum over SNPs of nucleotide 
-        diversity is returned (*note:* `L = NULL` is the \link[hierfstat]{pi.dosage}). 
-        Otherwise, L can be set to any numeric value which will serve as the 
-        denominator of the pi calculation. 
+        `hierfstat::pi.dosage()` (only works for bi-allelic data). Use
+        the `L` argument to set the sequence length for the pi
+        calculation. If the sequence length is unknown, `L` can be set
+        to "nvariants" (default) which sets `L` to the number of
+        variants; however, note that this is not strictly the correct
+        calculation of pi because it does not account for invariant
+        sites. If `L` is set to NULL, the sum over SNPs of nucleotide
+        diversity is returned (*note:* `L = NULL` is the
+        \link[hierfstat]{pi.dosage}). Otherwise, `L` can be set to any
+        numeric value which will serve as the denominator of the pi
+        calculation.
 
     -   `"Ho"` for average observed heterozygosity across all sites
 
@@ -168,21 +170,21 @@ The main arguments that all three functions have in common are:
         performing allele count rarefaction (`rarify_alleles = TRUE`) if
         there are missing values in the genetic data, but for datasets
         with no missing data, it is faster to use the raw counts
-        (`rarify_alleles = FALSE`).
+        (`rarify_alleles = FALSE`)
 
     -   `"hwe"` for the proportion of sites that are not in
-        Hardy--Weinberg equilibrium, calculated using `pegas`
+        Hardy-Weinberg equilibrium, calculated using `pegas`
         \link[pegas]{hw.test} at the 0.05 level (other alpha levels can
-        be specified by adding the sig argument; e.g., `sig = 0.10`).
+        be specified by adding the `sig` argument; e.g., `sig = 0.10`)
 
     -   `"basic_stats"` for a series of statistics produced by
         `hierfstat::basic.stats()` including mean observed
         heterozygosity (same as Ho), mean gene diversities within
-        population (Hs), G ene diversities overall (Ht), and Fis
+        population (Hs), Gene diversities overall (Ht), and Fis
         following Nei (1987). Population-based statistics (e.g., FST)
         normally reported by `hierfstat::basic.stats()` are not included
         as they are not meaningful within the individual-based moving
-        windows.
+        windows
 
 5.  `fact` - To decrease computational time, we provide the option to
     aggregate the input raster layer by some factor defined using the
@@ -218,7 +220,7 @@ The main arguments that all three functions have in common are:
     samples is not less than `rarify_n` (i.e., if `min = 2` and
     `rarify_n = 1` and the sample size is 1 in the window, then an NA
     value will be assigned; to change this behavior so that genetic
-    diversity is calculated, set `min_n = 1`)
+    diversity is calculated, set `min_n = 1`).
 
     If `rarify = FALSE`, rarefaction is not performed and only steps (1)
     and (2) from above occur such that: (1) if the number of samples in
@@ -291,12 +293,12 @@ Before running `window_gd()`, users can preview the moving window and
 the counts within each cell of the raster to get a sense of how big the
 window is and what the density of counts looks like across their
 landscape. Here, we provide the raster layer (`lotr_lyr`), the
-coordinates (`lotr_coords`), the window dimensions (7), the aggregation
-factor (3), and the minimum sample number (`min_n`). `min_n` will be
-used to mask the sample count layer to show how much of the landscape
-will be excluded due to low sample count. We specify `method = window`
-for a preview of `window_gd()`, we will discuss other methods (i.e.,
-`circle` and `resist` later).
+coordinates (`lotr_coords`), the window dimensions (7 x 7), the
+aggregation factor (3), and the minimum sample number (`min_n`). `min_n`
+will be used to mask the sample count layer to show how much of the
+landscape will be excluded due to low sample count. We specify
+`method = window` for a preview of `window_gd()`, we will discuss other
+methods (i.e., `circle` and `resist` later).
 
 ```{r, fig.width = 6, fig.height = 5, cache = TRUE, warning = FALSE}
 preview_gd(lotr_lyr,
@@ -320,8 +322,8 @@ produced raster stack) and the sample counts layer (the second layer).
 
 *Note:* you will get a warning that no CRS is found for the provided
 coordinates or raster and to check that the CRS for these objects match.
-This is because these simulated data doesn't have a CRS, but we know
-they match, so we can ignore this warning
+This is because these simulated data don't have a CRS, but we know they
+match, so we can ignore this warning.
 
 ```{r moving window, fig.width = 5, fig.height = 5, cache = TRUE, warning = TRUE, message = FALSE}
 wgd <- window_gd(lotr_vcf,
@@ -338,9 +340,10 @@ wgd <- window_gd(lotr_vcf,
 # The ggplot_gd function plots the genetic diversity layer
 ggplot_gd(wgd, bkg = lotr_range) +
   ggtitle("Moving window pi") +
-  # add coordinates
+  # Add sampling coordinates
   geom_point(data = lotr_coords, aes(x = x, y = y), pch = 16)
 ```
+
 ```{r, fig.height = 5, fig.width = 5.5}
 # The plot_count function plots the sample count layer
 ggplot_count(wgd) +
@@ -348,7 +351,7 @@ ggplot_count(wgd) +
 ```
 
 You can also create base R plots of your results using `plot_gd()` and
-`plot_count()`
+`plot_count()`:
 
 ```{r, fig.width = 5, fig.height = 5}
 plot_gd(wgd, bkg = lotr_range, main = "Moving window pi")
@@ -366,8 +369,8 @@ To create a moving window map with a circular window, we can use
     included (this can be thought of as the neighborhood radius). Can be
     provided as either (1) a single numeric value or (2) a SpatRaster
     where each pixel is the maximum distance to be used for that cell on
-    the landscape (must be the same spatial scale as `lyr`). Similarly
-    to `wdim`, we encourage users to experiment with different values of
+    the landscape (must be the same spatial scale as `lyr`). As with
+    `wdim`, we encourage users to experiment with different values of
     `maxdist` to determine the sensitivity of their results to this
     parameter and ideally set it with some knowledge of the study system
     in mind (e.g., the dispersal patterns and/or neighborhood size of
@@ -525,10 +528,10 @@ ggplot_gd(rgd, bkg = lotr_range) +
   ggtitle("Resistance moving window pi")
 ```
 
-In addition to using continuous rasters of connectivity you can also use
-rasters to designate passable and impassable areas. This can be useful
-for designating boundaries you don't want windows to extend across
-(e.g., mountain ranges) or extend between (e.g., rivers).
+In addition to using continuous rasters of connectivity, you can also
+use rasters to designate passable and impassable areas. This can be
+useful for designating boundaries you don't want windows to extend
+across (e.g., mountain ranges) or extend between (e.g., rivers).
 
 ```{r, fig.width = 6.5, fig.height = 5, cache = TRUE, warning = FALSE}
 # create layer
@@ -561,13 +564,10 @@ ggplot_gd(resist_gd)
 ### Krige results
 
 To produce smoother maps of genetic diversity, we provide the function
-`krig_gd()` which creates a spatially interpolated raster from the
+`wkrig_gd()` which creates a spatially interpolated raster from the
 moving window raster produced by the moving window functions. This
-function uses the `autoKrige()` function from the R package automap to
-perform kriging on the moving window raster using an automatically
-generated variogram. Note that the moving window raster stack, including
-both the genetic diversity layer and the sample count layer, can be used
-to generate kriged maps of both genetic diversity and sample count.
+function uses the gstat package to fit different variogram models and
+select the best one to perform kriging.
 
 Kriging is performed by first transforming the moving window layer into
 a set of coordinates with corresponding genetic diversity (or sample
@@ -581,61 +581,51 @@ grid-like artifacts during kriging.
 To deal with this issue, users can either (1) resample their moving
 window raster layers and grid layers to the same resolution using the
 `resample` argument, or (2) manually disaggregate or aggregate either
-the moving window or grid layers using the `agg_r`, `disagg_r`,
-`agg_grd`, or `disagg_grd` arguments. Generally, if users want a
-smoother resulting surface, a higher resolution grid layer should be
-used (this can be accomplished by using the `disagg_grd` argument to
-disaggregate the grid layer). The resampling, aggregation, and
-disaggregation options currently only work if the object provided to
-create the grid is a raster layer. Keep in mind that increasing the
-resolution of the moving window layer (i.e., either by resampling or
-disaggregating) can increase computational time substantially as this
+the moving window or grid layers using the terra `aggregate()` or
+`disagg()` functions. Generally, if users want a smoother resulting
+surface, a higher resolution grid layer should be used. Keep in mind
+that increasing the resolution of the moving window layer (either by
+resampling or disaggregating) can increase computational time as this
 increases the number of coordinates being used for kriging. This is also
 the case for increasing the resolution of the grid layer, though to a
 lesser extent.
 
-To run this function, we provide the moving window raster stack output,
-the indices of the layers we want to krige, and the raster layer to
-interpolate across. We also disaggregate the original layer by a factor
-of two to get a smoother output surface (users should play around with
-this parameter). The output of this function is a raster stack of the
-kriged input layers.
+To run this function, we provide the moving window raster layer and a
+raster layer to interpolate across. If no raster layer for interpolation
+is provided, the moving window layer will be used (i.e., the output
+kriged layer will have the same resolution and extent of the input
+window layer). If a stack of rasters is provided, only the first layer
+will be used. The output of this function is a kriged raster layer.
+Optionally, users can supply the moving window sample counts layer with
+the `weight_r` argument to set weights for variogram fitting and
+kriging, giving higher influence to cells with more samples. Users may
+also want to test different values for `nmax`, which is the maximum
+number of points to use for kriging; here, we use `nmax = 30` to balance
+speed and accuracy.
 
 ```{r krige results, fig.width = 5, fig.height = 5, cache = TRUE, warning = FALSE}
-# Note: this step can take a little while
-# index = 1 kriges the first layer in wgd (the genetic diversity layer)
-kgd <- krig_gd(wgd, index = 1, grd = lotr_lyr, disagg_grd = 2)
+# First, let's make a layer to krige across
+# Let's say I want to krige to twice the resolution of the moving window layer
+# I can use the disagg() function to disaggregate the moving window layer
+grd <- disagg(wgd, 2)
+
+# Then, I can use this layer as the grid to krige across
+kgd <- wkrig_gd(wgd[["pi"]], grd = grd, weight_r = wgd[["sample_count"]], nmax = 30)
 
 ggplot_gd(kgd) +
   ggtitle("Kriged pi")
 ```
 
-*Note:* By default, the kriging method is set to
-`krig_method = "ordinary"` for ordinary/simple kriging (model formula:
-\~ 1) which assumes that the mean and variance are constant across
-space. Alternatively, `krig_method` can be set to `"universal"` for
-universal kriging (model formula: \~ x + y), which allows the mean to
-vary across locations, while variance is held constant.
-
-For information on the differences between universal and ordinary
-kriging, we recommend these articles:
-
--   [What are the different kriging
-    models?](https://desktop.arcgis.com/en/arcmap/latest/extensions/geostatistical-analyst/what-are-the-different-kriging-models-.htm)
-
--   [Kriging
-    interpolation](https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation)
-
-Users can optionally get the full output from `autoKrige()` by setting `autoKrige_output = TRUE` in which case `krig_gd()` returns a list where the first element ("raster") is the kriged raster and second element ("autoKrige_output") is the autoKrige output. 
-
-*Note:* `autoKrige()` does not work for non-projected systems (i.e.,
-latitude-longitude) and will throw an error. See above example for how
-latitude-longitude coordinates and rasters can be transformed.
+Users can optionally get the full model output by setting
+`model_output = TRUE` in which case `wkrig_gd()` returns a list where
+the first element ("raster") is the kriged raster, the second element
+("variogram") is the variogram, and the third element ("model") is the
+best-fit variogram model.
 
 *Note:* Kriging can produce values that fall outside the range of
 possible values (e.g., genetic diversity values less than 0 or greater
 than the possible maximum). By default, in order to ensure that the
-values are bounded within the range of possible values, `krig_gd`
+values are bounded within the range of possible values, `wkrig_gd()`
 converts all values greater than the maximum of the input raster to that
 maximum (`upper_bound = TRUE`), and all values less than the minimum of
 the input raster to that minimum (`lower_bound = TRUE`). Users can turn
@@ -643,6 +633,13 @@ off this functionality by setting `lower_bound` and `upper_bound` to
 `FALSE`. Users can also set their own custom `lower_bound` and
 `upper_bound` values (e.g., for heterozygosity or pi, you may want to
 set `lower_bound = 0` and `upper_bound = 1`).
+
+**Legacy method: krig_gd()** Users should note that `wkrig_gd()`
+superseded `krig_gd()`. This legacy function used the `autoKrige()`
+function from the R package automap to perform kriging using an
+automatically generated variogram. We have found that `wkrig_gd()`
+provides improved performance for interpolation of the moving window
+raster and we recommend using it instead of `krig_gd()`.
 
 ### Mask results
 
@@ -655,9 +652,9 @@ could use a species distribution model or habitat suitability model to
 exclude areas where the probability of presence is very low:
 
 ```{r mask results 1, fig.width = 5.5, fig.height = 5, warning = FALSE}
-# Disaggregate lotr_lyr to make it the same resolution as kgd before masking
-## Note: lotr_lyr is a RasterLayer which we convert to a SpatRaster with rast()
-mask_lyr <- disagg(rast(lotr_lyr), 2)
+# Aggregate the lotr_lyr to make it the same resolution as kgd before masking
+# Note: lotr_lyr is a RasterLayer, so we convert it to a SpatRaster
+mask_lyr <- resample(rast(lotr_lyr), kgd)
 mgd <- mask_gd(kgd, mask_lyr, minval = 0.1)
 
 ggplot_gd(mgd) +
@@ -688,7 +685,7 @@ library(SpatialKDE)
 # Note: this code is not evaluated when building the vignette as it requires the SpatialKDE package
 
 # Spatial KDE requires an sf data.frame containing only POINTS that is in a projected coordinate system
-# The simulated coordinates are not projected, but for the purpose of this example, we'll pretend they are projected under the Goode Homolosine projection
+# The simulated coordinates are not projected, but for the purposes of this example, we'll pretend they are projected under the Goode Homolosine projection
 # This kind of arbitrary setting of crs should not be done for real data (see above example for how to properly project coordinates)
 lotr_sf <- st_as_sf(lotr_coords, coords = c("x", "y")) %>% st_set_crs("+proj=goode")
 
@@ -779,7 +776,10 @@ multistat_wgd <- window_gd(lotr_vcf,
 ggplot_gd(multistat_wgd, bkg = lotr_range)
 ```
 
-`"hwe"` and `"basic_stats"` take longer to calculate, so we do not evaluate these statistics here. We also change the parameters and reduce the dataset in the example to make it faster for users who wish to run it:
+`"hwe"` and `"basic_stats"` take longer to calculate, so we do not
+evaluate these statistics here. We also change the parameters and reduce
+the dataset in the example to make it faster for users who wish to run
+it:
 
 ```{r, warning = FALSE, message = FALSE, eval = FALSE}
 hwe_wgd <- window_gd(lotr_vcf[1:10, ],
@@ -872,11 +872,11 @@ ggplot_gd(we) +
 # Other genetic data input file types in wingen
 
 Although the default input data type for wingen is a VCF file, which is
-a standard file type to encode genomic data, wingen can accept a genind
-object as input to calculate allelic richness using `window_general()`.
-Given that some wingen functionality can be feasible using a genind
-object, users could easily convert various other genetic data file types
-to then run wingen.
+a standard file type to encode genomic data, wingen can accept a
+`genind` object as input to calculate allelic richness using
+`window_general()`. Given that some wingen functionality can be feasible
+using a `genind` object, users could easily convert various other
+genetic data file types to then run wingen.
 
 For example, genepop (.gen) is a typical file format for encoding
 microsatellite data, in which each allele within a locus is coded using
@@ -884,14 +884,14 @@ a two- or three-digit system (i.e., in a diploid organism, in a
 two-digit system, each locus would be assigned four digits specifying
 each of two alleles. In a three-digit system in the same organism, each
 locus would be assigned six digits encoding those same two alleles).
-Users can convert a genepop file into a genind object using the
+Users can convert a genepop file into a `genind` object using the
 `read.genepop()` function in the adegenet package, which automatically
-reads in a .gen file as a genind object. In many cases, microsatellite
+reads in a .gen file as a `genind` object. In many cases, microsatellite
 data may not be biallelic, and may contain more than one observed allele
 at a given locus; in such cases, running `window_general()` with a
-genind object is still feasible.
+`genind` object is still feasible.
 
-An example of how one could use a genind object as input into
+An example of how one could use a `genind` object as input into
 `window_general()` is as follows:
 
 ```{r, fig.width = 5.5, fig.height = 5, cache = TRUE, warning = FALSE, message = FALSE, eval = FALSE}
@@ -910,4 +910,7 @@ we_gi <- window_general(genind,
   fact = 3,
   na.rm = TRUE
 )
+
+ggplot_gd(we_gi) +
+  ggtitle("Allelic richness from genind")
 ```

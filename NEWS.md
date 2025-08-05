@@ -1,6 +1,12 @@
+## wingen 2.2.0
+
+-   New `wkrig_gd()` for improved kriging performance.
+-   Superseded `krig_gd()`: This legacy function now gives a deprecation warning and requires manual installation of the {automap} package.
+-   Minor documentation updates.
+
 # wingen 2.1.2
 
-Patch to fix `L` argument defaults and improve documentation. 
+Patch to fix `L` argument defaults and improve documentation.
 
 The wingen default for all functions is now `L = "nvariants"`, which sets `L` to the number of variants in the VCF when calculating pi. This was already the default in the original `window_gd()` function, but `circle_gd()` and `resist_gd()` had `L = NULL` as the default, which returns the sum over SNPs of nucleotide diversity. We have also improved documentation for `L`.
 
@@ -9,12 +15,14 @@ The wingen default for all functions is now `L = "nvariants"`, which sets `L` to
 Minor changes for CRAN
 
 ### Switch to `ggplot()` in examples and `preview_gd()`
-- Switch from using base R plotting with `plot_gd()`/`plot_count()` to ggplot plotting with `ggplot_gd()`/`ggplot_count()` in the README, vignette, and` preview_gd()` functions
-- This was done to avoid modifying the users environment with `par()`
-- `plot_gd()` and `plot_count()` can still be used
+
+-   Switch from using base R plotting with `plot_gd()`/`plot_count()` to ggplot plotting with `ggplot_gd()`/`ggplot_count()` in the README, vignette, and`preview_gd()` functions
+-   This was done to avoid modifying the users environment with `par()`
+-   `plot_gd()` and `plot_count()` can still be used
 
 ### Simplification of vignette and examples
-- To decrease code test time for CRAN the vignettes and the examples were reduced, however the core information remains the same
+
+-   To decrease code test time for CRAN the vignettes and the examples were reduced, however the core information remains the same
 
 # wingen 2.1.0
 

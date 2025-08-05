@@ -27,44 +27,44 @@ resist_general(
 )
 }
 \arguments{
-\item{x}{data to be summarized by the moving window (\emph{note:} order matters! \code{coords} should be in the same order, there are currently no checks for this). The class of \code{x} required depends on the statistic being calculated (see the \code{stat} argument and the function description for more details)}
+\item{x}{Data to be summarized by the moving window (\emph{note:} order matters! \code{coords} should be in the same order, there are currently no checks for this). The class of \code{x} required depends on the statistic being calculated (see the \code{stat} argument and the function description for more details).}
 
-\item{coords}{coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections)}
+\item{coords}{Coordinates of samples as sf points, a two-column matrix, or a data.frame representing x and y coordinates (see Details for important information about projections).}
 
-\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections)}
+\item{lyr}{SpatRaster or RasterLayer to slide the window across (see Details for important information about projections).}
 
-\item{maxdist}{maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
+\item{maxdist}{Maximum cost distance used to define neighborhood; any samples further than this cost distance will not be included (this can be thought of as the neighborhood radius, but in terms of cost distance).
 Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is the maximum distance to be used for that cell on the landscape (must be the same spatial scale as \code{lyr}).}
 
-\item{distmat}{distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations)}
+\item{distmat}{Distance matrix output from \link[wingen]{get_resdist} (optional; can be used to save time on distance calculations).}
 
-\item{stat}{moving window statistic to calculate (see details). \code{stat} can generally be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd})}
+\item{stat}{Moving window statistic to calculate (see details). \code{stat} can generally be set to any function that will take \code{x}as input and return a single numeric value (for example, \code{x} can be a vector and \code{stat} can be set equal to a summary statistic like \code{mean}, \code{sum}, or \code{sd}).}
 
-\item{fact}{aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time)}
+\item{fact}{Aggregation factor to apply to \code{lyr} (defaults to 0; \emph{note:} increasing this value reduces computational time).}
 
-\item{rarify}{if rarify = TRUE, rarefaction is performed (defaults to FALSE)}
+\item{rarify}{If rarify = TRUE, rarefaction is performed (defaults to FALSE).}
 
-\item{rarify_n}{if rarify = TRUE, number of points to use for rarefaction (defaults to min_n)}
+\item{rarify_n}{If rarify = TRUE, number of points to use for rarefaction (defaults to min_n).}
 
-\item{rarify_nit}{if rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
+\item{rarify_nit}{If rarify = TRUE, number of iterations to use for rarefaction (defaults to 5). Can also be set to \code{"all"} to use all possible combinations of samples of size \code{rarify_n} within the window.}
 
-\item{min_n}{minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2)}
+\item{min_n}{Minimum number of samples to use in calculations (any focal cell with a window containing less than this number of samples will be assigned a value of NA; defaults to 2).}
 
-\item{fun}{function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument)}
+\item{fun}{Function to use to summarize rarefaction results (defaults to mean, must take \code{na.rm = TRUE} as an argument).}
 
-\item{L}{for calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use)}
+\item{L}{For calculating \code{"pi"}, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (\emph{note:} L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use).}
 
-\item{rarify_alleles}{for calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE)}
+\item{rarify_alleles}{For calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).}
 
-\item{sig}{for calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05)}
+\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).}
 
-\item{transitionFunction}{function to calculate transition values from grid values (defaults to mean)}
+\item{transitionFunction}{Function to calculate transition values from grid values (defaults to mean).}
 
-\item{directions}{directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8)}
+\item{directions}{Directions in which cells are connected (4, 8, 16, or other), see \link[raster]{adjacent} (defaults to 8).}
 
-\item{geoCorrection}{whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
+\item{geoCorrection}{Whether to apply correction to account for local distances (defaults to TRUE). Geographic correction is necessary for all objects of the class Transition that are either: (1) based on a grid in a geographic (lonlat) projection and covering a large area; (2) made with directions > 4 (see \link[gdistance]{geoCorrection} for more details).}
 
-\item{...}{if a function is provided for \code{stat}, additional arguments to pass to the \code{stat} function (e.g. if \code{stat = mean}, users may want to set \code{na.rm = TRUE})}
+\item{...}{If a function is provided for \code{stat}, additional arguments to pass to the \code{stat} function (e.g. if \code{stat = mean}, users may want to set \code{na.rm = TRUE}).}
 }
 \value{
 SpatRaster that includes a raster layer of genetic diversity and a raster layer of the number of samples within the window for each cell

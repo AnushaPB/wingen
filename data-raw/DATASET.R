@@ -5,6 +5,7 @@ lyr <- read.csv("inst/extdata/middle_earth.csv", header = FALSE)
 lotr_lyr <- terra::rast(as.matrix(lyr))
 terra::ext(lotr_lyr) <- terra::ext(0, 100, -100, 0)
 lotr_lyr <- raster::raster(lotr_lyr)
+names(lotr_lyr) <- "lyr"
 usethis::use_data(lotr_lyr, overwrite = TRUE)
 
 # make a fake range map

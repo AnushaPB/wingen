@@ -1,8 +1,8 @@
 #' Calculate mean allelic richness
 #'
-#' @param genind genind
+#' @param genind Genind object.
 #'
-#' @return allelic richness averaged across all loci
+#' @return allelic richness averaged across all loci.
 #'
 #' @noRd
 calc_mean_ar <- function(genind) {
@@ -14,9 +14,9 @@ calc_mean_ar <- function(genind) {
 
 #' Helper function to calculate allelic richness
 #'
-#' @param genind genind object
+#' @param genind Genind object.
 #'
-#' @return allelic richness
+#' @return allelic richness.
 #'
 #' @noRd
 helper_calc_ar <- function(genind) {
@@ -38,7 +38,7 @@ helper_calc_ar <- function(genind) {
 
 #' Calculate mean heterozygosity
 #'
-#' @param hetmat matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote)
+#' @param hetmat Matrix of heterozygosity (0/FALSE = homozygote, 1/TRUE = heterozygote).
 #'
 #' @return heterozygosity averaged across all individuals then all loci
 #'
@@ -58,8 +58,8 @@ calc_mean_het <- function(hetmat) {
 #'
 #' Wrapper for \link[hierfstat]{pi.dosage} function
 #'
-#' @param dos a ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP
-#' @param L length of the sequence (*note:* defaults to NULL which returns the sum over SNPs of nucleotide diversity)
+#' @param dos A ni X nl dosage matrix containing the number of derived/alternate alleles each individual carries at each SNP.
+#' @param L Length of the sequence (*note:* defaults to NULL which returns the sum over SNPs of nucleotide diversity).
 #'
 #' @return nucleotide diversity (pi)
 #'
@@ -72,7 +72,7 @@ calc_pi <- function(dos, L = NULL) {
 
 #' Calculate mean allelic richness for biallelic data
 #'
-#' @param dos dosage matrix
+#' @param dos Dosage matrix.
 #'
 #' @return allelic richness averaged across all loci
 #'
@@ -105,7 +105,7 @@ calc_mean_biar <- function(dos, rarify_alleles = TRUE) {
 
 #' Helper function to calculate allelic richness for a biallelic locus
 #'
-#' @param loc genotypes at a biallelic locus (must have values of 0, 1, or 2)
+#' @param loc Genotypes at a biallelic locus (must have values of 0, 1, or 2).
 #'
 #' @return biallelic richness value
 #'
@@ -143,8 +143,8 @@ helper_calc_biar <- function(loc, rarify_alleles = TRUE, min.n = NULL) {
 
 #' Rarify allele counts (based on \link[hierfstat]{allelic.richness}code)
 #'
-#' @param x allele counts
-#' @param min.n the number of alleles down to which the number of alleles should be rarefied.
+#' @param x Allele counts.
+#' @param min.n The number of alleles down to which the number of alleles should be rarefied.
 #'
 #' @noRd
 raref <- function(x, min.n) {

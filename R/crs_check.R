@@ -1,7 +1,7 @@
 #' Check CRS of coords and layer for window_gd
 #'
-#' @param lyr RasterLayer or SpatRaster
-#' @param coords sf object, data frame, or matrix representing coordinates
+#' @param lyr RasterLayer or SpatRaster.
+#' @param coords Sf object, data frame, or matrix representing coordinates.
 #'
 #' @return NULL
 #'
@@ -25,9 +25,9 @@ crs_check_window <- function(lyr, coords) {
 
 #' Check CRS of coords and layer for krig_gd
 #'
-#' @param r RasterLayer or SpatRaster
-#' @param grd RasterLayer or SpatRaster
-#' @param coords sf object, data frame, or matrix representing coordinates
+#' @param r RasterLayer or SpatRaster.
+#' @param grd RasterLayer or SpatRaster.
+#' @param coords Sf object, data frame, or matrix representing coordinates.
 #'
 #' @return NULL
 #'
