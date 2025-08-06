@@ -8,7 +8,7 @@
 RasterLayer.
 }
 \source{
-Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \doi{10.21220/RKEZ-X707}
 }
 \usage{
 lotr_lyr
@@ -16,6 +16,6 @@ lotr_lyr
 \description{
 RasterLayer of middle earth based on an example digital elevation model of Tolkien’s
 Middle Earth produced by the Center for Geospatial Analysis at William & Mary
-(\href{https://doi.org/10.21220/RKEZ-X707}{Robert, 2020}).
+(Robert, 2020).
 }
 \keyword{datasets}

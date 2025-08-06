@@ -20,10 +20,10 @@
 #'
 #' RasterLayer of middle earth based on an example digital elevation model of Tolkien’s
 #' Middle Earth produced by the Center for Geospatial Analysis at William & Mary
-#' ([Robert, 2020](https://doi.org/10.21220/RKEZ-X707)).
+#' (Robert, 2020).
 #'
 #' @format RasterLayer.
-#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. https://doi.org/10.21220/RKEZ-X707
+#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \doi{10.21220/RKEZ-X707}
 #'
 "lotr_lyr"
 
@@ -67,8 +67,8 @@
 #'
 #' Small RasterLayer of middle earth based on an example digital elevation model of Tolkien's
 #' Middle Earth produced by the Center for Geospatial Analysis at William & Mary
-#' ([Robert, 2020](https://doi.org/10.21220/RKEZ-X707)).
+#' (Robert, 2020).
 #'
 #' @format A RasterLayer of middle earth.
-#' @source Created from simulations in Bishop et al. (2023).
+#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \doi{10.21220/RKEZ-X707}
 "mini_lyr"
