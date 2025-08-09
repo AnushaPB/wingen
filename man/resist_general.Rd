@@ -56,7 +56,7 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{rarify_alleles}{For calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).}
 
-\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).}
+\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for Hardy-Weinberg equilibrium tests (defaults to 0.05).}
 
 \item{transitionFunction}{Function to calculate transition values from grid values (defaults to mean).}
 

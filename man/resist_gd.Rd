@@ -55,7 +55,7 @@ Can either be (1) a single numeric value or (2) a SpatRaster where each pixel is
 
 \item{rarify_alleles}{For calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).}
 
-\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).}
+\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for Hardy-Weinberg equilibrium tests (defaults to 0.05).}
 
 \item{transitionFunction}{Function to calculate transition values from grid values (defaults to mean).}
 
@@ -83,7 +83,7 @@ Current genetic diversity metrics that can be specified with \code{stat} include
 \item \code{"Ho"} for average observed heterozygosity across all sites
 \item \code{"allelic_richness"} for average number of alleles across all sites
 \item \code{"biallelic_richness"} for average allelic richness across all sites for a biallelic dataset (this option is faster than \code{"allelic_richness"})
-\item \code{"hwe"} for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., \code{sig = 0.10}).
+\item \code{"hwe"} for the proportion of sites that are not in Hardy-Weinberg equilibrium, calculated using \code{pegas} \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., \code{sig = 0.10}).
 \item \code{"basic_stats"} for a series of statistics produced by \code{hierfstat} \link[hierfstat]{basic.stats} including
 mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}

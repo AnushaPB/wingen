@@ -50,7 +50,7 @@ window_general(
 
 \item{rarify_alleles}{For calculating \code{"biallelic_richness"}, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).}
 
-\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).}
+\item{sig}{For calculating \code{"hwe"}, significance threshold (i.e., alpha level) to use for Hardy-Weinberg equilibrium tests (defaults to 0.05).}
 
 \item{crop_edges}{Whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE).}
 

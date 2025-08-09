@@ -26,7 +26,7 @@
 #' - `"Ho"` for average observed heterozygosity across all sites
 #' - `"allelic_richness"` for average number of alleles across all sites
 #' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
-#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
+#' - `"hwe"` for the proportion of sites that are not in Hardy-Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
 #' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
 #' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 #' Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}

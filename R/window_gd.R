@@ -15,7 +15,7 @@
 #' @param fun Function to use to summarize rarefaction results (defaults to mean, must take `na.rm = TRUE` as an argument).
 #' @param L For calculating `"pi"`, L argument in \link[hierfstat]{pi.dosage} function. Return the average nucleotide diversity per nucleotide given the length L of the sequence. The wingen default is L = "nvariants", which sets L to the number of variants in the VCF. If L = NULL, returns the sum over SNPs of nucleotide diversity (*note:* L = NULL is the \link[hierfstat]{pi.dosage} default which wingen does not use).
 #' @param rarify_alleles For calculating `"biallelic_richness"`, whether to perform rarefaction of allele counts as in \link[hierfstat]{allelic.richness} (defaults to TRUE).
-#' @param sig For calculating `"hwe"`, significance threshold (i.e., alpha level) to use for hardy-weinberg equilibrium tests (defaults to 0.05).
+#' @param sig For calculating `"hwe"`, significance threshold (i.e., alpha level) to use for Hardy-Weinberg equilibrium tests (defaults to 0.05).
 #' @param crop_edges Whether to remove cells on the edge of the raster where the window is incomplete (defaults to FALSE).
 #' @param ... [deprecated] this was intended to be used to pass additional arguments to the `stat` function, however now formal arguments are used instead (see `L`, `rarify_alleles`, and `sig`). Passing additional arguments using `...` is still possible with the `*_general()` functions.
 #' @details
@@ -29,7 +29,7 @@
 #' - `"Ho"` for average observed heterozygosity across all sites
 #' - `"allelic_richness"` for average number of alleles across all sites
 #' - `"biallelic_richness"` for average allelic richness across all sites for a biallelic dataset (this option is faster than `"allelic_richness"`)
-#' - `"hwe"` for the proportion of sites that are not in Hardy–Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
+#' - `"hwe"` for the proportion of sites that are not in Hardy-Weinberg equilibrium, calculated using `pegas` \link[pegas]{hw.test} at the 0.05 level (other alpha levels  can be specified by adding the sig argument; e.g., `sig = 0.10`).
 #' - `"basic_stats"` for a series of statistics produced by `hierfstat` \link[hierfstat]{basic.stats} including
 #' mean observed heterozygosity (same as Ho), mean gene diversities within population (Hs),
 #' Gene diversities overall (Ht), and Fis following Nei (1987). Population-based statistics (e.g., FST) normally reported by \link[hierfstat]{basic.stats}
