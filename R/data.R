@@ -23,7 +23,7 @@
 #' (Robert, 2020).
 #'
 #' @format RasterLayer.
-#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \url{https://doi.org/10.21220/RKEZ-X707}
+#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \doi{10.21220/RKEZ-X707}
 #'
 "lotr_lyr"
 
@@ -70,5 +70,5 @@
 #' (Robert, 2020).
 #'
 #' @format A RasterLayer of middle earth.
-#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \url{https://doi.org/10.21220/RKEZ-X707}
+#' @source Created from simulations in Bishop et al. (2023) based on Rose, Robert A. (2020) GIS & Middle Earth Presentation & Data Set. William & Mary. \doi{10.21220/RKEZ-X707}
 "mini_lyr"
