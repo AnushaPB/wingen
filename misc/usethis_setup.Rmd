@@ -125,4 +125,4 @@ available::available("wingen")
 Commands to build, check, and release the package to CRAN. Make sure to update the version number in DESCRIPTION, update cran-comments.md, and update NEWS before running these commands:
 R CMD build --compact-vignettes=qpdf wingen
 R CMD check --as-cran wingen_*.tar.gz
-devtools::release()
+devtools::release(args = "--compact-vignettes=qpdf") 
