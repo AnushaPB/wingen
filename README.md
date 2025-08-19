@@ -1,6 +1,3 @@
-
-*Wingen has been temporarily archived on CRAN due to a dependency issue which has now been fixed, we expect it to return after August 18th. Wingen can still be downloaded from GitHub.*
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # wingen <img src="man/figures/logo.png" align="right" height="150"/>
