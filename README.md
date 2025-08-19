@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # wingen <img src="man/figures/logo.png" align="right" height="150"/>
@@ -109,8 +110,8 @@ krige_layer <- disagg(wgd, 2)
 kgd <- wkrig_gd(wgd, krige_layer)
 ```
 
-Finally, the output from `wkrig_gd()` (or `window_gd()`) can be
-masked to exclude areas that fall outside of the study area or that were
+Finally, the output from `wkrig_gd()` (or `window_gd()`) can be masked
+to exclude areas that fall outside of the study area or that were
 undersampled.
 
 ``` r
